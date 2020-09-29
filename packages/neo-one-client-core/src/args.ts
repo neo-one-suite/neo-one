@@ -1,19 +1,29 @@
 // tslint:disable strict-type-predicates
 import {
-  ABI,
   ABIDefault,
   ABIDefaultType,
-  ABIEvent,
-  ABIFunction,
   ABIParameter,
   ABIReturn,
   AddressString,
   addressToScriptHash,
-  assertAttributeUsageJSON,
+  assertAttributeTypeJSON,
   Attribute,
-  AttributeUsage,
+  AttributeTypeModel,
   BufferString,
   common,
+  ContractABI,
+  ContractABIClient,
+  ContractEventDescriptor,
+  ContractEventDescriptorClient,
+  ContractGroup,
+  ContractManifest,
+  ContractManifestClient,
+  ContractMethodDescriptor,
+  ContractMethodDescriptorClient,
+  ContractParameter,
+  ContractPermission,
+  ContractPermissionDescriptor,
+  ECPoint,
   ForwardValue,
   Hash256String,
   InvokeSendUnsafeReceiveTransactionOptions,
@@ -28,14 +38,19 @@ import {
   SmartContractNetworkDefinition,
   SmartContractNetworksDefinition,
   SourceMaps,
+  toAttributeType,
   TransactionOptions,
   Transfer,
+  UInt160,
   UpdateAccountNameOptions,
   UserAccountID,
   wifToPrivateKey,
+  Wildcard,
+  WildcardContainer,
 } from '@neo-one/client-common';
-import { OmitStrict, utils } from '@neo-one/utils';
+import { JSONObject, JSONValue, OmitStrict, utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
+import BN from 'bn.js';
 import _ from 'lodash';
 import { InvalidArgumentError } from './errors';
 
@@ -142,6 +157,14 @@ export const assertNullableBigNumber = (name: string, value?: unknown): BigNumbe
   return assertBigNumber(name, value);
 };
 
+export const assertBN = (name: string, value?: unknown): BN => {
+  if (value == undefined || !BN.isBN(value)) {
+    throw new InvalidArgumentError('BN', name, value);
+  }
+
+  return value;
+};
+
 export const assertArray = (name: string, value?: unknown): readonly unknown[] => {
   if (!Array.isArray(value)) {
     throw new InvalidArgumentError('Array', name, value);
@@ -225,10 +248,57 @@ export const assertUpdateAccountNameOptions = (name: string, value?: unknown): U
   };
 };
 
-const ABI_TYPES = new Set([
+const CONTRACT_PARAMETER_TYPES = new Set([
+  'Any',
   'Signature',
   'Boolean',
   'Address',
+  'Hash160',
+  'Hash256',
+  'Buffer',
+  'PublicKey',
+  'String',
+  'Array',
+  'Map',
+  'Object',
+  'Void',
+  'Integer',
+  'ForwardValue',
+]);
+
+const assertContractParameterType = (name: string, valueIn?: unknown): ContractParameter['type'] => {
+  const value = assertString(name, valueIn);
+
+  if (!CONTRACT_PARAMETER_TYPES.has(value)) {
+    throw new InvalidArgumentError('ContractParameterType', name, value);
+  }
+
+  return value as ContractParameter['type'];
+};
+
+const assertMapProperty = <T, Name extends string, P>(
+  value: T,
+  objectName: string,
+  name: Name,
+  assertType: (name: string, v?: unknown) => P,
+): ReadonlyArray<readonly [P, P]> => {
+  const map = assertProperty(value, objectName, name, assertMap);
+  const result: Array<[P, P]> = [];
+  map.forEach((val, key) => {
+    const keyOut = assertType(`${objectName}.${name}`, key);
+    const valOut = assertType(`${objectName}.${name}`, val);
+
+    // tslint:disable-next-line: no-array-mutation
+    result.push([keyOut, valOut]);
+  });
+
+  return result;
+};
+
+const ABI_TYPES = new Set([
+  'Signature',
+  'Boolean',
+  'Hash160',
   'Hash256',
   'Buffer',
   'PublicKey',
@@ -251,60 +321,58 @@ const assertABIType = (name: string, valueIn?: unknown): ABIReturn['type'] => {
   return value as ABIReturn['type'];
 };
 
-const assertABIProperties = (name: string, value?: unknown): { readonly [key: string]: ABIReturn } => {
+const assertContractParameter = (paramName: string, value?: unknown): ContractParameter => {
   if (!isObject(value)) {
-    throw new InvalidArgumentError('ABIReturn', name, value);
+    throw new InvalidArgumentError('ContractParameter', paramName, value);
   }
 
-  return _.fromPairs(Object.entries(value).map(([k, v]) => [assertString(name, k), assertABIReturn(name, v)]));
-};
+  const type = assertProperty(value, 'ContractParameter', 'type', assertContractParameterType);
+  const name = assertProperty(value, 'ContractParameter', 'name', assertString);
 
-const assertABIReturn = (name: string, value?: unknown): ABIReturn => {
-  if (!isObject(value)) {
-    throw new InvalidArgumentError('ABIReturn', name, value);
-  }
-
-  const type = assertProperty(value, 'ABIReturn', 'type', assertABIType);
-  const optional = assertProperty(value, 'ABIReturn', 'optional', assertNullableBoolean);
-  const forwardedValue = assertProperty(value, 'ABIReturn', 'forwardedValue', assertNullableBoolean);
   switch (type) {
+    case 'Any':
+      return { type, name, value: undefined };
     case 'Signature':
-      return { type, optional, forwardedValue };
+      return { type, name, value: assertProperty(value, 'ContractParameter', 'value', assertString) };
     case 'Boolean':
-      return { type, optional, forwardedValue };
-    case 'Address':
-      return { type, optional, forwardedValue };
+      return { type, name, value: assertProperty(value, 'ContractParameter', 'value', assertBoolean) };
+    case 'Hash160':
+      return { type, name, value: assertProperty(value, 'ContractParameter', 'value', assertAddress) };
     case 'Hash256':
-      return { type, optional, forwardedValue };
+      return { type, name, value: assertProperty(value, 'ContractParameter', 'value', assertHash256) };
     case 'Buffer':
-      return { type, optional, forwardedValue };
+      return { type, name, value: assertProperty(value, 'ContractParameter', 'value', assertBuffer) };
     case 'PublicKey':
-      return { type, optional, forwardedValue };
+      return { type, name, value: assertProperty(value, 'ContractParameter', 'value', assertPublicKey) };
     case 'String':
-      return { type, optional, forwardedValue };
+      return { type, name, value: assertProperty(value, 'ContractParameter', 'value', assertString) };
     case 'Array':
-      return { type, value: assertProperty(value, 'ABIReturn', 'value', assertABIReturn), optional, forwardedValue };
+      return {
+        type,
+        name,
+        value: assertProperty(value, 'ContractParameter', 'value', assertArray).map((param) =>
+          assertContractParameter('Array', param),
+        ),
+      };
     case 'Map':
       return {
         type,
-        key: assertProperty(value, 'ABIReturn', 'key', assertABIReturn),
-        value: assertProperty(value, 'ABIReturn', 'value', assertABIReturn),
-        optional,
-        forwardedValue,
-      };
-    case 'Object':
-      return {
-        type,
-        properties: assertProperty(value, 'ABIReturn', 'properties', assertABIProperties),
-        optional,
-        forwardedValue,
+        name,
+        value: assertMapProperty(value, 'ContractParameter', 'value', assertContractParameter),
       };
     case 'Void':
-      return { type, optional, forwardedValue };
+      return { type, name };
     case 'Integer':
-      return { type, decimals: assertProperty(value, 'ABIReturn', 'decimals', assertNumber), optional, forwardedValue };
-    case 'ForwardValue':
-      return { type, optional, forwardedValue };
+      return {
+        type,
+        name,
+        value: assertProperty(value, 'ContractParameter', 'value', assertBN),
+      };
+    case 'InteropInterface':
+      return {
+        type,
+        name,
+      };
     default:
       /* istanbul ignore next */
       utils.assertNever(type);
@@ -354,11 +422,13 @@ const assertABIParameter = (propName: string, value?: unknown): ABIParameter => 
   const forwardedValue = assertProperty(value, 'ABIParameter', 'forwardedValue', assertNullableBoolean);
 
   switch (type) {
+    case 'Any':
+      return { type, name, optional, default: defaultValue, forwardedValue, rest };
     case 'Signature':
       return { type, name, optional, default: defaultValue, forwardedValue, rest };
     case 'Boolean':
       return { type, name, optional, default: defaultValue, forwardedValue, rest };
-    case 'Address':
+    case 'Hash160':
       return { type, name, optional, default: defaultValue, forwardedValue, rest };
     case 'Hash256':
       return { type, name, optional, default: defaultValue, forwardedValue, rest };
@@ -420,52 +490,375 @@ const assertABIParameter = (propName: string, value?: unknown): ABIParameter => 
   }
 };
 
-const assertABIFunction = (name: string, value?: unknown): ABIFunction => {
+const assertABIProperties = (name: string, value?: unknown): { readonly [key: string]: ABIReturn } => {
   if (!isObject(value)) {
-    throw new InvalidArgumentError('ABIFunction', name, value);
+    throw new InvalidArgumentError('ABIReturn', name, value);
+  }
+
+  return _.fromPairs(Object.entries(value).map(([k, v]) => [assertString(name, k), assertABIReturn(name, v)]));
+};
+
+const assertABIReturn = (name: string, value?: unknown): ABIReturn => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('ABIReturn', name, value);
+  }
+
+  const type = assertProperty(value, 'ABIReturn', 'type', assertABIType);
+  const optional = assertProperty(value, 'ABIReturn', 'optional', assertNullableBoolean);
+  const forwardedValue = assertProperty(value, 'ABIReturn', 'forwardedValue', assertNullableBoolean);
+  switch (type) {
+    case 'Any':
+      return { type, optional, forwardedValue };
+    case 'Signature':
+      return { type, optional, forwardedValue };
+    case 'Boolean':
+      return { type, optional, forwardedValue };
+    case 'Hash160':
+      return { type, optional, forwardedValue };
+    case 'Hash256':
+      return { type, optional, forwardedValue };
+    case 'Buffer':
+      return { type, optional, forwardedValue };
+    case 'PublicKey':
+      return { type, optional, forwardedValue };
+    case 'String':
+      return { type, optional, forwardedValue };
+    case 'Array':
+      return { type, value: assertProperty(value, 'ABIReturn', 'value', assertABIReturn), optional, forwardedValue };
+    case 'Map':
+      return {
+        type,
+        key: assertProperty(value, 'ABIReturn', 'key', assertABIReturn),
+        value: assertProperty(value, 'ABIReturn', 'value', assertABIReturn),
+        optional,
+        forwardedValue,
+      };
+    case 'Object':
+      return {
+        type,
+        properties: assertProperty(value, 'ABIReturn', 'properties', assertABIProperties),
+        optional,
+        forwardedValue,
+      };
+    case 'Void':
+      return { type, optional, forwardedValue };
+    case 'Integer':
+      return { type, decimals: assertProperty(value, 'ABIReturn', 'decimals', assertNumber), optional, forwardedValue };
+    case 'ForwardValue':
+      return { type, optional, forwardedValue };
+    default:
+      /* istanbul ignore next */
+      utils.assertNever(type);
+      /* istanbul ignore next */
+      throw new Error('For TS');
+  }
+};
+
+const assertContractMethodDescriptorClient = (name: string, value?: unknown): ContractMethodDescriptorClient => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('ContractMethodDescriptorClient', name, value);
   }
 
   return {
-    name: assertProperty(value, 'ABIFunction', 'name', assertString),
-    parameters: assertProperty(value, 'ABIFunction', 'parameters', assertNullableArray).map((parameter) =>
-      assertABIParameter('ABIFunction.parameters', parameter),
-    ),
-    returnType: assertProperty(value, 'ABIFunction', 'returnType', assertABIReturn),
-    constant: assertProperty(value, 'ABIFunction', 'constant', assertNullableBoolean),
-    send: assertProperty(value, 'ABIFunction', 'send', assertNullableBoolean),
-    sendUnsafe: assertProperty(value, 'ABIFunction', 'sendUnsafe', assertNullableBoolean),
-    receive: assertProperty(value, 'ABIFunction', 'receive', assertNullableBoolean),
-    claim: assertProperty(value, 'ABIFunction', 'claim', assertNullableBoolean),
-    refundAssets: assertProperty(value, 'ABIFunction', 'refundAssets', assertNullableBoolean),
-    completeSend: assertProperty(value, 'ABIFunction', 'completeSend', assertNullableBoolean),
+    name: assertProperty(value, 'ContractMethodDescriptorClient', 'name', assertString),
+    parameters: assertProperty(
+      value,
+      'ContractMethodDescriptorClient',
+      'parameters',
+      assertNullableArray,
+    ).map((parameter) => assertABIParameter('ContractMethodDescriptorClient.parameters', parameter)),
+    returnType: assertProperty(value, 'ContractMethodDescriptorClient', 'returnType', assertABIReturn),
+    constant: assertProperty(value, 'ContractMethodDescriptorClient', 'constant', assertNullableBoolean),
+    send: assertProperty(value, 'ContractMethodDescriptorClient', 'send', assertNullableBoolean),
+    sendUnsafe: assertProperty(value, 'ContractMethodDescriptorClient', 'sendUnsafe', assertNullableBoolean),
+    receive: assertProperty(value, 'ContractMethodDescriptorClient', 'receive', assertNullableBoolean),
+    claim: assertProperty(value, 'ContractMethodDescriptorClient', 'claim', assertNullableBoolean),
+    refundAssets: assertProperty(value, 'ContractMethodDescriptorClient', 'refundAssets', assertNullableBoolean),
+    completeSend: assertProperty(value, 'ContractMethodDescriptorClient', 'completeSend', assertNullableBoolean),
   };
 };
 
-const assertABIEvent = (name: string, value?: unknown): ABIEvent => {
+const assertContractMethodDescriptor = (name: string, value?: unknown): ContractMethodDescriptor => {
   if (!isObject(value)) {
-    throw new InvalidArgumentError('ABIEvent', name, value);
+    throw new InvalidArgumentError('ContractMethodDescriptor', name, value);
   }
 
   return {
-    name: assertProperty(value, 'ABIEvent', 'name', assertString),
-    parameters: assertProperty(value, 'ABIEvent', 'parameters', assertNullableArray).map((parameter) =>
-      assertABIParameter('ABIEvent.parameters', parameter),
+    name: assertProperty(value, 'ContractMethodDescriptor', 'name', assertString),
+    parameters: assertProperty(value, 'ContractMethodDescriptor', 'parameters', assertNullableArray).map((parameter) =>
+      assertContractParameter('ContractMethodDescriptor.parameters', parameter),
+    ),
+    returnType: assertProperty(value, 'ContractMethodDescriptor', 'returnType', assertContractParameterType),
+    offset: assertProperty(value, 'ContractMethodDescriptor', 'offset', assertNullableNumber),
+  };
+};
+
+const assertContractEventDescriptorClient = (name: string, value?: unknown): ContractEventDescriptorClient => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('ContractEventDescriptorClient', name, value);
+  }
+
+  return {
+    name: assertProperty(value, 'ContractEventDescriptorClient', 'name', assertString),
+    parameters: assertProperty(
+      value,
+      'ContractEventDescriptorClient',
+      'parameters',
+      assertNullableArray,
+    ).map((parameter) => assertABIParameter('ContractEventDescriptorClient.parameters', parameter)),
+  };
+};
+
+const assertContractEventDescriptor = (name: string, value?: unknown): ContractEventDescriptor => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('ContractEventDescriptor', name, value);
+  }
+
+  return {
+    name: assertProperty(value, 'ContractEventDescriptor', 'name', assertString),
+    parameters: assertProperty(value, 'ContractEventDescriptor', 'parameters', assertNullableArray).map((parameter) =>
+      assertContractParameter('ContractEventDescriptor.parameters', parameter),
     ),
   };
 };
 
-export const assertABI = (name: string, value?: unknown): ABI => {
+export const assertContractABIClient = (name: string, value?: unknown): ContractABIClient => {
   if (!isObject(value)) {
-    throw new InvalidArgumentError('ABI', name, value);
+    throw new InvalidArgumentError('ContractABI', name, value);
   }
 
   return {
-    functions: assertProperty(value, 'ABI', 'functions', assertNullableArray).map((func) =>
-      assertABIFunction('ABI.functions', func),
+    hash: assertProperty(value, 'ContractABI', 'hash', assertUInt160),
+    methods: assertProperty(value, 'ContractABI', 'methods', assertArray).map((method) =>
+      assertContractMethodDescriptorClient('ContractABI.methods', method),
     ),
-    events: assertProperty(value, 'ABI', 'events', assertNullableArray).map((func) =>
-      assertABIEvent('ABI.events', func),
+    events: assertProperty(value, 'ABI', 'events', assertArray).map((func) =>
+      assertContractEventDescriptorClient('ABI.events', func),
     ),
+  };
+};
+
+export const assertContractABI = (name: string, value?: unknown): ContractABI => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('ContractABI', name, value);
+  }
+
+  return {
+    hash: assertProperty(value, 'ContractABI', 'hash', assertUInt160),
+    methods: assertProperty(value, 'ContractABI', 'methods', assertArray).map((method) =>
+      assertContractMethodDescriptor('ContractABI.methods', method),
+    ),
+    events: assertProperty(value, 'ABI', 'events', assertArray).map((func) =>
+      assertContractEventDescriptor('ABI.events', func),
+    ),
+  };
+};
+
+export const assertWildcardContainer = (name: string, value: unknown): WildcardContainer<unknown> => {
+  if (value === undefined || value === '*') {
+    return '*';
+  }
+  if (!Array.isArray(value) && value !== '*') {
+    throw new InvalidArgumentError('WildcardContainer', name, value);
+  }
+
+  return value;
+};
+
+export const assertWildcardContainerProperty = <T, Name extends string, P>(
+  value: T,
+  objectName: string,
+  name: Name,
+  assertType: (name: string, v?: unknown) => P,
+): readonly P[] | Wildcard => {
+  const wildcardOrArray = assertProperty(value, objectName, name, assertWildcardContainer);
+  if (wildcardOrArray === '*') {
+    return '*';
+  }
+
+  return assertProperty(value, objectName, name, assertArray).map((val) => assertType(`${objectName}.${name}`, val));
+};
+
+export const isJSON = (value?: unknown): value is JSONObject => {
+  if (value === undefined) {
+    return false;
+  }
+
+  if (!isObject(value)) {
+    return false;
+  }
+
+  try {
+    Object.keys(value).forEach((key) => assertString('JSONObject', key));
+    Object.values(value).forEach((val) => assertJSONValue('JSONObject', val));
+  } catch {
+    return false;
+  }
+
+  return true;
+};
+
+export const isJSONValue = (value?: unknown): value is JSONValue => {
+  if (value === undefined) {
+    return false;
+  }
+  if (typeof value === 'object') {
+    return isJSON(value);
+  }
+  if (Array.isArray(value)) {
+    return value.every(isJSONValue);
+  }
+
+  return true;
+};
+
+export const assertJSONValue = (name: string, value?: unknown): JSONValue => {
+  if (!isJSONValue(value)) {
+    throw new InvalidArgumentError('JSONObject', name, value);
+  }
+
+  return value;
+};
+
+export const assertNullableJSON = (name: string, value?: unknown): JSONObject => {
+  if (value === undefined) {
+    return {};
+  }
+
+  if (!isJSON(value)) {
+    throw new InvalidArgumentError('JSONObject', name, value);
+  }
+
+  return value;
+};
+
+const assertUInt160 = (name: string, value?: unknown): UInt160 => {
+  const valueIn = assertString(name, value);
+
+  return common.stringToUInt160(valueIn);
+};
+
+// TODO: should this assert some sort of string? Like an ECPointString?
+const assertECPoint = (name: string, value?: unknown): ECPoint => {
+  const valueIn = assertString(name, value);
+
+  return common.stringToECPoint(valueIn);
+};
+
+// TODO: check logic here
+const assertHashOrGroup = (name: string, value?: unknown): ECPoint | UInt160 | Wildcard => {
+  const valueIn = assertString(name, value);
+  if (valueIn === '*') {
+    return '*';
+  }
+
+  try {
+    return assertUInt160(valueIn);
+  } catch {
+    // do nothing
+  }
+
+  try {
+    return assertECPoint(valueIn);
+  } catch {
+    // do nothing
+  }
+
+  return '*';
+};
+
+export const assertContractManifestClient = (name: string, value?: unknown): ContractManifestClient => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('ContractManifest', name, value);
+  }
+
+  return {
+    hash: assertProperty(value, 'ContractManifest', 'hash', assertUInt160),
+    hashHex: assertProperty(value, 'ContractManifest', 'hashHex', assertString),
+    groups: assertProperty(value, 'ContractManifest', 'groups', assertArray).map((group) =>
+      assertContractGroup('ContractManifest.groups', group),
+    ),
+    features: {
+      storage: assertProperty(value, 'ContractManifest', 'hasStorage', assertBoolean),
+      payable: assertProperty(value, 'ContractManifest', 'payable', assertBoolean),
+    },
+    supportedStandards: assertProperty(value, 'ContractManifest', 'supportedStandards', assertArray).map((std) =>
+      assertString('ContractManifest.supportedStandards', std),
+    ),
+    abi: assertProperty(value, 'ContractManifest', 'abi', assertContractABIClient),
+    permissions: assertProperty(value, 'ContractManifest', 'permissions', assertArray).map((permission) =>
+      assertContractPermission('ContractManifest.permissions', permission),
+    ),
+    trusts: assertWildcardContainerProperty(value, 'ContractManifest', 'trusts', assertUInt160),
+    safeMethods: assertWildcardContainerProperty(value, 'ContractManifest', 'safeMethods', assertString),
+    extra: assertProperty(value, 'ContractManifest', 'extra', assertNullableJSON),
+    hasStorage: assertProperty(value, 'ContractManifest', 'hasStorage', assertBoolean),
+    payable: assertProperty(value, 'ContractManifest', 'payable', assertBoolean),
+  };
+};
+
+export const assertContractManifest = (name: string, value?: unknown): ContractManifest => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('ContractManifest', name, value);
+  }
+
+  return {
+    hash: assertProperty(value, 'ContractManifest', 'hash', assertUInt160),
+    hashHex: assertProperty(value, 'ContractManifest', 'hashHex', assertString),
+    groups: assertProperty(value, 'ContractManifest', 'groups', assertArray).map((group) =>
+      assertContractGroup('ContractManifest.groups', group),
+    ),
+    features: {
+      storage: assertProperty(value, 'ContractManifest', 'hasStorage', assertBoolean),
+      payable: assertProperty(value, 'ContractManifest', 'payable', assertBoolean),
+    },
+    supportedStandards: assertProperty(value, 'ContractManifest', 'supportedStandards', assertArray).map((std) =>
+      assertString('ContractManifest.supportedStandards', std),
+    ),
+    abi: assertProperty(value, 'ContractManifest', 'abi', assertContractABI),
+    permissions: assertProperty(value, 'ContractManifest', 'permissions', assertArray).map((permission) =>
+      assertContractPermission('ContractManifest.permissions', permission),
+    ),
+    trusts: assertWildcardContainerProperty(value, 'ContractManifest', 'trusts', assertUInt160),
+    safeMethods: assertWildcardContainerProperty(value, 'ContractManifest', 'safeMethods', assertString),
+    extra: assertProperty(value, 'ContractManifest', 'extra', assertNullableJSON),
+    hasStorage: assertProperty(value, 'ContractManifest', 'hasStorage', assertBoolean),
+    payable: assertProperty(value, 'ContractManifest', 'payable', assertBoolean),
+  };
+};
+
+const assertContractPermission = (name: string, value?: unknown): ContractPermission => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('ContractPermission', name, value);
+  }
+
+  return {
+    contract: assertProperty(value, 'ContractPermission', 'contract', assertContractPermissionDescriptor),
+    methods: assertWildcardContainerProperty(value, 'ContractPermission', 'methods', assertString),
+  };
+};
+
+const assertContractPermissionDescriptor = (name: string, value?: unknown): ContractPermissionDescriptor => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('ContractPermissionDescriptor', name, value);
+  }
+
+  return {
+    hashOrGroup: assertProperty(value, 'ContractPermissionDescriptor', 'hashOrGroup', assertHashOrGroup),
+    isHash: assertProperty(value, 'ContractPermissionDescriptor', 'isHash', assertBoolean),
+    isGroup: assertProperty(value, 'ContractPermissionDescriptor', 'isGroup', assertBoolean),
+    isWildcard: assertProperty(value, 'ContractPermissionDescriptor', 'isWildcard', assertBoolean),
+  };
+};
+
+const assertContractGroup = (name: string, value?: unknown): ContractGroup => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('ContractGroup', name, value);
+  }
+
+  return {
+    publicKey: assertProperty(value, 'ContractGroup', 'publicKey', assertECPoint),
+    signature: assertProperty(value, 'ContractGroup', 'signature', assertBuffer),
   };
 };
 
@@ -504,7 +897,7 @@ export const assertSmartContractDefinition = (name: string, value?: unknown): Sm
 
   return {
     networks: assertProperty(value, 'SmartContractDefinition', 'networks', assertSmartContractNetworksDefinition),
-    abi: assertProperty(value, 'SmartContractDefinition', 'abi', assertABI),
+    manifest: assertProperty(value, 'SmartContractDefinition', 'manfifest', assertContractManifestClient),
     sourceMaps: assertProperty(value, 'SmartContractDefinition', 'sourceMaps', assertSourceMaps),
   };
 };
@@ -589,12 +982,12 @@ export const assertTransfers = (name: string, valueIn?: unknown): readonly Trans
   return value.map((val) => assertTransfer(name, val));
 };
 
-const assertAttributeUsage = (name: string, valueIn?: unknown): AttributeUsage => {
+const assertAttributeTypeArg = (name: string, valueIn?: unknown): AttributeTypeModel => {
   const value = assertString(name, valueIn);
   try {
-    return assertAttributeUsageJSON(value);
+    return toAttributeType(assertAttributeTypeJSON(value));
   } catch {
-    throw new InvalidArgumentError('AttributeUsage', name, value);
+    throw new InvalidArgumentError('AttributeType', name, value);
   }
 };
 
@@ -603,68 +996,9 @@ export const assertAttribute = (name: string, attribute?: unknown): Attribute =>
     throw new InvalidArgumentError('Attribute', name, attribute);
   }
 
-  const usage = assertProperty(attribute, 'Attribute', 'usage', assertAttributeUsage);
-  switch (usage) {
-    case 'ContractHash':
-    case 'Vote':
-    case 'Hash1':
-    case 'Hash2':
-    case 'Hash3':
-    case 'Hash4':
-    case 'Hash5':
-    case 'Hash6':
-    case 'Hash7':
-    case 'Hash8':
-    case 'Hash9':
-    case 'Hash10':
-    case 'Hash11':
-    case 'Hash12':
-    case 'Hash13':
-    case 'Hash14':
-    case 'Hash15':
-      return {
-        usage,
-        data: assertProperty(attribute, 'Attribute', 'data', assertHash256),
-      };
-    case 'Script':
-      return {
-        usage,
-        data: assertProperty(attribute, 'Attribute', 'data', assertAddress),
-      };
-    case 'ECDH02':
-    case 'ECDH03':
-      return {
-        usage,
-        data: assertProperty(attribute, 'Attribute', 'data', assertPublicKey),
-      };
-    case 'DescriptionUrl':
-    case 'Description':
-    case 'Remark':
-    case 'Remark1':
-    case 'Remark2':
-    case 'Remark3':
-    case 'Remark4':
-    case 'Remark5':
-    case 'Remark6':
-    case 'Remark7':
-    case 'Remark8':
-    case 'Remark9':
-    case 'Remark10':
-    case 'Remark11':
-    case 'Remark12':
-    case 'Remark13':
-    case 'Remark14':
-    case 'Remark15':
-      return {
-        usage,
-        data: assertProperty(attribute, 'Attribute', 'data', assertBuffer),
-      };
-    default:
-      /* istanbul ignore next */
-      utils.assertNever(usage);
-      /* istanbul ignore next */
-      throw new Error('For TS');
-  }
+  return {
+    type: assertProperty(attribute, 'Attribute', 'type', assertAttributeTypeArg),
+  };
 };
 
 export const assertTransactionOptions = (name: string, options?: unknown): TransactionOptions => {
@@ -720,12 +1054,6 @@ export const assertInvokeSendUnsafeReceiveTransactionOptions = (
     ),
     sendTo: assertProperty(options, 'InvokeSendUnsafeReceiveTransactionOptions', 'sendTo', assertNullableSendTo),
     sendFrom: assertProperty(options, 'InvokeSendUnsafeReceiveTransactionOptions', 'sendFrom', assertNullableSendFrom),
-    skipSysFeeCheck: assertProperty(
-      options,
-      'InvokeSendUnsafeReceiveTransactionOptions',
-      'skipSysFeeCheck',
-      assertNullableBoolean,
-    ),
   };
 };
 

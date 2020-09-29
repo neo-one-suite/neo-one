@@ -1,33 +1,25 @@
 import {
-  ABI,
-  addressToScriptHash,
-  AssetType,
-  AssetTypeModel,
+  ABIParameter,
+  ABIReturn,
   BufferString,
-  common,
   Contract,
-  ContractParameterType,
+  ContractManifestClient,
   ContractParameterTypeModel,
   crypto,
-  InvocationResultError,
-  InvocationResultSuccess,
-  InvocationTransaction,
-  IssueTransaction,
   NetworkSettings,
   NetworkType,
   Param,
   RawInvocationData,
-  RawInvocationResultError,
-  RawInvocationResultSuccess,
   RawInvokeReceipt,
+  RawTransactionResultError,
+  RawTransactionResultSuccess,
   ScriptBuilder,
   SourceMaps,
   TransactionOptions,
-  TransactionReceipt,
   TransactionResult,
-  Transfer,
+  TransactionResultError,
+  TransactionResultSuccess,
   UserAccountID,
-  utils,
 } from '@neo-one/client-common';
 import {
   convertParams,
@@ -36,29 +28,39 @@ import {
   LocalUserAccountProvider as LocalUserAccountProviderLite,
   Provider as ProviderLite,
 } from '@neo-one/client-core';
-import { ContractModel, getContractProperties, IssueTransactionModel } from '@neo-one/client-full-common';
+import {
+  ContractABIModel,
+  ContractEventDescriptorModel,
+  ContractGroupModel,
+  ContractManifestModel,
+  ContractMethodDescriptorModel,
+  ContractParameterDefinitionModel,
+  ContractPermissionDescriptorModel,
+  ContractPermissionModel,
+  ContractStateModel,
+  getContractProperties,
+} from '@neo-one/client-full-common';
 import { processActionsAndMessage, processConsoleLogMessages } from '@neo-one/client-switch';
 import { utils as commonUtils } from '@neo-one/utils';
-import { NothingToIssueError } from '../errors';
 import {
-  AssetRegister,
   ContractRegister,
   DataProvider,
   InvokeExecuteTransactionOptions,
   PublishReceipt,
-  RegisterAssetReceipt,
   UserAccountProvider,
 } from '../types';
 
-const toContractParameterType = (parameter: ContractParameterType): ContractParameterTypeModel => {
-  switch (parameter) {
+const toContractParameterType = (parameter: ABIReturn | ABIParameter): ContractParameterTypeModel => {
+  switch (parameter.type) {
+    case 'Any':
+      return ContractParameterTypeModel.Any;
     case 'Signature':
       return ContractParameterTypeModel.Signature;
     case 'Boolean':
       return ContractParameterTypeModel.Boolean;
     case 'Integer':
       return ContractParameterTypeModel.Integer;
-    case 'Address':
+    case 'Hash160':
       return ContractParameterTypeModel.Hash160;
     case 'Hash256':
       return ContractParameterTypeModel.Hash256;
@@ -70,9 +72,10 @@ const toContractParameterType = (parameter: ContractParameterType): ContractPara
       return ContractParameterTypeModel.String;
     case 'Array':
       return ContractParameterTypeModel.Array;
+    case 'Object': // TODO: is this correct?
     case 'Map':
       return ContractParameterTypeModel.Map;
-    case 'InteropInterface':
+    case 'ForwardValue': // TODO: is this correct?
       return ContractParameterTypeModel.InteropInterface;
     case 'Void':
       return ContractParameterTypeModel.Void;
@@ -84,30 +87,64 @@ const toContractParameterType = (parameter: ContractParameterType): ContractPara
   }
 };
 
-const toAssetType = (assetType: AssetType): AssetTypeModel => {
-  switch (assetType) {
-    case 'Credit':
-      return AssetTypeModel.CreditFlag;
-    case 'Duty':
-      return AssetTypeModel.DutyFlag;
-    case 'Governing':
-      return AssetTypeModel.GoverningToken;
-    case 'Utility':
-      return AssetTypeModel.UtilityToken;
-    case 'Currency':
-      return AssetTypeModel.Currency;
-    case 'Share':
-      return AssetTypeModel.Share;
-    case 'Invoice':
-      return AssetTypeModel.Invoice;
-    case 'Token':
-      return AssetTypeModel.Token;
-    default:
-      /* istanbul ignore next */
-      commonUtils.assertNever(assetType);
-      /* istanbul ignore next */
-      throw new Error('For TS');
-  }
+const contractRegisterToContractModel = (contractIn: ContractRegister): ContractStateModel => {
+  const abi = new ContractABIModel({
+    hash: contractIn.manifest.abi.hash,
+    methods: contractIn.manifest.abi.methods.map(
+      (methodIn) =>
+        new ContractMethodDescriptorModel({
+          returnType: toContractParameterType(methodIn.returnType),
+          offset: methodIn.offset,
+          name: methodIn.name,
+          parameters:
+            methodIn.parameters === undefined
+              ? []
+              : methodIn.parameters.map(
+                  (param) =>
+                    new ContractParameterDefinitionModel({
+                      type: toContractParameterType(param),
+                      name: param.name,
+                    }),
+                ),
+        }),
+    ),
+    events: contractIn.manifest.abi.events.map(
+      (event) =>
+        new ContractEventDescriptorModel({
+          name: event.name,
+          parameters: event.parameters.map(
+            (param) => new ContractParameterDefinitionModel({ type: toContractParameterType(param), name: param.name }),
+          ),
+        }),
+    ),
+  });
+  const manifest = new ContractManifestModel({
+    groups: contractIn.manifest.groups.map(
+      (group) => new ContractGroupModel({ publicKey: group.publicKey, signature: Buffer.from(group.signature, 'hex') }),
+    ),
+    features: getContractProperties({
+      hasStorage: contractIn.manifest.features.storage,
+      payable: contractIn.manifest.features.payable,
+    }),
+    supportedStandards: contractIn.manifest.supportedStandards,
+    abi,
+    permissions: contractIn.manifest.permissions.map(
+      (perm) =>
+        new ContractPermissionModel({
+          contract: new ContractPermissionDescriptorModel(perm.contract),
+          methods: perm.methods,
+        }),
+    ),
+    trusts: contractIn.manifest.trusts,
+    safeMethods: contractIn.manifest.safeMethods,
+    extra: contractIn.manifest.extra,
+  });
+
+  return new ContractStateModel({
+    script: Buffer.from(contractIn.script, 'hex'),
+    id: contractIn.id,
+    manifest,
+  });
 };
 
 export interface Provider extends ProviderLite {
@@ -125,7 +162,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   public async publish(
     contract: ContractRegister,
     options?: TransactionOptions,
-  ): Promise<TransactionResult<PublishReceipt, InvocationTransaction>> {
+  ): Promise<TransactionResult<PublishReceipt>> {
     return this.publishBase(
       'publish',
       contract,
@@ -139,16 +176,16 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
 
   public async publishAndDeploy(
     contract: ContractRegister,
-    abi: ABI,
+    manifest: ContractManifestClient,
     params: readonly Param[],
     options?: TransactionOptions,
     sourceMaps: SourceMaps = {},
-  ): Promise<TransactionResult<PublishReceipt, InvocationTransaction>> {
+  ): Promise<TransactionResult<PublishReceipt>> {
     return this.publishBase(
       'publish',
       contract,
       (sb, from) => {
-        const deployFunc = abi.functions.find((func) => func.name === 'deploy');
+        const deployFunc = manifest.abi.methods.find((func) => func.name === 'deploy');
         if (deployFunc !== undefined) {
           // []
           sb.emitOp('DROP');
@@ -162,7 +199,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
               senderAddress: from.address,
             }).converted,
           );
-          sb.emitOp('THROWIFNOT');
+          sb.emitOp('ASSERT');
         }
       },
       sourceMaps,
@@ -170,105 +207,11 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     );
   }
 
-  public async registerAsset(
-    asset: AssetRegister,
-    options?: TransactionOptions,
-  ): Promise<TransactionResult<RegisterAssetReceipt, InvocationTransaction>> {
-    const sb = new ScriptBuilder();
-
-    sb.emitSysCall(
-      'Neo.Asset.Create',
-      toAssetType(asset.type),
-      asset.name,
-      utils.bigNumberToBN(asset.amount, 8),
-      asset.precision,
-      common.stringToECPoint(asset.owner),
-      common.stringToUInt160(addressToScriptHash(asset.admin)),
-      common.stringToUInt160(addressToScriptHash(asset.issuer)),
-    );
-
-    return this.invokeRaw({
-      invokeMethodOptionsOrScript: sb.build(),
-      options,
-      onConfirm: async ({ receipt, data }): Promise<RegisterAssetReceipt> => {
-        let result;
-        if (data.result.state === 'FAULT') {
-          result = await this.getInvocationResultError(data, data.result);
-        } else {
-          const createdAsset = data.asset;
-          if (createdAsset === undefined) {
-            /* istanbul ignore next */
-            throw new InvalidTransactionError(
-              'Something went wrong! Expected a asset to have been created, but none was found',
-            );
-          }
-
-          result = await this.getInvocationResultSuccess(data, data.result, createdAsset);
-        }
-
-        return {
-          blockIndex: receipt.blockIndex,
-          blockHash: receipt.blockHash,
-          transactionIndex: receipt.transactionIndex,
-          globalIndex: receipt.globalIndex,
-          result,
-        };
-      },
-      method: 'registerAsset',
-    });
-  }
-
-  public async issue(
-    transfers: readonly Transfer[],
-    options?: TransactionOptions,
-  ): Promise<TransactionResult<TransactionReceipt, IssueTransaction>> {
-    const { from, attributes, networkFee } = this.getTransactionOptions(options);
-
-    return this.capture(
-      async () => {
-        if (transfers.length === 0) {
-          throw new NothingToIssueError();
-        }
-
-        const settings = await this.provider.getNetworkSettings(from.network);
-        const { inputs, outputs } = await this.getTransfersInputOutputs({
-          transfers: [],
-          from,
-          gas: networkFee.plus(settings.issueGASFee),
-        });
-
-        const issueOutputs = outputs.concat(
-          transfers.map((transfer) => ({
-            address: transfer.to,
-            asset: transfer.asset,
-            value: transfer.amount,
-          })),
-        );
-
-        const transaction = new IssueTransactionModel({
-          inputs: this.convertInputs(inputs),
-          outputs: this.convertOutputs(issueOutputs),
-          attributes: this.convertAttributes(attributes),
-        });
-
-        return this.sendTransaction<IssueTransaction>({
-          inputs,
-          from,
-          transaction,
-          onConfirm: async ({ receipt }) => receipt,
-        });
-      },
-      {
-        name: 'neo_issue',
-      },
-    );
-  }
-
   public async __execute(
     script: BufferString,
     options: InvokeExecuteTransactionOptions = {},
     sourceMaps: SourceMaps = {},
-  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
+  ): Promise<TransactionResult<RawInvokeReceipt>> {
     const { from } = this.getTransactionOptions(options);
 
     return this.invokeRaw({
@@ -278,8 +221,11 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
         blockIndex: receipt.blockIndex,
         blockHash: receipt.blockHash,
+        blockTime: receipt.blockTime,
         transactionIndex: receipt.transactionIndex,
+        transactionHash: receipt.transactionHash,
         globalIndex: receipt.globalIndex,
+        confirmations: receipt.confirmations,
         result: data.result,
         actions: data.actions,
       }),
@@ -294,36 +240,11 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     emit: (sb: ScriptBuilder, from: UserAccountID) => void,
     sourceMaps: SourceMaps = {},
     options?: TransactionOptions,
-  ): Promise<TransactionResult<PublishReceipt, InvocationTransaction>> {
-    const contract = new ContractModel({
-      script: Buffer.from(contractIn.script, 'hex'),
-      parameterList: contractIn.parameters.map(toContractParameterType),
-      returnType: toContractParameterType(contractIn.returnType),
-      name: contractIn.name,
-      codeVersion: contractIn.codeVersion,
-      author: contractIn.author,
-      email: contractIn.email,
-      description: contractIn.description,
-      contractProperties: getContractProperties({
-        hasDynamicInvoke: contractIn.dynamicInvoke,
-        hasStorage: contractIn.storage,
-        payable: contractIn.payable,
-      }),
-    });
+  ): Promise<TransactionResult<PublishReceipt>> {
+    const contract = contractRegisterToContractModel(contractIn);
 
     const sb = new ScriptBuilder();
-    sb.emitSysCall(
-      'Neo.Contract.Create',
-      contract.script,
-      Buffer.from([...contract.parameterList]),
-      contract.returnType,
-      contract.contractProperties,
-      contract.name,
-      contract.codeVersion,
-      contract.author,
-      contract.email,
-      contract.description,
-    );
+    sb.emitSysCall('System.Contract.Create', contract.script, contract.manifest.serializeWire());
     const { from } = this.getTransactionOptions(options);
     emit(sb, from);
 
@@ -351,6 +272,9 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           blockHash: receipt.blockHash,
           transactionIndex: receipt.transactionIndex,
           globalIndex: receipt.globalIndex,
+          blockTime: receipt.blockTime,
+          transactionHash: receipt.transactionHash,
+          confirmations: receipt.confirmations,
           result,
         };
       },
@@ -361,9 +285,9 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
 
   protected async getInvocationResultError(
     data: RawInvocationData,
-    result: RawInvocationResultError,
+    result: RawTransactionResultError,
     sourceMaps: SourceMaps = {},
-  ): Promise<InvocationResultError> {
+  ): Promise<TransactionResultError> {
     const message = await processActionsAndMessage({
       actions: data.actions,
       message: result.message,
@@ -374,16 +298,17 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       state: result.state,
       gasConsumed: result.gasConsumed,
       gasCost: result.gasCost,
+      script: result.script,
       message,
     };
   }
 
   protected async getInvocationResultSuccess<T>(
     data: RawInvocationData,
-    result: RawInvocationResultSuccess,
+    result: RawTransactionResultSuccess,
     value: T,
     sourceMaps: SourceMaps = {},
-  ): Promise<InvocationResultSuccess<T>> {
+  ): Promise<TransactionResultSuccess<T>> {
     await processConsoleLogMessages({
       actions: data.actions,
       sourceMaps,
@@ -393,6 +318,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       state: result.state,
       gasConsumed: result.gasConsumed,
       gasCost: result.gasCost,
+      script: result.script,
       value,
     };
   }

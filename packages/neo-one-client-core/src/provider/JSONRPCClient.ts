@@ -1,20 +1,15 @@
 import {
-  AccountJSON,
   AddressString,
   addressToScriptHash,
-  AssetJSON,
+  ApplicationLogDataJSON,
   BlockJSON,
   BufferString,
   CallReceiptJSON,
   ContractJSON,
   GetOptions,
   Hash256String,
-  InputJSON,
   InvocationDataJSON,
-  NeoClaimableJSON,
-  NeoUnspentJSON,
   NetworkSettingsJSON,
-  OutputJSON,
   Peer,
   PrivateNetworkSettings,
   RawInvocationResultJSON,
@@ -22,8 +17,9 @@ import {
   StorageItemJSON,
   TransactionJSON,
   TransactionReceiptJSON,
+  UnclaimedGASJSON,
+  VersionJSON,
 } from '@neo-one/client-common';
-import BigNumber from 'bignumber.js';
 import { RelayTransactionError } from '../errors';
 import { JSONRPCProvider, JSONRPCProviderManager } from './JSONRPCProvider';
 
@@ -32,33 +28,6 @@ export class JSONRPCClient {
 
   public constructor(provider: JSONRPCProvider | JSONRPCProviderManager) {
     this.provider = provider;
-  }
-
-  public async getClaimable(address: AddressString): Promise<NeoClaimableJSON> {
-    return this.withInstance(async (provider) =>
-      provider.request({
-        method: 'getclaimable',
-        params: [address],
-      }),
-    );
-  }
-
-  public async getAccount(address: AddressString): Promise<AccountJSON> {
-    return this.withInstance(async (provider) =>
-      provider.request({
-        method: 'getaccountstate',
-        params: [address],
-      }),
-    );
-  }
-
-  public async getAsset(hash: Hash256String): Promise<AssetJSON> {
-    return this.withInstance(async (provider) =>
-      provider.request({
-        method: 'getassetstate',
-        params: [hash],
-      }),
-    );
   }
 
   public async getBlock(hashOrIndex: Hash256String | number, options: GetOptions = {}): Promise<BlockJSON> {
@@ -99,24 +68,6 @@ export class JSONRPCClient {
       provider.request({
         method: 'getrawtransaction',
         params: [hash, 1],
-      }),
-    );
-  }
-
-  public async getUnspentOutput(input: InputJSON): Promise<OutputJSON | undefined> {
-    return this.withInstance(async (provider) =>
-      provider.request({
-        method: 'gettxout',
-        params: [input.txid, input.vout],
-      }),
-    );
-  }
-
-  public async getUnspents(address: AddressString): Promise<NeoUnspentJSON> {
-    return this.withInstance(async (provider) =>
-      provider.request({
-        method: 'getunspents',
-        params: [address],
       }),
     );
   }
@@ -187,23 +138,12 @@ export class JSONRPCClient {
     );
   }
 
-  public async getOutput(input: InputJSON): Promise<OutputJSON> {
+  public async getUnclaimedGas(address: AddressString): Promise<UnclaimedGASJSON> {
     return this.withInstance(async (provider) =>
       provider.request({
-        method: 'getoutput',
-        params: [input.txid, input.vout],
+        method: 'getunclaimedgas',
+        params: [address],
       }),
-    );
-  }
-
-  public async getClaimAmount(input: InputJSON): Promise<BigNumber> {
-    return this.withInstance(async (provider) =>
-      provider
-        .request({
-          method: 'getclaimamount',
-          params: [input.txid, input.vout],
-        })
-        .then((res) => new BigNumber(res)),
     );
   }
 
@@ -241,6 +181,36 @@ export class JSONRPCClient {
     return this.withInstance(async (provider) =>
       provider.request({
         method: 'gettransactionheight',
+        params: [hash],
+      }),
+    );
+  }
+
+  public async getBlockHash(index: number): Promise<readonly string[]> {
+    return this.withInstance(async (provider) =>
+      provider.request({
+        method: 'getblockhash',
+        params: [index],
+      }),
+    );
+  }
+
+  public async getConnectionCount(): Promise<number> {
+    return this.withInstance(async (provider) => provider.request({ method: 'getconnectioncount' }));
+  }
+
+  public async getStorage(address: AddressString, key: BufferString): Promise<StorageItemJSON> {
+    return this.withInstance(async (provider) => provider.request({ method: 'getstorage', params: [address, key] }));
+  }
+
+  public async getVersion(): Promise<VersionJSON> {
+    return this.withInstance(async (provider) => provider.request({ method: 'getversion' }));
+  }
+
+  public async getApplicationLog(hash: Hash256String): Promise<ApplicationLogDataJSON> {
+    return this.withInstance(async (provider) =>
+      provider.request({
+        method: 'getapplicationlog',
         params: [hash],
       }),
     );

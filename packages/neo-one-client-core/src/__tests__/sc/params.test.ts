@@ -27,7 +27,7 @@ describe('params', () => {
   });
 
   test('Address - optional undefined', () => {
-    const result = params.Address(name, undefined, { type: 'Address', optional: true });
+    const result = params.Hash160(name, undefined, { type: 'Hash160', optional: true });
 
     expect(result).toBeUndefined();
   });
@@ -35,7 +35,7 @@ describe('params', () => {
   test('Address - optional defined', () => {
     const value = keys[0].address;
 
-    const result = params.Address(name, value, { type: 'Address', optional: true });
+    const result = params.Hash160(name, value, { type: 'Hash160', optional: true });
 
     expect(result).toMatchSnapshot();
   });
@@ -43,7 +43,7 @@ describe('params', () => {
   test('Address - defined', () => {
     const value = keys[0].address;
 
-    const result = params.Address(name, value, { type: 'Address' });
+    const result = params.Hash160(name, value, { type: 'Hash160' });
 
     expect(result).toMatchSnapshot();
   });

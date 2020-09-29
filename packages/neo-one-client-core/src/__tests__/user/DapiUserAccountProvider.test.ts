@@ -15,9 +15,7 @@ describe('DapiUserAccountProvider', () => {
   const networks = [network];
   const getNetworks = jest.fn(() => networks);
   const getUnclaimed = jest.fn();
-  const getOutput = jest.fn();
   const getTransaction = jest.fn();
-  const getUnspentOutputs = jest.fn();
   const relayTransaction = jest.fn();
   const getTransactionReceipt = jest.fn();
   const getInvocationData = jest.fn();
@@ -25,21 +23,17 @@ describe('DapiUserAccountProvider', () => {
   const getBlockCount = jest.fn();
   const call = jest.fn();
   const iterBlocks = jest.fn();
-  const getAccount = jest.fn();
   const iterActionsRaw = jest.fn();
   const dataProvider: Modifiable<Provider> = {
     networks$: _of(networks),
     getNetworks,
     getUnclaimed,
-    getOutput,
     getTransaction,
-    getUnspentOutputs,
     relayTransaction,
     getTransactionReceipt,
     getInvocationData,
     testInvoke,
     getBlockCount,
-    getAccount,
     iterBlocks,
     iterActionsRaw,
     call,
@@ -58,7 +52,7 @@ describe('DapiUserAccountProvider', () => {
     publicKey: unlockedWallet.userAccount.publicKey,
   };
   const writeResult = {
-    txid: factory.createContractTransaction().hash,
+    txid: factory.createTransaction().hash,
     nodeUrl: 'http://mock.node.com:0000',
   };
 
@@ -112,17 +106,6 @@ describe('DapiUserAccountProvider', () => {
     expect(result).toEqual(blockCount);
   });
 
-  test('getAccount', async () => {
-    const account = {
-      address: unlockedWallet.userAccount.id.address,
-      balances: {},
-    };
-    getAccount.mockImplementation(async () => account);
-    const result = await dapiProvider.getAccount(unlockedWallet.userAccount.id.address, network);
-
-    expect(result).toEqual(account);
-  });
-
   test('iterBlocks', async () => {
     const block = factory.createBlock();
 
@@ -160,8 +143,6 @@ describe('DapiUserAccountProvider', () => {
   test('transfer', async () => {
     await new Promise<void>((resolve) => setTimeout(resolve, 100));
     const transfer = factory.createTransfer();
-    getUnspentOutputs.mockImplementation(async () => [factory.createInputOutput()]);
-    getOutput.mockImplementation(async () => factory.createInputOutput());
 
     const transaction = factory.createContractTransaction();
     getTransaction.mockImplementation(async () => transaction);
@@ -240,20 +221,12 @@ describe('DapiUserAccountProvider', () => {
       ],
     ] as ReadonlyArray<readonly [string, Param | undefined]>;
 
-    const inputOutputs = [
-      factory.createInputOutput(),
-      factory.createInputOutput(),
-      factory.createInputOutput({ asset: common.GAS_ASSET_HASH }),
-      factory.createInputOutput({ asset: common.GAS_ASSET_HASH }),
-    ];
     const invocation = factory.createInvocationTransaction();
     const receipt = factory.createRawCallReceipt();
     const invocationData = factory.createRawInvocationData();
 
     test('invoke', async () => {
       await new Promise<void>((resolve) => setTimeout(resolve, 100));
-      getUnspentOutputs.mockImplementation(async () => inputOutputs);
-      getOutput.mockImplementation(async () => factory.createInputOutput());
       getTransaction.mockImplementation(async () => invocation);
       getTransactionReceipt.mockImplementation(async () => receipt);
       testInvoke.mockImplementation(async () => receipt);
@@ -283,8 +256,6 @@ describe('DapiUserAccountProvider', () => {
       await new Promise<void>((resolve) => setTimeout(resolve, 100));
       const transfer = factory.createTransfer();
 
-      getUnspentOutputs.mockImplementation(async () => inputOutputs);
-      getOutput.mockImplementation(async () => factory.createInputOutput());
       getTransaction.mockImplementation(async () => invocation);
       getTransactionReceipt.mockImplementation(async () => receipt);
       testInvoke.mockImplementation(async () => receipt);
@@ -311,8 +282,6 @@ describe('DapiUserAccountProvider', () => {
 
     test('invokeCompleteSend', async () => {
       await new Promise<void>((resolve) => setTimeout(resolve, 100));
-      getUnspentOutputs.mockImplementation(async () => inputOutputs);
-      getOutput.mockImplementation(async () => factory.createInputOutput());
       getTransaction.mockImplementation(async () => invocation);
       getTransactionReceipt.mockImplementation(async () => receipt);
       testInvoke.mockImplementation(async () => receipt);
@@ -339,8 +308,6 @@ describe('DapiUserAccountProvider', () => {
 
     test('invokeRefundAssets', async () => {
       await new Promise<void>((resolve) => setTimeout(resolve, 100));
-      getUnspentOutputs.mockImplementation(async () => inputOutputs);
-      getOutput.mockImplementation(async () => factory.createInputOutput());
       getTransaction.mockImplementation(async () => invocation);
       getTransactionReceipt.mockImplementation(async () => receipt);
       testInvoke.mockImplementation(async () => receipt);
@@ -367,7 +334,6 @@ describe('DapiUserAccountProvider', () => {
 
     test('invokeClaim - not implemented', async () => {
       await new Promise<void>((resolve) => setTimeout(resolve, 100));
-      getOutput.mockImplementation(async () => factory.createInputOutput());
       getUnclaimed.mockImplementation(async () => ({
         unclaimed: [factory.createInputOutput({ asset: common.GAS_ASSET_HASH })],
         amount: data.bigNumbers.a,

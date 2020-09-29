@@ -13,3 +13,4 @@ export * from './onComplete';
 export * from './retryBackoff';
 export * from './timer';
 export * from './utils';
+export * from './JSONType';

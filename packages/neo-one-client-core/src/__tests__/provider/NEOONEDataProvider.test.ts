@@ -1,9 +1,14 @@
 // tslint:disable no-object-mutation
-import { common, scriptHashToAddress, StorageItem, StorageItemJSON } from '@neo-one/client-common';
+import {
+  common,
+  ContractParameterTypeJSON,
+  scriptHashToAddress,
+  StorageItem,
+  StorageItemJSON,
+} from '@neo-one/client-common';
 import { Modifiable } from '@neo-one/utils';
 import { toArray } from '@reactivex/ix-es2015-cjs/asynciterable/toarray';
 import { data, factory, keys, verifyDataProvider as verify } from '../../__data__';
-import { Hash256 } from '../../Hash256';
 import { convertAction, JSONRPCClient, JSONRPCHTTPProvider, NEOONEDataProvider } from '../../provider';
 
 jest.mock('../../provider/JSONRPCClient');
@@ -30,52 +35,30 @@ describe('NEOONEDataProvider', () => {
   });
 
   test('getUnclaimed', async () => {
-    const accountJSON = factory.createAccountJSON();
-    client.getAccount = jest.fn(async () => Promise.resolve(accountJSON));
-    client.getClaimAmount = jest.fn(async () => Promise.resolve(data.bigNumbers.a));
+    client.getUnclaimedGas = jest.fn(async () =>
+      Promise.resolve({ unclaimed: data.bigNumbers.a.toString(10), address: keys[0].address }),
+    );
 
     const result = await provider.getUnclaimed(keys[0].address);
 
-    expect(result.amount).toEqual(data.bigNumbers.a.times(accountJSON.unclaimed.length));
-    expect(result.unclaimed[0].hash).toEqual(accountJSON.unclaimed[0].txid);
-    expect(result.unclaimed[0].index).toEqual(accountJSON.unclaimed[0].vout);
-    expect(result.unclaimed[1].hash).toEqual(accountJSON.unclaimed[1].txid);
-    expect(result.unclaimed[1].index).toEqual(accountJSON.unclaimed[1].vout);
-  });
-
-  test('getUnspent', async () => {
-    const accountJSON = factory.createAccountJSON();
-    const outputJSON = factory.createOutputJSON();
-    client.getAccount = jest.fn(async () => Promise.resolve(accountJSON));
-    client.getUnspentOutput = jest.fn(async (input) =>
-      input.vout === accountJSON.unspent[0].vout ? outputJSON : undefined,
-    );
-
-    const result = await provider.getUnspentOutputs(keys[0].address);
-
-    expect(result).toHaveLength(1);
-    expect(result[0].asset).toEqual(outputJSON.asset);
-    expect(result[0].value.toString(10)).toEqual(outputJSON.value);
-    expect(result[0].address).toEqual(outputJSON.address);
-    expect(result[0].hash).toEqual(accountJSON.unspent[0].txid);
-    expect(result[0].index).toEqual(accountJSON.unspent[0].vout);
+    expect(result).toEqual(data.bigNumbers.a);
   });
 
   test('relayTransaction', async () => {
-    const transactionJSON = factory.createInvocationTransactionJSON();
+    const transactionWithInvocationDataJSON = factory.createTransactionWithInvocationDataJSON();
     client.relayTransaction = jest.fn(async () =>
       Promise.resolve({
-        transaction: transactionJSON,
+        transaction: transactionWithInvocationDataJSON,
       }),
     );
 
-    const result = await provider.relayTransaction(factory.createInvocationTransactionModel());
+    const result = await provider.relayTransaction(factory.createTransactionModel());
 
-    verify.verifyInvocationTransaction(result.transaction, transactionJSON);
+    verify.verifyTransaction(result.transaction, transactionWithInvocationDataJSON);
   });
 
   test('verifyConvertTransaction', async () => {
-    const transactionJSON = factory.createInvocationTransactionJSON();
+    const transactionJSON = factory.createTransactionWithInvocationDataJSON();
 
     const actionJSON = factory.createLogActionJSON();
     const verificationScriptJSON = factory.createVerifyScriptResultJSON({
@@ -93,7 +76,7 @@ describe('NEOONEDataProvider', () => {
       }),
     );
 
-    const result = await provider.relayTransaction(factory.createInvocationTransactionModel());
+    const result = await provider.relayTransaction(factory.createTransactionModel());
 
     if (result.verifyResult === undefined) {
       throw new Error('for TS');
@@ -105,7 +88,7 @@ describe('NEOONEDataProvider', () => {
         witness: verificationScriptJSON.witness,
         address: scriptHashToAddress(verificationScriptJSON.hash),
         actions: [
-          convertAction(common.uInt256ToString(common.ZERO_UINT256), -1, transactionJSON.txid, -1, 0, actionJSON),
+          convertAction(common.uInt256ToString(common.ZERO_UINT256), -1, transactionJSON.hash, -1, 0, actionJSON),
         ],
       },
     ]);
@@ -122,7 +105,7 @@ describe('NEOONEDataProvider', () => {
   });
 
   test('getInvocationData', async () => {
-    const transactionJSON = factory.createInvocationTransactionJSON();
+    const transactionJSON = factory.createTransactionWithInvocationDataJSON();
     const invocationData = transactionJSON.invocationData;
     const transactionData = transactionJSON.data;
     if (invocationData === undefined || transactionData === undefined) {
@@ -140,7 +123,7 @@ describe('NEOONEDataProvider', () => {
       transactionData.blockIndex,
       transactionData.blockHash,
       transactionData.transactionIndex,
-      transactionJSON.txid,
+      transactionJSON.hash,
     );
 
     const notificationAction = result.actions[0];
@@ -163,13 +146,6 @@ describe('NEOONEDataProvider', () => {
     }
     expect(logAction.message).toEqual(logActionJSON.message);
 
-    const asset = result.asset;
-    const assetJSON = invocationData.asset;
-    if (asset === undefined || assetJSON === undefined) {
-      throw new Error('For TS');
-    }
-    verify.verifyAsset(asset, assetJSON);
-
     expect(result.contracts.length).toEqual(invocationData.contracts.length);
     verify.verifyContract(result.contracts[0], invocationData.contracts[0]);
 
@@ -187,7 +163,7 @@ describe('NEOONEDataProvider', () => {
   });
 
   test('getInvocationData - missing transaction data', async () => {
-    const { data: _data, ...transactionJSON } = factory.createInvocationTransactionJSON();
+    const { data: _data, ...transactionJSON } = factory.createTransactionWithInvocationDataJSON();
 
     // tslint:disable:no-any
     client.getInvocationData = jest.fn(async () => Promise.resolve(transactionJSON.invocationData) as any);
@@ -201,67 +177,9 @@ describe('NEOONEDataProvider', () => {
     const callReceiptJSON = factory.createCallReceiptJSON();
     client.testInvocation = jest.fn(async () => Promise.resolve(callReceiptJSON));
 
-    const result = await provider.testInvoke(factory.createInvocationTransactionModel());
+    const result = await provider.testInvoke(factory.createTransactionModel());
 
     verify.verifyCallReceipt(result, callReceiptJSON);
-  });
-
-  test('getAccount', async () => {
-    const accountJSON = factory.createAccountJSON();
-    client.getAccount = jest.fn(async () => Promise.resolve(accountJSON));
-
-    const result = await provider.getAccount(keys[0].address);
-
-    expect(result.address).toEqual(scriptHashToAddress(accountJSON.script_hash));
-    expect(result.balances[Hash256.NEO].toString(10)).toEqual(accountJSON.balances[0].value);
-    expect(result.balances[Hash256.GAS].toString(10)).toEqual(accountJSON.balances[1].value);
-  });
-
-  const convertedAssetTypes = [
-    ['CreditFlag', 'Credit'],
-    ['DutyFlag', 'Duty'],
-    ['GoverningToken', 'Governing'],
-    ['UtilityToken', 'Utility'],
-    ['Currency', 'Currency'],
-    ['Share', 'Share'],
-    ['Invoice', 'Invoice'],
-    ['Token', 'Token'],
-  ];
-
-  convertedAssetTypes.forEach(([from, to]) => {
-    test(`getAsset - ${from} -> ${to}`, async () => {
-      const assetJSON = factory.createAssetJSON({ type: from });
-      client.getAsset = jest.fn(async () => Promise.resolve(assetJSON));
-
-      const result = await provider.getAsset(data.hash256s.a);
-      verify.verifyAsset(result, assetJSON, to);
-    });
-  });
-
-  test(`getAsset - extracts en name`, async () => {
-    const assetJSON = factory.createAssetJSON({
-      name: [
-        { lang: 'foo', name: 'bar' },
-        { lang: 'en', name: 'baz' },
-      ],
-    });
-    client.getAsset = jest.fn(async () => Promise.resolve(assetJSON));
-
-    const result = await provider.getAsset(data.hash256s.a);
-    verify.verifyAsset(result, assetJSON, assetJSON.type, 'baz');
-  });
-
-  test(`getAsset - otherwise, first name`, async () => {
-    const assetJSON = factory.createAssetJSON({
-      name: [
-        { lang: 'foo', name: 'bar' },
-        { lang: 'baz', name: 'baz' },
-      ],
-    });
-    client.getAsset = jest.fn(async () => Promise.resolve(assetJSON));
-
-    const result = await provider.getAsset(data.hash256s.a);
-    verify.verifyAsset(result, assetJSON, assetJSON.type, 'bar');
   });
 
   test('getBlock', async () => {
@@ -271,34 +189,19 @@ describe('NEOONEDataProvider', () => {
     const result = await provider.getBlock(10);
 
     expect(result.version).toEqual(blockJSON.version);
-    expect(result.hash).toEqual(blockJSON.hash);
     expect(result.previousBlockHash).toEqual(blockJSON.previousblockhash);
     expect(result.merkleRoot).toEqual(blockJSON.merkleroot);
     expect(result.time).toEqual(blockJSON.time);
     expect(result.index).toEqual(blockJSON.index);
-    expect(result.nonce).toEqual(blockJSON.nonce);
     expect(result.nextConsensus).toEqual(blockJSON.nextconsensus);
-    expect(result.script).toEqual(blockJSON.script);
+    expect(result.witnesses.length).toEqual(blockJSON.witnesses.length);
+    expect(result.witnesses).toEqual(blockJSON.witnesses);
+    expect(result.hash).toEqual(blockJSON.hash);
+    expect(result.witness).toEqual(blockJSON.witnesses[0]);
     expect(result.size).toEqual(blockJSON.size);
     expect(result.transactions.length).toEqual(blockJSON.tx.length);
-    verify.verifyMinerTransaction(result.transactions[0], blockJSON.tx[0]);
+    verify.verifyTransaction(result.transactions[0], blockJSON.tx[0]);
     verify.verifyConfirmedTransaction(result.transactions[0], blockJSON.tx[0]);
-    verify.verifyClaimTransaction(result.transactions[1], blockJSON.tx[1]);
-    verify.verifyConfirmedTransaction(result.transactions[1], blockJSON.tx[1]);
-    verify.verifyContractTransaction(result.transactions[2], blockJSON.tx[2]);
-    verify.verifyConfirmedTransaction(result.transactions[2], blockJSON.tx[2]);
-    verify.verifyEnrollmentTransaction(result.transactions[3], blockJSON.tx[3]);
-    verify.verifyConfirmedTransaction(result.transactions[3], blockJSON.tx[3]);
-    verify.verifyInvocationTransaction(result.transactions[4], blockJSON.tx[4]);
-    verify.verifyConfirmedTransaction(result.transactions[4], blockJSON.tx[4]);
-    verify.verifyIssueTransaction(result.transactions[5], blockJSON.tx[5]);
-    verify.verifyConfirmedTransaction(result.transactions[5], blockJSON.tx[5]);
-    verify.verifyPublishTransaction(result.transactions[6], blockJSON.tx[6]);
-    verify.verifyConfirmedTransaction(result.transactions[6], blockJSON.tx[6]);
-    verify.verifyRegisterTransaction(result.transactions[7], blockJSON.tx[7]);
-    verify.verifyConfirmedTransaction(result.transactions[7], blockJSON.tx[7]);
-    verify.verifyStateTransaction(result.transactions[8], blockJSON.tx[8]);
-    verify.verifyConfirmedTransaction(result.transactions[8], blockJSON.tx[8]);
   });
 
   test('iterBlocks', async () => {
@@ -339,10 +242,11 @@ describe('NEOONEDataProvider', () => {
   });
 
   const convertedContractParameterTypes = [
+    ['Any', 'Any'],
     ['Signature', 'Signature'],
     ['Boolean', 'Boolean'],
     ['Integer', 'Integer'],
-    ['Hash160', 'Address'],
+    ['Hash160', 'Hash160'],
     ['Hash256', 'Hash256'],
     ['ByteArray', 'Buffer'],
     ['PublicKey', 'PublicKey'],
@@ -354,7 +258,16 @@ describe('NEOONEDataProvider', () => {
 
   convertedContractParameterTypes.forEach(([from, to]) => {
     test(`getContract - ${from} -> ${to}`, async () => {
-      const contractJSON = factory.createContractJSON({ returntype: from });
+      const contractJSON = factory.createContractJSON({
+        manifest: {
+          abi: {
+            methods: [
+              { name: `test ${from}`, returnType: from as ContractParameterTypeJSON, offset: 0, parameters: [] },
+            ],
+          },
+          // tslint:disable-next-line: no-any
+        } as any,
+      });
       client.getContract = jest.fn(async () => Promise.resolve(contractJSON));
 
       const result = await provider.getContract(keys[0].address);
@@ -372,21 +285,12 @@ describe('NEOONEDataProvider', () => {
   });
 
   test('getTransaction', async () => {
-    const transactionJSON = factory.createInvocationTransactionJSON();
+    const transactionJSON = factory.createTransactionJSON();
     client.getTransaction = jest.fn(async () => Promise.resolve(transactionJSON));
 
-    const result = await provider.getTransaction(transactionJSON.txid);
+    const result = await provider.getTransaction(transactionJSON.hash);
 
-    verify.verifyInvocationTransaction(result, transactionJSON);
-  });
-
-  test('getOutput', async () => {
-    const outputJSON = factory.createOutputJSON();
-    client.getOutput = jest.fn(async () => Promise.resolve(outputJSON));
-
-    const result = await provider.getOutput({ hash: data.hash256s.a, index: 0 });
-
-    verify.verifyOutput(result, outputJSON);
+    verify.verifyTransaction(result, transactionJSON);
   });
 
   test('getConnectedPeers', async () => {
@@ -432,11 +336,7 @@ describe('NEOONEDataProvider', () => {
 
     expect(result.length).toEqual(2);
     const transactionJSON = blockJSON.tx[4];
-    if (
-      transactionJSON.type !== 'InvocationTransaction' ||
-      transactionJSON.data === undefined ||
-      transactionJSON.invocationData === undefined
-    ) {
+    if (transactionJSON.data === undefined || transactionJSON.invocationData === undefined) {
       throw new Error('For TS');
     }
 
@@ -446,7 +346,7 @@ describe('NEOONEDataProvider', () => {
       transactionJSON.data.blockIndex,
       transactionJSON.data.blockHash,
       transactionJSON.data.transactionIndex,
-      transactionJSON.txid,
+      transactionJSON.hash,
     );
   });
 
@@ -505,15 +405,6 @@ describe('NEOONEDataProvider', () => {
     await provider.reset();
 
     expect(reset).toHaveBeenCalled();
-  });
-
-  test('convertMapContractParamaterType - Map', async () => {
-    const contract = factory.createContractJSON({ parameters: ['Map'] });
-    client.getContract = jest.fn(async () => Promise.resolve(contract));
-
-    const result = await provider.getContract(keys[0].address);
-
-    expect(result.parameters).toEqual(['Map']);
   });
 
   test('construction with rpcURL provider works', () => {

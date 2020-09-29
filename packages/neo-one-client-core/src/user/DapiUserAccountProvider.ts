@@ -2,12 +2,7 @@ import {
   AddressString,
   addressToScriptHash,
   Attribute,
-  ClaimTransaction,
-  ContractTransaction,
-  Input,
-  InvocationTransaction,
   NetworkType,
-  Output,
   PublicKeyString,
   ScriptBuilderParam,
   scriptBuilderParamTo,
@@ -22,12 +17,10 @@ import {
 import BigNumber from 'bignumber.js';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
-import { InvocationCallError, NothingToTransferError, NotImplementedError } from '../errors';
+import { NothingToTransferError, NotImplementedError } from '../errors';
 import {
   ACCOUNT_CHANGED,
   Argument,
-  AssetInput,
-  AssetOutput,
   Dapi,
   DapiAccount,
   DapiError,
@@ -97,7 +90,8 @@ const paramToArgDataTypeCallbacks: ScriptBuilderParamToCallbacks<Argument> = {
 const paramToArgDataType = (param: ScriptBuilderParam): Argument =>
   scriptBuilderParamTo<Argument>(param, paramToArgDataTypeCallbacks);
 
-export class DapiUserAccountProvider<TProvider extends Provider> extends UserAccountProviderBase<TProvider>
+export class DapiUserAccountProvider<TProvider extends Provider>
+  extends UserAccountProviderBase<TProvider>
   implements UserAccountProvider {
   public readonly currentUserAccount$: Observable<UserAccount | undefined>;
   public readonly userAccounts$: Observable<ReadonlyArray<UserAccount>>;
@@ -185,7 +179,7 @@ export class DapiUserAccountProvider<TProvider extends Provider> extends UserAcc
     from: UserAccountID,
     _attributes: readonly Attribute[],
     networkFee: BigNumber,
-  ): Promise<TransactionResult<TransactionReceipt, InvocationTransaction | ContractTransaction>> {
+  ): Promise<TransactionResult> {
     await this.initCheck();
     if (transfers.length === 0) {
       throw new NothingToTransferError();
@@ -205,9 +199,6 @@ export class DapiUserAccountProvider<TProvider extends Provider> extends UserAcc
       network: from.network,
     });
     const transaction = await this.provider.getTransaction(from.network, txid);
-    if (transaction.type !== 'ContractTransaction') {
-      throw new Error('For TS');
-    }
 
     return {
       transaction,
@@ -219,19 +210,17 @@ export class DapiUserAccountProvider<TProvider extends Provider> extends UserAcc
     _from: UserAccountID,
     _attributes: readonly Attribute[],
     _networkFee: BigNumber,
-  ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
+  ): Promise<TransactionResult> {
     throw new NotImplementedError('executeClaim');
   }
 
   protected async executeInvokeScript<T extends TransactionReceipt>(
     _options: ExecuteInvokeScriptOptions<T>,
-  ): Promise<TransactionResult<T, InvocationTransaction>> {
+  ): Promise<TransactionResult<T>> {
     throw new NotImplementedError('executeInvokeScript');
   }
 
-  protected async executeInvokeClaim(
-    _options: ExecuteInvokeClaimOptions,
-  ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
+  protected async executeInvokeClaim(_options: ExecuteInvokeClaimOptions): Promise<TransactionResult> {
     throw new NotImplementedError('executeInvokeClaim');
   }
 
@@ -239,14 +228,9 @@ export class DapiUserAccountProvider<TProvider extends Provider> extends UserAcc
     invokeMethodOptions,
     from,
     attributes,
-    inputs,
-    outputs,
-    rawInputs,
-    rawOutputs,
     verify,
-    reorderOutputs,
     onConfirm,
-  }: ExecuteInvokeMethodOptions<T>): Promise<TransactionResult<T, InvocationTransaction>> {
+  }: ExecuteInvokeMethodOptions<T>): Promise<TransactionResult<T>> {
     await this.initCheck();
     const { contract, invokeMethod, params } = invokeMethodOptions;
 
@@ -257,16 +241,9 @@ export class DapiUserAccountProvider<TProvider extends Provider> extends UserAcc
       network: this.defaultNetworkInternal$.getValue(),
       triggerContractVerification: verify,
       txHashAttributes: this.convertDapiAttributes(attributes),
-      assetIntentOverrides: {
-        inputs: this.convertDapiInputs(rawInputs.concat(inputs)),
-        outputs: this.convertDapiOutputs(reorderOutputs(rawOutputs.concat(outputs))),
-      },
     });
 
     const transaction = await this.provider.getTransaction(from.network, txid);
-    if (transaction.type !== 'InvocationTransaction') {
-      throw new InvocationCallError(`Expected InvocationTransaction, received ${transaction.type}`);
-    }
 
     return {
       transaction,
@@ -282,14 +259,9 @@ export class DapiUserAccountProvider<TProvider extends Provider> extends UserAcc
   }
 
   private convertDapiAttributes(attributes: readonly Attribute[]): readonly TxHashAttribute[] {
-    return attributes.map((attribute) => {
-      const argBase = paramToArgDataType(attribute.data);
-
-      return {
-        ...argBase,
-        txAttrUsage: attribute.usage,
-      };
-    });
+    return attributes.map((attribute) => ({
+      txAttrType: attribute.type,
+    }));
   }
 
   private async init(): Promise<void> {
@@ -344,20 +316,5 @@ export class DapiUserAccountProvider<TProvider extends Provider> extends UserAcc
   private updateNetworks({ networks, defaultNetwork }: DapiNetworks) {
     this.networksInternal$.next(networks);
     this.defaultNetworkInternal$.next(defaultNetwork);
-  }
-
-  private convertDapiInputs(inputs: ReadonlyArray<Input>): ReadonlyArray<AssetInput> {
-    return inputs.map((input) => ({
-      txid: input.hash,
-      index: input.index,
-    }));
-  }
-
-  private convertDapiOutputs(outputs: ReadonlyArray<Output>): ReadonlyArray<AssetOutput> {
-    return outputs.map((output) => ({
-      asset: output.asset,
-      address: output.address,
-      value: output.value.toString(),
-    }));
   }
 }

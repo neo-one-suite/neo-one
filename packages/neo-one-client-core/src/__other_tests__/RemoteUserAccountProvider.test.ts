@@ -48,12 +48,7 @@ describe('RemoteUserAccountProvider', () => {
   ] as ReadonlyArray<readonly [string, Param | undefined]>;
   const transactionOptions = {
     from: unlockedWallet1.userAccount.id,
-    attributes: [
-      factory.createAddressAttribute(),
-      factory.createBufferAttribute(),
-      factory.createPublicKeyAttribute(),
-      factory.createHash256Attribute(),
-    ],
+    attributes: [],
     networkFee: data.bigNumbers.a,
     systemFee: data.bigNumbers.b,
   };

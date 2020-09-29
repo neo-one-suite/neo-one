@@ -1,10 +1,10 @@
 import {
-  ABIEvent,
-  ABIFunction,
   ABIParameter,
   ABIReturn,
   Action,
   AddressString,
+  ContractEventDescriptorClient,
+  ContractMethodDescriptorClient,
   ContractParameter,
   contractParameters,
   Event,
@@ -63,8 +63,7 @@ export const isTransactionOptions = (arg: any) =>
     (arg.systemFee !== undefined && BigNumber.isBigNumber(arg.systemFee)) ||
     (arg.sendFrom !== undefined && Array.isArray(arg.sendFrom)) ||
     (arg.sendTo !== undefined && Array.isArray(arg.sendTo)) ||
-    (arg.timeoutMS !== undefined && typeof arg.timeoutMS === 'number') ||
-    (arg.skipSysFeeCheck !== undefined && typeof arg.skipSysFeeCheck === 'boolean'));
+    (arg.timeoutMS !== undefined && typeof arg.timeoutMS === 'number'));
 
 // tslint:disable-next-line:no-any
 export const isForwardValueOptions = (arg: any): boolean =>
@@ -83,7 +82,7 @@ export const getForwardValues = ({
   readonly parameters: readonly ABIParameter[];
   // tslint:disable-next-line no-any
   readonly args: readonly any[];
-  readonly events: readonly ABIEvent[];
+  readonly events: readonly ContractEventDescriptorClient[];
 }): ReadonlyArray<ForwardOptions | ForwardValue> => {
   const hasForwardOptions =
     parameters.length > 0 &&
@@ -116,7 +115,10 @@ export const getForwardValues = ({
   );
 };
 
-const createForwardValueArgs = (parameters: readonly ABIParameter[], events: readonly ABIEvent[]) => (
+const createForwardValueArgs = (
+  parameters: readonly ABIParameter[],
+  events: readonly ContractEventDescriptorClient[],
+) => (
   // tslint:disable-next-line no-any readonly-array
   ...args: any[]
 ) => getForwardValues({ parameters, events, args });
@@ -126,9 +128,9 @@ export const convertActions = ({
   events,
 }: {
   readonly actions: readonly RawAction[];
-  readonly events: readonly ABIEvent[];
+  readonly events: readonly ContractEventDescriptorClient[];
 }): readonly Action[] => {
-  const eventsObj = traceEvents.concat(events).reduce<{ [key: string]: ABIEvent }>(
+  const eventsObj = traceEvents.concat(events).reduce<{ [key: string]: ContractEventDescriptorClient }>(
     (acc, event) => ({
       ...acc,
       [event.name]: event,
@@ -157,7 +159,7 @@ export const filterLogs = (actions: ReadonlyArray<Event | Log>): readonly Log[] 
 const isInvokeReceipt = (value: any): value is InvokeReceipt<ContractParameter> =>
   typeof value === 'object' && value.result !== undefined && value.events !== undefined && value.logs !== undefined;
 
-const createForwardValueReturn = (returnType: ABIReturn, forwardEvents: readonly ABIEvent[]) => (
+const createForwardValueReturn = (returnType: ABIReturn, forwardEvents: readonly ContractEventDescriptorClient[]) => (
   receiptOrValue: InvokeReceipt<ContractParameter> | ContractParameter,
   // tslint:disable-next-line no-any
 ): any => {
@@ -220,7 +222,7 @@ export const convertAction = ({
   events,
 }: {
   readonly action: RawAction;
-  readonly events: { readonly [K in string]?: ABIEvent };
+  readonly events: { readonly [K in string]?: ContractEventDescriptorClient };
 }): Action | string => {
   if (action.type === 'Log') {
     return action;
@@ -266,7 +268,7 @@ export const convertInvocationResult = async ({
   readonly actions: readonly RawAction[];
   readonly sourceMaps?: SourceMaps;
 }): Promise<InvocationResult<Return | undefined>> => {
-  const { gasConsumed, gasCost } = result;
+  const { gasConsumed, gasCost, script } = result;
   if (result.state === 'FAULT') {
     const message = await processActionsAndMessage({
       actions,
@@ -279,6 +281,7 @@ export const convertInvocationResult = async ({
       gasConsumed,
       gasCost,
       message,
+      script,
     };
   }
 
@@ -290,7 +293,7 @@ export const convertInvocationResult = async ({
     parameter: contractParameter,
   });
 
-  return { state: result.state, gasConsumed, gasCost, value };
+  return { state: result.state, gasConsumed, gasCost, value, script };
 };
 
 export const convertCallResult = async ({
@@ -390,8 +393,8 @@ export const convertParams = ({
 };
 
 export const addForward = (
-  func: ABIFunction,
-  forwardEvents: readonly ABIEvent[],
+  func: ContractMethodDescriptorClient,
+  forwardEvents: readonly ContractEventDescriptorClient[],
   // tslint:disable-next-line no-any
   value: any,
   // tslint:disable-next-line no-any

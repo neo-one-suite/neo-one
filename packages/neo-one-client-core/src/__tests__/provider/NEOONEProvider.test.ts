@@ -1,7 +1,6 @@
 // tslint:disable no-object-mutation
 import { Modifiable } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable';
-import BigNumber from 'bignumber.js';
 import { take } from 'rxjs/operators';
 import { data, factory, keys } from '../../__data__';
 import { NEOONEDataProvider, NEOONEProvider } from '../../provider';
@@ -51,7 +50,7 @@ describe('NEOONEProvider', () => {
   test('addNetwork', () => {
     const newNetwork = 'test';
 
-    provider.addNetwork({ network: newNetwork, rpcURL: 'https://test.neotracker.io/rpc' });
+    provider.addNetwork({ network: newNetwork, rpcURL: 'https://testnet.neotracker.io/rpc' });
     const result = provider.getNetworks();
 
     expect(result).toEqual([network, newNetwork]);
@@ -65,7 +64,7 @@ describe('NEOONEProvider', () => {
   });
 
   test('getUnclaimed', async () => {
-    const expected = { unclaimed: [factory.createInput()], amount: data.bigNumbers.a };
+    const expected = data.bigNumbers.a;
     dataProvider.getUnclaimed = jest.fn(async () => Promise.resolve(expected));
 
     const result = await provider.getUnclaimed(network, keys[0].address);
@@ -73,21 +72,12 @@ describe('NEOONEProvider', () => {
     expect(result).toBe(expected);
   });
 
-  test('getUnspentOutputs', async () => {
-    const expected = [factory.createInputOutput()];
-    dataProvider.getUnspentOutputs = jest.fn(async () => Promise.resolve(expected));
-
-    const result = await provider.getUnspentOutputs(network, keys[0].address);
-
-    expect(result).toBe(expected);
-  });
-
   test('relayTransaction', async () => {
-    const expected = factory.createInvocationTransaction();
+    const expected = factory.createTransaction();
     // tslint:disable-next-line:no-any
     dataProvider.relayTransaction = jest.fn((async () => Promise.resolve(expected)) as any);
 
-    const result = await provider.relayTransaction(network, factory.createInvocationTransactionModel());
+    const result = await provider.relayTransaction(network, factory.createTransactionModel());
 
     expect(result).toBe(expected);
   });
@@ -114,16 +104,7 @@ describe('NEOONEProvider', () => {
     const expected = factory.createRawCallReceipt();
     dataProvider.testInvoke = jest.fn(async () => Promise.resolve(expected));
 
-    const result = await provider.testInvoke(network, factory.createInvocationTransactionModel());
-
-    expect(result).toBe(expected);
-  });
-
-  test('getClaimAmount', async () => {
-    const expected = new BigNumber('1');
-    dataProvider.getClaimAmount = jest.fn(async () => Promise.resolve(expected));
-
-    const result = await provider.getClaimAmount(network, factory.createInput());
+    const result = await provider.testInvoke(network, factory.createTransactionModel());
 
     expect(result).toBe(expected);
   });
@@ -133,15 +114,6 @@ describe('NEOONEProvider', () => {
     dataProvider.getNetworkSettings = jest.fn(async () => Promise.resolve(expected));
 
     const result = await provider.getNetworkSettings(network);
-
-    expect(result).toBe(expected);
-  });
-
-  test('getAccount', async () => {
-    const expected = factory.createAccount();
-    dataProvider.getAccount = jest.fn(async () => Promise.resolve(expected));
-
-    const result = await provider.getAccount(network, expected.address);
 
     expect(result).toBe(expected);
   });

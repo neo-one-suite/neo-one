@@ -1,4 +1,4 @@
-import { ABI } from '@neo-one/client-common';
+import { ContractManifestClient } from '@neo-one/client-common';
 import { ContractRegister } from '@neo-one/client-full-core';
 import { tsUtils } from '@neo-one/ts-utils';
 import { normalizePath } from '@neo-one/utils';
@@ -17,7 +17,7 @@ export interface CompileContractOptions extends WithLinked {
 }
 
 export interface CompileContractResult {
-  readonly abi: ABI;
+  readonly manifest: ContractManifestClient;
   readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
   readonly contract: ContractRegister;
   readonly sourceMap: Promise<RawSourceMap>;
@@ -41,7 +41,7 @@ export const compileContract = ({
       ? transpileContext
       : updateContext(transpileContext, { [filePath]: transpileResult.text });
 
-  const { abi, sourceMap: finalSourceMap, contract, debugInfo } = compile({
+  const { manifest, sourceMap: finalSourceMap, contract, debugInfo } = compile({
     sourceFile: tsUtils.file.getSourceFileOrThrow(context.program, filePath),
     context,
     linked,
@@ -51,7 +51,7 @@ export const compileContract = ({
   return {
     diagnostics: context.diagnostics,
     sourceMap: finalSourceMap,
-    abi,
+    manifest,
     contract,
     debugInfo,
   };

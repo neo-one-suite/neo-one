@@ -7,7 +7,7 @@ import { convertContractParameter, convertInvocationResult } from '../../provide
 describe('Convert Provider Helper Tests', () => {
   test('convertInvocationResult - FaultState', () => {
     const value = '0';
-    const invokeResult = factory.createInvocationResultErrorJSON({
+    const invokeResult = factory.createTransactionResultErrorJSON({
       stack: [factory.createIntegerContractParameterJSON({ value })],
     });
     const result = convertInvocationResult(invokeResult);

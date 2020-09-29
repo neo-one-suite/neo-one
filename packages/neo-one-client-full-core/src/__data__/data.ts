@@ -1,4 +1,4 @@
-import { ABIParameter, ABIReturn, AssetType } from '@neo-one/client-common';
+import { ABIParameter, ABIReturn } from '@neo-one/client-common';
 import { Hash256 } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
@@ -88,25 +88,7 @@ const numbers = {
   b: 8,
 };
 
-const createValidAssetRegister = (type: AssetType) => ({
-  type,
-  name: 'Foo',
-  amount: bigNumbers.a,
-  precision: numbers.b,
-  owner: keys[0].publicKeyString,
-  admin: keys[0].address,
-  issuer: keys[1].address,
-});
-
 const assetRegisters = {
-  credit: createValidAssetRegister('Credit'),
-  duty: createValidAssetRegister('Duty'),
-  governing: createValidAssetRegister('Governing'),
-  utility: createValidAssetRegister('Utility'),
-  currency: createValidAssetRegister('Currency'),
-  share: createValidAssetRegister('Share'),
-  invoice: createValidAssetRegister('Invoice'),
-  token: createValidAssetRegister('Token'),
   validScriptHash: {
     type: 'Token',
     name: 'Foo',
@@ -235,7 +217,7 @@ const simpleParameterType = (paramType: ABIParameter) => ({
 const abi = {
   returnSignature: simpleReturnType({ type: 'Signature' }),
   returnBoolean: simpleReturnType({ type: 'Boolean' }),
-  returnAddress: simpleReturnType({ type: 'Address' }),
+  returnAddress: simpleReturnType({ type: 'Hash160' }),
   returnHash256: simpleReturnType({ type: 'Hash256' }),
   returnBuffer: simpleReturnType({ type: 'Buffer' }),
   returnPublicKey: simpleReturnType({ type: 'PublicKey' }),
@@ -245,7 +227,7 @@ const abi = {
   returnInteger: simpleReturnType({ type: 'Integer', decimals: 8 }),
   paramSignature: simpleParameterType({ type: 'Signature', name: 'foo' }),
   paramBoolean: simpleParameterType({ type: 'Boolean', name: 'foo' }),
-  paramAddress: simpleParameterType({ type: 'Address', name: 'foo' }),
+  paramAddress: simpleParameterType({ type: 'Hash160', name: 'foo' }),
   paramHash256: simpleParameterType({ type: 'Hash256', name: 'foo' }),
   paramBuffer: simpleParameterType({ type: 'Buffer', name: 'foo' }),
   paramPublicKey: simpleParameterType({ type: 'PublicKey', name: 'foo' }),

@@ -17,26 +17,6 @@ describe('JSONRPCClient', () => {
     mockRequest.mockReset();
   });
 
-  test('getAccount', async () => {
-    const value = factory.createAccountJSON();
-    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
-
-    const result = await client.getAccount(keys[0].address);
-
-    expect(result).toEqual(value);
-    expect(mockRequest.mock.calls).toMatchSnapshot();
-  });
-
-  test('getAsset', async () => {
-    const value = factory.createAssetJSON();
-    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
-
-    const result = await client.getAsset(data.hash256s.a);
-
-    expect(result).toEqual(value);
-    expect(mockRequest.mock.calls).toMatchSnapshot();
-  });
-
   test('getSettings', async () => {
     const settings = { secondsPerBlock: 15 };
     mockRequest.mockImplementationOnce(async () => Promise.resolve(settings));
@@ -108,7 +88,7 @@ describe('JSONRPCClient', () => {
   });
 
   test('getTransaction', async () => {
-    const value = factory.createInvocationTransactionJSON();
+    const value = factory.createTransactionJSON();
     mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
 
     const result = await client.getTransaction(data.hash256s.a);
@@ -117,28 +97,8 @@ describe('JSONRPCClient', () => {
     expect(mockRequest.mock.calls).toMatchSnapshot();
   });
 
-  test('getUnspentOutput - defined', async () => {
-    const value = factory.createOutputJSON();
-    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
-
-    const result = await client.getUnspentOutput(factory.createInputJSON());
-
-    expect(result).toEqual(value);
-    expect(mockRequest.mock.calls).toMatchSnapshot();
-  });
-
-  test('getUnspentOutput - undefined', async () => {
-    const value = undefined;
-    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
-
-    const result = await client.getUnspentOutput(factory.createInputJSON());
-
-    expect(result).toEqual(value);
-    expect(mockRequest.mock.calls).toMatchSnapshot();
-  });
-
   test('testInvokeRaw', async () => {
-    const value = factory.createInvocationResultSuccessJSON();
+    const value = factory.createTransactionResultSuccessJSON();
     mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
 
     const result = await client.testInvokeRaw(data.buffers.a);
@@ -158,7 +118,7 @@ describe('JSONRPCClient', () => {
   });
 
   test('relayTransaction', async () => {
-    const value = factory.createInvocationTransactionJSON();
+    const value = factory.createTransactionJSON();
     mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
 
     const result = await client.relayTransaction(data.buffers.a);
@@ -188,23 +148,14 @@ describe('JSONRPCClient', () => {
     expect(mockRequest.mock.calls).toMatchSnapshot();
   });
 
-  test('getOutput', async () => {
-    const value = factory.createOutputJSON();
+  test('getunclaimedgas', async () => {
+    const value = { unclaimed: data.bigNumbers.a.toString(10), address: keys[0].address };
     mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
 
-    const result = await client.getOutput(factory.createInputJSON());
+    const result = await client.getUnclaimedGas(keys[0].address);
 
-    expect(result).toEqual(value);
-    expect(mockRequest.mock.calls).toMatchSnapshot();
-  });
-
-  test('getClaimAmount', async () => {
-    const value = data.bigNumbers.a.toString(10);
-    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
-
-    const result = await client.getClaimAmount(factory.createInputJSON());
-
-    expect(result.toString(10)).toEqual(value);
+    expect(result.unclaimed).toEqual(value);
+    expect(result.address).toEqual(keys[0].address);
     expect(mockRequest.mock.calls).toMatchSnapshot();
   });
 
@@ -263,26 +214,6 @@ describe('JSONRPCClient', () => {
     mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
 
     const result = await client.getNetworkSettings();
-
-    expect(result).toEqual(value);
-    expect(mockRequest.mock.calls).toMatchSnapshot();
-  });
-
-  test('getClaimable', async () => {
-    const value = factory.createNeoClaimableJSON();
-    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
-
-    const result = await client.getClaimable(keys[0].address);
-
-    expect(result).toEqual(value);
-    expect(mockRequest.mock.calls).toMatchSnapshot();
-  });
-
-  test('getUnspents', async () => {
-    const value = factory.createNeoUnspentJSON();
-    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
-
-    const result = await client.getUnspents(keys[0].address);
 
     expect(result).toEqual(value);
     expect(mockRequest.mock.calls).toMatchSnapshot();

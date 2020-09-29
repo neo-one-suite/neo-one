@@ -116,9 +116,9 @@ describe('Client Tests', () => {
   test('iterActionsRaw - undefined on provider', async () => {
     const actions = [factory.createRawNotification(), factory.createRawLog()];
     const invocationData = factory.createRawInvocationData({ actions });
-    const invocationTransaction = factory.createConfirmedInvocationTransaction({ invocationData });
+    const invocationTransaction = factory.createConfirmedTransaction({ invocationData });
     const block = factory.createBlock({
-      transactions: [invocationTransaction, factory.createConfirmedMinerTransaction()],
+      transactions: [invocationTransaction, factory.createConfirmedTransaction()],
     });
     providerOne.iterActionsRaw = undefined;
     providerOne.iterBlocks = jest.fn(() => AsyncIterableX.from(of(block)));

@@ -1,127 +1,75 @@
 // tslint:disable deprecation
 import {
-  ABI,
-  ABIEvent,
-  ABIFunction,
-  Account,
-  AccountJSON,
   ActionBaseJSON,
-  AddressABIParameter,
-  AddressAttribute,
-  AddressContractParameter,
-  addressToScriptHash,
+  AnyContractParameterJSON,
   ArrayContractParameterJSON,
-  Asset,
-  AssetJSON,
   AttributeJSON,
-  AttributeUsageModel,
   Block,
   BlockJSON,
   BooleanContractParameter,
   BooleanContractParameterJSON,
-  BufferAttribute,
-  BufferAttributeModel,
   ByteArrayContractParameterJSON,
   CallReceiptJSON,
-  ClaimTransaction,
-  ClaimTransactionJSON,
   common,
-  ConfirmedClaimTransaction,
-  ConfirmedContractTransaction,
-  ConfirmedEnrollmentTransaction,
-  ConfirmedInvocationTransaction,
-  ConfirmedIssueTransaction,
-  ConfirmedMinerTransaction,
-  ConfirmedPublishTransaction,
-  ConfirmedRegisterTransaction,
-  ConfirmedStateTransaction,
-  ConfirmedTransactionBase,
+  ConfirmedTransaction,
   Contract,
+  ContractABI,
+  ContractABIJSON,
   ContractJSON,
-  ContractTransaction,
-  ContractTransactionJSON,
-  ECPointAttributeModel,
-  EnrollmentTransaction,
-  EnrollmentTransactionJSON,
+  ContractManifestJSON,
   ForwardValue,
+  Hash160ABIParameter,
+  Hash160ContractParameter,
   Hash160ContractParameterJSON,
-  Hash256Attribute,
   Hash256ContractParameterJSON,
   Header,
   HeaderJSON,
-  Input,
-  InputJSON,
-  InputModel,
-  InputOutput,
   IntegerABIParameter,
   IntegerABIReturn,
   IntegerContractParameter,
   IntegerContractParameterJSON,
   InteropInterfaceContractParameterJSON,
   InvocationDataJSON,
-  InvocationResultError,
-  InvocationResultErrorJSON,
-  InvocationResultSuccess,
-  InvocationResultSuccessJSON,
-  InvocationTransaction,
-  InvocationTransactionJSON,
-  InvocationTransactionModel,
-  InvocationTransactionModelAdd,
-  IssueTransaction,
-  IssueTransactionJSON,
   LogActionJSON,
   MapContractParameterJSON,
-  MinerTransaction,
-  MinerTransactionJSON,
-  NeoBalanceJSON,
-  NeoClaimableJSON,
-  NeoInputClaimableJSON,
-  NeoUnspentJSON,
-  NeoUnspentOutputJSON,
   NetworkSettings,
   NetworkSettingsJSON,
   NotificationActionJSON,
-  Output,
-  OutputJSON,
-  OutputModel,
   Peer,
-  PublicKeyAttribute,
   PublicKeyContractParameterJSON,
-  PublishTransaction,
-  PublishTransactionJSON,
   RawActionBase,
   RawCallReceipt,
   RawInvocationData,
-  RawInvocationResultError,
   RawInvocationResultErrorJSON,
-  RawInvocationResultSuccess,
   RawInvocationResultSuccessJSON,
   RawInvokeReceipt,
   RawLog,
   RawNotification,
-  RegisterTransaction,
-  RegisterTransactionJSON,
+  RawTransactionResultError,
+  RawTransactionResultSuccess,
   SignatureContractParameterJSON,
   SmartContractDefinition,
-  StateTransaction,
-  StateTransactionJSON,
   StorageItemJSON,
   StringABIParameter,
   StringABIReturn,
   StringContractParameter,
   StringContractParameterJSON,
-  TransactionBase,
-  TransactionBaseJSON,
+  Transaction,
+  TransactionJSON,
+  TransactionModel,
+  TransactionModelAdd,
   TransactionReceipt,
   TransactionResult,
+  TransactionResultError,
+  TransactionResultErrorJSON,
+  TransactionResultSuccess,
+  TransactionResultSuccessJSON,
+  TransactionWithInvocationDataJSON,
   Transfer,
-  UInt160AttributeModel,
-  UInt256AttributeModel,
   UserAccount,
   UserAccountID,
   VerifyScriptResultJSON,
   VerifyTransactionResultJSON,
-  VMState,
   VoidContractParameterJSON,
   Witness,
   WitnessJSON,
@@ -129,89 +77,55 @@ import {
 } from '@neo-one/client-common';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
+import { ContractEventDescriptor, ContractMethodDescriptor } from '../../../neo-one-node-core/src/manifest';
 import { Hash256 } from '../Hash256';
 import * as nep5 from '../nep5';
 import { LockedWallet, UnlockedWallet } from '../user';
 import { data } from './data';
 import { keys } from './keys';
 
-const createInputJSON = (options: Partial<InputJSON> = {}): InputJSON => ({
-  txid: data.hash256s.a,
-  vout: 2,
-  ...options,
-});
-
-const createAccountJSON = (options: Partial<AccountJSON> = {}): AccountJSON => ({
-  version: 0,
-  script_hash: keys[0].scriptHashString,
-  frozen: false,
-  votes: [keys[0].publicKeyString],
-  balances: [
-    { asset: Hash256.NEO, value: data.bigNumbers.a.toString(10) },
-    { asset: Hash256.GAS, value: data.bigNumbers.b.toString(10) },
-  ],
-  unspent: [
-    createInputJSON(),
-    {
-      txid: data.hash256s.b,
-      vout: 0,
-    },
-  ],
-  unclaimed: [
-    {
-      txid: data.hash256s.c,
-      vout: 3,
-    },
-    {
-      txid: data.hash256s.d,
-      vout: 0,
-    },
-  ],
-  ...options,
-});
-
-const createOutputJSON = (options: Partial<OutputJSON> = {}): OutputJSON => ({
-  n: 0,
-  asset: Hash256.NEO,
-  value: data.bigNumbers.a.toString(10),
-  address: keys[0].address,
-  ...options,
-});
-
-const createAssetJSON = (options: Partial<AssetJSON> = {}): AssetJSON => ({
-  version: 0,
-  id: data.hash256s.c,
-  type: 'Token',
-  name: 'TheToken',
-  amount: '100000000',
-  available: '10000000',
-  precision: 8,
-  owner: keys[0].publicKeyString,
-  admin: keys[0].address,
-  issuer: keys[1].address,
-  expiration: 1534418216,
-  frozen: false,
-  ...options,
-});
-
-const createContractJSON = (options: Partial<ContractJSON> = {}): ContractJSON => ({
-  version: 0,
+const createContractABIJSON = (options: Partial<ContractABIJSON> = {}): ContractABIJSON => ({
   hash: keys[0].scriptHashString,
-  script: data.buffers.b,
-  parameters: ['Hash160', 'ByteArray'],
-  returntype: 'ByteArray',
-  name: 'MyContract',
-  code_version: '1.0',
-  author: 'dicarlo2',
-  email: 'alex.dicarlo@neotracker.io',
-  description: 'Hello World',
-  properties: {
-    storage: true,
-    dynamic_invoke: false,
-    payable: true,
-  },
+  methods: [], // TODO
+  events: [], // TODO
   ...options,
+  // parameters: ['Hash160', 'ByteArray'],
+  // returntype: 'ByteArray',
 });
+
+const createManifestJSON = (options: Partial<ContractManifestJSON> = {}): ContractManifestJSON => {
+  const { abi, features, ...optionsIn } = options;
+
+  return {
+    hash: keys[0].scriptHashString,
+    hashHex: keys[0].scriptHashString,
+    abi: createContractABIJSON(abi),
+    groups: [], // TODO
+    permissions: [], // TODO
+    trusts: '*',
+    safeMethods: '*',
+    features: {
+      storage: true,
+      payable: true,
+      ...features,
+    },
+    supportedStandards: [], // TODO
+    ...optionsIn,
+  };
+};
+
+const createContractJSON = (options: Partial<ContractJSON> = {}): ContractJSON => {
+  const { manifest, ...optionsIn } = options;
+
+  return {
+    id: 0,
+    script: data.buffers.b,
+    manifest: createManifestJSON(manifest),
+    hasStorage: true,
+    payable: true,
+    ...optionsIn,
+  };
+};
 
 const createActionBaseJSON = (options: Partial<ActionBaseJSON> = {}): ActionBaseJSON => ({
   version: 0,
@@ -234,27 +148,8 @@ const createLogActionJSON = (options: Partial<LogActionJSON> = {}): LogActionJSO
   ...options,
 });
 
-const createUInt160AttributeJSON = (options: Partial<AttributeJSON> = {}): AttributeJSON => ({
-  usage: 'Script',
-  data: keys[0].scriptHashString,
-  ...options,
-});
-
-const createUInt256AttributeJSON = (options: Partial<AttributeJSON> = {}): AttributeJSON => ({
-  usage: 'Hash1',
-  data: data.hash256s.b,
-  ...options,
-});
-
-const createBufferAttributeJSON = (options: Partial<AttributeJSON> = {}): AttributeJSON => ({
-  usage: 'Description',
-  data: data.buffers.a,
-  ...options,
-});
-
-const createECPointAttributeJSON = (options: Partial<AttributeJSON> = {}): AttributeJSON => ({
-  usage: 'ECDH02',
-  data: keys[0].publicKeyString,
+const createHighPriorityAttributeJSON = (options: Partial<AttributeJSON> = {}): AttributeJSON => ({
+  type: 'HighPriority',
   ...options,
 });
 
@@ -264,54 +159,69 @@ const createWitnessJSON = (options: Partial<WitnessJSON> = {}): WitnessJSON => (
   ...options,
 });
 
-const createTransactionBaseJSON = (options: Partial<TransactionBaseJSON> = {}): TransactionBaseJSON => ({
-  txid: data.hash256s.a,
+const createTransactionJSON = (options: Partial<TransactionJSON> = {}): TransactionJSON => ({
+  hash: data.hash256s.a,
   size: 256,
   version: 0,
-  attributes: [
-    createUInt160AttributeJSON(),
-    createUInt256AttributeJSON(),
-    createBufferAttributeJSON(),
-    createECPointAttributeJSON(),
-  ],
-  vin: [createInputJSON()],
-  vout: [createOutputJSON()],
-  scripts: [createWitnessJSON()],
-  sys_fee: '10',
-  net_fee: '5',
+  attributes: [createHighPriorityAttributeJSON()],
+  script: data.buffers.a,
+  sysfee: '10',
+  netfee: '5',
+  nonce: 10, // TODO
+  sender: '', // TODO
+  validuntilblock: 1000, // TODO
+  signers: [], // TODO
+  witnesses: [], // TODO
   data: {
     blockHash: data.hash256s.b,
     blockIndex: 5,
+    blockTime: 0, // TODO
+    confirmations: 0, // TODO
+    transactionHash: '', // TODO
     transactionIndex: 10,
     globalIndex: '25',
   },
   ...options,
 });
 
+const createTransactionWithInvocationDataJSON = (
+  options: Partial<TransactionWithInvocationDataJSON> = {},
+): TransactionWithInvocationDataJSON => ({
+  // TODO: get options into invocationData and createTransactionJSON()
+  ...createTransactionJSON(),
+  script: Buffer.from(data.buffers.a, 'hex').toString('hex'),
+  gas: '0', // TODO
+  invocationData: createInvocationDataJSON(),
+  ...options,
+});
+
 const createIntegerContractParameterJSON = (
   options: Partial<IntegerContractParameterJSON> = {},
 ): IntegerContractParameterJSON => ({
+  name: 'param',
   type: 'Integer',
   value: '20',
   ...options,
 });
 
-const createInvocationResultSuccessJSON = (
-  options: Partial<InvocationResultSuccessJSON> = {},
-): InvocationResultSuccessJSON => ({
-  state: VMState.HALT,
+const createTransactionResultSuccessJSON = (
+  options: Partial<TransactionResultSuccessJSON> = {},
+): TransactionResultSuccessJSON => ({
+  script: '', // TODO
+  state: 'HALT',
   gas_consumed: '20',
-  gas_cost: '10',
+  gas_cost: '20',
   stack: [createIntegerContractParameterJSON()],
   ...options,
 });
 
-const createInvocationResultErrorJSON = (
-  options: Partial<InvocationResultErrorJSON> = {},
-): InvocationResultErrorJSON => ({
-  state: VMState.FAULT,
+const createTransactionResultErrorJSON = (
+  options: Partial<TransactionResultErrorJSON> = {},
+): TransactionResultErrorJSON => ({
+  script: '', // TODO
+  state: 'FAULT',
   gas_consumed: '20',
-  gas_cost: '10',
+  gas_cost: '20',
   stack: [createIntegerContractParameterJSON()],
   message: 'failure',
   ...options,
@@ -322,7 +232,6 @@ const createRawInvocationResultSuccessJSON = (
 ): RawInvocationResultSuccessJSON => ({
   state: 'HALT',
   gas_consumed: '20',
-  gas_cost: '10',
   stack: [createIntegerContractParameterJSON()],
   ...options,
 });
@@ -332,15 +241,12 @@ const createRawInvocationResultErrorJSON = (
 ): RawInvocationResultErrorJSON => ({
   state: 'FAULT',
   gas_consumed: '20',
-  gas_cost: '10',
   stack: [createIntegerContractParameterJSON()],
-  message: '',
   ...options,
 });
 
 const createInvocationDataJSON = (options: Partial<InvocationDataJSON> = {}): InvocationDataJSON => ({
-  result: createInvocationResultSuccessJSON(),
-  asset: createAssetJSON(),
+  result: createTransactionResultSuccessJSON(),
   contracts: [createContractJSON()],
   deletedContractHashes: [keys[2].scriptHashString],
   migratedContractHashes: [[keys[0].scriptHashString, keys[1].scriptHashString]],
@@ -350,135 +256,32 @@ const createInvocationDataJSON = (options: Partial<InvocationDataJSON> = {}): In
   ...options,
 });
 
-const createClaimTransactionJSON = (options: Partial<ClaimTransactionJSON> = {}): ClaimTransactionJSON => ({
-  ...createTransactionBaseJSON(),
-  type: 'ClaimTransaction',
-  claims: [createInputJSON()],
-  ...options,
-});
+const createTransactionModel = (options: Partial<TransactionModelAdd> = {}): TransactionModel => {
+  const invocation = createTransactionWithInvocationDataJSON();
 
-const createContractTransactionJSON = (options: Partial<ContractTransactionJSON> = {}): ContractTransactionJSON => ({
-  ...createTransactionBaseJSON(),
-  type: 'ContractTransaction',
-  ...options,
-});
-
-const createEnrollmentTransactionJSON = (
-  options: Partial<EnrollmentTransactionJSON> = {},
-): EnrollmentTransactionJSON => ({
-  ...createTransactionBaseJSON(),
-  type: 'EnrollmentTransaction',
-  pubkey: keys[0].publicKeyString,
-  ...options,
-});
-
-const createIssueTransactionJSON = (options: Partial<IssueTransactionJSON> = {}): IssueTransactionJSON => ({
-  ...createTransactionBaseJSON(),
-  type: 'IssueTransaction',
-  ...options,
-});
-
-const createPublishTransactionJSON = (options: Partial<PublishTransactionJSON> = {}): PublishTransactionJSON => ({
-  ...createTransactionBaseJSON(),
-  type: 'PublishTransaction',
-  contract: createContractJSON(),
-  ...options,
-});
-
-const createRegisterTransactionJSON = (options: Partial<RegisterTransactionJSON> = {}): RegisterTransactionJSON => ({
-  ...createTransactionBaseJSON(),
-  type: 'RegisterTransaction',
-  asset: createAssetJSON(),
-  ...options,
-});
-
-const createStateTransactionJSON = (options: Partial<StateTransactionJSON> = {}): StateTransactionJSON => ({
-  ...createTransactionBaseJSON(),
-  type: 'StateTransaction',
-  descriptors: [],
-  ...options,
-});
-
-const createInvocationTransactionJSON = (
-  options: Partial<InvocationTransactionJSON> = {},
-): InvocationTransactionJSON => ({
-  ...createTransactionBaseJSON(),
-  type: 'InvocationTransaction',
-  script: data.buffers.a,
-  gas: '10',
-  invocationData: createInvocationDataJSON(),
-  ...options,
-});
-
-const createInvocationTransactionModel = (
-  options: Partial<InvocationTransactionModelAdd> = {},
-): InvocationTransactionModel => {
-  const invocation = createInvocationTransactionJSON();
-  const uInt160Attribute = createUInt160AttributeJSON();
-  const uInt256Attribute = createUInt256AttributeJSON();
-  const bufferAttribute = createBufferAttributeJSON();
-  const ecPointAttribute = createECPointAttributeJSON();
-
-  return new InvocationTransactionModel({
-    gas: new BN(invocation.gas),
+  return new TransactionModel({
     script: Buffer.from(invocation.script, 'hex'),
     version: invocation.version,
-    attributes: [
-      new UInt160AttributeModel({
-        usage: AttributeUsageModel[uInt160Attribute.usage] as 0x20,
-        value: common.hexToUInt160(uInt160Attribute.data),
-      }),
-      new UInt256AttributeModel({
-        usage: AttributeUsageModel[uInt256Attribute.usage] as 0xa1,
-        value: common.hexToUInt256(uInt256Attribute.data),
-      }),
-      new BufferAttributeModel({
-        usage: AttributeUsageModel[bufferAttribute.usage] as 0x90,
-        value: Buffer.from(bufferAttribute.data, 'hex'),
-      }),
-      new ECPointAttributeModel({
-        usage: AttributeUsageModel[ecPointAttribute.usage] as 0x02,
-        value: common.hexToECPoint(ecPointAttribute.data),
-      }),
-    ],
-    inputs: invocation.vin.map((input) => new InputModel({ hash: common.hexToUInt256(input.txid), index: input.vout })),
-    outputs: invocation.vout.map(
-      (output) =>
-        new OutputModel({
-          asset: common.hexToUInt256(output.asset),
-          value: new BN(output.value),
-          address: common.hexToUInt160(addressToScriptHash(output.address)),
-        }),
-    ),
-    scripts: invocation.scripts.map(
-      (script) =>
-        new WitnessModel({
-          invocation: Buffer.from(script.invocation, 'hex'),
-          verification: Buffer.from(script.verification, 'hex'),
-        }),
-    ),
-    hash: common.hexToUInt256(invocation.txid),
+    attributes: [],
+    systemFee: new BN(0), // TODO
+    hash: common.hexToUInt256(invocation.hash),
     ...options,
   });
 };
-
-const createMinerTransactionJSON = (options: Partial<MinerTransactionJSON> = {}): MinerTransactionJSON => ({
-  ...createTransactionBaseJSON(),
-  type: 'MinerTransaction',
-  nonce: 1234,
-  ...options,
-});
 
 const createTransactionReceipt = (options: Partial<TransactionReceipt> = {}): TransactionReceipt => ({
   blockHash: data.hash256s.a,
   blockIndex: 0,
   transactionIndex: 3,
+  transactionHash: '', // TODO
+  blockTime: 0, // TODO
+  confirmations: 10, // TODO
   globalIndex: new BigNumber(4),
   ...options,
 });
 
 const createCallReceiptJSON = (options: Partial<CallReceiptJSON> = {}): CallReceiptJSON => ({
-  result: createInvocationResultSuccessJSON(),
+  result: createTransactionResultSuccessJSON(),
   actions: [createNotificationActionJSON(), createLogActionJSON()],
   ...options,
 });
@@ -502,29 +305,17 @@ const createHeaderJSON = (options: Partial<HeaderJSON> = {}): HeaderJSON => ({
   hash: data.hash256s.a,
   previousblockhash: data.hash256s.b,
   merkleroot: data.hash256s.c,
-  time: data.timestamps.past,
+  time: data.timestamps.past.toString(),
   index: 10,
-  nonce: '1234',
   nextconsensus: keys[0].address,
-  script: createWitnessJSON(),
+  witnesses: [createWitnessJSON()],
   size: 256,
-  confirmations: 10,
   ...options,
 });
 
 const createBlockJSON = (options: Partial<BlockJSON> = {}): BlockJSON => ({
   ...createHeaderJSON(),
-  tx: [
-    createMinerTransactionJSON(),
-    createClaimTransactionJSON(),
-    createContractTransactionJSON(),
-    createEnrollmentTransactionJSON(),
-    createInvocationTransactionJSON(),
-    createIssueTransactionJSON(),
-    createPublishTransactionJSON(),
-    createRegisterTransactionJSON(),
-    createStateTransactionJSON(),
-  ],
+  tx: [createTransactionWithInvocationDataJSON()],
   ...options,
 });
 
@@ -547,9 +338,17 @@ const createStorageItemJSON = (options: Partial<StorageItemJSON> = {}): StorageI
   ...options,
 });
 
+const createAnyContractParameterJSON = (options: Partial<AnyContractParameterJSON> = {}): AnyContractParameterJSON => ({
+  name: 'param',
+  type: 'Any',
+  value: undefined,
+  ...options,
+});
+
 const createArrayContractParameterJSON = (
   options: Partial<ArrayContractParameterJSON> = {},
 ): ArrayContractParameterJSON => ({
+  name: 'param',
   type: 'Array',
   value: [createBooleanContractParameterJSON()],
   ...options,
@@ -558,6 +357,7 @@ const createArrayContractParameterJSON = (
 const createBooleanContractParameterJSON = (
   options: Partial<BooleanContractParameterJSON> = {},
 ): BooleanContractParameterJSON => ({
+  name: 'param',
   type: 'Boolean',
   value: true,
   ...options,
@@ -566,6 +366,7 @@ const createBooleanContractParameterJSON = (
 const createByteArrayContractParameterJSON = (
   options: Partial<ByteArrayContractParameterJSON> = {},
 ): ByteArrayContractParameterJSON => ({
+  name: 'param',
   type: 'ByteArray',
   value: Buffer.alloc(1, 0xff).toString(),
   ...options,
@@ -574,6 +375,7 @@ const createByteArrayContractParameterJSON = (
 const createHash160ContractParameterJSON = (
   options: Partial<Hash160ContractParameterJSON> = {},
 ): Hash160ContractParameterJSON => ({
+  name: 'param',
   type: 'Hash160',
   value: keys[0].scriptHashString,
   ...options,
@@ -582,6 +384,7 @@ const createHash160ContractParameterJSON = (
 const createHash256ContractParameterJSON = (
   options: Partial<Hash256ContractParameterJSON> = {},
 ): Hash256ContractParameterJSON => ({
+  name: 'param',
   type: 'Hash256',
   value: data.hash256s.a,
   ...options,
@@ -589,10 +392,12 @@ const createHash256ContractParameterJSON = (
 
 const createInteropInterfaceContractParameterJSON = (options: Partial<InteropInterfaceContractParameterJSON> = {}) => ({
   type: 'InteropInterface' as 'InteropInterface',
+  name: 'param',
   ...options,
 });
 
 const createMapContractParameterJSON = (options: Partial<MapContractParameterJSON> = {}): MapContractParameterJSON => ({
+  name: 'param',
   type: 'Map',
   value: [[createIntegerContractParameterJSON(), createBooleanContractParameterJSON()]],
   ...options,
@@ -601,6 +406,7 @@ const createMapContractParameterJSON = (options: Partial<MapContractParameterJSO
 const createPublicKeyContractParameterJSON = (
   options: Partial<PublicKeyContractParameterJSON> = {},
 ): PublicKeyContractParameterJSON => ({
+  name: 'param',
   type: 'PublicKey',
   value: keys[0].publicKeyString,
   ...options,
@@ -609,6 +415,7 @@ const createPublicKeyContractParameterJSON = (
 const createSignatureContractParameterJSON = (
   options: Partial<SignatureContractParameterJSON> = {},
 ): SignatureContractParameterJSON => ({
+  name: 'param',
   type: 'Signature',
   value: data.signatures.a,
   ...options,
@@ -617,6 +424,7 @@ const createSignatureContractParameterJSON = (
 const createStringContractParameterJSON = (
   options: Partial<StringContractParameterJSON> = {},
 ): StringContractParameterJSON => ({
+  name: 'param',
   type: 'String',
   value: 'test',
   ...options,
@@ -625,41 +433,8 @@ const createStringContractParameterJSON = (
 const createVoidContractParameterJSON = (
   options: Partial<VoidContractParameterJSON> = {},
 ): VoidContractParameterJSON => ({
+  name: 'param',
   type: 'Void',
-  ...options,
-});
-
-const createInput = (options: Partial<Input> = {}): Input => ({
-  hash: data.hash256s.a,
-  index: 0,
-  ...options,
-});
-
-const createOutput = (options: Partial<Output> = {}): Output => ({
-  asset: Hash256.NEO,
-  value: data.bigNumbers.a,
-  address: keys[0].address,
-  ...options,
-});
-
-const createInputOutput = (options: Partial<InputOutput> = {}): InputOutput => ({
-  ...createInput(),
-  ...createOutput(),
-  ...options,
-});
-
-const createAsset = (options: Partial<Asset> = {}): Asset => ({
-  hash: data.hash256s.c,
-  type: 'Token',
-  name: 'TheToken',
-  amount: new BigNumber('100000000'),
-  available: new BigNumber('10000000'),
-  precision: 8,
-  owner: keys[0].publicKeyString,
-  admin: keys[0].address,
-  issuer: keys[1].address,
-  expiration: 1534418216,
-  frozen: false,
   ...options,
 });
 
@@ -703,8 +478,8 @@ const createRawTransferNotification = (options: Partial<RawNotification> = {}): 
   createRawNotification({
     args: [
       createStringContractParameter({ value: 'transfer' }),
-      createAddressContractParameter({ value: keys[0].address }),
-      createAddressContractParameter({ value: keys[1].address }),
+      createHash160ContractParameter({ value: keys[0].address }),
+      createHash160ContractParameter({ value: keys[1].address }),
       createIntegerContractParameter({ value: data.bns.b }),
     ],
     ...options,
@@ -717,74 +492,59 @@ const createRawLog = (options: Partial<RawLog> = {}): RawLog => ({
   ...options,
 });
 
-const createAddressAttribute = (options: Partial<AddressAttribute> = {}): AddressAttribute => ({
-  usage: 'Script',
-  data: keys[0].address,
-  ...options,
-});
-
-const createHash256Attribute = (options: Partial<Hash256Attribute> = {}): Hash256Attribute => ({
-  usage: 'Hash1',
-  data: data.hash256s.b,
-  ...options,
-});
-
-const createBufferAttribute = (options: Partial<BufferAttribute> = {}): BufferAttribute => ({
-  usage: 'Description',
-  data: data.buffers.a,
-  ...options,
-});
-
-const createPublicKeyAttribute = (options: Partial<PublicKeyAttribute> = {}): PublicKeyAttribute => ({
-  usage: 'ECDH02',
-  data: keys[0].publicKeyString,
-  ...options,
-});
-
 const createWitness = (options: Partial<Witness> = {}): Witness => ({
   invocation: data.buffers.a,
   verification: data.buffers.b,
   ...options,
 });
 
-const createTransactionBase = (options: Partial<TransactionBase> = {}): TransactionBase => ({
+const createTransaction = (options: Partial<Transaction> = {}): Transaction => ({
   hash: data.hash256s.a,
   size: 256,
   version: 0,
-  attributes: [createAddressAttribute(), createHash256Attribute(), createBufferAttribute(), createPublicKeyAttribute()],
-  inputs: [createInput()],
-  outputs: [createOutput()],
-  scripts: [createWitness()],
+  nonce: 0,
+  validUntilBlock: 0,
+  signers: [],
+  attributes: [],
+  witnesses: [createWitness()],
   systemFee: new BigNumber('10'),
   networkFee: new BigNumber('5'),
+  script: data.buffers.a,
   ...options,
 });
 
-const createAddressContractParameter = (options: Partial<AddressContractParameter> = {}): AddressContractParameter => ({
-  type: 'Address',
+const createHash160ContractParameter = (options: Partial<Hash160ContractParameter> = {}): Hash160ContractParameter => ({
+  name: 'param',
+  type: 'Hash160',
   value: keys[0].address,
   ...options,
 });
 
 const createStringContractParameter = (options: Partial<StringContractParameter> = {}): StringContractParameter => ({
+  name: 'param',
   type: 'String',
   value: 'transfer',
   ...options,
 });
 
 const createIntegerContractParameter = (options: Partial<IntegerContractParameter> = {}): IntegerContractParameter => ({
+  name: 'param',
   type: 'Integer',
   value: new BN(20),
   ...options,
 });
 
 const createBooleanContractParameter = (options: Partial<BooleanContractParameter> = {}): BooleanContractParameter => ({
+  name: 'param',
   type: 'Boolean',
   value: true,
   ...options,
 });
 
-const createRawInvocationResultError = (options: Partial<RawInvocationResultError> = {}): RawInvocationResultError => ({
+const createRawInvocationResultError = (
+  options: Partial<RawTransactionResultError> = {},
+): RawTransactionResultError => ({
+  script: '', // TODO
   state: 'FAULT',
   gasConsumed: new BigNumber('10'),
   gasCost: new BigNumber('20'),
@@ -794,8 +554,9 @@ const createRawInvocationResultError = (options: Partial<RawInvocationResultErro
 });
 
 const createRawInvocationResultSuccess = (
-  options: Partial<RawInvocationResultSuccess> = {},
-): RawInvocationResultSuccess => ({
+  options: Partial<RawTransactionResultSuccess> = {},
+): RawTransactionResultSuccess => ({
+  script: '', // TODO
   state: 'HALT',
   gasConsumed: new BigNumber('10'),
   gasCost: new BigNumber('20'),
@@ -803,7 +564,8 @@ const createRawInvocationResultSuccess = (
   ...options,
 });
 
-const createInvocationResultError = (options: Partial<InvocationResultError> = {}): InvocationResultError => ({
+const createInvocationResultError = (options: Partial<TransactionResultError> = {}): TransactionResultError => ({
+  script: '', // TODO
   state: 'FAULT',
   gasConsumed: new BigNumber('20'),
   gasCost: new BigNumber('10'),
@@ -812,8 +574,9 @@ const createInvocationResultError = (options: Partial<InvocationResultError> = {
 });
 
 const createInvocationResultSuccess = (
-  options: Partial<InvocationResultSuccess<boolean>> = {},
-): InvocationResultSuccess<boolean> => ({
+  options: Partial<TransactionResultSuccess<boolean>> = {},
+): TransactionResultSuccess<boolean> => ({
+  script: '', // TODO
   state: 'HALT',
   gasConsumed: new BigNumber('20'),
   gasCost: new BigNumber('10'),
@@ -823,7 +586,6 @@ const createInvocationResultSuccess = (
 
 const createRawInvocationData = (options: Partial<RawInvocationData> = {}): RawInvocationData => ({
   result: createRawInvocationResultSuccess(),
-  asset: createAsset(),
   contracts: [createContract()],
   deletedContractAddresses: [keys[2].address],
   migratedContractAddresses: [[keys[0].address, keys[1].address]],
@@ -832,7 +594,7 @@ const createRawInvocationData = (options: Partial<RawInvocationData> = {}): RawI
   ...options,
 });
 
-const createConfirmedTransactionBase = (options: Partial<ConfirmedTransactionBase> = {}): ConfirmedTransactionBase => ({
+const createConfirmedTransactionBase = (options: Partial<ConfirmedTransaction> = {}): ConfirmedTransaction => ({
   receipt: {
     blockHash: data.hash256s.a,
     blockIndex: 10,
@@ -842,137 +604,10 @@ const createConfirmedTransactionBase = (options: Partial<ConfirmedTransactionBas
   ...options,
 });
 
-const createClaimTransaction = (options: Partial<ClaimTransaction> = {}): ClaimTransaction => ({
-  ...createTransactionBase(),
-  type: 'ClaimTransaction',
-  claims: [createInput()],
-  ...options,
-});
-
-const createContractTransaction = (options: Partial<ContractTransaction> = {}): ContractTransaction => ({
-  ...createTransactionBase(),
-  type: 'ContractTransaction',
-  ...options,
-});
-
-const createEnrollmentTransaction = (options: Partial<EnrollmentTransaction> = {}): EnrollmentTransaction => ({
-  ...createTransactionBase(),
-  type: 'EnrollmentTransaction',
-  publicKey: keys[0].publicKeyString,
-  ...options,
-});
-
-const createIssueTransaction = (options: Partial<IssueTransaction> = {}): IssueTransaction => ({
-  ...createTransactionBase(),
-  type: 'IssueTransaction',
-  ...options,
-});
-
-const createPublishTransaction = (options: Partial<PublishTransaction> = {}): PublishTransaction => ({
-  ...createTransactionBase(),
-  type: 'PublishTransaction',
-  contract: createContract(),
-  ...options,
-});
-
-const createRegisterTransaction = (options: Partial<RegisterTransaction> = {}): RegisterTransaction => ({
-  ...createTransactionBase(),
-  type: 'RegisterTransaction',
-  asset: createAsset(),
-  ...options,
-});
-
-const createStateTransaction = (options: Partial<StateTransaction> = {}): StateTransaction => ({
-  ...createTransactionBase(),
-  type: 'StateTransaction',
-  ...options,
-});
-
-const createInvocationTransaction = (options: Partial<InvocationTransaction> = {}): InvocationTransaction => ({
-  ...createTransactionBase(),
-  type: 'InvocationTransaction',
-  script: data.buffers.a,
-  gas: new BigNumber('10'),
-  ...options,
-});
-
-const createMinerTransaction = (options: Partial<MinerTransaction> = {}): MinerTransaction => ({
-  ...createTransactionBase(),
-  type: 'MinerTransaction',
-  nonce: 1234,
-  ...options,
-});
-
-const createConfirmedMinerTransaction = (
-  options: Partial<ConfirmedMinerTransaction> = {},
-): ConfirmedMinerTransaction => ({
-  ...createMinerTransaction(),
-  ...createConfirmedTransactionBase(),
-  ...options,
-});
-
-const createConfirmedClaimTransaction = (
-  options: Partial<ConfirmedClaimTransaction> = {},
-): ConfirmedClaimTransaction => ({
-  ...createClaimTransaction(),
-  ...createConfirmedTransactionBase(),
-  ...options,
-});
-
-const createConfirmedContractTransaction = (
-  options: Partial<ConfirmedContractTransaction> = {},
-): ConfirmedContractTransaction => ({
-  ...createContractTransaction(),
-  ...createConfirmedTransactionBase(),
-  ...options,
-});
-
-const createConfirmedEnrollmentTransaction = (
-  options: Partial<ConfirmedEnrollmentTransaction> = {},
-): ConfirmedEnrollmentTransaction => ({
-  ...createEnrollmentTransaction(),
-  ...createConfirmedTransactionBase(),
-  ...options,
-});
-
-const createConfirmedInvocationTransaction = (
-  options: Partial<ConfirmedInvocationTransaction> = {},
-): ConfirmedInvocationTransaction => ({
-  ...createInvocationTransaction(),
+const createConfirmedTransaction = (options: Partial<ConfirmedTransaction> = {}): ConfirmedTransaction => ({
+  ...createTransaction(),
   ...createConfirmedTransactionBase(),
   invocationData: createRawInvocationData(),
-  ...options,
-});
-
-const createConfirmedIssueTransaction = (
-  options: Partial<ConfirmedIssueTransaction> = {},
-): ConfirmedIssueTransaction => ({
-  ...createIssueTransaction(),
-  ...createConfirmedTransactionBase(),
-  ...options,
-});
-
-const createConfirmedPublishTransaction = (
-  options: Partial<ConfirmedPublishTransaction> = {},
-): ConfirmedPublishTransaction => ({
-  ...createPublishTransaction(),
-  ...createConfirmedTransactionBase(),
-  ...options,
-});
-
-const createConfirmedRegisterTransaction = (
-  options: Partial<ConfirmedRegisterTransaction> = {},
-): ConfirmedRegisterTransaction => ({
-  ...createRegisterTransaction(),
-  ...createConfirmedTransactionBase(),
-  ...options,
-});
-
-const createConfirmedStateTransaction = (
-  options: Partial<ConfirmedStateTransaction> = {},
-): ConfirmedStateTransaction => ({
-  ...createStateTransaction(),
-  ...createConfirmedTransactionBase(),
   ...options,
 });
 
@@ -1050,8 +685,8 @@ const createTransfer = (options: Partial<Transfer> = {}): Transfer => ({
   ...options,
 });
 
-const createAddressABIParameter = (options: Partial<AddressABIParameter> = {}): AddressABIParameter => ({
-  type: 'Address',
+const createHash160ABIParameter = (options: Partial<Hash160ABIParameter> = {}): Hash160ABIParameter => ({
+  type: 'Hash160',
   name: 'from',
   ...options,
 });
@@ -1063,18 +698,20 @@ const createIntegerABIParameter = (options: Partial<IntegerABIParameter> = {}): 
   ...options,
 });
 
-const createDeployABIFunction = (options: Partial<ABIFunction> = {}): ABIFunction => ({
+const createDeployContractMethodDescriptor = (
+  options: Partial<ContractMethodDescriptor> = {},
+): ContractMethodDescriptor => ({
   name: 'deploy',
   parameters: [],
   returnType: { type: 'Boolean' },
   ...options,
 });
 
-const createABIEvent = (options: Partial<ABIEvent> = {}): ABIEvent => ({
+const createABIEvent = (options: Partial<ContractEventDescriptor> = {}): ContractEventDescriptor => ({
   name: 'transfer',
   parameters: [
-    createAddressABIParameter({ name: 'from' }),
-    createAddressABIParameter({ name: 'to' }),
+    createHash160ABIParameter({ name: 'from' }),
+    createHash160ABIParameter({ name: 'to' }),
     createIntegerABIParameter({ name: 'amount' }),
   ],
   ...options,
@@ -1095,7 +732,7 @@ const createStringABIParameter = (options: Partial<StringABIParameter> = {}): St
   ...options,
 });
 
-const createABI = (options: Partial<ABI> = {}): ABI => ({
+const createABI = (options: Partial<ContractABI> = {}): ContractABI => ({
   ...nep5.abi(8),
   ...options,
 });
@@ -1109,7 +746,7 @@ const createForwardValue = (options: Partial<ForwardValue> = {}): ForwardValue =
     ...options,
   } as ForwardValue);
 
-const createABIFunction = (options: Partial<ABIFunction> = {}): ABIFunction => ({
+const createContractMethodDescriptor = (options: Partial<ContractMethodDescriptor> = {}): ContractMethodDescriptor => ({
   name: 'foo',
   parameters: [],
   returnType: { type: 'Boolean' },
@@ -1128,22 +765,13 @@ const createSmartContractDefinition = (options: Partial<SmartContractDefinition>
       address: keys[0].address,
     },
   },
-  abi: createABI(),
+  manifest: createContractManifest(),
   ...options,
 });
 
 const createTransactionResult = (options: Partial<TransactionResult> = {}): TransactionResult => ({
-  transaction: createContractTransaction(),
+  transaction: createTransaction(),
   confirmed: jest.fn(async () => createTransactionReceipt()),
-  ...options,
-});
-
-const createAccount = (options: Partial<Account> = {}): Account => ({
-  address: keys[0].address,
-  balances: {
-    [Hash256.NEO]: data.bigNumbers.a,
-    [Hash256.GAS]: data.bigNumbers.b,
-  },
   ...options,
 });
 
@@ -1154,76 +782,22 @@ const createHeader = (options: Partial<Header> = {}): Header => ({
   merkleRoot: data.hash256s.c,
   time: data.timestamps.past,
   index: 10,
-  nonce: '1234',
   nextConsensus: keys[0].address,
-  script: createWitnessJSON(),
   size: 256,
+  witnesses: [createWitness()],
+  witness: createWitness(),
   ...options,
 });
 
 const createBlock = (options: Partial<Block> = {}): Block => ({
   ...createHeader(),
-  transactions: [
-    createConfirmedMinerTransaction(),
-    createConfirmedClaimTransaction(),
-    createConfirmedContractTransaction(),
-    createConfirmedEnrollmentTransaction(),
-    createConfirmedInvocationTransaction(),
-    createConfirmedIssueTransaction(),
-    createConfirmedPublishTransaction(),
-    createConfirmedRegisterTransaction(),
-    createConfirmedStateTransaction(),
-  ],
-  ...options,
-});
-
-const createNeoClaimableInputJSON = (options: Partial<NeoInputClaimableJSON> = {}): NeoInputClaimableJSON => ({
-  txid: data.hash256s.a,
-  n: 3,
-  value: '23',
-  start_height: 2000000,
-  end_height: 3000000,
-  generated: '1.23',
-  sys_fee: '.01',
-  unclaimed: '1.23',
-  ...options,
-});
-
-const createNeoClaimableJSON = (options: Partial<NeoClaimableJSON> = {}): NeoClaimableJSON => ({
-  claimable: [createNeoClaimableInputJSON()],
-  unclaimed: '1.23',
-  address: keys[0].address,
-  ...options,
-});
-
-const createNeoUnspentOutputJSON = (options: Partial<NeoUnspentOutputJSON> = {}): NeoUnspentOutputJSON => ({
-  txid: data.hash256s.b,
-  n: 0,
-  value: '.034',
-  ...options,
-});
-
-const createNeoBalanceJSON = (options: Partial<NeoBalanceJSON> = {}): NeoBalanceJSON => ({
-  unspent: [createNeoUnspentOutputJSON()],
-  asset_hash: data.hash256s.c,
-  asset: 'Gas',
-  asset_symbol: 'GAS',
-  amount: '.034',
-  ...options,
-});
-
-const createNeoUnspentJSON = (options: Partial<NeoUnspentJSON> = {}): NeoUnspentJSON => ({
-  balance: [createNeoBalanceJSON()],
-  address: keys[0].address,
+  transactions: [createConfirmedTransaction()],
   ...options,
 });
 
 export const factory = {
-  createAccountJSON,
-  createAssetJSON,
   createContractJSON,
-  createInputJSON,
-  createOutputJSON,
+  createAnyContractParameterJSON,
   createIntegerContractParameterJSON,
   createArrayContractParameterJSON,
   createBooleanContractParameterJSON,
@@ -1237,17 +811,10 @@ export const factory = {
   createStringContractParameterJSON,
   createVoidContractParameterJSON,
   createInvocationDataJSON,
-  createInvocationResultSuccessJSON,
-  createInvocationResultErrorJSON,
-  createInvocationTransactionJSON,
-  createMinerTransactionJSON,
-  createClaimTransactionJSON,
-  createContractTransactionJSON,
-  createEnrollmentTransactionJSON,
-  createIssueTransactionJSON,
-  createPublishTransactionJSON,
-  createRegisterTransactionJSON,
-  createStateTransactionJSON,
+  createTransactionResultSuccessJSON,
+  createTransactionResultErrorJSON,
+  createTransactionJSON,
+  createTransactionWithInvocationDataJSON,
   createTransactionReceipt,
   createCallReceiptJSON,
   createLogActionJSON,
@@ -1257,43 +824,29 @@ export const factory = {
   createPeerJSON,
   createNetworkSettingsJSON,
   createStorageItemJSON,
-  createAsset,
   createContract,
-  createInput,
-  createOutput,
   createRawInvocationData,
-  createInvocationTransaction,
-  createConfirmedInvocationTransaction,
+  createTransactionModel,
+  createTransaction,
+  createConfirmedTransaction,
   createInvocationResultSuccess,
   createInvocationResultError,
-  createMinerTransaction,
-  createConfirmedMinerTransaction,
-  createInputOutput,
   createRawCallReceipt,
   createNetworkSettings,
-  createBufferAttribute,
-  createAddressAttribute,
-  createHash256Attribute,
-  createPublicKeyAttribute,
   createWitness,
   createLockedWallet,
   createUnlockedWallet,
   createOtherWallet,
   createTransfer,
-  createContractTransaction,
-  createClaimTransaction,
-  createRegisterTransaction,
-  createDeployABIFunction,
-  createPublishTransaction,
+  createDeployContractMethodDescriptor,
   createRawInvocationResultError,
   createRawInvocationResultSuccess,
-  createIssueTransaction,
   createRawLog,
   createRawNotification,
   createABIEvent,
-  createABIFunction,
+  createContractMethodDescriptor,
   createForwardValue,
-  createAddressContractParameter,
+  createHash160ContractParameter,
   createIntegerContractParameter,
   createStringContractParameter,
   createStringABIReturn,
@@ -1307,16 +860,7 @@ export const factory = {
   createUserAccount,
   createUserAccountID,
   createTransactionResult,
-  createEnrollmentTransaction,
-  createStateTransaction,
-  createAccount,
   createBlock,
-  createInvocationTransactionModel,
-  createNeoClaimableInputJSON,
-  createNeoClaimableJSON,
-  createNeoUnspentOutputJSON,
-  createNeoBalanceJSON,
-  createNeoUnspentJSON,
   createRawInvocationResultSuccessJSON,
   createRawInvocationResultErrorJSON,
 };

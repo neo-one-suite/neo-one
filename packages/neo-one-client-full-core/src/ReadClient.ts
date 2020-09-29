@@ -1,14 +1,10 @@
 import {
-  Account,
   AddressString,
-  Asset,
   Block,
   Contract,
   GetOptions,
   Hash256String,
-  Input,
   IterOptions,
-  Output,
   Peer,
   Transaction,
 } from '@neo-one/client-common';
@@ -25,10 +21,6 @@ export class ReadClient<TDataProvider extends DataProvider = DataProvider> {
 
   public async getAccount(address: AddressString): Promise<Account> {
     return this.dataProvider.getAccount(clientArgs.assertAddress('address', address));
-  }
-
-  public async getAsset(hash: Hash256String): Promise<Asset> {
-    return this.dataProvider.getAsset(clientArgs.assertHash256('hash', hash));
   }
 
   public async getBlock(hash: number | Hash256String, optionsIn?: GetOptions): Promise<Block> {
@@ -62,10 +54,6 @@ export class ReadClient<TDataProvider extends DataProvider = DataProvider> {
 
   public async getTransaction(hash: Hash256String): Promise<Transaction> {
     return this.dataProvider.getTransaction(clientArgs.assertHash256('hash', hash));
-  }
-
-  public async getOutput(input: Input): Promise<Output> {
-    return this.dataProvider.getOutput(input);
   }
 
   public async getConnectedPeers(): Promise<readonly Peer[]> {

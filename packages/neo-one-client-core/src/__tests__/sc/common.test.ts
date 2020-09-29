@@ -9,6 +9,7 @@ describe('common', () => {
   const param: ContractParameter = {
     type: 'String',
     value,
+    name,
   };
 
   test('convertParameter', () => {
@@ -56,8 +57,8 @@ describe('common', () => {
     const action = factory.createRawNotification({
       args: [
         factory.createStringContractParameter({ value: event.name }),
-        factory.createAddressContractParameter({ value: keys[0].address }),
-        factory.createAddressContractParameter({ value: keys[1].address }),
+        factory.createHash160ContractParameter({ value: keys[0].address }),
+        factory.createHash160ContractParameter({ value: keys[1].address }),
         factory.createIntegerContractParameter({ value: data.bns.a }),
       ],
     });

@@ -1,4 +1,4 @@
-import { ABIParameter, ABIReturn, AssetType } from '@neo-one/client-common';
+import { ABIParameter, ABIReturn } from '@neo-one/client-common';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
 import { Hash256 } from '../Hash256';
@@ -88,25 +88,7 @@ const numbers = {
   b: 8,
 };
 
-const createValidAssetRegister = (type: AssetType) => ({
-  type,
-  name: 'Foo',
-  amount: bigNumbers.a,
-  precision: numbers.b,
-  owner: keys[0].publicKeyString,
-  admin: keys[0].address,
-  issuer: keys[1].address,
-});
-
 const assetRegisters = {
-  credit: createValidAssetRegister('Credit'),
-  duty: createValidAssetRegister('Duty'),
-  governing: createValidAssetRegister('Governing'),
-  utility: createValidAssetRegister('Utility'),
-  currency: createValidAssetRegister('Currency'),
-  share: createValidAssetRegister('Share'),
-  invoice: createValidAssetRegister('Invoice'),
-  token: createValidAssetRegister('Token'),
   validScriptHash: {
     type: 'Token',
     name: 'Foo',
@@ -253,7 +235,7 @@ const simpleParameterType = (paramType: ABIParameter) => ({
 const abi = {
   returnSignature: simpleReturnType({ type: 'Signature' }),
   returnBoolean: simpleReturnType({ type: 'Boolean' }),
-  returnAddress: simpleReturnType({ type: 'Address' }),
+  returnHash160: simpleReturnType({ type: 'Hash160' }),
   returnHash256: simpleReturnType({ type: 'Hash256' }),
   returnBuffer: simpleReturnType({ type: 'Buffer' }),
   returnPublicKey: simpleReturnType({ type: 'PublicKey' }),
@@ -263,7 +245,7 @@ const abi = {
   returnInteger: simpleReturnType({ type: 'Integer', decimals: 8 }),
   paramSignature: simpleParameterType({ type: 'Signature', name: 'foo' }),
   paramBoolean: simpleParameterType({ type: 'Boolean', name: 'foo' }),
-  paramAddress: simpleParameterType({ type: 'Address', name: 'foo' }),
+  paramHash160: simpleParameterType({ type: 'Hash160', name: 'foo' }),
   paramHash256: simpleParameterType({ type: 'Hash256', name: 'foo' }),
   paramBuffer: simpleParameterType({ type: 'Buffer', name: 'foo' }),
   paramPublicKey: simpleParameterType({ type: 'PublicKey', name: 'foo' }),
@@ -330,23 +312,23 @@ const smartContractNetworksDefinition = {
 const smartContractDefinition = {
   valid: {
     networks: smartContractNetworksDefinition.valid,
-    abi: abi.paramAddress,
+    abi: abi.paramHash160,
   },
   invalid: 'Foo',
   invalidNetworks: {
     networks: smartContractNetworksDefinition.invalid,
-    abi: abi.paramAddress,
+    abi: abi.paramHash160,
   },
   invalidNetwork: {
     networks: smartContractNetworksDefinition.invalidNetwork,
-    abi: abi.paramAddress,
+    abi: abi.paramHash160,
   },
 };
 
 const readSmartContractDefinition = {
   valid: {
     address: keys[0].address,
-    abi: abi.paramAddress,
+    abi: abi.paramHash160,
   },
   invalid: 'Foo',
 };
@@ -376,7 +358,7 @@ const serializedTransaction = {
 };
 
 const timestamps = {
-  past: 1534365211,
+  past: new BigNumber(1534365211),
 };
 
 const invokeSendUnsafeReceiveTransactionOptions = {

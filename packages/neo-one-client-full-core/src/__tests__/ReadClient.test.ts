@@ -7,7 +7,6 @@ import { DataProvider } from '../types';
 describe('ReadClient', () => {
   const network = 'main';
   const getAccount = jest.fn();
-  const getAsset = jest.fn();
   const getBlock = jest.fn();
   const iterBlocks = jest.fn();
   const getBestBlockHash = jest.fn();
@@ -15,12 +14,10 @@ describe('ReadClient', () => {
   const getContract = jest.fn();
   const getMemPool = jest.fn();
   const getTransaction = jest.fn();
-  const getOutput = jest.fn();
   const getConnectedPeers = jest.fn();
   const provider: DataProvider = {
     network,
     getAccount,
-    getAsset,
     getBlock,
     iterBlocks,
     getBestBlockHash,
@@ -28,7 +25,6 @@ describe('ReadClient', () => {
     getContract,
     getMemPool,
     getTransaction,
-    getOutput,
     getConnectedPeers,
   };
   let client: ReadClient;
@@ -44,16 +40,6 @@ describe('ReadClient', () => {
 
     expect(result).toEqual(value);
     expect(getAccount.mock.calls).toMatchSnapshot();
-  });
-
-  test('getAsset', async () => {
-    const value = factory.createAsset();
-    getAsset.mockImplementationOnce(() => value);
-
-    const result = await client.getAsset(data.hash256s.a);
-
-    expect(result).toEqual(value);
-    expect(getAsset.mock.calls).toMatchSnapshot();
   });
 
   test('getBlock', async () => {
@@ -136,16 +122,6 @@ describe('ReadClient', () => {
 
     expect(result).toEqual(value);
     expect(getTransaction.mock.calls).toMatchSnapshot();
-  });
-
-  test('getOutput', async () => {
-    const value = factory.createOutput();
-    getOutput.mockImplementationOnce(() => value);
-
-    const result = await client.getOutput(factory.createInput());
-
-    expect(result).toEqual(value);
-    expect(getOutput.mock.calls).toMatchSnapshot();
   });
 
   test('getConnectedPeers', async () => {

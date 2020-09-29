@@ -1,19 +1,12 @@
 import {
   AddressString,
+  addressToScriptHash,
   Attribute,
-  ClaimTransaction,
-  ClaimTransactionModel,
   common,
   crypto,
   GetOptions,
-  Input,
-  InputModel,
-  InputOutput,
-  InvocationTransaction,
-  InvocationTransactionModel,
   IterOptions,
   NetworkType,
-  Output,
   Param,
   RawAction,
   RelayTransactionResult,
@@ -21,7 +14,7 @@ import {
   ScriptBuilderParam,
   SourceMaps,
   Transaction,
-  TransactionBaseModel,
+  TransactionModel,
   TransactionReceipt,
   TransactionResult,
   Transfer,
@@ -37,6 +30,7 @@ import { utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { Observable } from 'rxjs';
 import { InvokeError, NothingToClaimError, NothingToTransferError, UnknownAccountError } from '../errors';
+import { Hash256 } from '../Hash256';
 import {
   ExecuteInvokeMethodOptions,
   ExecuteInvokeScriptOptions,
@@ -88,13 +82,7 @@ export interface KeyStore {
 export interface Provider extends ProviderBase {
   readonly relayTransaction: (
     network: NetworkType,
-    transaction: TransactionBaseModel,
-    networkFee?: BigNumber | undefined,
-  ) => Promise<RelayTransactionResult>;
-  readonly relayStrippedTransaction: (
-    network: NetworkType,
-    verifcationTransaction: InvocationTransactionModel,
-    relayTransaction: InvocationTransactionModel,
+    transaction: TransactionModel,
     networkFee?: BigNumber | undefined,
   ) => Promise<RelayTransactionResult>;
 }
@@ -116,10 +104,10 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
   public readonly iterActionsRaw?: (network: NetworkType, options?: IterOptions) => AsyncIterable<RawAction>;
   protected readonly executeInvokeMethod: <T extends TransactionReceipt>(
     options: ExecuteInvokeMethodOptions<T>,
-  ) => Promise<TransactionResult<T, InvocationTransaction>>;
+  ) => Promise<TransactionResult<T>>;
   protected readonly executeInvokeScript: <T extends TransactionReceipt>(
     options: ExecuteInvokeScriptOptions<T>,
-  ) => Promise<TransactionResult<T, InvocationTransaction>>;
+  ) => Promise<TransactionResult<T>>;
 
   public constructor({ keystore, provider }: { readonly keystore: TKeyStore; readonly provider: TProvider }) {
     super({ provider });
@@ -171,15 +159,13 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
   }
 
   protected async sendTransaction<TTransaction extends Transaction, T extends TransactionReceipt = TransactionReceipt>({
-    inputs,
-    transaction: transactionUnsignedIn,
+    transaction: transactionUnsigned,
     from,
     onConfirm,
     networkFee,
     sourceMaps,
   }: {
-    readonly inputs: readonly InputOutput[];
-    readonly transaction: TransactionBaseModel;
+    readonly transaction: TransactionModel;
     readonly from: UserAccountID;
     readonly onConfirm: (options: {
       readonly transaction: Transaction;
@@ -190,57 +176,10 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
   }): Promise<TransactionResult<T, TTransaction>> {
     return this.capture(
       async () => {
-        let transactionUnsigned = transactionUnsignedIn;
-        if (this.keystore.byteLimit !== undefined) {
-          transactionUnsigned = await this.consolidate({
-            inputs,
-            from,
-            transactionUnsignedIn,
-            byteLimit: this.keystore.byteLimit,
-          });
-        }
-        const address = from.address;
-        if (
-          transactionUnsigned.inputs.length === 0 &&
-          // tslint:disable no-any
-          ((transactionUnsigned as any).claims == undefined ||
-            !Array.isArray((transactionUnsigned as any).claims) ||
-            (transactionUnsigned as any).claims.length === 0)
-          // tslint:enable no-any
-        ) {
-          transactionUnsigned = transactionUnsigned.clone({
-            attributes: transactionUnsigned.attributes.concat(
-              this.convertAttributes([
-                {
-                  usage: 'Script',
-                  data: address,
-                },
-              ]),
-            ),
-          });
-        }
-
-        const [signature, inputOutputs, claimOutputs] = await Promise.all([
-          this.keystore.sign({
-            account: from,
-            message: transactionUnsigned.serializeUnsigned().toString('hex'),
-          }),
-          Promise.all(
-            transactionUnsigned.inputs.map(async (input) =>
-              this.provider.getOutput(from.network, { hash: common.uInt256ToString(input.hash), index: input.index }),
-            ),
-          ),
-          transactionUnsigned instanceof ClaimTransactionModel
-            ? Promise.all(
-                transactionUnsigned.claims.map(async (input) =>
-                  this.provider.getOutput(from.network, {
-                    hash: common.uInt256ToString(input.hash),
-                    index: input.index,
-                  }),
-                ),
-              )
-            : Promise.resolve([]),
-        ]);
+        const signature = await this.keystore.sign({
+          account: from,
+          message: transactionUnsigned.serializeUnsigned().toString('hex'),
+        });
 
         const userAccount = this.getUserAccount(from);
         const witness = crypto.createWitnessForSignature(
@@ -253,8 +192,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
           from.network,
           this.addWitness({
             transaction: transactionUnsigned,
-            inputOutputs: inputOutputs.concat(claimOutputs),
-            address,
             witness,
           }),
           networkFee,
@@ -275,10 +212,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
 
           throw new InvokeError(message);
         }
-
-        (transactionUnsigned.inputs as readonly InputModel[]).forEach((transfer) =>
-          this.mutableUsedOutputs.add(`${common.uInt256ToString(transfer.hash)}:${transfer.index}`),
-        );
 
         const { transaction } = result;
 
@@ -302,159 +235,9 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     );
   }
 
-  protected async sendStrippedTransaction<T extends TransactionReceipt = TransactionReceipt>({
-    inputs,
-    transaction: transactionUnsignedIn,
-    from,
-    onConfirm,
-    networkFee,
-    sourceMaps,
-  }: {
-    readonly inputs: readonly InputOutput[];
-    readonly transaction: InvocationTransactionModel;
-    readonly from: UserAccountID;
-    readonly onConfirm: (options: {
-      readonly transaction: Transaction;
-      readonly receipt: TransactionReceipt;
-    }) => Promise<T>;
-    readonly networkFee?: BigNumber;
-    readonly sourceMaps?: SourceMaps;
-  }): Promise<TransactionResult<T, InvocationTransaction>> {
-    // when this problem invocation comes in we need to strip the bad verification script and then sign that transaction
-    return this.capture(
-      async () => {
-        let transactionUnsigned = transactionUnsignedIn;
-        if (this.keystore.byteLimit !== undefined) {
-          transactionUnsigned = (await this.consolidate({
-            inputs,
-            from,
-            transactionUnsignedIn,
-            byteLimit: this.keystore.byteLimit,
-          })) as InvocationTransactionModel;
-        }
-        const address = from.address;
-        if (
-          transactionUnsigned.inputs.length === 0 &&
-          // tslint:disable no-any
-          ((transactionUnsigned as any).claims == undefined ||
-            !Array.isArray((transactionUnsigned as any).claims) ||
-            (transactionUnsigned as any).claims.length === 0)
-          // tslint:enable no-any
-        ) {
-          transactionUnsigned = transactionUnsigned.clone({
-            attributes: transactionUnsigned.attributes.concat(
-              this.convertAttributes([
-                {
-                  usage: 'Script',
-                  data: address,
-                },
-              ]),
-            ),
-          });
-        }
-
-        const relayTransactionUnsigned = transactionUnsigned.clone({
-          attributes: [],
-          scripts: [],
-        });
-
-        const [verificationSignature, relaySignature, inputOutputs] = await Promise.all([
-          this.keystore.sign({
-            account: from,
-            message: transactionUnsigned.serializeUnsigned().toString('hex'),
-          }),
-          this.keystore.sign({
-            account: from,
-            message: relayTransactionUnsigned.serializeUnsigned().toString('hex'),
-          }),
-          Promise.all(
-            transactionUnsigned.inputs.map(async (input) =>
-              this.provider.getOutput(from.network, { hash: common.uInt256ToString(input.hash), index: input.index }),
-            ),
-          ),
-        ]);
-
-        const userAccount = this.getUserAccount(from);
-
-        const verificationWitness = crypto.createWitnessForSignature(
-          Buffer.from(verificationSignature, 'hex'),
-          common.stringToECPoint(userAccount.publicKey),
-          WitnessModel,
-        );
-
-        const relayWitness = crypto.createWitnessForSignature(
-          Buffer.from(relaySignature, 'hex'),
-          common.stringToECPoint(userAccount.publicKey),
-          WitnessModel,
-        );
-
-        const signedVerificationTransaction = this.addWitness({
-          transaction: transactionUnsigned,
-          inputOutputs,
-          address,
-          witness: verificationWitness,
-        }) as InvocationTransactionModel;
-
-        const signedRelayTransaction = relayTransactionUnsigned.clone({
-          scripts: [relayWitness],
-        });
-
-        const result = await this.provider.relayStrippedTransaction(
-          from.network,
-          signedVerificationTransaction,
-          signedRelayTransaction,
-          networkFee,
-        );
-
-        const failures =
-          result.verifyResult === undefined
-            ? []
-            : result.verifyResult.verifications.filter(({ failureMessage }) => failureMessage !== undefined);
-        if (failures.length > 0) {
-          const message = await processActionsAndMessage({
-            actions: failures.reduce<readonly RawAction[]>((acc, { actions }) => acc.concat(actions), []),
-            message: failures
-              .map(({ failureMessage }) => failureMessage)
-              .filter(commonUtils.notNull)
-              .join(' '),
-            sourceMaps,
-          });
-
-          throw new InvokeError(message);
-        }
-
-        transactionUnsigned.inputs.forEach((transfer) =>
-          this.mutableUsedOutputs.add(`${common.uInt256ToString(transfer.hash)}:${transfer.index}`),
-        );
-
-        const { transaction } = result;
-
-        return {
-          transaction: transaction as InvocationTransaction,
-          // tslint:disable-next-line no-unnecessary-type-annotation
-          confirmed: async (optionsIn: GetOptions = {}): Promise<T> => {
-            const options = {
-              ...optionsIn,
-              timeoutMS: optionsIn.timeoutMS === undefined ? 120000 : optionsIn.timeoutMS,
-            };
-            const receipt = await this.provider.getTransactionReceipt(from.network, transaction.hash, options);
-
-            return onConfirm({ transaction, receipt });
-          },
-        };
-      },
-      {
-        name: 'neo_send_stripped_transaction',
-      },
-    );
-  }
-
   protected async executeInvokeClaim({
     contract,
-    inputs,
-    outputs,
-    unclaimed,
-    amount,
+    unclaimedAmount,
     attributes,
     method,
     params,
@@ -463,40 +246,32 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     sourceMaps,
   }: {
     readonly contract: AddressString;
-    readonly inputs: readonly InputOutput[];
-    readonly outputs: readonly Output[];
-    readonly unclaimed: readonly Input[];
-    readonly amount: BigNumber;
+    readonly unclaimedAmount: BigNumber;
     readonly attributes: readonly Attribute[];
     readonly method: string;
     readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
     readonly paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>;
     readonly from: UserAccountID;
     readonly sourceMaps?: SourceMaps;
-  }): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
-    const transaction = new ClaimTransactionModel({
-      inputs: this.convertInputs(inputs),
-      claims: this.convertInputs(unclaimed),
-      outputs: this.convertOutputs(
-        outputs.concat([
-          {
-            address: contract,
-            asset: common.GAS_ASSET_HASH,
-            value: amount,
-          },
-        ]),
-      ),
-      attributes: this.convertAttributes(
-        // By definition, the contract address is a claim input so the script hash is already included
-        // By definition, the from address is not an input or a claim, so we need to add it
-        attributes.concat(this.getInvokeAttributes(contract, method, paramsZipped, false, from.address)),
-      ),
+  }): Promise<TransactionResult> {
+    const script = new ScriptBuilder()
+      .emitSysCall('System.Contract.Call', common.GAS_CONTRACT_SCRIPT_HASH, 'transfer', [
+        addressToScriptHash(contract),
+        common.GAS_CONTRACT_SCRIPT_HASH,
+        unclaimedAmount.toString(),
+      ])
+      .build();
+
+    const { gas } = await this.getSystemFee({ from, script, attributes });
+
+    const transaction = new TransactionModel({
+      systemFee: utils.bigNumberToBN(gas, 8),
       // Since the contract address is an input, we must add a witness for it.
-      scripts: this.getInvokeScripts(method, params, true),
+      witnesses: this.getInvokeScripts(method, params, true),
+      script,
     });
 
-    return this.sendTransaction<ClaimTransaction>({
-      inputs,
+    return this.sendTransaction<Transaction>({
       from,
       transaction,
       onConfirm: async ({ receipt }) => receipt,
@@ -505,33 +280,40 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
   }
 
   protected async executeTransfer(
+    // TODO: how to represent transfer objects now?
     transfers: readonly Transfer[],
     from: UserAccountID,
     attributes: readonly Attribute[],
     networkFee: BigNumber,
-  ): Promise<TransactionResult<TransactionReceipt, InvocationTransaction>> {
-    const { inputs, outputs } = await this.getTransfersInputOutputs({
-      transfers: transfers.map((transfer) => ({ from, ...transfer })),
-      from,
-      gas: networkFee,
-    });
-
-    if (inputs.length === 0 && this.keystore.byteLimit === undefined) {
+  ): Promise<TransactionResult> {
+    if (this.keystore.byteLimit === undefined) {
       throw new NothingToTransferError();
     }
+    // TODO: need to rebuild transfer script
+    const sb = new ScriptBuilder();
+    transfers.forEach((transfer) => {
+      sb.emitSysCall(
+        'System.Contract.Call',
+        transfer.asset === Hash256.NEO ? common.NEO_CONTRACT_SCRIPT_HASH : common.GAS_CONTRACT_SCRIPT_HASH,
+        'transfer',
+        [addressToScriptHash(from.address), addressToScriptHash(transfer.to), transfer.amount.toString()],
+      );
+    });
+    const script = sb.build();
 
-    const transaction = new InvocationTransactionModel({
-      inputs: this.convertInputs(inputs),
-      outputs: this.convertOutputs(outputs),
+    // TODO: can probably cache certain scripts if they call the same method on the same contract
+    const { gas } = await this.getSystemFee({ from, attributes, script });
+
+    const transaction = new TransactionModel({
+      systemFee: utils.bigNumberToBN(gas, 8), // TODO: check. fee for transfer method is 0.08 GAS
+      networkFee: utils.bigNumberToBN(networkFee, 8), // TODO: check
       attributes: this.convertAttributes(attributes),
-      gas: utils.ZERO,
-      script: new ScriptBuilder().emitOp('PUSH1').build(),
+      script,
     });
 
-    return this.sendTransaction<InvocationTransaction>({
+    return this.sendTransaction<Transaction>({
       from,
       transaction,
-      inputs,
       onConfirm: async ({ receipt }) => receipt,
       networkFee,
     });
@@ -539,39 +321,34 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
 
   protected async executeClaim(
     from: UserAccountID,
-    attributes: readonly Attribute[],
+    attributes: readonly Attribute[] = [],
     networkFee: BigNumber,
-  ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
-    const [{ unclaimed, amount }, { inputs, outputs }] = await Promise.all([
-      this.provider.getUnclaimed(from.network, from.address),
-      this.getTransfersInputOutputs({
-        from,
-        gas: networkFee,
-        transfers: [],
-      }),
-    ]);
-
-    if (unclaimed.length === 0) {
+  ): Promise<TransactionResult> {
+    const unclaimedAmount = await this.provider.getUnclaimed(from.network, from.address);
+    if (unclaimedAmount.eq(new BigNumber('0'))) {
       throw new NothingToClaimError(from);
     }
 
-    const transaction = new ClaimTransactionModel({
-      inputs: this.convertInputs(inputs),
-      claims: this.convertInputs(unclaimed),
-      outputs: this.convertOutputs(
-        outputs.concat([
-          {
-            address: from.address,
-            asset: common.GAS_ASSET_HASH,
-            value: amount,
-          },
-        ]),
-      ),
+    const script = new ScriptBuilder()
+      .emitSysCall('System.Contract.Call', common.GAS_CONTRACT_SCRIPT_HASH, 'transfer', [
+        addressToScriptHash(from.address),
+        common.GAS_CONTRACT_SCRIPT_HASH,
+        unclaimedAmount.toString(),
+      ])
+      .build();
+
+    const { gas } = await this.getSystemFee({ script, from, attributes });
+
+    const transaction = new TransactionModel({
+      systemFee: utils.bigNumberToBN(gas, 8), // TODO: check this. check decimals
+      networkFee: utils.bigNumberToBN(networkFee, 8), // TODO: check decimals
+      signers: undefined, // ?
+      witnesses: undefined, // ?
+      script,
       attributes: this.convertAttributes(attributes),
     });
 
-    return this.sendTransaction<ClaimTransaction>({
-      inputs,
+    return this.sendTransaction<Transaction>({
       from,
       transaction,
       onConfirm: async ({ receipt }) => receipt,
@@ -583,51 +360,33 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     script,
     from,
     attributes,
-    inputs,
-    outputs,
-    rawInputs,
-    rawOutputs,
     gas,
-    scripts,
-    reorderOutputs,
+    witnesses,
     onConfirm,
     sourceMaps,
-  }: ExecuteInvokeScriptOptions<T>): Promise<TransactionResult<T, InvocationTransaction>> {
-    const invokeTransaction = new InvocationTransactionModel({
-      version: 1,
-      inputs: this.convertInputs(rawInputs.concat(inputs)),
-      outputs: this.convertOutputs(reorderOutputs(rawOutputs.concat(outputs))),
+  }: ExecuteInvokeScriptOptions<T>): Promise<TransactionResult<T>> {
+    // TODO: check
+    const { gas: systemFee } = await this.getSystemFee({ attributes, script, from });
+    const invokeTransaction = new TransactionModel({
+      systemFee: utils.bigNumberToBN(systemFee, 8), // TODO: check
+      networkFee: utils.bigNumberToBN(gas, 8), // TODO: check
       attributes: this.convertAttributes(attributes),
-      gas: utils.bigNumberToBN(gas, 8),
+      signers: [], // TODO: ?
       script,
-      scripts,
+      witnesses,
     });
 
-    const inputsFrom = inputs.filter((input) => input.address === from.address);
-
     try {
-      return scripts.length === 1 && scripts[0].verification.length === 0 && inputsFrom.length > 0
-        ? this.sendStrippedTransaction({
-            from,
-            inputs,
-            transaction: invokeTransaction,
-            onConfirm: async ({ transaction, receipt }) => {
-              const data = await this.provider.getInvocationData(from.network, transaction.hash);
+      return this.sendTransaction<Transaction, T>({
+        from,
+        transaction: invokeTransaction,
+        onConfirm: async ({ transaction, receipt }) => {
+          const data = await this.provider.getInvocationData(from.network, transaction.hash);
 
-              return onConfirm({ transaction, receipt, data });
-            },
-          })
-        : this.sendTransaction<InvocationTransaction, T>({
-            from,
-            inputs,
-            transaction: invokeTransaction,
-            onConfirm: async ({ transaction, receipt }) => {
-              const data = await this.provider.getInvocationData(from.network, transaction.hash);
-
-              return onConfirm({ transaction, receipt, data });
-            },
-            sourceMaps,
-          });
+          return onConfirm({ transaction, receipt, data });
+        },
+        sourceMaps,
+      });
     } catch (error) {
       const message = await processActionsAndMessage({
         actions: [],

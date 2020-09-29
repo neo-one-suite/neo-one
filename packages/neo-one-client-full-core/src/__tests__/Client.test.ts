@@ -21,7 +21,6 @@ describe('Client', () => {
   const claim = jest.fn(async () => commonTransactionResult) as any;
   const publish = jest.fn(async () => commonTransactionResult) as any;
   const publishAndDeploy = jest.fn(async () => commonTransactionResult) as any;
-  const registerAsset = jest.fn(async () => commonTransactionResult) as any;
   const readClient = {};
   const read = jest.fn(() => readClient) as any;
   const invoke = jest.fn(async () => commonTransactionResult) as any;
@@ -33,12 +32,9 @@ describe('Client', () => {
   const call = jest.fn(async () => commonRawCallReceipt);
   const iterBlocks = jest.fn();
   const getBlockCount = jest.fn();
-  const getAccount = jest.fn();
   const iterActionsRaw = jest.fn();
   let transfer: jest.Mock;
   let transfer1: jest.Mock;
-  let issue: jest.Mock;
-  let issue1: jest.Mock;
   // tslint:enable:no-any
 
   let provider: UserAccountProvider;
@@ -47,8 +43,6 @@ describe('Client', () => {
   beforeEach(() => {
     transfer = jest.fn(async () => factory.createTransactionResult());
     transfer1 = jest.fn(async () => factory.createTransactionResult());
-    issue = jest.fn(async () => factory.createTransactionResult());
-    issue1 = jest.fn(async () => factory.createTransactionResult());
 
     provider = {
       currentUserAccount$: _of(unlockedWallet.userAccount),
@@ -64,8 +58,6 @@ describe('Client', () => {
       claim,
       publish,
       publishAndDeploy,
-      registerAsset,
-      issue,
       read,
       invoke,
       invokeSend,
@@ -75,7 +67,6 @@ describe('Client', () => {
       call,
       iterBlocks,
       getBlockCount,
-      getAccount,
       iterActionsRaw,
     };
     provider1 = {
@@ -93,8 +84,6 @@ describe('Client', () => {
       claim: jest.fn(async () => Promise.resolve()) as any,
       publish: jest.fn(async () => Promise.resolve()) as any,
       publishAndDeploy: jest.fn(async () => Promise.resolve()) as any,
-      registerAsset: jest.fn(async () => Promise.resolve()) as any,
-      issue: issue1,
       read: jest.fn(),
       invoke: jest.fn(async () => Promise.resolve()) as any,
       invokeSend: jest.fn(async () => Promise.resolve()) as any,
@@ -105,7 +94,6 @@ describe('Client', () => {
       call: jest.fn(),
       iterBlocks,
       getBlockCount,
-      getAccount,
       iterActionsRaw,
     };
     client = new Client({ [type]: provider, [type1]: provider1 });
@@ -255,36 +243,6 @@ describe('Client', () => {
 
     expect(publishAndDeploy.mock.calls).toMatchSnapshot();
     expect(result.transaction).toEqual(commonTransactionResult.transaction);
-  });
-
-  test('registerAsset', async () => {
-    const asset = factory.createAssetRegister();
-    const result = await client.registerAsset(asset);
-
-    expect(registerAsset.mock.calls).toMatchSnapshot();
-    expect(result.transaction).toEqual(commonTransactionResult.transaction);
-  });
-
-  test('issue - simple', async () => {
-    const transactionResult = factory.createTransactionResult();
-    issue.mockImplementation(async () => transactionResult);
-
-    const result = await client.issue(data.bigNumbers.a, Hash256.NEO, keys[0].address);
-
-    expect(issue.mock.calls).toMatchSnapshot();
-    expect(result.transaction).toEqual(transactionResult.transaction);
-  });
-
-  test('issue - array', async () => {
-    const transactionResult = factory.createTransactionResult();
-    issue1.mockImplementation(async () => transactionResult);
-
-    const result = await client.issue([{ amount: data.bigNumbers.a, asset: Hash256.NEO, to: keys[0].address }], {
-      from: unlockedWallet1.userAccount.id,
-    });
-
-    expect(issue1.mock.calls).toMatchSnapshot();
-    expect(result.transaction).toEqual(transactionResult.transaction);
   });
 
   test('read', () => {
