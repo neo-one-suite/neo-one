@@ -105,78 +105,6 @@ describe('arg assertions', () => {
     expect(() => args.assertGetOptions('value', value)).toThrowErrorMatchingSnapshot();
   });
 
-  test('assertAssetRegister - credit', () => {
-    const value = data.assetRegisters.credit;
-
-    expect(args.assertAssetRegister('value', value)).toEqual(value);
-  });
-
-  test('assertAssetRegister - duty', () => {
-    const value = data.assetRegisters.duty;
-
-    expect(args.assertAssetRegister('value', value)).toEqual(value);
-  });
-
-  test('assertAssetRegister - governing', () => {
-    const value = data.assetRegisters.governing;
-
-    expect(args.assertAssetRegister('value', value)).toEqual(value);
-  });
-
-  test('assertAssetRegister - utility', () => {
-    const value = data.assetRegisters.utility;
-
-    expect(args.assertAssetRegister('value', value)).toEqual(value);
-  });
-
-  test('assertAssetRegister - currency', () => {
-    const value = data.assetRegisters.currency;
-
-    expect(args.assertAssetRegister('value', value)).toEqual(value);
-  });
-
-  test('assertAssetRegister - share', () => {
-    const value = data.assetRegisters.share;
-
-    expect(args.assertAssetRegister('value', value)).toEqual(value);
-  });
-
-  test('assertAssetRegister - invoice', () => {
-    const value = data.assetRegisters.invoice;
-
-    expect(args.assertAssetRegister('value', value)).toEqual(value);
-  });
-
-  test('assertAssetRegister - token', () => {
-    const value = data.assetRegisters.token;
-
-    expect(args.assertAssetRegister('value', value)).toEqual(value);
-  });
-
-  test('assertAssetRegister - validScriptHash', () => {
-    const value = data.assetRegisters.validScriptHash;
-
-    expect(args.assertAssetRegister('value', value)).toEqual(data.assetRegisters.token);
-  });
-
-  test('assertAssetRegister - undefined', () => {
-    const value = undefined;
-
-    expect(() => args.assertAssetRegister('value', value)).toThrowErrorMatchingSnapshot();
-  });
-
-  test('assertAssetRegister - non object', () => {
-    const value = true;
-
-    expect(() => args.assertAssetRegister('value', value)).toThrowErrorMatchingSnapshot();
-  });
-
-  test('assertAssetRegister - invalid', () => {
-    const value = data.assetRegisters.invalid;
-
-    expect(() => args.assertAssetRegister('value', value)).toThrowErrorMatchingSnapshot();
-  });
-
   test('assertContractRegister - valid', () => {
     const value = data.contractRegisters.valid;
 
@@ -204,6 +132,12 @@ describe('arg assertions', () => {
   test('assertABI - nep5', () => {
     const value = nep5.abi(8);
 
-    expect(clientArgs.assertABI('value', value)).toEqual(value);
+    expect(clientArgs.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractManifest', () => {
+    const value = nep5.manifest(8);
+
+    expect(clientArgs.assertContractManifest('value', value)).toEqual(value);
   });
 });

@@ -1,4 +1,4 @@
-import { AddressString, AttributeUsage, Hash256String, NetworkType, PublicKeyString } from '@neo-one/client-common';
+import { AddressString, AttributeTypeModel, Hash256String, NetworkType, PublicKeyString } from '@neo-one/client-common';
 
 /**
  * Information about the provider of a Dapi
@@ -172,13 +172,15 @@ export interface AttachedAssets {
 }
 
 /**
- * Hash `Attrribute` attached to a transaction.
+ * Hash `Attribute` attached to a transaction.
+ * TODO: removed `extends Argument` but kept `Argument` definition, as it may be
+ * needed after Preview 3 when they add back transaction attributes
  */
-export interface TxHashAttribute extends Argument {
+export interface TxHashAttribute {
   /**
    * Allowed `Attribute` types.
    */
-  readonly txAttrUsage: AttributeUsage;
+  readonly txAttrType: AttributeTypeModel;
 }
 
 /**
@@ -194,11 +196,6 @@ export interface InvokeArgs extends InvokeReadArgs {
    */
   readonly fee?: string;
   /**
-   * A hard override of all transaction utxo inputs and outputs.
-   * IMPORTANT: If provided, fee and attachedAssets will be ignored.
-   */
-  readonly assetIntentOverrides?: AssetIntentOverrides;
-  /**
    * Adds the instruction to invoke the contract verification trigger.
    */
   readonly triggerContractVerification?: boolean;
@@ -206,20 +203,6 @@ export interface InvokeArgs extends InvokeReadArgs {
    * Adds transaction attributes.
    */
   readonly txHashAttributes?: readonly TxHashAttribute[];
-}
-
-/**
- * A hard override of all transaction utxo inputs and outputs.
- */
-export interface AssetIntentOverrides {
-  /**
-   * Inputs to attach to the transaction.
-   */
-  readonly inputs: readonly AssetInput[];
-  /**
-   * Outputs to attach to the transaction.
-   */
-  readonly outputs: readonly AssetOutput[];
 }
 
 /**

@@ -1,4 +1,3 @@
-import { VersionJSON } from '@neo-one/client-common';
 import { Block } from './Block';
 import { Blockchain, VerifyTransactionResult } from './Blockchain';
 import { Endpoint } from './net';
@@ -19,8 +18,15 @@ export interface RelayTransactionResult {
   readonly verifyResult?: VerifyTransactionResult;
 }
 
+export interface Version {
+  readonly tcpPort: number;
+  readonly wsPort: number;
+  readonly nonce: string;
+  readonly useragent: string;
+}
+
 export interface Node {
-  readonly version: VersionJSON;
+  readonly version: Version;
   readonly blockchain: Blockchain;
   readonly relayTransaction: (
     transaction: Transaction,

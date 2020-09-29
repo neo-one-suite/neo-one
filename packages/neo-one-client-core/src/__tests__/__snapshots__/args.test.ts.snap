@@ -36,6 +36,14 @@ exports[`arg assertions assertAttribute - non object 1`] = `"Expected Attribute 
 
 exports[`arg assertions assertAttribute - undefined 1`] = `"Expected Attribute for value, found undefined"`;
 
+exports[`arg assertions assertBN - BigNumber 1`] = `"Expected string for value, found 10"`;
+
+exports[`arg assertions assertBN - non BN 1`] = `"Expected string for value, found 0"`;
+
+exports[`arg assertions assertBN - undefined 1`] = `"Expected string for value, found undefined"`;
+
+exports[`arg assertions assertBN - undefined 2`] = `"Expected string for value, found undefined"`;
+
 exports[`arg assertions assertBigNumber - non BigNumber 1`] = `"Expected BigNumber for value, found 0"`;
 
 exports[`arg assertions assertBigNumber - undefined 1`] = `"Expected BigNumber for value, found undefined"`;

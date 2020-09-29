@@ -1,7 +1,7 @@
-import { ABIEvent } from '@neo-one/client-common';
+import { ContractEventDescriptorClient } from '@neo-one/client-common';
 
 // tslint:disable-next-line export-name
-export const events: readonly ABIEvent[] = [
+export const events: readonly ContractEventDescriptorClient[] = [
   {
     name: 'trace',
     parameters: [

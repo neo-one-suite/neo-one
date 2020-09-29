@@ -18,11 +18,11 @@ export class ContractPermissionDescriptorModel implements SerializableJSON<Contr
     this.hashOrGroup = hashOrGroup === undefined ? '*' : hashOrGroup;
   }
 
-  public isHash(): boolean {
+  public get isHash(): boolean {
     return common.isWildcard(this.hashOrGroup) ? false : common.isUInt160(this.hashOrGroup);
   }
 
-  public isGroup(): boolean {
+  public get isGroup(): boolean {
     return common.isWildcard(this.hashOrGroup) ? false : common.isECPoint(this.hashOrGroup);
   }
 
@@ -31,13 +31,28 @@ export class ContractPermissionDescriptorModel implements SerializableJSON<Contr
   }
 
   public serializeJSON(): ContractPermissionDescriptorJSON {
-    if (this.isGroup()) {
-      return common.ecPointToString(this.hashOrGroup as ECPoint);
+    if (this.isGroup) {
+      return {
+        hashOrGroup: common.ecPointToString(this.hashOrGroup as ECPoint),
+        isHash: false,
+        isGroup: true,
+        isWildcard: false,
+      };
     }
-    if (this.isHash()) {
-      return common.uInt160ToString(this.hashOrGroup as UInt160);
+    if (this.isHash) {
+      return {
+        hashOrGroup: common.uInt160ToString(this.hashOrGroup as UInt160),
+        isHash: true,
+        isGroup: false,
+        isWildcard: false,
+      };
     }
 
-    return this.hashOrGroup as Wildcard;
+    return {
+      hashOrGroup: this.hashOrGroup as Wildcard,
+      isHash: false,
+      isGroup: false,
+      isWildcard: true,
+    };
   }
 }

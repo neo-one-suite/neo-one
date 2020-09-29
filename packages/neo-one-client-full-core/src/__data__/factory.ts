@@ -264,7 +264,7 @@ const createIntegerContractParameterJSON = (
 const createInvocationResultSuccessJSON = (
   options: Partial<InvocationResultSuccessJSON> = {},
 ): InvocationResultSuccessJSON => ({
-  state: VMState.HALT,
+  state: 'HALT',
   gas_consumed: '20',
   gas_cost: '10',
   stack: [createIntegerContractParameterJSON()],

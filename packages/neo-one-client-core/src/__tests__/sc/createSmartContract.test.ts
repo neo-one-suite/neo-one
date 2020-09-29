@@ -60,7 +60,7 @@ describe('createSmartContract', () => {
   };
 
   test('createInvoke', async () => {
-    const transaction = factory.createInvocationTransaction();
+    const transaction = factory.createTransaction();
     const receipt = factory.createRawInvokeReceipt({
       actions: [factory.createRawTransferNotification(), rawLog],
       result: factory.createRawInvocationResultSuccess({
@@ -92,7 +92,7 @@ describe('createSmartContract', () => {
   });
 
   test('createInvoke - confirmed', async () => {
-    const transaction = factory.createInvocationTransaction();
+    const transaction = factory.createTransaction();
     const receipt = factory.createRawInvokeReceipt({
       actions: [factory.createRawTransferNotification(), rawLog],
       result: factory.createRawInvocationResultSuccess({

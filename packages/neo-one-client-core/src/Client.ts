@@ -1,13 +1,10 @@
 /// <reference types="@reactivex/ix-es2015-cjs" />
 // tslint:disable member-ordering readonly-array no-any
 import {
-  Account,
   AddressString,
   Block,
-  ClaimTransaction,
   GetOptions,
   Hash256String,
-  InvocationTransaction,
   InvokeSendUnsafeReceiveTransactionOptions,
   IterOptions,
   NetworkType,
@@ -179,13 +176,6 @@ export class Client<
    */
   public readonly block$: Observable<BlockEntry>;
 
-  /**
-   * Emits a value whenever a new user account is selected and whenever a block is persisted to the blockchain.
-   *
-   * Immediately emits the latest value when subscribed to.
-   */
-  public readonly accountState$: Observable<AccountStateEntry | undefined>;
-
   public constructor(providersIn: TUserAccountProviders) {
     this.hooks = {
       beforeRelay: new AsyncParallelHook(['beforeRelay']),
@@ -266,23 +256,6 @@ export class Client<
         ),
       ),
       multicast(() => new ReplaySubject<BlockEntry>(1)),
-      refCount(),
-    );
-    this.accountState$ = combineLatest([this.currentUserAccount$, this.block$]).pipe(
-      switchMap(async ([currentUserAccount]) => {
-        if (currentUserAccount === undefined) {
-          return undefined;
-        }
-
-        const account = await this.getNetworkProvider(currentUserAccount.id.network).getAccount(
-          currentUserAccount.id.network,
-          currentUserAccount.id.address,
-        );
-
-        return { currentUserAccount, account };
-      }),
-      distinctUntilChanged((a, b) => _.isEqual(a, b)),
-      multicast(() => new ReplaySubject<AccountStateEntry | undefined>(1)),
       refCount(),
     );
   }
@@ -446,7 +419,7 @@ export class Client<
     asset: Hash256String,
     to: AddressString,
     options?: TransactionOptions,
-  ): Promise<TransactionResult<TransactionReceipt, InvocationTransaction>>;
+  ): Promise<TransactionResult>;
   public async transfer(transfers: readonly Transfer[], options?: TransactionOptions): Promise<TransactionResult>;
   public async transfer(...argsIn: any[]): Promise<TransactionResult> {
     const { transfers, options } = this.getTransfersOptions(argsIn);
@@ -458,20 +431,11 @@ export class Client<
   /**
    * Claim all available unclaimed `GAS` for the currently selected account (or the specified `from` `UserAccountID`).
    */
-  public async claim(optionsIn?: TransactionOptions): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
+  public async claim(optionsIn?: TransactionOptions): Promise<TransactionResult> {
     const options = args.assertTransactionOptions('options', optionsIn);
     await this.applyBeforeRelayHook(options);
 
     return this.addTransactionHooks(this.getProvider(options).claim(options));
-  }
-
-  /**
-   * @returns `Promise` which resolves to an `Account` object for the provided `UserAccountID`.
-   */
-  public async getAccount(idIn: UserAccountID): Promise<Account> {
-    const id = args.assertUserAccountID('id', idIn);
-
-    return this.getNetworkProvider(id.network).getAccount(id.network, id.address);
   }
 
   /**
@@ -487,15 +451,7 @@ export class Client<
 
     return AsyncIterableX.from(provider.iterBlocks(network, options)).pipe<RawAction>(
       flatMap(async (block) => {
-        const actions = _.flatten(
-          block.transactions.map((transaction) => {
-            if (transaction.type === 'InvocationTransaction') {
-              return [...transaction.invocationData.actions];
-            }
-
-            return [];
-          }),
-        );
+        const actions = _.flatten(block.transactions.map((transaction) => [...transaction.invocationData.actions]));
 
         return AsyncIterableX.of(...actions);
       }),
@@ -513,7 +469,7 @@ export class Client<
     verify: boolean,
     optionsIn?: InvokeSendUnsafeReceiveTransactionOptions,
     sourceMaps: SourceMaps = {},
-  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
+  ): Promise<TransactionResult<RawInvokeReceipt>> {
     args.assertAddress('contract', contract);
     args.assertString('method', method);
     args.assertArray('params', params).forEach((param) => args.assertNullableScriptBuilderParam('params.param', param));
@@ -543,7 +499,7 @@ export class Client<
     transfer: Transfer,
     optionsIn?: TransactionOptions,
     sourceMaps: SourceMaps = {},
-  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
+  ): Promise<TransactionResult<RawInvokeReceipt>> {
     args.assertAddress('contract', contract);
     args.assertString('method', method);
     args.assertArray('params', params).forEach((param) => args.assertNullableScriptBuilderParam('params.param', param));
@@ -572,7 +528,7 @@ export class Client<
     hash: Hash256String,
     optionsIn?: TransactionOptions,
     sourceMaps: SourceMaps = {},
-  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
+  ): Promise<TransactionResult<RawInvokeReceipt>> {
     args.assertAddress('contract', contract);
     args.assertString('method', method);
     args.assertArray('params', params).forEach((param) => args.assertNullableScriptBuilderParam('params.param', param));
@@ -601,7 +557,7 @@ export class Client<
     hash: Hash256String,
     optionsIn?: TransactionOptions,
     sourceMaps: SourceMaps = {},
-  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
+  ): Promise<TransactionResult<RawInvokeReceipt>> {
     args.assertAddress('contract', contract);
     args.assertString('method', method);
     args.assertArray('params', params).forEach((param) => args.assertNullableScriptBuilderParam('params.param', param));
@@ -629,7 +585,7 @@ export class Client<
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     optionsIn?: TransactionOptions,
     sourceMaps: SourceMaps = {},
-  ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
+  ): Promise<TransactionResult> {
     args.assertAddress('contract', contract);
     args.assertString('method', method);
     args.assertArray('params', params).forEach((param) => args.assertNullableScriptBuilderParam('params.param', param));

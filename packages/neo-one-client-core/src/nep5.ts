@@ -1,10 +1,14 @@
 import {
-  ABI,
-  ABIFunction,
   AddressString,
+  common,
+  ContractABIClient,
+  ContractManifestClient,
+  ContractMethodDescriptorClient,
+  crypto,
   Event,
   InvokeReceipt,
   NetworkType,
+  ScriptBuilder,
   SmartContractNetworksDefinition,
   SmartContractReadOptions,
   TransactionOptions,
@@ -38,15 +42,20 @@ export interface NEP5SmartContract<TClient extends Client = Client> extends Smar
   ) => TransactionResult<InvokeReceipt<boolean, NEP5Event>>;
 }
 
-const decimalsFunction: ABIFunction = {
+const decimalsFunction: ContractMethodDescriptorClient = {
   name: 'decimals',
   constant: true,
   parameters: [],
   returnType: { type: 'Integer', decimals: 0 },
 };
 
-export const abi = (decimals: number): ABI => ({
-  functions: [
+const blankScript = new ScriptBuilder().build();
+const blankHash = crypto.toScriptHash(blankScript);
+
+export const abi = (decimals: number): ContractABIClient => ({
+  // TODO: check
+  hash: blankHash,
+  methods: [
     {
       name: 'name',
       constant: true,
@@ -70,11 +79,11 @@ export const abi = (decimals: number): ABI => ({
       name: 'transfer',
       parameters: [
         {
-          type: 'Address',
+          type: 'Hash160',
           name: 'from',
         },
         {
-          type: 'Address',
+          type: 'Hash160',
           name: 'to',
         },
         {
@@ -90,7 +99,7 @@ export const abi = (decimals: number): ABI => ({
       constant: true,
       parameters: [
         {
-          type: 'Address',
+          type: 'Hash160',
           name: 'account',
         },
       ],
@@ -102,12 +111,12 @@ export const abi = (decimals: number): ABI => ({
       name: 'transfer',
       parameters: [
         {
-          type: 'Address',
+          type: 'Hash160',
           name: 'from',
           optional: true,
         },
         {
-          type: 'Address',
+          type: 'Hash160',
           name: 'to',
           optional: true,
         },
@@ -121,13 +130,36 @@ export const abi = (decimals: number): ABI => ({
   ],
 });
 
+export const manifest = (decimals: number): ContractManifestClient => ({
+  hash: blankHash, // TODO: check
+  hashHex: common.uInt160ToHex(blankHash), // TODO: check
+  groups: [],
+  features: {
+    storage: true,
+    payable: true,
+  },
+  supportedStandards: [],
+  abi: abi(decimals),
+  permissions: [],
+  trusts: '*',
+  safeMethods: '*',
+  hasStorage: true,
+  payable: true,
+});
+
 export const getDecimals = async (
   client: Client,
   networksDefinition: SmartContractNetworksDefinition,
   network: NetworkType,
 ): Promise<number> => {
   const decimalsBigNumber = await client
-    .smartContract({ networks: networksDefinition, abi: { functions: [decimalsFunction] } })
+    .smartContract({
+      networks: networksDefinition,
+      manifest: {
+        ...manifest(0),
+        abi: { hash: manifest(0).hash, events: [], methods: [decimalsFunction] },
+      },
+    })
     .decimals({ network });
 
   return decimalsBigNumber.toNumber();
@@ -140,5 +172,5 @@ export const createNEP5SmartContract = <TClient extends Client>(
 ): NEP5SmartContract =>
   client.smartContract<NEP5SmartContract<TClient>>({
     networks: networksDefinition,
-    abi: abi(decimals),
+    manifest: manifest(decimals),
   });

@@ -37,7 +37,7 @@ export const runMigration = async (
   let contracts: Contracts = _.fromPairs(
     Object.entries(nameToContract).map(([name, contract]) => [
       name,
-      client.smartContract({ abi: contract.abi, networks: {} }),
+      client.smartContract({ manifest: contract.manifest, networks: {} }),
     ]),
   );
 
@@ -46,7 +46,7 @@ export const runMigration = async (
     Object.entries(nameToContract).map(([name, contract]) => [
       name,
       _.fromPairs(
-        contract.abi.functions.map((func) => [
+        contract.manifest.abi.methods.map((func) => [
           func.name,
           (...args: any[]) => {
             const { requiredArgs, forwardOptions, options, transfer, hash } = getParamAndOptionsResults({

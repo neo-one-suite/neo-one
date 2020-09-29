@@ -72,7 +72,6 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   getpeers: 'getpeers',
   relaytransaction: 'relaytransaction',
   relaystrippedtransaction: 'relaystrippedtransaction',
-  getclaimamount: 'getclaimamount',
   getallstorage: 'getallstorage',
   testinvocation: 'testinvocation',
   gettransactionreceipt: 'gettransactionreceipt',
@@ -91,9 +90,9 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   gettransactionheight: 'gettransactionheight',
   getversion: 'getversion',
   getapplicationlog: 'getapplicationlog',
-  getnep5transfers: 'getnep5transfers',
-  getnep5balances: 'getnep5balances',
-  getblockheader: 'getblockheader',
+  getnep5transfers: 'getnep5transfers', // add to RPCClient?
+  getnep5balances: 'getnep5balances', // add to RPCClient?
+  getblockheader: 'getblockheader', // add to RPCClient?
   closewallet: 'closewallet',
   dumpprivkey: 'dumpprivkey',
   getnewaddress: 'getnewaddress',
@@ -345,7 +344,7 @@ export const createHandler = ({
       const key = Buffer.from(args[1], 'hex');
       const item = await blockchain.storageItem.tryGet({ id, key });
 
-      return item === undefined ? undefined : item.value.toString('hex');
+      return item === undefined ? undefined : item.serializeJSON(blockchain.serializeJSONContext);
     },
     [RPC_METHODS.invokefunction]: async () => {
       throw new JSONRPCError(-101, 'Not implemented');
@@ -496,8 +495,21 @@ export const createHandler = ({
 
       return header.serializeWire().toString('hex');
     },
-    [RPC_METHODS.getunclaimedgas]: async () => {
-      throw new JSONRPCError(-101, 'Not implemented');
+    [RPC_METHODS.getunclaimedgas]: async (args) => {
+      const address = JSONHelper.readUInt160(args[0]);
+      const isValidAddress = common.isUInt160(address);
+      if (!isValidAddress) {
+        throw new JSONRPCError(-100, 'Invalid address');
+      }
+
+      // TODO: implement native contracts in blockchain for getting unclaimed gas
+      // const unclaimed = await blockchain.getUnclaimedGas(address);
+      // result = unclaimed.toString();
+
+      return {
+        unclaimed: '0', // TODO: replace
+        address: JSONHelper.writeUInt160(address),
+      };
     },
     [RPC_METHODS.closewallet]: async () => {
       throw new JSONRPCError(-101, 'Not implemented');
@@ -612,23 +624,6 @@ export const createHandler = ({
         throw new JSONRPCError(-110, `Relay transaction failed: ${error.message}`);
       }
     },
-    [RPC_METHODS.getclaimamount]: async (args) => {
-      const hash = JSONHelper.readUInt256(args[0]);
-      const index = args[1];
-      try {
-        // TODO: figure out how we're going to implement calculateClaimAmount in blockchain
-        const value = await blockchain.calculateClaimAmount([
-          {
-            hash,
-            index,
-          },
-        ]);
-
-        return common.fixed8ToDecimal(value).toString();
-      } catch (error) {
-        throw new JSONRPCError(-102, error.message);
-      }
-    },
     [RPC_METHODS.getallstorage]: async (args) => {
       const hash = JSONHelper.readUInt160(args[0]);
       const contract = await blockchain.contract.tryGet({ hash });
@@ -713,6 +708,7 @@ export const createHandler = ({
     [RPC_METHODS.getvalidators]: async () => {
       // TODO: implement with NativeContract.NEO
       // blockchain.getValidators()
+
       const validators = await blockchain.validator.all$.pipe(toArray()).toPromise();
 
       return validators.map((validator) => validator.serializeJSON(blockchain.serializeJSONContext));

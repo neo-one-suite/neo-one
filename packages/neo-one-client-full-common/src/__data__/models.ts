@@ -7,13 +7,17 @@ import {
   ContractGroupModel,
   ContractManifestModel,
   ContractMethodDescriptorModel,
-  ContractModel,
   ContractParameterDefinitionModel,
   ContractPermissionDescriptorModel,
   ContractPermissionModel,
+  ContractStateModel,
 } from '../models';
 
 export const contractParamDefinitionModel = {
+  any: new ContractParameterDefinitionModel({
+    type: ContractParameterTypeModel.Any,
+    name: 'param',
+  }),
   boolean: new ContractParameterDefinitionModel({
     type: ContractParameterTypeModel.Boolean,
     name: 'param',
@@ -68,7 +72,8 @@ export const contractMethodDescriptorModel = (
   parameters: readonly ContractParameterDefinitionModel[] = [contractParamDefinitionModel.boolean],
   returnType: ContractParameterTypeModel = ContractParameterTypeModel.Void,
   name = 'function',
-) => new ContractMethodDescriptorModel({ name, parameters, returnType });
+  offset = 0,
+) => new ContractMethodDescriptorModel({ name, parameters, returnType, offset });
 
 export const contractEventDescriptorModel = (
   parameters: readonly ContractParameterDefinitionModel[] = [contractParamDefinitionModel.boolean],
@@ -83,7 +88,10 @@ export const contractAbiModel = (
 
 export const contractGroupModel = (
   publicKey: ECPoint = common.stringToECPoint(constants.PRIVATE_NET_PUBLIC_KEY),
-  signature: SignatureString = 'ccaab040cc25021c91567b75db4778853441869157b8f6aad960cdcf1069812480027a528ca9b98e2205027de20696f848cf81824eeb7af1d5110870870ceb67',
+  signature: Buffer = Buffer.from(
+    'ccaab040cc25021c91567b75db4778853441869157b8f6aad960cdcf1069812480027a528ca9b98e2205027de20696f848cf81824eeb7af1d5110870870ceb67',
+    'hex',
+  ),
 ) => new ContractGroupModel({ publicKey, signature });
 
 export const contractPermissionDescriptorModel = (hashOrGroupType: 'uint160' | 'ecpoint' | undefined) => {
@@ -116,4 +124,4 @@ export const contractModel = (
   id = 1,
   script: Buffer = Buffer.alloc(25),
   manifest: ContractManifestModel = contractManifestModel(),
-) => new ContractModel({ id, script, manifest });
+) => new ContractStateModel({ id, script, manifest });

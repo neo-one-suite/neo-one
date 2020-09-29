@@ -1,17 +1,6 @@
 // tslint:disable no-object-mutation
-import {
-  ABIParameter,
-  AssetType,
-  Attribute,
-  common,
-  ContractParameterType,
-  InputModel,
-  InputOutput,
-  Param,
-  utils,
-} from '@neo-one/client-common';
+import { ABIParameter, Attribute, common, ContractParameterType, Param, utils } from '@neo-one/client-common';
 import { Hash256, KeyStore } from '@neo-one/client-core';
-import { deserializeTransactionWire } from '@neo-one/node-core';
 import { Modifiable } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { of as _of } from 'rxjs';
@@ -43,9 +32,7 @@ describe('LocalUserAccountProvider', () => {
   const networks = [network];
   const getNetworks = jest.fn(() => networks);
   const getUnclaimed = jest.fn();
-  const getOutput = jest.fn();
   const getTransaction = jest.fn();
-  const getUnspentOutputs = jest.fn();
   const relayTransaction = jest.fn();
   const getTransactionReceipt = jest.fn();
   const getInvocationData = jest.fn();
@@ -55,22 +42,18 @@ describe('LocalUserAccountProvider', () => {
   const read = jest.fn();
   const call = jest.fn();
   const iterBlocks = jest.fn();
-  const getAccount = jest.fn();
   const iterActionsRaw = jest.fn();
   const dataProvider: Modifiable<Provider> = {
     networks$: _of(networks),
     getNetworks,
     getUnclaimed,
-    getOutput,
     getTransaction,
-    getUnspentOutputs,
     relayTransaction,
     getTransactionReceipt,
     getInvocationData,
     testInvoke,
     getNetworkSettings,
     getBlockCount,
-    getAccount,
     read,
     iterBlocks,
     iterActionsRaw,
@@ -109,8 +92,8 @@ describe('LocalUserAccountProvider', () => {
 
   test('transfer', async () => {
     const transfer = factory.createTransfer();
-    getUnspentOutputs.mockImplementation(async () => Promise.resolve([factory.createInputOutput()]));
-    getOutput.mockImplementation(async () => Promise.resolve(factory.createInputOutput()));
+    // getUnspentOutputs.mockImplementation(async () => Promise.resolve([factory.createInputOutput()]));
+    // getOutput.mockImplementation(async () => Promise.resolve(factory.createInputOutput()));
     sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
     const transaction = factory.createContractTransaction();
     relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
@@ -143,7 +126,7 @@ describe('LocalUserAccountProvider', () => {
 
   test('transfer - insufficient funds', async () => {
     const transfer = factory.createTransfer();
-    getUnspentOutputs.mockImplementation(async () => Promise.resolve([]));
+    // getUnspentOutputs.mockImplementation(async () => Promise.resolve([]));
 
     const result = provider.transfer([transfer]);
 
@@ -179,7 +162,7 @@ describe('LocalUserAccountProvider', () => {
 
   test(`publish fault`, async () => {
     const contract = factory.createContractRegister();
-    getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
+    // getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
     testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
     sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
     const transaction = factory.createPublishTransaction();
@@ -213,7 +196,7 @@ describe('LocalUserAccountProvider', () => {
 
   test(`publish invoke fault`, async () => {
     const contract = factory.createContractRegister();
-    getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
+    // getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
     testInvoke.mockImplementation(async () =>
       Promise.resolve(
         factory.createRawCallReceipt({
@@ -231,7 +214,7 @@ describe('LocalUserAccountProvider', () => {
     'Signature',
     'Boolean',
     'Integer',
-    'Address',
+    'Hash160',
     'Hash256',
     'Buffer',
     'PublicKey',
@@ -245,7 +228,7 @@ describe('LocalUserAccountProvider', () => {
   contractParameterTypes.forEach((returnType) => {
     test(`publish with return type ${returnType}`, async () => {
       const contract = factory.createContractRegister({ returnType });
-      getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
+      // getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
       testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
       sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
       const transaction = factory.createPublishTransaction();
@@ -296,7 +279,7 @@ describe('LocalUserAccountProvider', () => {
   publishAndDeployCases.forEach(({ name, parameters, params }) => {
     test(`publishAndDeploy ${name}`, async () => {
       const contract = factory.createContractRegister();
-      getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
+      // getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
       testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
       sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
       const transaction = factory.createPublishTransaction();
@@ -332,116 +315,11 @@ describe('LocalUserAccountProvider', () => {
     });
   });
 
-  const assetTypes: readonly AssetType[] = [
-    'Credit',
-    'Duty',
-    'Governing',
-    'Utility',
-    'Currency',
-    'Share',
-    'Invoice',
-    'Token',
-  ];
-
-  assetTypes.forEach((assetType) => {
-    test(`registerAsset ${assetType}`, async () => {
-      const asset = factory.createAssetRegister({ type: assetType });
-      getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
-      testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
-      sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
-      const transaction = factory.createRegisterTransaction();
-      relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
-      const receipt = factory.createTransactionReceipt();
-      getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
-      const invocationData = factory.createRawInvocationData();
-      getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
-
-      const result = await provider.registerAsset(asset, { systemFee: new BigNumber(-1) });
-      const confirmResult = await result.confirmed();
-
-      expect(result.transaction).toEqual(transaction);
-      expect(confirmResult.blockHash).toEqual(receipt.blockHash);
-      expect(confirmResult.blockIndex).toEqual(receipt.blockIndex);
-      expect(confirmResult.transactionIndex).toEqual(receipt.transactionIndex);
-      expect(confirmResult.result.gasConsumed).toEqual(invocationData.result.gasConsumed);
-      expect(confirmResult.result.gasCost).toEqual(invocationData.result.gasCost);
-      expect(confirmResult.result.state).toEqual('HALT');
-      if (confirmResult.result.state !== 'HALT') {
-        throw new Error('For TS');
-      }
-      expect(confirmResult.result.value).toEqual(invocationData.asset);
-
-      expect(sign.mock.calls).toMatchSnapshot();
-      expect(testInvoke.mock.calls).toMatchSnapshot();
-      expect(relayTransaction.mock.calls).toMatchSnapshot();
-    });
-  });
-
-  test(`registerAsset fault`, async () => {
-    const asset = factory.createAssetRegister();
-    getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
-    sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
-    const transaction = factory.createRegisterTransaction();
-    relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
-    const receipt = factory.createTransactionReceipt();
-    getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
-    testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
-    const invocationData = factory.createRawInvocationData({ result: factory.createRawInvocationResultError() });
-    getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
-
-    const result = await provider.registerAsset(asset, { systemFee: new BigNumber(-1) });
-    const confirmResult = await result.confirmed();
-
-    expect(result.transaction).toEqual(transaction);
-    expect(confirmResult.blockHash).toEqual(receipt.blockHash);
-    expect(confirmResult.blockIndex).toEqual(receipt.blockIndex);
-    expect(confirmResult.transactionIndex).toEqual(receipt.transactionIndex);
-    expect(confirmResult.result.gasConsumed).toEqual(invocationData.result.gasConsumed);
-    expect(confirmResult.result.gasCost).toEqual(invocationData.result.gasCost);
-    expect(confirmResult.result.state).toEqual('FAULT');
-    if (confirmResult.result.state !== 'FAULT') {
-      throw new Error('For TS');
-    }
-    expect(confirmResult.result.message).toMatchSnapshot();
-
-    expect(sign.mock.calls).toMatchSnapshot();
-    expect(testInvoke.mock.calls).toMatchSnapshot();
-    expect(relayTransaction.mock.calls).toMatchSnapshot();
-  });
-
-  test('issue', async () => {
-    const transfer = factory.createTransfer();
-    getNetworkSettings.mockImplementation(async () =>
-      Promise.resolve(factory.createNetworkSettings({ issueGASFee: gasInputOutput.value })),
-    );
-    getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
-    sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
-    const transaction = factory.createIssueTransaction();
-    relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
-    const receipt = factory.createTransactionReceipt();
-    getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
-
-    const result = await provider.issue([transfer]);
-    const confirmResult = await result.confirmed();
-
-    expect(result.transaction).toEqual(transaction);
-    expect(confirmResult).toEqual(receipt);
-
-    expect(sign.mock.calls).toMatchSnapshot();
-    expect(relayTransaction.mock.calls).toMatchSnapshot();
-  });
-
-  test('issue - nothing to issue', async () => {
-    const result = provider.issue([]);
-
-    await expect(result).rejects.toMatchSnapshot();
-  });
-
   const invokeTestCases = [true, false];
 
   invokeTestCases.forEach((verify) => {
     test(`invoke ${verify ? 'verify' : 'no verify'}`, async () => {
-      getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
+      // getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
       testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
       sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
       const transaction = factory.createRegisterTransaction();
@@ -518,8 +396,8 @@ describe('LocalUserAccountProvider', () => {
   });
 
   test('__execute', async () => {
-    getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
-    getOutput.mockImplementation(async () => Promise.resolve(gasInputOutput));
+    // getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
+    // getOutput.mockImplementation(async () => Promise.resolve(gasInputOutput));
     testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
     sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
     const transaction = factory.createRegisterTransaction();
@@ -550,8 +428,8 @@ describe('LocalUserAccountProvider', () => {
   });
 
   test('__execute - with transfers', async () => {
-    getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
-    getOutput.mockImplementation(async () => Promise.resolve(gasInputOutput));
+    // getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
+    // getOutput.mockImplementation(async () => Promise.resolve(gasInputOutput));
     testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
     sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
     const transaction = factory.createRegisterTransaction();
@@ -567,7 +445,8 @@ describe('LocalUserAccountProvider', () => {
       transfers: [transfer],
     });
 
-    expect(result.transaction.inputs).toMatchSnapshot();
+    expect(result).toMatchSnapshot();
+    // expect(result.transaction.inputs).toMatchSnapshot();
   });
 
   describe('consolidation + multi-inputs', () => {
@@ -637,13 +516,8 @@ describe('LocalUserAccountProvider', () => {
       },
     };
 
-    const attribute: Attribute = {
-      usage: 'Remark',
-      data: 'testData',
-    };
-
     const options = {
-      attributes: [attribute],
+      attributes: [],
     };
 
     const context = {
@@ -652,7 +526,7 @@ describe('LocalUserAccountProvider', () => {
 
     test('throws on reused inputs', async () => {
       const unspent = [outputs.sevenNEO, outputs.oneNEO, outputs.elevenGAS];
-      getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      // getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
       sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
       const transaction = factory.createContractTransaction();
       relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
@@ -683,7 +557,7 @@ describe('LocalUserAccountProvider', () => {
 
     test('updates on new block', async () => {
       const unspent = [outputs.sevenNEO, outputs.oneNEO, outputs.elevenGAS];
-      getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      // getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
       sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
       const transaction = factory.createContractTransaction();
       relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
@@ -723,15 +597,15 @@ describe('LocalUserAccountProvider', () => {
         asset: Hash256.NEO,
         to: keys[1].address,
       };
-      getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
-      getOutput.mockImplementation(async (_network, input) =>
-        Promise.resolve(
-          unspent.find(
-            (inputOutput) =>
-              inputOutput.hash === common.uInt256ToString(input.hash) && inputOutput.index === input.index,
-          ),
-        ),
-      );
+      // getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      // getOutput.mockImplementation(async (_network, input) =>
+      //   Promise.resolve(
+      //     unspent.find(
+      //       (inputOutput) =>
+      //         inputOutput.hash === common.uInt256ToString(input.hash) && inputOutput.index === input.index,
+      //     ),
+      //   ),
+      // );
       sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
       const transaction = factory.createContractTransaction();
       relayTransaction.mockImplementation(async (_network, transactionModel) => {
@@ -762,7 +636,7 @@ describe('LocalUserAccountProvider', () => {
       const byteLimit = 500;
       keystore.byteLimit = byteLimit;
       const unspent = [outputs.elevenGAS];
-      getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      // getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
       getUnclaimed.mockImplementation(async () =>
         Promise.resolve({
           unclaimed: [
@@ -774,13 +648,13 @@ describe('LocalUserAccountProvider', () => {
           amount: new BigNumber('3'),
         }),
       );
-      getOutput.mockImplementation(async () =>
-        Promise.resolve({
-          hash: data.hash256s.a,
-          index: 2,
-          address: keys[0].address,
-        }),
-      );
+      // getOutput.mockImplementation(async () =>
+      //   Promise.resolve({
+      //     hash: data.hash256s.a,
+      //     index: 2,
+      //     address: keys[0].address,
+      //   }),
+      // );
       sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
       const transaction = factory.createClaimTransaction();
       relayTransaction.mockImplementation(async (_network, transactionModel) => {
@@ -818,15 +692,15 @@ describe('LocalUserAccountProvider', () => {
         outputs.twoGAS,
         outputs.elevenGAS,
       ];
-      getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
-      getOutput.mockImplementation(async (_network, input) =>
-        Promise.resolve(
-          unspent.find(
-            (inputOutput) =>
-              inputOutput.hash === common.uInt256ToString(input.hash) && inputOutput.index === input.index,
-          ),
-        ),
-      );
+      // getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      // getOutput.mockImplementation(async (_network, input) =>
+      //   Promise.resolve(
+      //     unspent.find(
+      //       (inputOutput) =>
+      //         inputOutput.hash === common.uInt256ToString(input.hash) && inputOutput.index === input.index,
+      //     ),
+      //   ),
+      // );
       sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
       const transaction = factory.createContractTransaction();
       relayTransaction.mockImplementation(async (_network, transactionModel) => {
@@ -871,15 +745,15 @@ describe('LocalUserAccountProvider', () => {
         outputs.twoGAS,
         outputs.elevenGAS,
       ];
-      getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
-      getOutput.mockImplementation(async (_network, input) =>
-        Promise.resolve(
-          unspent.find(
-            (inputOutput) =>
-              inputOutput.hash === common.uInt256ToString(input.hash) && inputOutput.index === input.index,
-          ),
-        ),
-      );
+      // getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      // getOutput.mockImplementation(async (_network, input) =>
+      //   Promise.resolve(
+      //     unspent.find(
+      //       (inputOutput) =>
+      //         inputOutput.hash === common.uInt256ToString(input.hash) && inputOutput.index === input.index,
+      //     ),
+      //   ),
+      // );
       sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
       const transaction = factory.createContractTransaction();
       relayTransaction.mockImplementation(async (_network, transactionModel) => {
@@ -910,11 +784,6 @@ describe('LocalUserAccountProvider', () => {
       expect(relayTransaction.mock.calls).toMatchSnapshot();
     });
 
-    const verifyInput = (result: InputModel, input: InputOutput) => {
-      expect(common.uInt256ToString(result.hash)).toEqual(input.hash);
-      expect(result.index).toEqual(input.index);
-    };
-
     test('transfer one - consolidate prioritizes NEO/GAS for new outputs', async () => {
       const byteLimit = 400;
       keystore.byteLimit = byteLimit;
@@ -928,15 +797,15 @@ describe('LocalUserAccountProvider', () => {
         outputs.twoGAS,
         outputs.elevenGAS,
       ];
-      getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
-      getOutput.mockImplementation(async (_network, input) =>
-        Promise.resolve(
-          unspent.find(
-            (inputOutput) =>
-              inputOutput.hash === common.uInt256ToString(input.hash) && inputOutput.index === input.index,
-          ),
-        ),
-      );
+      // getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      // getOutput.mockImplementation(async (_network, input) =>
+      //   Promise.resolve(
+      //     unspent.find(
+      //       (inputOutput) =>
+      //         inputOutput.hash === common.uInt256ToString(input.hash) && inputOutput.index === input.index,
+      //     ),
+      //   ),
+      // );
       sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
       const transaction = factory.createContractTransaction();
       relayTransaction.mockImplementation(async (_network, transactionModel) => {
@@ -980,15 +849,15 @@ describe('LocalUserAccountProvider', () => {
         to: keys[1].address,
       };
       const unspent = [outputs.oneNEO, outputs.oneGAS, outputs.elevenGAS];
-      getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
-      getOutput.mockImplementation(async (_network, input) =>
-        Promise.resolve(
-          unspent.find(
-            (inputOutput) =>
-              inputOutput.hash === common.uInt256ToString(input.hash) && inputOutput.index === input.index,
-          ),
-        ),
-      );
+      // getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      // getOutput.mockImplementation(async (_network, input) =>
+      //   Promise.resolve(
+      //     unspent.find(
+      //       (inputOutput) =>
+      //         inputOutput.hash === common.uInt256ToString(input.hash) && inputOutput.index === input.index,
+      //     ),
+      //   ),
+      // );
       sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
       const transaction = factory.createContractTransaction();
       relayTransaction.mockImplementation(async (_network, transactionModel) => {

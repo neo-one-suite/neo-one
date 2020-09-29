@@ -3,7 +3,6 @@ import {
   common,
   ContractManifestJSON,
   createSerializeWire,
-  Extra,
   JSONHelper,
   SerializableJSON,
   SerializableWire,
@@ -13,6 +12,7 @@ import {
   utils,
   WildcardContainer,
 } from '@neo-one/client-common';
+import { JSONObject } from '@neo-one/utils';
 import { ContractABIModel } from './ContractABIModel';
 import { ContractFeaturesModel, HasPayable, HasStorage } from './ContractFeaturesModel';
 import { ContractGroupModel } from './ContractGroupModel';
@@ -30,7 +30,7 @@ export interface ContractManifestModelAdd<
   readonly permissions: readonly TContractPermission[];
   readonly trusts: WildcardContainer<UInt160>;
   readonly safeMethods: WildcardContainer<string>;
-  readonly extra?: Extra;
+  readonly extra?: JSONObject;
 }
 
 export class ContractManifestModel<
@@ -46,7 +46,7 @@ export class ContractManifestModel<
   public readonly permissions: readonly TContractPermission[];
   public readonly trusts: WildcardContainer<UInt160>;
   public readonly safeMethods: WildcardContainer<string>;
-  public readonly extra: Extra | undefined;
+  public readonly extra: JSONObject | undefined;
   public readonly hasStorage: boolean;
   public readonly payable: boolean;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
@@ -85,6 +85,10 @@ export class ContractManifestModel<
 
   public serializeJSON(): ContractManifestJSON {
     return {
+      // TODO: not sure if hash and hashHex should be returned here
+      // we serialize hash but not hashHex in old `Contract.ts`
+      hash: JSONHelper.writeUInt160(this.hash),
+      hashHex: this.hashHex,
       groups: this.groups.map((group) => group.serializeJSON()),
       features: {
         storage: this.hasStorage,

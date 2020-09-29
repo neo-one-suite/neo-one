@@ -139,6 +139,29 @@ describe('arg assertions', () => {
     expect(() => args.assertBigNumber('value', value)).toThrowErrorMatchingSnapshot();
   });
 
+  test('assertBN - BN', () => {
+    const value = data.bns.a;
+    expect(args.assertBN('value', value)).toEqual(value);
+  });
+
+  test('assertBN - undefined', () => {
+    const value = undefined;
+
+    expect(() => args.assertPublicKey('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertBN - non BN', () => {
+    const value = 0;
+
+    expect(() => args.assertPublicKey('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertBN - BigNumber', () => {
+    const value = data.bigNumbers.a;
+
+    expect(() => args.assertPublicKey('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
   test('assertBoolean - boolean', () => {
     const value = true;
 
@@ -247,178 +270,178 @@ describe('arg assertions', () => {
     expect(() => args.assertNullableArray('value', value)).toThrowErrorMatchingSnapshot();
   });
 
-  test('assertABI - returnSignature', () => {
+  test('assertContractABI - returnSignature', () => {
     const value = data.abi.returnSignature;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - returnBoolean', () => {
+  test('assertContractABI - returnBoolean', () => {
     const value = data.abi.returnBoolean;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - returnAddress', () => {
-    const value = data.abi.returnAddress;
+  test('assertContractABI - returnHash160', () => {
+    const value = data.abi.returnHash160;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - returnHash256', () => {
+  test('assertContractABI - returnHash256', () => {
     const value = data.abi.returnHash256;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - returnBuffer', () => {
+  test('assertContractABI - returnBuffer', () => {
     const value = data.abi.returnBuffer;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - returnPublicKey', () => {
+  test('assertContractABI - returnPublicKey', () => {
     const value = data.abi.returnPublicKey;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - returnString', () => {
+  test('assertContractABI - returnString', () => {
     const value = data.abi.returnString;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - returnArray', () => {
+  test('assertContractABI - returnArray', () => {
     const value = data.abi.returnArray;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - returnVoid', () => {
+  test('assertContractABI - returnVoid', () => {
     const value = data.abi.returnVoid;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - returnInteger', () => {
+  test('assertContractABI - returnInteger', () => {
     const value = data.abi.returnInteger;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - paramSignature', () => {
+  test('assertContractABI - paramSignature', () => {
     const value = data.abi.paramSignature;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - paramBoolean', () => {
+  test('assertContractABI - paramBoolean', () => {
     const value = data.abi.paramBoolean;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - paramAddress', () => {
-    const value = data.abi.paramAddress;
+  test('assertContractABI - paramHash160', () => {
+    const value = data.abi.paramHash160;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - paramHash256', () => {
+  test('assertContractABI - paramHash256', () => {
     const value = data.abi.paramHash256;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - paramBuffer', () => {
+  test('assertContractABI - paramBuffer', () => {
     const value = data.abi.paramBuffer;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - paramPublicKey', () => {
+  test('assertContractABI - paramPublicKey', () => {
     const value = data.abi.paramPublicKey;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - paramString', () => {
+  test('assertContractABI - paramString', () => {
     const value = data.abi.paramString;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - paramArray', () => {
+  test('assertContractABI - paramArray', () => {
     const value = data.abi.paramArray;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - paramVoid', () => {
+  test('assertContractABI - paramVoid', () => {
     const value = data.abi.paramVoid;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - paramInteger', () => {
+  test('assertContractABI - paramInteger', () => {
     const value = data.abi.paramInteger;
 
-    expect(args.assertABI('value', value)).toEqual(value);
+    expect(args.assertContractABI('value', value)).toEqual(value);
   });
 
-  test('assertABI - undefined', () => {
+  test('assertContractABI - undefined', () => {
     const value = undefined;
 
-    expect(() => args.assertABI('value', value)).toThrowErrorMatchingSnapshot();
+    expect(() => args.assertContractABI('value', value)).toThrowErrorMatchingSnapshot();
   });
 
-  test('assertABI - non object', () => {
+  test('assertContractABI - non object', () => {
     const value = true;
 
-    expect(() => args.assertABI('value', value)).toThrowErrorMatchingSnapshot();
+    expect(() => args.assertContractABI('value', value)).toThrowErrorMatchingSnapshot();
   });
 
-  test('assertABI - invalidType', () => {
+  test('assertContractABI - invalidType', () => {
     const value = data.abi.invalidType;
 
-    expect(() => args.assertABI('value', value)).toThrowErrorMatchingSnapshot();
+    expect(() => args.assertContractABI('value', value)).toThrowErrorMatchingSnapshot();
   });
 
-  test('assertABI - invalidReturnType', () => {
+  test('assertContractABI - invalidReturnType', () => {
     const value = data.abi.invalidReturnType;
 
-    expect(() => args.assertABI('value', value)).toThrowErrorMatchingSnapshot();
+    expect(() => args.assertContractABI('value', value)).toThrowErrorMatchingSnapshot();
   });
 
-  test('assertABI - invalidParameterType', () => {
+  test('assertContractABI - invalidParameterType', () => {
     const value = data.abi.invalidParameterType;
 
-    expect(() => args.assertABI('value', value)).toThrowErrorMatchingSnapshot();
+    expect(() => args.assertContractABI('value', value)).toThrowErrorMatchingSnapshot();
   });
 
-  test('assertABI - invalidFunction', () => {
+  test('assertContractABI - invalidFunction', () => {
     const value = data.abi.invalidFunction;
 
-    expect(() => args.assertABI('value', value)).toThrowErrorMatchingSnapshot();
+    expect(() => args.assertContractABI('value', value)).toThrowErrorMatchingSnapshot();
   });
 
-  test('assertABI - invalidFunctions', () => {
+  test('assertContractABI - invalidFunctions', () => {
     const value = data.abi.invalidFunctions;
 
-    expect(() => args.assertABI('value', value)).toThrowErrorMatchingSnapshot();
+    expect(() => args.assertContractABI('value', value)).toThrowErrorMatchingSnapshot();
   });
 
-  test('assertABI - invalidEvent', () => {
+  test('assertContractABI - invalidEvent', () => {
     const value = data.abi.invalidEvent;
 
-    expect(() => args.assertABI('value', value)).toThrowErrorMatchingSnapshot();
+    expect(() => args.assertContractABI('value', value)).toThrowErrorMatchingSnapshot();
   });
 
-  test('assertABI - invalidEvents', () => {
+  test('assertContractABI - invalidEvents', () => {
     const value = data.abi.invalidEvents;
 
-    expect(() => args.assertABI('value', value)).toThrowErrorMatchingSnapshot();
+    expect(() => args.assertContractABI('value', value)).toThrowErrorMatchingSnapshot();
   });
 
   test('assertSmartContractDefinition - valid', () => {
@@ -796,5 +819,179 @@ describe('arg assertions', () => {
     const value = data.iterOptions.invalidBlockFilter;
 
     expect(() => args.assertNullableIterOptions('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertContractABIClient - returnSignature', () => {
+    const value = data.abi.returnSignature;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - returnBoolean', () => {
+    const value = data.abi.returnBoolean;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - returnAddress', () => {
+    const value = data.abi.returnAddress;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - returnHash256', () => {
+    const value = data.abi.returnHash256;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - returnBuffer', () => {
+    const value = data.abi.returnBuffer;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - returnPublicKey', () => {
+    const value = data.abi.returnPublicKey;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - returnString', () => {
+    const value = data.abi.returnString;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - returnArray', () => {
+    const value = data.abi.returnArray;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - returnVoid', () => {
+    const value = data.abi.returnVoid;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - returnInteger', () => {
+    const value = data.abi.returnInteger;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - paramSignature', () => {
+    const value = data.abi.paramSignature;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - paramBoolean', () => {
+    const value = data.abi.paramBoolean;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - paramAddress', () => {
+    const value = data.abi.paramAddress;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - paramHash256', () => {
+    const value = data.abi.paramHash256;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - paramBuffer', () => {
+    const value = data.abi.paramBuffer;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - paramPublicKey', () => {
+    const value = data.abi.paramPublicKey;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - paramString', () => {
+    const value = data.abi.paramString;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - paramArray', () => {
+    const value = data.abi.paramArray;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - paramVoid', () => {
+    const value = data.abi.paramVoid;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - paramInteger', () => {
+    const value = data.abi.paramInteger;
+
+    expect(args.assertContractABIClient('value', value)).toEqual(value);
+  });
+
+  test('assertContractABIClient - undefined', () => {
+    const value = undefined;
+
+    expect(() => args.assertContractABIClient('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertContractABIClient - non object', () => {
+    const value = true;
+
+    expect(() => args.assertContractABIClient('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertContractABIClient - invalidType', () => {
+    const value = data.abi.invalidType;
+
+    expect(() => args.assertContractABIClient('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertContractABIClient - invalidReturnType', () => {
+    const value = data.abi.invalidReturnType;
+
+    expect(() => args.assertContractABIClient('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertContractABIClient - invalidParameterType', () => {
+    const value = data.abi.invalidParameterType;
+
+    expect(() => args.assertContractABIClient('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertContractABIClient - invalidFunction', () => {
+    const value = data.abi.invalidFunction;
+
+    expect(() => args.assertContractABIClient('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertContractABIClient - invalidFunctions', () => {
+    const value = data.abi.invalidFunctions;
+
+    expect(() => args.assertContractABIClient('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertContractABIClient - invalidEvent', () => {
+    const value = data.abi.invalidEvent;
+
+    expect(() => args.assertContractABIClient('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertContractABIClient - invalidEvents', () => {
+    const value = data.abi.invalidEvents;
+
+    expect(() => args.assertContractABIClient('value', value)).toThrowErrorMatchingSnapshot();
   });
 });

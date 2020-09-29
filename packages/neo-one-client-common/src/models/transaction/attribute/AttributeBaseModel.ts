@@ -1,6 +1,5 @@
 import { BinaryWriter } from '../../../BinaryWriter';
 import { createSerializeWire, SerializableWire, SerializeWire } from '../../Serializable';
-import { AttributeModel } from './AttributeModel';
 import { AttributeTypeModel } from './AttributeTypeModel';
 
 export abstract class AttributeBaseModel implements SerializableWire {

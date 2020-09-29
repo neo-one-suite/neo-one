@@ -1,11 +1,8 @@
 import {
-  Account,
   AddressString,
   Block,
-  ClaimTransaction,
   GetOptions,
   Hash256String,
-  InvocationTransaction,
   InvokeSendUnsafeReceiveTransactionOptions,
   IterOptions,
   NetworkType,
@@ -16,7 +13,6 @@ import {
   ScriptBuilderParam,
   SourceMaps,
   TransactionOptions,
-  TransactionReceipt,
   TransactionResult,
   Transfer,
   UpdateAccountNameOptions,
@@ -196,17 +192,14 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
     return asyncGenerator(this.messageEndpoint, 'iterActionsRaw', network, options);
   }
 
-  public async transfer(
-    transfers: readonly Transfer[],
-    options?: TransactionOptions,
-  ): Promise<TransactionResult<TransactionReceipt, InvocationTransaction>> {
+  public async transfer(transfers: readonly Transfer[], options?: TransactionOptions): Promise<TransactionResult> {
     return this.handleMethodWithConfirmation({
       method: 'transfer',
       args: [transfers, options],
     });
   }
 
-  public async claim(options?: TransactionOptions): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
+  public async claim(options?: TransactionOptions): Promise<TransactionResult> {
     return this.handleMethodWithConfirmation({ method: 'claim', args: [options] });
   }
 
@@ -218,7 +211,7 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
     verify: boolean,
     options?: InvokeSendUnsafeReceiveTransactionOptions,
     sourceMaps?: SourceMaps,
-  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
+  ): Promise<TransactionResult<RawInvokeReceipt>> {
     return this.handleMethodWithConfirmation({
       method: 'invoke',
       args: [contract, method, params, paramsZipped, verify, options, sourceMaps],
@@ -233,7 +226,7 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
     transfer: Transfer,
     options?: TransactionOptions,
     sourceMaps?: SourceMaps,
-  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
+  ): Promise<TransactionResult<RawInvokeReceipt>> {
     return this.handleMethodWithConfirmation({
       method: 'invokeSend',
       args: [contract, method, params, paramsZipped, transfer, options, sourceMaps],
@@ -248,7 +241,7 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
     hash: Hash256String,
     options?: TransactionOptions,
     sourceMaps?: SourceMaps,
-  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
+  ): Promise<TransactionResult<RawInvokeReceipt>> {
     return this.handleMethodWithConfirmation({
       method: 'invokeCompleteSend',
       args: [contract, method, params, paramsZipped, hash, options, sourceMaps],
@@ -263,7 +256,7 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
     hash: Hash256String,
     options?: TransactionOptions,
     sourceMaps?: SourceMaps,
-  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
+  ): Promise<TransactionResult<RawInvokeReceipt>> {
     return this.handleMethodWithConfirmation({
       method: 'invokeRefundAssets',
       args: [contract, method, params, paramsZipped, hash, options, sourceMaps],
@@ -277,7 +270,7 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     options?: TransactionOptions,
     sourceMaps?: SourceMaps,
-  ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
+  ): Promise<TransactionResult> {
     return this.handleMethodWithConfirmation({
       method: 'invokeClaim',
       args: [contract, method, params, paramsZipped, options, sourceMaps],

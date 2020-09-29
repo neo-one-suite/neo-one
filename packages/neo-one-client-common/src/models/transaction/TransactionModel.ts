@@ -15,10 +15,10 @@ export interface TransactionModelAdd<
   TSigner extends SignerModel = SignerModel
 > {
   readonly version?: number;
-  readonly nonce: number;
+  readonly nonce?: number;
   readonly systemFee: BN;
-  readonly networkFee: BN;
-  readonly validUntilBlock: number;
+  readonly networkFee?: BN;
+  readonly validUntilBlock?: number;
   readonly attributes?: readonly TAttribute[];
   readonly signers?: readonly TSigner[];
   readonly script: Buffer;

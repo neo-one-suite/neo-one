@@ -1,29 +1,15 @@
 import {
-  ABI,
-  AddressString,
-  Hash256String,
-  InvocationTransaction,
-  IssueTransaction,
+  ContractManifest,
   NetworkType,
   Param,
   SourceMaps,
   TransactionOptions,
-  TransactionReceipt,
   TransactionResult,
-  Transfer,
 } from '@neo-one/client-common';
 import { args as clientArgs, Client as ClientLite } from '@neo-one/client-core';
-import BigNumber from 'bignumber.js';
 import * as args from './args';
 import { ReadClient } from './ReadClient';
-import {
-  AssetRegister,
-  ContractRegister,
-  PublishReceipt,
-  RegisterAssetReceipt,
-  UserAccountProvider,
-  UserAccountProviders,
-} from './types';
+import { ContractRegister, PublishReceipt, UserAccountProvider, UserAccountProviders } from './types';
 
 // tslint:disable-next-line no-any
 export class Client<TUserAccountProviders extends UserAccountProviders = any> extends ClientLite<
@@ -33,7 +19,7 @@ export class Client<TUserAccountProviders extends UserAccountProviders = any> ex
   public async publish(
     contract: ContractRegister,
     optionsIn?: TransactionOptions,
-  ): Promise<TransactionResult<PublishReceipt, InvocationTransaction>> {
+  ): Promise<TransactionResult<PublishReceipt>> {
     const options = clientArgs.assertTransactionOptions('options', optionsIn);
     await this.applyBeforeRelayHook(options);
 
@@ -44,53 +30,23 @@ export class Client<TUserAccountProviders extends UserAccountProviders = any> ex
 
   public async publishAndDeploy(
     contract: ContractRegister,
-    abi: ABI,
+    manifest: ContractManifest,
     params: readonly Param[] = [],
     optionsIn?: TransactionOptions,
     sourceMaps: SourceMaps = {},
-  ): Promise<TransactionResult<PublishReceipt, InvocationTransaction>> {
+  ): Promise<TransactionResult<PublishReceipt>> {
     const options = clientArgs.assertTransactionOptions('options', optionsIn);
     await this.applyBeforeRelayHook(options);
 
     return this.addTransactionHooks(
       this.getProvider(options).publishAndDeploy(
         args.assertContractRegister('contract', contract),
-        clientArgs.assertABI('abi', abi),
+        clientArgs.assertContractManifestClient('manifest', manifest),
         params,
         options,
         sourceMaps,
       ),
     );
-  }
-
-  public async registerAsset(
-    asset: AssetRegister,
-    optionsIn?: TransactionOptions,
-  ): Promise<TransactionResult<RegisterAssetReceipt, InvocationTransaction>> {
-    const options = clientArgs.assertTransactionOptions('options', optionsIn);
-    await this.applyBeforeRelayHook(options);
-
-    return this.addTransactionHooks(
-      this.getProvider(options).registerAsset(args.assertAssetRegister('asset', asset), options),
-    );
-  }
-
-  public async issue(
-    amount: BigNumber,
-    asset: Hash256String,
-    to: AddressString,
-    options?: TransactionOptions,
-  ): Promise<TransactionResult<TransactionReceipt, IssueTransaction>>;
-  public async issue(
-    transfers: readonly Transfer[],
-    options?: TransactionOptions,
-  ): Promise<TransactionResult<TransactionReceipt, IssueTransaction>>;
-  // tslint:disable-next-line readonly-array no-any
-  public async issue(...argsIn: any[]): Promise<TransactionResult<TransactionReceipt, IssueTransaction>> {
-    const { transfers, options } = this.getTransfersOptions(argsIn);
-    await this.applyBeforeRelayHook(options);
-
-    return this.addTransactionHooks(this.getProvider(options).issue(transfers, options));
   }
 
   public read(network: NetworkType): ReadClient {

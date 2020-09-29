@@ -12,6 +12,6 @@ module.exports = {
       '<rootDir>/packages/neo-one-smart-contract/src/index.d.ts',
     '^@neo-one/(.*)$': '<rootDir>/packages/neo-one-$1/src/index',
   },
-  testRegex: '^.*/__tests__/.*\\.test\\.tsx?$',
+  testRegex: '^neo-one-client-core/__tests__/.*\\.test\\.tsx?$',
   coverageReporters: ['json'],
 };

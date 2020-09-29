@@ -1,16 +1,14 @@
 /// <reference types="@reactivex/ix-es2015-cjs" />
 import {
-  ABIEvent,
-  ABIFunction,
   ABIParameter,
   Action,
   AddressString,
-  ClaimTransaction,
+  ContractEventDescriptorClient,
+  ContractMethodDescriptorClient,
   Event,
   ForwardOptions,
   GetOptions,
   Hash256String,
-  InvocationTransaction,
   InvokeReceipt,
   InvokeSendUnsafeReceiveTransactionOptions,
   Log,
@@ -23,7 +21,6 @@ import {
   SmartContractDefinition,
   SmartContractIterOptions,
   SmartContractNetworkDefinition,
-  TransactionReceipt,
   TransactionResult,
   Transfer,
 } from '@neo-one/client-common';
@@ -227,7 +224,7 @@ const createCall = ({
 }: {
   readonly definition: SmartContractDefinition;
   readonly client: Client;
-  readonly func: ABIFunction;
+  readonly func: ContractMethodDescriptorClient;
   // tslint:disable-next-line no-any
 }) => async (...args: any[]): Promise<Return | undefined> => {
   const { params, network, address } = getParamsAndOptions({
@@ -269,14 +266,12 @@ const createInvoke = ({
 }: {
   readonly definition: SmartContractDefinition;
   readonly client: Client;
-  readonly func: ABIFunction;
+  readonly func: ContractMethodDescriptorClient;
 }) => {
   const invoke = async (
     // tslint:disable-next-line no-any
     ...args: any[]
-  ): Promise<
-    TransactionResult<InvokeReceipt, InvocationTransaction> | TransactionResult<TransactionReceipt, ClaimTransaction>
-  > => {
+  ): Promise<TransactionResult<InvokeReceipt> | TransactionResult> => {
     const { params, paramsZipped, options, forwardOptions, address, transfer, hash } = getParamsAndOptions({
       definition,
       parameters,
@@ -293,7 +288,7 @@ const createInvoke = ({
       return client.__invokeClaim(address, name, params, paramsZipped, options, definition.sourceMaps);
     }
 
-    let result: TransactionResult<RawInvokeReceipt, InvocationTransaction>;
+    let result: TransactionResult<RawInvokeReceipt>;
     if (send) {
       /* istanbul ignore next */
       if (transfer === undefined) {
@@ -347,7 +342,7 @@ const createInvoke = ({
       transaction: result.transaction,
       confirmed: async (getOptions?): Promise<InvokeReceipt> => {
         const receipt = await result.confirmed(getOptions);
-        const { events = [] } = definition.abi;
+        const { events = [] } = definition.manifest.abi;
         const { events: forwardEvents = [] } = forwardOptions;
         const actions = common.convertActions({
           actions: receipt.actions,
@@ -365,6 +360,9 @@ const createInvoke = ({
           blockIndex: receipt.blockIndex,
           blockHash: receipt.blockHash,
           globalIndex: receipt.globalIndex,
+          blockTime: receipt.blockTime,
+          confirmations: receipt.confirmations,
+          transactionHash: receipt.transactionHash,
           transactionIndex: receipt.transactionIndex,
           result: invocationResult,
           events: common.filterEvents(actions),
@@ -399,9 +397,11 @@ export const createSmartContract = ({
   readonly client: Client;
 }): SmartContractAny => {
   const {
-    abi: { events: abiEvents = [] },
+    manifest: {
+      abi: { events: abiEvents = [] },
+    },
   } = definition;
-  const events = traceEvents.concat(abiEvents).reduce<{ [key: string]: ABIEvent }>(
+  const events = traceEvents.concat(abiEvents).reduce<{ [key: string]: ContractEventDescriptorClient }>(
     (acc, event) => ({
       ...acc,
       [event.name]: event,
@@ -452,7 +452,7 @@ export const createSmartContract = ({
       filter<Log>(Boolean),
     );
 
-  return definition.abi.functions.reduce<SmartContractAny>(
+  return definition.manifest.abi.methods.reduce<SmartContractAny>(
     (acc, func) =>
       common.addForward(func, abiEvents, {
         ...acc,
