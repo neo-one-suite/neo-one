@@ -1,12 +1,25 @@
 import { UInt256 } from '@neo-one/client-common';
-import { Block, Blockchain as BlockchainType, BlockchainSettings, Header, Storage, VM } from '@neo-one/node-core';
+import {
+  Block,
+  Blockchain as BlockchainType,
+  BlockchainSettings,
+  CallReceipt,
+  DeserializeWireContext,
+  Header,
+  Storage,
+  Transaction,
+  TransactionState,
+  TriggerType,
+  VM,
+} from '@neo-one/node-core';
 import PriorityQueue from 'js-priority-queue';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { flatMap, map, toArray } from 'rxjs/operators';
 import { GenesisBlockNotRegisteredError } from './errors';
 import { PersistingBlockchain } from './PersistingBlockchain';
 import { utils } from './utils';
 import { verifyWitnesses } from './verify';
+import { wrapExecuteScripts } from './wrapExecuteScripts';
 
 // TODO: bring logger over when its time;
 const logger = console;
@@ -34,8 +47,7 @@ interface Entry {
 
 // TODO: revisit this with more context into how the headerIndex is being used.
 export const recoverHeaderIndex = async (storage: Storage) => {
-  const initHeaderIndex = await storage.headerHashList
-    .getAll$()
+  const initHeaderIndex = await storage.headerHashList.all$
     .pipe(
       flatMap((value) => value.hashes),
       toArray(),
@@ -61,8 +73,7 @@ export const recoverHeaderIndex = async (storage: Storage) => {
     }
   }
 
-  return storage.blocks
-    .getAll$()
+  return storage.blocks.all$
     .pipe(
       map((block) => block.header.hash),
       toArray(),
@@ -87,15 +98,19 @@ export class Blockchain {
     }
 
     // TODO: see if we need something similar and how we'll implement it.
-    blockchain.loadMempoolPolicy(storage);
+    // blockchain.loadMempoolPolicy(storage);
 
     return blockchain;
   }
 
+  public readonly deserializeWireContext: DeserializeWireContext;
+
+  public readonly verifyWitnesses = verifyWitnesses;
+  public readonly settings: BlockchainSettings;
+
   // tslint:disable-next-line: readonly-array
   private readonly headerIndex: UInt256[];
   private readonly onPersistNativeContractScript: Buffer;
-  private readonly settings: BlockchainSettings;
   private readonly storage: Storage;
   private readonly vm: VM;
 
@@ -120,6 +135,10 @@ export class Blockchain {
     this.vm = options.vm;
     this.onPersistNativeContractScript =
       options.onPersistNativeContractScript ?? utils.getOnPersistNativeContractScript();
+    this.deserializeWireContext = {
+      messageMagic: this.settings.messageMagic,
+    };
+    this.start();
   }
 
   public get currentBlock(): Block {
@@ -130,6 +149,10 @@ export class Blockchain {
     return this.mutableCurrentBlock;
   }
 
+  public get previousBlock(): Block | undefined {
+    return this.mutablePreviousBlock;
+  }
+
   public get storedHeaderCount(): number {
     return this.mutableStoredHeaderCount;
   }
@@ -138,8 +161,83 @@ export class Blockchain {
     return this.mutableCurrentBlock === undefined ? -1 : this.currentBlock.index;
   }
 
+  public get currentHeaderIndex(): number {
+    return this.headerIndex.length;
+  }
+
+  public get block$(): Observable<Block> {
+    return this.mutableBlock$;
+  }
+
+  public get isPersistingBlock(): boolean {
+    return this.mutablePersistingBlocks;
+  }
+
+  public get blocks() {
+    return this.storage.blocks;
+  }
+
+  public get transactions() {
+    return this.storage.transactions;
+  }
+
+  public get contracts() {
+    return this.storage.contracts;
+  }
+
+  public get storages() {
+    return this.storage.storages;
+  }
+
+  public get headerHashList() {
+    return this.storage.headerHashList;
+  }
+
+  public get blockHashIndex() {
+    return this.storage.blockHashIndex;
+  }
+
+  public get headerHashIndex() {
+    return this.storage.headerHashIndex;
+  }
+
+  public get contractID() {
+    return this.storage.contractID;
+  }
+
+  public async stop(): Promise<void> {
+    if (!this.mutableRunning) {
+      return;
+    }
+
+    if (this.mutablePersistingBlocks) {
+      // tslint:disable-next-line promise-must-complete
+      const doneRunningPromise = new Promise<void>((resolve) => {
+        this.mutableDoneRunningResolve = resolve;
+      });
+      this.mutableRunning = false;
+
+      await doneRunningPromise;
+      this.mutableDoneRunningResolve = undefined;
+    } else {
+      this.mutableRunning = false;
+    }
+
+    logger.info({ name: 'neo_blockchain_stop' }, 'NEO blockchain stopped.');
+  }
+
+  public async reset(): Promise<void> {
+    await this.stop();
+    await this.storage.reset();
+    this.mutableCurrentHeader = undefined;
+    this.mutableCurrentBlock = undefined;
+    this.mutablePreviousBlock = undefined;
+    this.start();
+    await this.persistBlock({ block: this.settings.genesisBlock });
+  }
+
   public async verifyBlock(block: Block): Promise<void> {
-    const verification = await block.verify(this.storage, verifyWitnesses);
+    const verification = await block.verify(this.vm, this.storage, this.verifyWitnesses);
     if (!verification) {
       // TODO: implement a makeError
       throw new Error('Block Verification Failed');
@@ -161,7 +259,6 @@ export class Blockchain {
         return;
       }
       this.mutableInQueue.add(block.hashHex);
-
       this.mutableBlockQueue.queue({
         block,
         resolve,
@@ -172,6 +269,32 @@ export class Blockchain {
       // tslint:disable-next-line no-floating-promises
       this.persistBlocksAsync();
     });
+  }
+
+  public invokeScript(script: Buffer): CallReceipt {
+    const transaction = { script };
+
+    return this.invokeTransaction(transaction, 100);
+  }
+
+  public invokeTransaction<TTransaction extends { readonly script: Buffer }>(
+    transaction: TTransaction,
+    gas: number,
+  ): CallReceipt {
+    return this.vm.withApplicationEngine(
+      {
+        trigger: TriggerType.Application,
+        gas,
+        // container: transaction, TODO: implement this
+        snapshot: 'main',
+        testMode: true,
+      },
+      (engine) => {
+        engine.loadScript(transaction.script);
+
+        return wrapExecuteScripts(engine);
+      },
+    );
   }
 
   private async persistBlocksAsync(): Promise<void> {
@@ -193,7 +316,6 @@ export class Blockchain {
         };
         try {
           await this.persistBlockInternal(entryNonNull.block, entryNonNull.verify);
-          logger.debug(logData);
         } catch (err) {
           logger.error({ err, ...logData });
 
@@ -284,8 +406,8 @@ export class Blockchain {
      * it is the already serialized changeSet coming from the C# VM Snapshot. There won't need to be as much storage
      * change conversion with this changeSet so will probably make 2 different `commit` methods, 1 for each.
      */
-    const { changeSet, applicationsExecuted } = blockchain.persistBlock(block, currentHeaderCount);
-    await this.storage.commit(changeSet);
+    const { changeBatch, applicationsExecuted } = blockchain.persistBlock(block, currentHeaderCount);
+    await this.storage.commitBatch(changeBatch);
     await this.saveHeaderHashList();
 
     this.mutablePreviousBlock = this.mutableCurrentBlock;

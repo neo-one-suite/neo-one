@@ -1,9 +1,9 @@
-import { common, VMState } from '@neo-one/client-common';
+import { common } from '@neo-one/client-common';
 import { CallFlags, SnapshotName, TriggerType, Verifiable } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
+import { parseNotifications, parseStackItems } from './converters';
 import { EngineMethods } from './Methods';
-import { parse as parseStackItems } from './StackItems';
 import { DispatcherFunc } from './types';
 
 export interface CreateOptions {
@@ -44,11 +44,9 @@ export class ApplicationEngine {
   }
 
   public get state() {
-    return VMState[
-      this.dispatch({
-        method: 'getvmstate',
-      })
-    ];
+    return this.dispatch({
+      method: 'getvmstate',
+    });
   }
 
   public get resultStack() {
@@ -58,6 +56,14 @@ export class ApplicationEngine {
           method: 'getresultstack',
         }),
       ),
+    );
+  }
+
+  public get notifications() {
+    return parseNotifications(
+      this.dispatch({
+        method: 'getnotifications',
+      }),
     );
   }
 

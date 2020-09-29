@@ -2,9 +2,9 @@ import {
   BinaryWriter,
   BlockJSON,
   common,
+  createSerializeWire,
   InvalidFormatError,
   IOHelper,
-  TransactionJSON,
   UInt256,
 } from '@neo-one/client-common';
 import _ from 'lodash';
@@ -92,7 +92,7 @@ export class Block extends BlockBase implements SerializableWire, SerializableJS
       throw new InvalidFormatError('Invalid merkle root');
     }
 
-    return new this({
+    return new Block({
       version: blockBase.version,
       previousHash: blockBase.previousHash,
       merkleRoot: blockBase.merkleRoot,
@@ -112,6 +112,8 @@ export class Block extends BlockBase implements SerializableWire, SerializableJS
     });
   }
 
+  public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
+  public readonly serializeUnsigned = createSerializeWire(super.serializeUnsignedBase.bind(this));
   public readonly transactions: readonly Transaction[];
   public readonly consensusData?: ConsensusData;
   protected readonly sizeExclusive = utils.lazy(() =>
@@ -202,7 +204,7 @@ export class Block extends BlockBase implements SerializableWire, SerializableJS
     return {
       ...blockBaseJSON,
       consensusdata: this.consensusData ? this.consensusData.serializeJSON() : undefined,
-      tx: this.transactions.map((transaction) => transaction.serializeJSON(context) as TransactionJSON),
+      tx: this.transactions.map((transaction) => transaction.serializeJSON(context)),
       // confirmations: blockBaseJSON.confirmations, TODO: is this our own property?
     };
   }

@@ -3,6 +3,7 @@ export * from './BlockBase';
 export * from './Blockchain';
 export * from './ConsensusData';
 export * from './manifest';
+export * from './ContractIDState';
 export * from './ContractState';
 export * from './constants';
 export * from './crypto';

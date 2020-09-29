@@ -65,7 +65,7 @@ export const verifyWithApplicationEngine = (
   init?: ContractMethodDescriptor,
 ): VerifyResult =>
   vm.withApplicationEngine(
-    { trigger: TriggerType.Verification, container: verifiable, snapshot: 'main', gas },
+    { trigger: TriggerType.Verification, container: verifiable, snapshot: 'main', gas, testMode: true },
     (engine) => {
       engine.loadScript(verification, CallFlags.None);
       engine.loadClonedContext(offset);

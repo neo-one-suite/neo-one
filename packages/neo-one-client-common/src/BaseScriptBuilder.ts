@@ -122,10 +122,6 @@ export class BaseScriptBuilder {
     return this;
   }
 
-  public emitSysCallInternal(hash: Buffer) {
-    return this.emitOp('SYSCALL', hash);
-  }
-
   public emitUInt8(value: number): this {
     const buff = Buffer.allocUnsafe(1);
     buff.writeUInt8(value, 0);
@@ -166,5 +162,9 @@ export class BaseScriptBuilder {
 
   public build(): Buffer {
     return Buffer.concat(this.mutableBuffers);
+  }
+
+  protected emitSysCallInternal(hash: Buffer) {
+    return this.emitOp('SYSCALL', hash);
   }
 }

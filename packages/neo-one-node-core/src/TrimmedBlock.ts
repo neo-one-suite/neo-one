@@ -1,5 +1,6 @@
 import {
   BinaryWriter,
+  createSerializeWire,
   InvalidFormatError,
   IOHelper,
   JSONHelper,
@@ -27,21 +28,15 @@ export interface BlockKey {
 
 export class TrimmedBlock extends BlockBase implements SerializableWire {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): TrimmedBlock {
-    const {
-      version,
-      previousHash,
-      merkleRoot,
-      timestamp,
-      index,
-      nextConsensus,
-      witness,
-    } = BlockBase.deserializeWireBase(options);
     const { reader } = options;
+    const { version, previousHash, merkleRoot, timestamp, index, nextConsensus, witness } = super.deserializeWireBase(
+      options,
+    );
 
-    const hashes = reader.readArray(reader.readUInt256, Block.MaxContentsPerBlock);
+    const hashes = reader.readArray(reader.readUInt256.bind(reader), Block.MaxContentsPerBlock);
     const consensusData = hashes.length > 0 ? ConsensusData.deserializeWireBase(options) : undefined;
 
-    return new this({
+    return new TrimmedBlock({
       version,
       previousHash,
       merkleRoot,
@@ -61,6 +56,8 @@ export class TrimmedBlock extends BlockBase implements SerializableWire {
     });
   }
 
+  public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
+  public readonly serializeUnsigned = createSerializeWire(super.serializeUnsignedBase.bind(this));
   public readonly consensusData?: ConsensusData;
   public readonly hashes: readonly UInt256[];
   public readonly isBlock: boolean;
@@ -82,10 +79,30 @@ export class TrimmedBlock extends BlockBase implements SerializableWire {
       }),
   );
 
-  public constructor(options: TrimmedBlockAdd) {
-    super(options);
-    this.consensusData = options.consensusData;
-    this.hashes = options.hashes;
+  public constructor({
+    version,
+    previousHash,
+    merkleRoot,
+    timestamp,
+    index,
+    nextConsensus,
+    witness,
+    hash,
+    consensusData,
+    hashes,
+  }: TrimmedBlockAdd) {
+    super({
+      version,
+      previousHash,
+      merkleRoot,
+      timestamp,
+      index,
+      nextConsensus,
+      witness,
+      hash,
+    });
+    this.consensusData = consensusData;
+    this.hashes = hashes;
     this.isBlock = this.hashes.length > 0;
   }
 
@@ -131,7 +148,7 @@ export class TrimmedBlock extends BlockBase implements SerializableWire {
 
   public serializeWireBase(writer: BinaryWriter): void {
     super.serializeWireBase(writer);
-    writer.writeArray(this.hashes, writer.writeUInt256);
+    writer.writeArray(this.hashes, writer.writeUInt256.bind(writer));
     if (this.hashes.length > 0) {
       if (this.consensusData === undefined) {
         throw new InvalidFormatError(

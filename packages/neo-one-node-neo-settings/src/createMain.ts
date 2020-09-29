@@ -1,5 +1,5 @@
-import { common as clientCommon, crypto, UInt160 } from '@neo-one/client-common';
-import { Settings, TransactionType } from '@neo-one/node-core';
+import { common as clientCommon, crypto } from '@neo-one/client-common';
+import { Settings } from '@neo-one/node-core';
 import { common } from './common';
 
 const DEFAULT_VALIDATORS: readonly string[] = [
@@ -12,68 +12,74 @@ const DEFAULT_VALIDATORS: readonly string[] = [
   '02486fd15702c4490a26703112a5cc1d0923fd697a33406bd5a1c00e0013b09a70',
 ];
 
+const DEFAULT_EXTRA_MEMBERS: readonly string[] = [
+  '023a36c72844610b4d34d1968662424011bf783ca9d984efa19a20babf5582f3fe',
+  '03708b860c1de5d87f5b151a12c2a99feebd2e8b315ee8e7cf8aa19692a9e18379',
+  '03c6aa6e12638b36e88adc1ccdceac4db9929575c3e03576c617c49cce7114a050',
+  '03204223f8c86b8cd5c89ef12e4f0dbb314172e9241e30c9ef2293790793537cf0',
+  '02a62c915cf19c7f19a50ec217e79fac2439bbaad658493de0c7d8ffa92ab0aa62',
+  '03409f31f0d66bdc2f70a9730b66fe186658f84a8018204db01c106edc36553cd0',
+  '0288342b141c30dc8ffcde0204929bb46aed5756b41ef4a56778d15ada8f0c6654',
+  '020f2887f41474cfeb11fd262e982051c1541418137c02a0f4961af911045de639',
+  '0222038884bbd1d8ff109ed3bdef3542e768eef76c1247aea8bc8171f532928c30',
+  '03d281b42002647f0113f36c7b8efb30db66078dfaaa9ab3ff76d043a98d512fde',
+  '02504acbc1f4b3bdad1d86d6e1a08603771db135a73e61c9d565ae06a1938cd2ad',
+  '0226933336f1b75baa42d42b71d9091508b638046d19abd67f4e119bf64a7cfb4d',
+  '03cdcea66032b82f5c30450e381e5295cae85c5e6943af716cc6b646352a6067dc',
+  '02cd5a5547119e24feaa7c2a0f37b8c9366216bab7054de0065c9be42084003c8a',
+];
+
 export const createMain = ({
   privateNet = false,
   standbyValidators: standbyValidatorsIn = DEFAULT_VALIDATORS,
-  secondsPerBlock,
-  address: addressIn,
+  extraCommitteeMembers: extraCommitteeMembersIn = DEFAULT_EXTRA_MEMBERS,
+  millisecondsPerBlock,
 }: {
   readonly privateNet?: boolean;
-  readonly secondsPerBlock?: number;
   readonly standbyValidators?: readonly string[];
-  readonly address?: string;
+  readonly extraCommitteeMembers?: readonly string[];
+  readonly millisecondsPerBlock?: number;
 } = {}): Settings => {
   const standbyValidators = standbyValidatorsIn.map((value) => clientCommon.stringToECPoint(value));
+  const standbyMembers = extraCommitteeMembersIn.map((value) => clientCommon.stringToECPoint(value));
+  const standbyCommittee = standbyValidators.concat(standbyMembers);
 
-  const consensusAddress =
-    standbyValidatorsIn === DEFAULT_VALIDATORS
-      ? clientCommon.asUInt160(Buffer.from('59e75d652b5d3827bf04c165bbe9ef95cca4bf55', 'hex'))
-      : crypto.getConsensusAddress(standbyValidators);
-  let address: UInt160;
-  if (addressIn === undefined) {
-    address =
-      standbyValidatorsIn === DEFAULT_VALIDATORS
-        ? clientCommon.asUInt160(Buffer.from('5fa99d93303775fe50ca119c327759313eccfa1c', 'hex'))
-        : crypto.toScriptHash(
-            crypto.createMultiSignatureVerificationScript(standbyValidators.length / 2 + 1, standbyValidators),
-          );
-  } else {
-    address = clientCommon.stringToUInt160(addressIn);
-  }
+  const consensusAddress = crypto.getConsensusAddress(standbyValidators);
 
   const commonSettings = common({
     privateNet,
     consensusAddress,
-    address,
   });
 
   return {
     genesisBlock: commonSettings.genesisBlock,
-    governingToken: commonSettings.governingToken,
-    utilityToken: commonSettings.utilityToken,
     decrementInterval: commonSettings.decrementInterval,
     generationAmount: commonSettings.generationAmount,
-    secondsPerBlock: secondsPerBlock === undefined ? commonSettings.secondsPerBlock : secondsPerBlock,
-    maxTransactionsPerBlock: commonSettings.maxTransactionsPerBlock,
-    memPoolSize: commonSettings.memPoolSize,
-    fees: {
-      [TransactionType.Enrollment]: clientCommon.fixed8FromDecimal(1000),
-      [TransactionType.Issue]: clientCommon.fixed8FromDecimal(500),
-      [TransactionType.Publish]: clientCommon.fixed8FromDecimal(500),
-      [TransactionType.Register]: clientCommon.fixed8FromDecimal(10000),
-    },
+    millisecondsPerBlock:
+      millisecondsPerBlock === undefined ? commonSettings.millisecondsPerBlock : millisecondsPerBlock,
+    // maxTransactionsPerBlock: commonSettings.maxTransactionsPerBlock,
+    standbyCommittee,
+    committeeMembersCount: standbyCommittee.length,
+    memoryPoolMaxTransactions: commonSettings.memoryPoolMaxTransactions,
+    validatorsCount: standbyValidators.length,
+    // fees: {
+    //   [TransactionType.Enrollment]: clientCommon.fixed8FromDecimal(1000),
+    //   [TransactionType.Issue]: clientCommon.fixed8FromDecimal(500),
+    //   [TransactionType.Publish]: clientCommon.fixed8FromDecimal(500),
+    //   [TransactionType.Register]: clientCommon.fixed8FromDecimal(10000),
+    // },
 
-    registerValidatorFee: clientCommon.fixed8FromDecimal(1000),
-    messageMagic: 7630401,
+    // registerValidatorFee: clientCommon.fixed8FromDecimal(1000),
+    messageMagic: 5195086,
     addressVersion: clientCommon.NEO_ADDRESS_VERSION,
     privateKeyVersion: clientCommon.NEO_PRIVATE_KEY_VERSION,
     standbyValidators,
-    vm: {
-      storageContext: {
-        v0: {
-          index: 0,
-        },
-      },
-    },
+    // vm: {
+    //   storageContext: {
+    //     v0: {
+    //       index: 0,
+    //     },
+    //   },
+    // },
   };
 };

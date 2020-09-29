@@ -1,113 +1,23 @@
 import { AddChange, Change, DeleteChange } from '@neo-one/node-core';
 import { keys } from '@neo-one/node-storage-common';
 import { utils } from '@neo-one/utils';
-import * as common from './common';
+import type { AbstractBatch, DelBatch, PutBatch } from 'abstract-leveldown';
 import { UnknownChangeTypeError, UnknownTypeError } from './errors';
 
-// tslint:disable-next-line no-any
-type AbstractBatch = any;
+/**
+ * TODO: previously we had extra storage for things like `latestBlock`, etc
+ * If we decide we need those back we'll need to add the logic back to here
+ * like we did in 2.x, revisit this.
+ */
 
-const convertAddChange = (changeIn: AddChange): readonly AbstractBatch[] => {
-  const change = changeIn;
+const convertAddChange = (change: AddChange): readonly PutBatch[] => {
   switch (change.type) {
-    case 'account':
-      return [
-        {
-          type: 'put',
-          key: keys.typeKeyToSerializeKey.account(change.value),
-          value: change.value.serializeWire(),
-        },
-      ];
-
-    case 'accountUnspent':
-      return [
-        {
-          type: 'put',
-          key: keys.typeKeyToSerializeKey.accountUnspent({
-            hash: change.value.hash,
-            input: change.value.input,
-          }),
-
-          value: change.value.serializeWire(),
-        },
-      ];
-
-    case 'accountUnclaimed':
-      return [
-        {
-          type: 'put',
-          key: keys.typeKeyToSerializeKey.accountUnclaimed({
-            hash: change.value.hash,
-            input: change.value.input,
-          }),
-
-          value: change.value.serializeWire(),
-        },
-      ];
-
-    case 'action':
-      return [
-        {
-          type: 'put',
-          key: keys.typeKeyToSerializeKey.action({
-            index: change.value.index,
-          }),
-
-          value: change.value.serializeWire(),
-        },
-      ];
-
-    case 'asset':
-      return [
-        {
-          type: 'put',
-          key: keys.typeKeyToSerializeKey.asset(change.value),
-          value: change.value.serializeWire(),
-        },
-      ];
-
     case 'block':
       return [
         {
           type: 'put',
-          key: keys.typeKeyToSerializeKey.block(change.value),
+          key: keys.createBlockKey(change.key),
           value: change.value.serializeWire(),
-        },
-
-        {
-          type: 'put',
-          key: keys.maxBlockHashKey,
-          value: common.serializeBlockHash(change.value.hash),
-        },
-      ];
-
-    case 'blockData':
-      return [
-        {
-          type: 'put',
-          key: keys.typeKeyToSerializeKey.blockData(change.value),
-          value: change.value.serializeWire(),
-        },
-      ];
-
-    case 'header':
-      return [
-        {
-          type: 'put',
-          key: keys.typeKeyToSerializeKey.header(change.value),
-          value: change.value.serializeWire(),
-        },
-
-        {
-          type: 'put',
-          key: keys.maxHeaderHashKey,
-          value: common.serializeHeaderHash(change.value.hash),
-        },
-
-        {
-          type: 'put',
-          key: keys.serializeHeaderIndexHashKey(change.value.index),
-          value: common.serializeHeaderHash(change.value.hash),
         },
       ];
 
@@ -115,29 +25,7 @@ const convertAddChange = (changeIn: AddChange): readonly AbstractBatch[] => {
       return [
         {
           type: 'put',
-          key: keys.typeKeyToSerializeKey.transaction(change.value),
-          value: change.value.serializeWire(),
-        },
-      ];
-
-    case 'output':
-      return [
-        {
-          type: 'put',
-          key: keys.typeKeyToSerializeKey.output({
-            hash: change.value.hash,
-            index: change.value.index,
-          }),
-
-          value: change.value.output.serializeWire(),
-        },
-      ];
-
-    case 'transactionData':
-      return [
-        {
-          type: 'put',
-          key: keys.typeKeyToSerializeKey.transactionData(change.value),
+          key: keys.createTransactionKey(change.key),
           value: change.value.serializeWire(),
         },
       ];
@@ -146,96 +34,74 @@ const convertAddChange = (changeIn: AddChange): readonly AbstractBatch[] => {
       return [
         {
           type: 'put',
-          key: keys.typeKeyToSerializeKey.contract(change.value),
+          key: keys.createContractKey(change.key),
           value: change.value.serializeWire(),
         },
       ];
 
-    case 'storageItem':
+    case 'storage':
       return [
         {
           type: 'put',
-          key: keys.typeKeyToSerializeKey.storageItem({
-            hash: change.value.hash,
-            key: change.value.key,
-          }),
-
+          key: keys.createStorageKey(change.key),
           value: change.value.serializeWire(),
         },
       ];
 
-    case 'validator':
+    case 'headerHashList':
       return [
         {
           type: 'put',
-          key: keys.typeKeyToSerializeKey.validator({
-            publicKey: change.value.publicKey,
-          }),
-
+          key: keys.createHeaderHashListKey(change.key),
           value: change.value.serializeWire(),
         },
       ];
 
-    case 'invocationData':
+    case 'blockHashIndex':
       return [
         {
           type: 'put',
-          key: keys.typeKeyToSerializeKey.invocationData(change.value),
+          key: keys.blockHashIndexKey,
           value: change.value.serializeWire(),
         },
       ];
 
-    case 'validatorsCount':
+    case 'headerHashIndex':
       return [
         {
           type: 'put',
-          key: keys.validatorsCountKey,
+          key: keys.headerHashIndexKey,
+          value: change.value.serializeWire(),
+        },
+      ];
+
+    case 'contractID':
+      return [
+        {
+          type: 'put',
+          key: keys.contractIDKey,
           value: change.value.serializeWire(),
         },
       ];
 
     default:
       utils.assertNever(change);
-      throw new UnknownTypeError(changeIn.type);
+      throw new UnknownTypeError();
   }
 };
 
-const convertDeleteChange = (change: DeleteChange): AbstractBatch => {
+const convertDeleteChange = (change: DeleteChange): DelBatch => {
   switch (change.type) {
-    case 'account':
-      return {
-        type: 'del',
-        key: keys.typeKeyToSerializeKey.account(change.key),
-      };
-
-    case 'accountUnspent':
-      return {
-        type: 'del',
-        key: keys.typeKeyToSerializeKey.accountUnspent(change.key),
-      };
-
-    case 'accountUnclaimed':
-      return {
-        type: 'del',
-        key: keys.typeKeyToSerializeKey.accountUnclaimed(change.key),
-      };
-
     case 'contract':
       return {
         type: 'del',
-        key: keys.typeKeyToSerializeKey.contract(change.key),
+        key: keys.createContractKey(change.key),
       };
 
-    case 'storageItem':
+    case 'storage':
       return {
         type: 'del',
-        key: keys.typeKeyToSerializeKey.storageItem(change.key),
-      };
-
-    case 'validator':
-      return {
-        type: 'del',
-        key: keys.typeKeyToSerializeKey.validator(change.key),
+        key: keys.createStorageKey(change.key),
       };
 
     default:

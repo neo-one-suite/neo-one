@@ -9,6 +9,12 @@ import { SignerModel } from '../SignerModel';
 import { WitnessModel } from '../WitnessModel';
 import { AttributeModel } from './attribute';
 
+export interface TransactionConsensusOptions {
+  readonly nonce: number;
+  readonly validUntilBlock: number;
+  readonly networkFee: BN;
+}
+
 export interface TransactionModelAdd<
   TAttribute extends AttributeModel = AttributeModel,
   TWitness extends WitnessModel = WitnessModel,
@@ -43,8 +49,8 @@ export class TransactionModel<
   protected static readonly WitnessConstructor: Constructor<WitnessModel> = WitnessModel;
 
   public readonly version: number;
-  public readonly nonce: number;
-  public readonly validUntilBlock: number;
+  public readonly nonce?: number;
+  public readonly validUntilBlock?: number;
   public readonly signers: readonly TSigner[];
   public readonly sender?: UInt160;
   public readonly attributes: readonly TAttribute[];
@@ -78,7 +84,7 @@ export class TransactionModel<
     this.witnesses = witnesses;
     this.signers = signers;
     this.systemFeeInternal = utils.lazy(() => systemFee);
-    this.networkFeeInternal = utils.lazy(() => networkFee);
+    this.networkFeeInternal = utils.lazy(() => (networkFee ? networkFee : new BN(0)));
     this.validUntilBlock = validUntilBlock;
     this.script = script;
     const hashIn = hash;
@@ -127,6 +133,22 @@ export class TransactionModel<
     });
   }
 
+  public cloneWithConsensusOptions(options: TransactionConsensusOptions): this {
+    // tslint:disable-next-line: no-any
+    return new (this.constructor as any)({
+      version: this.version,
+      systemFee: this.systemFee,
+      attributes: this.attributes,
+      signers: this.signers,
+      script: this.script,
+      hash: this.hash,
+      witnesses: this.witnesses,
+      nonce: options.nonce,
+      networkFee: options.networkFee,
+      validUntilBlock: options.validUntilBlock,
+    });
+  }
+
   public sign(key: PrivateKey): this {
     return this.clone({
       witnesses: this.witnesses.concat([
@@ -147,10 +169,10 @@ export class TransactionModel<
 
   public serializeUnsignedBase(writer: BinaryWriter): void {
     writer.writeUInt8(this.version);
-    writer.writeUInt32LE(this.nonce);
+    writer.writeUInt32LE(this.nonce ? this.nonce : 0);
     writer.writeUInt64LE(this.systemFee);
     writer.writeUInt64LE(this.networkFee);
-    writer.writeUInt32LE(this.validUntilBlock);
+    writer.writeUInt32LE(this.validUntilBlock ? this.validUntilBlock : 0);
     writer.writeArray(this.signers, (signer) => {
       signer.serializeWireBase(writer);
     });

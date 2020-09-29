@@ -37,4 +37,8 @@ describe('Dispatcher Tests', () => {
     expect(postEngine.state).toEqual('BREAK');
     expect(() => postEngine.execute()).toThrow();
   });
+
+  test.only('test', () => {
+    console.log(dispatcher.test());
+  });
 });

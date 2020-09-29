@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Neo;
 using Neo.Ledger;
 using Neo.Network.P2P.Payloads;
@@ -27,6 +28,7 @@ namespace NEOONE
             snapshot_change_header_hash_index,
             snapshot_set_persisting_block,
             snapshot_get_change_set,
+            snapshot_transactions_delete,
         }
 
         private dynamic dispatchSnapshotMethod(SnapshotMethod method, dynamic args)
@@ -48,6 +50,7 @@ namespace NEOONE
                 case SnapshotMethod.snapshot_transactions_add:
                     uint blockIndex = (uint)args.index;
                     byte[] txSerialized = (byte[])args.tx;
+                    VMState vmState = (VMState)args.state;
                     Transaction tx = new Transaction();
                     using (MemoryStream ms = new MemoryStream(txSerialized))
                     using (BinaryReader reader = new BinaryReader(ms))
@@ -56,7 +59,12 @@ namespace NEOONE
                         ((IVerifiable)tx).Deserialize(reader);
                     }
 
-                    return this._snapshotTransactionsAdd(this.selectSnapshot(args.snapshot), tx, blockIndex);
+                    return this._snapshotTransactionsAdd(this.selectSnapshot(args.snapshot), tx, blockIndex, vmState);
+
+                case SnapshotMethod.snapshot_transactions_delete:
+                    UInt256 transactionHash = new UInt256((byte[])args.hash);
+
+                    return this._snapshotTransactionsDelete(this.selectSnapshot(args.snapshot), transactionHash);
 
                 case SnapshotMethod.snapshot_clone:
                     return this._snapshotClone();
@@ -130,7 +138,7 @@ namespace NEOONE
             }
         }
 
-        private void _snapshotCommit(SnapshotView snapshot, string partial)
+        private void _snapshotCommit(StoreView snapshot, string partial)
         {
             switch (partial)
             {
@@ -161,6 +169,13 @@ namespace NEOONE
             return true;
         }
 
+        private bool _snapshotTransactionsDelete(StoreView snapshot, UInt256 hash)
+        {
+            snapshot.Transactions.Delete(hash);
+
+            return true;
+        }
+
         private bool _snapshotChangeBlockHashIndex(StoreView snapshot, uint index, UInt256 hash)
         {
             var hashIndex = snapshot.BlockHashIndex.GetAndChange();
@@ -179,7 +194,7 @@ namespace NEOONE
             return true;
         }
 
-        private dynamic _snapshotGetChangeSet(SnapshotView snapshot)
+        private dynamic _snapshotGetChangeSet(StoreView snapshot)
         {
             return new ChangeSet(snapshot).set.ToArray();
         }

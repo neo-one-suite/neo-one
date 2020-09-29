@@ -68,7 +68,8 @@ export class PersistingBlockchain {
   public persistBlock(
     block: Block,
     currentHeaderIndexCount: number,
-  ): { readonly changeSet: readonly any[]; readonly applicationsExecuted: readonly ApplicationExecuted[] } {
+    // tslint:disable-next-line: readonly-array no-any
+  ): { readonly changeBatch: any[]; readonly applicationsExecuted: readonly ApplicationExecuted[] } {
     return this.vm.withSnapshots(({ main, clone }) => {
       if (block.index === currentHeaderIndexCount) {
         main.changeHeaderHashIndex(block.index, block.hash);
@@ -103,17 +104,12 @@ export class PersistingBlockchain {
       main.addBlock(block);
       main.clone();
 
-      const { changeSet: transactionsChangeSet, executed: executedTransactions } = this.persistTransactions(
-        block,
-        main,
-        clone,
-      );
+      const executedTransactions = this.persistTransactions(block, main, clone);
 
       main.changeBlockHashIndex(block.index, block.hash);
-      const finalChangeSet = new Set([...transactionsChangeSet, ...main.getChangeSet()]);
       const finalApplicationsExecuted = appsExecuted.concat(executedTransactions);
 
-      return { changeSet: [...finalChangeSet], applicationsExecuted: finalApplicationsExecuted };
+      return { changeBatch: main.getChangeSet(), applicationsExecuted: finalApplicationsExecuted };
     });
   }
 
@@ -146,26 +142,12 @@ export class PersistingBlockchain {
     block: Block,
     main: SnapshotHandler,
     clone: Omit<SnapshotHandler, 'clone'>,
-  ): { readonly changeSet: readonly any[]; readonly executed: readonly ApplicationExecuted[] } {
-    return block.transactions.reduce<{
-      readonly changeSet: any[];
-      readonly executed: readonly ApplicationExecuted[];
-    }>(
-      (acc, transaction) => {
-        const { changeSet: nextChangeSet, appExecuted } = this.persistTransaction(
-          transaction,
-          block.index,
-          main,
-          clone,
-        );
+  ): readonly ApplicationExecuted[] {
+    return block.transactions.reduce<readonly ApplicationExecuted[]>((acc, transaction) => {
+      const appExecuted = this.persistTransaction(transaction, block.index, main, clone);
 
-        return {
-          changeSet: acc.changeSet.concat(nextChangeSet),
-          executed: acc.executed.concat(appExecuted),
-        };
-      },
-      { changeSet: [], executed: [] },
-    );
+      return acc.concat(appExecuted);
+    }, []);
   }
 
   private persistTransaction(
@@ -173,9 +155,8 @@ export class PersistingBlockchain {
     index: number,
     main: SnapshotHandler,
     clone: Omit<SnapshotHandler, 'clone'>,
-  ): { readonly appExecuted: ApplicationExecuted; readonly changeSet: readonly any[] } {
+  ): ApplicationExecuted {
     clone.addTransaction(transaction, index);
-    let changeSet = clone.getChangeSet();
     clone.commit('transactions');
 
     return this.vm.withApplicationEngine(
@@ -192,16 +173,12 @@ export class PersistingBlockchain {
         if (state === 'HALT') {
           clone.deleteTransaction(transaction.hash);
           clone.addTransaction(transaction, index, VMState.HALT);
-          changeSet = changeSet.concat(clone.getChangeSet());
           clone.commit();
         } else {
           main.clone();
         }
 
-        return {
-          changeSet,
-          appExecuted: blockchainUtils.getApplicationExecuted(engine),
-        };
+        return blockchainUtils.getApplicationExecuted(engine);
       },
     );
   }

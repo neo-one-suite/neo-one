@@ -1,12 +1,13 @@
 // tslint:disable no-var-before-return prefer-immediate-return
-import { ReadAllStorage, ReadGetAllStorage, ReadMetadataStorage, ReadStorage } from '@neo-one/node-core';
+import { ReadAllStorage, ReadMetadataStorage, ReadStorage } from '@neo-one/node-core';
 import { LevelUp } from 'levelup';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { KeyNotFoundError } from './errors';
 import { streamToObservable } from './streamToObservable';
+import { StreamOptions } from './types';
 
-type SerializeKey<Key> = (key: Key) => string;
+type SerializeKey<Key> = (key: Key) => Buffer;
 
 export function createTryGet<Key, Value>({
   get,
@@ -27,31 +28,32 @@ export function createTryGet<Key, Value>({
   };
 }
 
-export function createTryGetLatest<Key, Value>({
-  db,
-  latestKey,
-  deserializeResult,
-  get,
-}: {
-  readonly db: LevelUp;
-  readonly latestKey: string;
-  readonly deserializeResult: (latestResult: Buffer) => Key;
-  readonly get: (key: Key) => Promise<Value>;
-}): () => Promise<Value | undefined> {
-  return async (): Promise<Value | undefined> => {
-    try {
-      const result = await db.get(latestKey);
-      const value = await get(deserializeResult(result as Buffer));
+// TODO: we haven't implemented any `tryGetLatest` functions, should we reimplement for something?
+// export function createTryGetLatest<Key, Value>({
+//   db,
+//   latestKey,
+//   deserializeResult,
+//   get,
+// }: {
+//   readonly db: LevelUp;
+//   readonly latestKey: string;
+//   readonly deserializeResult: (latestResult: Buffer) => Key;
+//   readonly get: (key: Key) => Promise<Value>;
+// }): () => Promise<Value | undefined> {
+//   return async (): Promise<Value | undefined> => {
+//     try {
+//       const result = await db.get(latestKey);
+//       const value = await get(deserializeResult(result as Buffer));
 
-      return value;
-    } catch (error) {
-      if (error.notFound || error.code === 'KEY_NOT_FOUND') {
-        return undefined;
-      }
-      throw error;
-    }
-  };
-}
+//       return value;
+//     } catch (error) {
+//       if (error.notFound || error.code === 'KEY_NOT_FOUND') {
+//         return undefined;
+//       }
+//       throw error;
+//     }
+//   };
+// }
 
 export function createReadStorage<Key, Value>({
   db,
@@ -70,7 +72,7 @@ export function createReadStorage<Key, Value>({
       return deserializeValue(result as Buffer);
     } catch (error) {
       if (error.notFound || error.code === 'KEY_NOT_FOUND') {
-        throw new KeyNotFoundError(serialized);
+        throw new KeyNotFoundError(serialized.toString('hex'));
       }
 
       throw error;
@@ -82,34 +84,25 @@ export function createReadStorage<Key, Value>({
 
 export function createAll$<Value>({
   db,
-  minKey,
-  maxKey,
+  range,
   deserializeValue,
 }: {
   readonly db: LevelUp;
-  readonly minKey: string;
-  readonly maxKey: string;
+  readonly range: StreamOptions;
   readonly deserializeValue: (value: Buffer) => Value;
 }): Observable<Value> {
-  return streamToObservable(() =>
-    db.createValueStream({
-      gte: minKey,
-      lte: maxKey,
-    }),
-  ).pipe(map(deserializeValue));
+  return streamToObservable(() => db.createValueStream(range)).pipe(map(deserializeValue));
 }
 
 export function createReadAllStorage<Key, Value>({
   db,
   serializeKey,
-  minKey,
-  maxKey,
+  range,
   deserializeValue,
 }: {
   readonly db: LevelUp;
   readonly serializeKey: SerializeKey<Key>;
-  readonly minKey: string;
-  readonly maxKey: string;
+  readonly range: StreamOptions;
   readonly deserializeValue: (value: Buffer) => Value;
 }): ReadAllStorage<Key, Value> {
   const readStorage = createReadStorage({
@@ -121,41 +114,42 @@ export function createReadAllStorage<Key, Value>({
   return {
     get: readStorage.get,
     tryGet: readStorage.tryGet,
-    all$: createAll$({ db, minKey, maxKey, deserializeValue }),
+    all$: createAll$({ db, range, deserializeValue }),
   };
 }
 
-export function createReadGetAllStorage<Key, Keys, Value>({
-  db,
-  serializeKey,
-  getMinKey,
-  getMaxKey,
-  deserializeValue,
-}: {
-  readonly db: LevelUp;
-  readonly serializeKey: SerializeKey<Key>;
-  readonly getMinKey: (keys: Keys) => string;
-  readonly getMaxKey: (keys: Keys) => string;
-  readonly deserializeValue: (value: Buffer) => Value;
-}): ReadGetAllStorage<Key, Keys, Value> {
-  const readStorage = createReadStorage({
-    db,
-    serializeKey,
-    deserializeValue,
-  });
+// TODO: do we need to reimplement this for something?
+// export function createReadGetAllStorage<Key, Value>({
+//   db,
+//   serializeKey,
+//   getMinKey,
+//   getMaxKey,
+//   deserializeValue,
+// }: {
+//   readonly db: LevelUp;
+//   readonly serializeKey: SerializeKey<Key>;
+//   readonly getMinKey: (keys: Keys) => string;
+//   readonly getMaxKey: (keys: Keys) => string;
+//   readonly deserializeValue: (value: Buffer) => Value;
+// }): ReadGetAllStorage<Key, Keys, Value> {
+//   const readStorage = createReadStorage({
+//     db,
+//     serializeKey,
+//     deserializeValue,
+//   });
 
-  return {
-    get: readStorage.get,
-    tryGet: readStorage.tryGet,
-    getAll$: (keys: Keys) =>
-      createAll$({
-        db,
-        minKey: getMinKey(keys),
-        maxKey: getMaxKey(keys),
-        deserializeValue,
-      }),
-  };
-}
+//   return {
+//     get: readStorage.get,
+//     tryGet: readStorage.tryGet,
+//     getAll$: (keys: Keys) =>
+//       createAll$({
+//         db,
+//         minKey: getMinKey(keys),
+//         maxKey: getMaxKey(keys),
+//         deserializeValue,
+//       }),
+//   };
+// }
 
 export function createTryGetMetadata<Value>({
   get,
@@ -182,7 +176,7 @@ export function createReadMetadataStorage<Value>({
   deserializeValue,
 }: {
   readonly db: LevelUp;
-  readonly key: string;
+  readonly key: Buffer;
   readonly deserializeValue: (value: Buffer) => Value;
 }): ReadMetadataStorage<Value> {
   const get = async (): Promise<Value> => {
@@ -192,7 +186,7 @@ export function createReadMetadataStorage<Value>({
       return deserializeValue(result as Buffer);
     } catch (error) {
       if (error.notFound || error.code === 'KEY_NOT_FOUND') {
-        throw new KeyNotFoundError(key);
+        throw new KeyNotFoundError(key.toString('hex'));
       }
 
       throw error;
