@@ -3,6 +3,7 @@ using System.Linq;
 using Neo.IO;
 using Neo.SmartContract;
 using Neo.VM.Types;
+using Neo;
 
 namespace NEOONE
 {
@@ -154,6 +155,29 @@ namespace NEOONE
                 this.scriptHash = notifyEvent.ScriptHash.ToArray();
                 this.eventName = notifyEvent.EventName;
                 this.state = convertStackItem(notifyEvent.State);
+            }
+        }
+        public class ProtocolSettingsReturn
+        {
+            public int magic;
+            public int addressVersion;
+            public string[] standbyCommittee;
+            public int committeeMembersCount;
+            public int validatorsCount;
+            public string[] seedList;
+            public int millisecondsPerBlock;
+            public int memoryPoolMaxTransactions;
+
+            public ProtocolSettingsReturn(ProtocolSettings value)
+            {
+                this.magic = Convert.ToInt32(value.Magic);
+                this.addressVersion = Convert.ToInt32(value.AddressVersion);
+                this.standbyCommittee = value.StandbyCommittee;
+                this.committeeMembersCount = value.CommitteeMembersCount;
+                this.validatorsCount = value.ValidatorsCount;
+                this.seedList = value.SeedList;
+                this.millisecondsPerBlock = Convert.ToInt32(value.MillisecondsPerBlock);
+                this.memoryPoolMaxTransactions = value.MemoryPoolMaxTransactions;
             }
         }
     }
