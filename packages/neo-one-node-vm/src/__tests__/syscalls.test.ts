@@ -1,5 +1,5 @@
 import { common, ScriptBuilder } from '@neo-one/client-common';
-import { Block, ByteStringStackItem, ConsensusData, IntegerStackItem, TriggerType, Witness } from '@neo-one/node-core';
+import { Block, ConsensusData, TriggerType, Witness } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import { ApplicationEngine } from '../ApplicationEngine';
@@ -33,7 +33,7 @@ describe('Application Engine SysCall Tests', () => {
 
       const resultStack = engine.resultStack;
       expect(resultStack[0].isNull).toEqual(true);
-      expect(resultStack[1].value.toNumber()).toEqual(123);
+      expect(resultStack[1].getInteger().toNumber()).toEqual(123);
     });
 
     test('Fault -- Wrong Json', () => {
@@ -82,11 +82,11 @@ describe('Application Engine SysCall Tests', () => {
       const resultStack = engine.resultStack;
       expect(resultStack.length).toEqual(5);
 
-      expect((resultStack[0] as ByteStringStackItem).asString()).toEqual('{"key":"value"}');
-      expect((resultStack[1] as ByteStringStackItem).asString()).toEqual('null');
-      expect((resultStack[2] as ByteStringStackItem).asString()).toEqual('"test"');
-      expect((resultStack[3] as ByteStringStackItem).asString()).toEqual('true');
-      expect((resultStack[4] as ByteStringStackItem).asString()).toEqual('5');
+      expect(resultStack[0].getString()).toEqual('{"key":"value"}');
+      expect(resultStack[1].getString()).toEqual('null');
+      expect(resultStack[2].getString()).toEqual('"test"');
+      expect(resultStack[3].getString()).toEqual('true');
+      expect(resultStack[4].getString()).toEqual('5');
     });
 
     test('Fault -- Bad values', () => {
@@ -130,7 +130,7 @@ describe('Application Engine SysCall Tests', () => {
 
     const resultStack = engine.resultStack;
     expect(resultStack.length).toEqual(1);
-    expect((resultStack[0] as IntegerStackItem).value.eq(new BN(4))).toEqual(true);
+    expect(resultStack[0].getInteger().eq(new BN(4))).toEqual(true);
   });
 
   test('System.Callback.CreateFromSyscall -- Halt', () => {
@@ -155,8 +155,7 @@ describe('Application Engine SysCall Tests', () => {
 
     const resultStack = engine.resultStack;
     expect(resultStack.length).toEqual(1);
-    const byteStringItem = engine.resultStack[0] as ByteStringStackItem;
-    expect(byteStringItem.value.toString('hex')).toEqual(
+    expect(resultStack[0].getBuffer().toString('hex')).toEqual(
       'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
     );
   });

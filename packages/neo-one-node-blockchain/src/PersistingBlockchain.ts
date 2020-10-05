@@ -26,6 +26,7 @@ import {
   TriggerType,
   VM,
 } from '@neo-one/node-core';
+import { PersistNativeContractsError } from './errors';
 import { ReadAddStorageCache } from './StorageCache';
 import { utils, utils as blockchainUtils } from './utils';
 
@@ -90,8 +91,7 @@ export class PersistingBlockchain {
             engine.loadScript(this.onPersistNativeContractScript);
             const result = engine.execute();
             if (result !== 'HALT') {
-              // TODO: Implement a real error;
-              throw new Error('Failed to persist native contract changes');
+              throw new PersistNativeContractsError();
             }
 
             return blockchainUtils.getApplicationExecuted(engine);

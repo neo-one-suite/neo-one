@@ -10,6 +10,7 @@ import {
   Storage,
   // TransactionData,
   StorageItem,
+  StorageKey,
   TransactionState,
   TrimmedBlock,
 } from '@neo-one/node-core';
@@ -100,9 +101,14 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
         }),
     }),
 
-    storages: read.createReadStorage({
+    storages: read.createReadFindStorage({
       db,
       serializeKey: keys.createStorageKey,
+      deserializeKey: (buffer) =>
+        StorageKey.deserializeWire({
+          context,
+          buffer,
+        }),
       deserializeValue: (buffer) =>
         StorageItem.deserializeWire({
           context,

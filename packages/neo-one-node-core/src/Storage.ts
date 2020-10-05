@@ -11,6 +11,16 @@ import { BlockKey, TrimmedBlock } from './TrimmedBlock';
 // TODO: along with other storage definitions in node-vm `batch` definitions need to move to `node-core`.
 type AbstractBatch = any;
 
+export interface StreamOptions {
+  readonly gte?: Buffer;
+  readonly lte?: Buffer;
+}
+
+export interface StorageReturn<Key, Value> {
+  readonly key: Key;
+  readonly value: Value;
+}
+
 export interface ReadMetadataStorage<Value> {
   readonly get: () => Promise<Value>;
   readonly tryGet: () => Promise<Value | undefined>;
@@ -23,6 +33,10 @@ export interface ReadStorage<Key, Value> {
 
 export interface ReadAllStorage<Key, Value> extends ReadStorage<Key, Value> {
   readonly all$: Observable<Value>;
+}
+
+export interface ReadFindStorage<Key, Value> extends ReadStorage<Key, Value> {
+  readonly find$: (range: StreamOptions) => Observable<StorageReturn<Key, Value>>;
 }
 
 export interface ReadGetAllStorage<Key, Value> extends ReadStorage<Key, Value> {
@@ -112,7 +126,7 @@ export interface BlockchainStorage {
   readonly blocks: ReadStorage<BlockKey, TrimmedBlock>;
   readonly transactions: ReadStorage<TransactionKey, TransactionState>;
   readonly contracts: ReadStorage<ContractKey, ContractState>;
-  readonly storages: ReadStorage<StorageKey, StorageItem>;
+  readonly storages: ReadFindStorage<StorageKey, StorageItem>;
   readonly headerHashList: ReadStorage<HeaderKey, HeaderHashList>;
   readonly blockHashIndex: ReadMetadataStorage<HashIndexState>;
   readonly headerHashIndex: ReadMetadataStorage<HashIndexState>;

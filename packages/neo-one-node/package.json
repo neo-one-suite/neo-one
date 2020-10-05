@@ -18,6 +18,7 @@
     "@neo-one/node-blockchain": "^2.7.0",
     "@neo-one/node-core": "^2.7.0",
     "@neo-one/node-http-rpc": "^2.7.0",
+    "@neo-one/node-native": "^2.7.0",
     "@neo-one/node-network": "^2.7.0",
     "@neo-one/node-offline": "^2.7.0",
     "@neo-one/node-protocol": "^2.7.0",

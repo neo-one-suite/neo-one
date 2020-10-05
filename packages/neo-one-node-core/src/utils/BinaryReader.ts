@@ -159,7 +159,8 @@ export class BinaryReader {
     return this.readBytes(this.readVarUIntLE(new BN(max)).toNumber());
   }
 
-  public readVarUIntLE(max: BN = new BN('18446744073709551615', 10)): BN {
+  public readVarUIntLE(maxIn: BN | number = new BN('18446744073709551615', 10)): BN {
+    const max = typeof maxIn === 'number' ? new BN(maxIn) : maxIn;
     const fb = this.readUInt8();
     let value: BN;
     switch (fb) {

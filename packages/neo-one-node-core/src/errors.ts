@@ -21,6 +21,10 @@ export const InvalidConsensusMessageTypeError = makeErrorWithCode(
   'INVALID_CONSENSUS_MESSAGE_TYPE',
   (value: number) => `Expected ConsensusMessageType, found: ${value.toString(16)}`,
 );
+export const InvalidChangeViewReasonError = makeErrorWithCode(
+  'INVALID_CHANGE_VIEW_REASON',
+  (value: number) => `Expected ChangeViewReason, found: ${value.toString(16)}`,
+);
 export const UnsignedBlockError = makeErrorWithCode(
   'UNSIGNED_BLOCK',
   (stringHash: string) => `Block script does not exist because it has not been signed. @ block with hash ${stringHash}`,
@@ -28,4 +32,28 @@ export const UnsignedBlockError = makeErrorWithCode(
 export const InvalidStorageChangeTypeError = makeErrorWithCode(
   'INVALID_STORAGE_CHANGE_TYPE',
   (storageChangeType: number) => `Invalid Storage Change Type: ${storageChangeType}`,
+);
+export const InvalidIntegerStackItemError = makeErrorWithCode(
+  'INVALID_INTEGER_STACK_ITEM',
+  (size: number) => `value of of size ${size} too large to be represented as a BN, expected < 32`,
+);
+export const InvalidStackItemCastError = makeErrorWithCode(
+  'INVALID_STACK_ITEM_CAST_OPERATION',
+  () => 'invalid stack item conversion operation',
+);
+export const InvalidInteropInterfaceValueError = makeErrorWithCode(
+  'INVALID_INTEROP_INTERFACE_VALUE',
+  () => 'value must be defined, found undefined',
+);
+export const InvalidStackItemError = makeErrorWithCode(
+  'INVALID_STACK_ITEM_ERROR',
+  () => 'Invalid StackItem encountered',
+);
+export const InvalidStackItemTypeError = makeErrorWithCode(
+  'INVALID_STACK_ITEM_TYPE_ERROR',
+  (type: string) => `Invalid StackItemType, expected: ${type}`,
+);
+export const InvalidPrimitiveStackItemError = makeErrorWithCode(
+  'INVALID_PRIMITIVE_STACK_ITEM_ERROR',
+  () => 'Invalid PrimitiveStackItem found; expected one of [Boolean, ByteString, Integer].',
 );

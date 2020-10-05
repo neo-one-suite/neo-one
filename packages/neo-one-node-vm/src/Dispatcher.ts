@@ -75,6 +75,7 @@ export class Dispatcher {
     this.initialize(this.options.levelDBPath);
   }
 
+  // tslint:disable-next-line: no-any
   public test(): any {
     return this.dispatch({
       method: 'test',

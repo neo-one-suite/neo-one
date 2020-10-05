@@ -1,4 +1,18 @@
-import { PrimitiveStackItem, StackItem, StackItemType } from '@neo-one/node-core';
+import {
+  ArrayStackItem,
+  BooleanStackItem,
+  BufferStackItem,
+  ByteStringStackItem,
+  IntegerStackItem,
+  InteropInterface,
+  MapStackItem,
+  NullStackItem,
+  PointerStackItem,
+  PrimitiveStackItem,
+  StackItem,
+  StackItemType,
+  StructStackItem,
+} from '@neo-one/node-core';
 import { BN } from 'bn.js';
 
 export interface StackItemReturnBase {
@@ -24,7 +38,7 @@ export interface BooleanStackItemReturn extends StackItemReturnBase {
 
 export interface IntegerStackItemReturn extends StackItemReturnBase {
   readonly Type: 'Integer';
-  readonly value: string | number; // TODO: it might just be one?
+  readonly value: string | number;
   readonly Size: number;
 }
 
@@ -59,7 +73,7 @@ export interface MapStackItemReturn extends StackItemReturnBase {
 }
 
 // tslint:disable-next-line: no-any
-export interface InteropInterfaceStackItemReturn<T = any> extends StackItemReturnBase {
+export interface InteropInterfaceStackItemReturn<T extends object = any> extends StackItemReturnBase {
   readonly Type: 'InteropInterface';
   readonly value: T;
 }
@@ -78,66 +92,40 @@ export type StackItemReturn =
 
 export const parseStackItems = (stack: readonly StackItemReturn[]): readonly StackItem[] => stack.map(parseStackItem);
 
-const parseStackItem = (item: StackItemReturn): StackItem => {
-  const isNull = item.IsNull;
+export const parseStackItem = (item: StackItemReturn): StackItem => {
   switch (item.Type) {
     case 'Any':
-      return {
-        type: 'Any',
-        value: undefined,
-        isNull,
-      };
-
-    case 'Pointer':
-      return {
-        type: 'Pointer',
-        value: item.value,
-        position: item.Position,
-        isNull,
-      };
-
-    case 'Buffer':
-      return {
-        type: 'Buffer',
-        value: item.value,
-        size: item.Size,
-        isNull,
-      };
+      return new NullStackItem();
 
     case 'Array':
-      return {
-        type: 'Array',
-        value: parseStackItems(item.value),
-        count: item.Count,
-        isNull,
-      };
+      return new ArrayStackItem(parseStackItems(item.value));
 
-    case 'Struct':
-      return {
-        type: 'Struct',
-        value: parseStackItems(item.value), // TODO: how should StructStackItem look?
-        count: item.Count,
-        isNull,
-      };
+    case 'Buffer':
+      return new BufferStackItem(item.value);
+
+    case 'InteropInterface':
+      return new InteropInterface(item.value);
 
     case 'Map':
-      return {
-        type: 'Map',
-        value: item.value.reduce((acc, { key, value }) => {
-          acc.set(parsePrimitiveStackItem(key), parseStackItem(value));
+      return new MapStackItem(
+        item.value.reduce((acc, { key, value }) => {
+          const parsedKey = parsePrimitiveStackItem(key);
+          const parsedValue = parseStackItem(value);
+
+          acc.set(parsedKey, parsedValue);
 
           return acc;
         }, new Map<PrimitiveStackItem, StackItem>()),
-        count: item.Count,
-        isNull,
-      };
+      );
 
-    case 'InteropInterface':
-      return {
-        type: 'InteropInterface',
-        value: item.value,
-        isNull,
-      };
+    case 'Pointer':
+      return new PointerStackItem({
+        script: item.value,
+        position: item.Position,
+      });
+
+    case 'Struct':
+      return new StructStackItem(parseStackItems(item.value));
 
     default:
       return parsePrimitiveStackItem(item);
@@ -145,35 +133,17 @@ const parseStackItem = (item: StackItemReturn): StackItem => {
 };
 
 const parsePrimitiveStackItem = (item: PrimitiveStackItemReturn): PrimitiveStackItem => {
-  const isNull = item.IsNull;
   switch (item.Type) {
     case 'Boolean':
-      return {
-        type: 'Boolean',
-        value: item.value,
-        size: item.Size,
-        isNull,
-      };
-
-    case 'Integer':
-      return {
-        type: 'Integer',
-        value: new BN(item.value),
-        size: item.Size,
-        isNull,
-      };
+      return new BooleanStackItem(item.value);
 
     case 'ByteString':
-      return {
-        type: 'ByteString',
-        value: item.value,
-        asString: () => item.value.toString('utf8'),
-        size: item.Size,
-        isNull,
-      };
+      return new ByteStringStackItem(item.value);
+
+    case 'Integer':
+      return new IntegerStackItem(new BN(item.value));
 
     default:
-      // TODO: create an error here
-      throw new Error('Invalid StackItem');
+      throw new Error(`invalid stack item when parsing, found type ${item}`);
   }
 };

@@ -1,7 +1,6 @@
-import { UInt160 } from '@neo-one/client-common';
+import { common, UInt160 } from '@neo-one/client-common';
 import {
   BlockchainStorage,
-  BooleanStackItem,
   CallFlags,
   ContractMethodDescriptor,
   SerializableWire,
@@ -10,6 +9,7 @@ import {
   VerifyResult,
   VM,
 } from '@neo-one/node-core';
+import { ContractMethodError, ContractStateFetchError, WitnessVerifyError } from './errors';
 
 const maxVerificationGas = 0.5;
 
@@ -28,13 +28,11 @@ const getApplicationEngineVerifyOptions = async (
   if (verification.length === 0) {
     const contractState = await storage.contracts.tryGet(hash);
     if (contractState === undefined) {
-      // TODO: implement an error
-      throw new Error('Failed to fetch contract from storage');
+      throw new ContractStateFetchError(common.uInt160ToHex(hash));
     }
     const methodDescriptor = contractState.manifest.abi.getMethod('verify');
     if (methodDescriptor === undefined) {
-      // TODO: implement an error
-      throw new Error('Failed to get contract verify method');
+      throw new ContractMethodError('verify', common.uInt160ToHex(hash));
     }
 
     return {
@@ -44,9 +42,9 @@ const getApplicationEngineVerifyOptions = async (
     };
   }
 
-  // TODO: look into this `possible-timing-attack` warning
+  // tslint:disable-next-line: possible-timing-attack TODO: look into this `possible-timing-attack` warning
   if (hash !== scriptHash) {
-    throw new Error('Witness hash does not match verification hash');
+    throw new WitnessVerifyError();
   }
 
   return {
@@ -80,7 +78,7 @@ export const verifyWithApplicationEngine = (
       }
 
       const stack = engine.resultStack;
-      if (stack.length !== 1 || !(stack[0] as BooleanStackItem).value) {
+      if (stack.length !== 1 || !stack[0].getBoolean()) {
         return { result: false, gas };
       }
 

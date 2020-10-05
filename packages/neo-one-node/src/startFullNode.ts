@@ -2,11 +2,12 @@ import { setGlobalLogLevel } from '@neo-one/logger';
 import { Blockchain } from '@neo-one/node-blockchain';
 import { Settings } from '@neo-one/node-core';
 import { RPCServerOptions, setupRPCServer } from '@neo-one/node-http-rpc';
+import { NativeContainer } from '@neo-one/node-native';
 import { Network, NetworkOptions } from '@neo-one/node-network';
 import { dumpChain, loadChain } from '@neo-one/node-offline';
 import { Node, NodeOptions } from '@neo-one/node-protocol';
 import { storage as levelupStorage } from '@neo-one/node-storage-levelup';
-import { vm } from '@neo-one/node-vm';
+import { Dispatcher } from '@neo-one/node-vm';
 import { composeDisposables, Disposable, noopDisposable } from '@neo-one/utils';
 import { AbstractLevelDOWN } from 'abstract-leveldown';
 import fs from 'fs-extra';
@@ -80,11 +81,17 @@ export const startFullNode = async ({
       await storage.close();
     });
 
+    const native = new NativeContainer(blockchainSettings);
+
+    const vm = new Dispatcher({ levelDBPath: dataPath });
+
     const blockchain = await Blockchain.create({
       settings: blockchainSettings,
       storage,
+      native,
       vm,
     });
+
     disposable = composeDisposables(disposable, async () => {
       await blockchain.stop();
     });

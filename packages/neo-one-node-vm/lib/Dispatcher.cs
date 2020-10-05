@@ -9,6 +9,8 @@ using LevelHelper = NEOONE.Storage.LevelDB.Helper;
 using Neo.IO;
 using Neo.SmartContract.Native;
 using Neo.Network.P2P.Payloads;
+using System.IO;
+using System.Buffers.Binary;
 
 namespace NEOONE
 {
@@ -90,19 +92,7 @@ namespace NEOONE
 
         private dynamic _test()
         {
-            var tx = new Transaction()
-            {
-                Script = new byte[] { 0x01 },
-                Attributes = Array.Empty<TransactionAttribute>(),
-                Signers = Array.Empty<Signer>(),
-                NetworkFee = 0x02,
-                SystemFee = 0x03,
-                Nonce = 0x04,
-                ValidUntilBlock = 0x05,
-                Version = 0x06,
-                Witnesses = new Witness[] { new Witness() { VerificationScript = new byte[] { 0x07 } } },
-            };
-            return tx.Hash.ToArray();
+            return NativeContract.Policy.Hash.ToArray();
         }
 
 #pragma warning disable 1998
