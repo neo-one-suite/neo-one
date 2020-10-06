@@ -1,5 +1,5 @@
 import { BN } from 'bn.js';
-import { InvalidStackItemCastError } from 'src/errors';
+import { InvalidStackItemCastError } from '../errors';
 import { StackItemAdd, StackItemBase } from './StackItemBase';
 
 const MIN_SAFE_BN = new BN(Number.MIN_SAFE_INTEGER);

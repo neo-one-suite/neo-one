@@ -1,9 +1,9 @@
 import * as nodePath from 'path';
 import { ApplicationEngine, CreateOptions } from './ApplicationEngine';
-import { BaseMethods, EngineMethods, SnapshotMethods } from './Methods';
+import { BaseMethods, EngineMethods, ProtocolSettings, ProtocolSettingsReturn, SnapshotMethods } from './Methods';
 import { SnapshotHandler } from './SnapshotHandler';
 import { DispatcherFunc } from './types';
-import { constants, createCSharpDispatchInvoke } from './utils';
+import { constants, createCSharpDispatchInvoke, validateProtocolSettings } from './utils';
 
 export interface DispatcherMethods extends BaseMethods, SnapshotMethods, EngineMethods {}
 
@@ -17,6 +17,7 @@ export const createDispatcher = () => createCSharpDispatchInvoke<DispatcherMetho
 
 export interface DispatcherOptions {
   readonly levelDBPath?: string;
+  readonly protocolSettings?: ProtocolSettings;
 }
 
 export class Dispatcher {
@@ -27,7 +28,7 @@ export class Dispatcher {
   public constructor(options: DispatcherOptions = {}) {
     this.options = options;
     this.dispatch = createDispatcher();
-    this.init = this.initialize(this.options.levelDBPath);
+    this.init = this.initialize(this.options.levelDBPath, this.options.protocolSettings);
   }
 
   public withSnapshots<T = void>(
@@ -75,6 +76,12 @@ export class Dispatcher {
     this.initialize(this.options.levelDBPath);
   }
 
+  public getConfig(): ProtocolSettingsReturn {
+    return this.dispatch({
+      method: 'get_config',
+    });
+  }
+
   // tslint:disable-next-line: no-any
   public test(): any {
     return this.dispatch({
@@ -82,11 +89,12 @@ export class Dispatcher {
     });
   }
 
-  private initialize(path?: string): boolean {
+  private initialize(path?: string, settings?: ProtocolSettings): boolean {
     return this.dispatch({
       method: 'init',
       args: {
         path,
+        settings: settings ? validateProtocolSettings(settings) : undefined,
       },
     });
   }

@@ -7,7 +7,7 @@ import { Network, NetworkOptions } from '@neo-one/node-network';
 import { dumpChain, loadChain } from '@neo-one/node-offline';
 import { Node, NodeOptions } from '@neo-one/node-protocol';
 import { storage as levelupStorage } from '@neo-one/node-storage-levelup';
-import { Dispatcher } from '@neo-one/node-vm';
+import { blockchainSettingsToProtocolSettings, Dispatcher } from '@neo-one/node-vm';
 import { composeDisposables, Disposable, noopDisposable } from '@neo-one/utils';
 import { AbstractLevelDOWN } from 'abstract-leveldown';
 import fs from 'fs-extra';
@@ -83,7 +83,10 @@ export const startFullNode = async ({
 
     const native = new NativeContainer(blockchainSettings);
 
-    const vm = new Dispatcher({ levelDBPath: dataPath });
+    const vm = new Dispatcher({
+      levelDBPath: dataPath,
+      protocolSettings: blockchainSettingsToProtocolSettings(blockchainSettings),
+    });
 
     const blockchain = await Blockchain.create({
       settings: blockchainSettings,

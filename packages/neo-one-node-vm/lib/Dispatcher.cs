@@ -5,12 +5,8 @@ using System.Dynamic;
 using System.Collections.Generic;
 using NEOONE.Storage;
 using Neo.Persistence;
-using LevelHelper = NEOONE.Storage.LevelDB.Helper;
-using Neo.IO;
 using Neo.SmartContract.Native;
-using Neo.Network.P2P.Payloads;
-using System.IO;
-using System.Buffers.Binary;
+using Microsoft.Extensions.Configuration;
 
 namespace NEOONE
 {
@@ -26,6 +22,7 @@ namespace NEOONE
             init,
             dispose,
             test,
+            get_config,
         }
 
         private dynamic dispatchBaseMethod(BaseMethod method, dynamic args)
@@ -33,15 +30,26 @@ namespace NEOONE
             switch (method)
             {
                 case BaseMethod.init:
-                    if (args.path == null)
+                    if (args.path == null && args.settings == null)
                     {
                         return this._init();
                     }
+                    if (args.path == null && args.settings != null)
+                    {
+                        return this._init(parseConfig(args.settings));
+                    }
+                    if (args.path != null && args.settings == null)
+                    {
+                        return this._init((string)args.path);
+                    }
 
-                    return this._init((string)args.path);
+                    return this._init((string)args.path, parseConfig(args.settings));
 
                 case BaseMethod.dispose:
                     return this._dispose();
+
+                case BaseMethod.get_config:
+                    return this._getConfig();
 
                 case BaseMethod.test:
                     return this._test();
@@ -50,6 +58,34 @@ namespace NEOONE
                     throw new InvalidOperationException();
 
             }
+        }
+
+        private bool _init(string path, IConfiguration config)
+        {
+            if (!this.init)
+            {
+                Neo.ProtocolSettings.Initialize(config);
+                this.store = new LevelDBStore(path).GetStore();
+                this.resetSnapshots();
+
+                this.init = true;
+            }
+
+            return this.init;
+        }
+
+        private bool _init(IConfiguration config)
+        {
+            if (!this.init)
+            {
+                Neo.ProtocolSettings.Initialize(config);
+                this.store = new MemoryStore();
+                this.resetSnapshots();
+
+                this.init = true;
+            }
+
+            return this.init;
         }
 
         private bool _init(string path)
@@ -92,7 +128,12 @@ namespace NEOONE
 
         private dynamic _test()
         {
-            return NativeContract.Policy.Hash.ToArray();
+            return NativeContract.Policy.Hash.ToString();
+        }
+
+        private NEOONE.ReturnHelpers.ProtocolSettingsReturn _getConfig()
+        {
+            return new NEOONE.ReturnHelpers.ProtocolSettingsReturn(Neo.ProtocolSettings.Default);
         }
 
 #pragma warning disable 1998
@@ -137,6 +178,53 @@ namespace NEOONE
             }
 
             return inputType.GetProperty("args") != null;
+        }
+
+        private IConfiguration parseConfig(dynamic input)
+        {
+            Dictionary<string, string> config = new Dictionary<string, string> { };
+            if (input.magic != null)
+            {
+                uint Magic = (uint)input.magic;
+                config.Add("ProtocolConfiguration:Magic", Magic.ToString());
+            }
+            if (input.addressVersion != null)
+            {
+                byte AddressVersion = (byte)input.addressVersion;
+                config.Add("ProtocolConfiguration:AddressVersion", AddressVersion.ToString());
+            }
+            if (input.standbyCommittee != null)
+            {
+                object[] StandbyCommittee = (object[])input.standbyCommittee;
+                int idx = 0;
+                foreach (object member in StandbyCommittee)
+                {
+                    config.Add($"ProtocolConfiguration:StandbyCommittee:{idx}", member.ToString());
+                    idx++;
+                }
+            }
+            if (input.committeeMembersCount != null)
+            {
+                int CommitteeMembersCount = (int)input.committeeMembersCount;
+                config.Add("ProtocolConfiguration:CommitteeMembersCount", CommitteeMembersCount.ToString());
+            }
+            if (input.validatorsCount != null)
+            {
+                int ValidatorsCount = (int)input.validatorsCount;
+                config.Add("ProtocolConfiguration:ValidatorsCount", ValidatorsCount.ToString());
+            }
+            if (input.millisecondsPerBlock != null)
+            {
+                uint MillisecondsPerBlock = (uint)input.millisecondsPerBlock;
+                config.Add("ProtocolConfiguration:MillisecondsPerBlock", MillisecondsPerBlock.ToString());
+            }
+            if (input.memoryPoolMaxTransactions != null)
+            {
+                int MemoryPoolMaxTransactions = (int)input.memoryPoolMaxTransactions;
+                config.Add("ProtocolConfiguration:MemoryPoolMaxTransactions", MemoryPoolMaxTransactions.ToString());
+            }
+
+            return new ConfigurationBuilder().AddInMemoryCollection(config).Build();
         }
     }
 }
