@@ -204,8 +204,7 @@ export class Block extends BlockBase implements SerializableWire, SerializableJS
     return {
       ...blockBaseJSON,
       consensusdata: this.consensusData ? this.consensusData.serializeJSON() : undefined,
-      tx: this.transactions.map((transaction) => transaction.serializeJSON(context)),
-      // confirmations: blockBaseJSON.confirmations, TODO: is this our own property?
+      tx: this.transactions.map((transaction) => transaction.serializeJSON()),
     };
   }
 

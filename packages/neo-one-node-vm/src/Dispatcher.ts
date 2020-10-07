@@ -47,8 +47,14 @@ export class Dispatcher {
   ) {
     const engine = new ApplicationEngine(this);
     engine.create(options);
-    const result = func(engine);
-    this.disposeEngine();
+    let result: T;
+    try {
+      result = func(engine);
+    } catch (error) {
+      throw error;
+    } finally {
+      this.disposeEngine();
+    }
 
     return result;
   }

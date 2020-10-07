@@ -1,4 +1,4 @@
-import { BinaryWriter, HeaderJSON, InvalidFormatError, IOHelper } from '@neo-one/client-common';
+import { BinaryWriter, HeaderJSON, InvalidFormatError, IOHelper, UInt256Hex } from '@neo-one/client-common';
 import { BlockBase, BlockBaseAdd } from './BlockBase';
 import {
   DeserializeWireBaseOptions,
@@ -62,5 +62,18 @@ export class Header extends BlockBase implements SerializableWire, SerializableJ
 
   public serializeJSON(context: SerializeJSONContext): HeaderJSON {
     return super.serializeJSON(context);
+  }
+
+  public serializeJSONVerbose(
+    context: SerializeJSONContext,
+    verbose: { readonly confirmations: number; readonly nextblockhash?: UInt256Hex },
+  ) {
+    const base = this.serializeJSON(context);
+
+    return {
+      ...base,
+      confirmations: verbose.confirmations,
+      nextblockhash: verbose.nextblockhash,
+    };
   }
 }

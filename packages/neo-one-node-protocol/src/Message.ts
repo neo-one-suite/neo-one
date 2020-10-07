@@ -12,7 +12,6 @@ import {
   BinaryReader,
   Block,
   ConsensusPayload,
-  deserializeTransactionWire,
   DeserializeWireBaseOptions,
   DeserializeWireContext,
   DeserializeWireOptions,
@@ -21,85 +20,65 @@ import {
 import { makeErrorWithCode, utils } from '@neo-one/utils';
 import { Transform } from 'stream';
 import { assertCommand, Command } from './Command';
+import { assertMessageFlags } from './MessageFlags';
 import {
   AddrPayload,
   FilterAddPayload,
   FilterLoadPayload,
+  GetBlockByIndexPayload,
   GetBlocksPayload,
   HeadersPayload,
   InvPayload,
   MerkleBlockPayload,
+  PingPayload,
   VersionPayload,
 } from './payload';
 export type MessageValue =
-  | { readonly command: Command.addr; readonly payload: AddrPayload }
-  | { readonly command: Command.block; readonly payload: Block }
-  | { readonly command: Command.consensus; readonly payload: ConsensusPayload }
-  | { readonly command: Command.filteradd; readonly payload: FilterAddPayload }
-  | { readonly command: Command.filterclear }
-  | { readonly command: Command.filterload; readonly payload: FilterLoadPayload }
-  | { readonly command: Command.getaddr }
-  | { readonly command: Command.getblocks; readonly payload: GetBlocksPayload }
-  | { readonly command: Command.getdata; readonly payload: InvPayload }
-  | { readonly command: Command.getheaders; readonly payload: GetBlocksPayload }
-  | { readonly command: Command.headers; readonly payload: HeadersPayload }
-  | { readonly command: Command.inv; readonly payload: InvPayload }
-  | { readonly command: Command.mempool }
-  | { readonly command: Command.tx; readonly payload: Transaction }
-  | { readonly command: Command.verack }
-  | { readonly command: Command.version; readonly payload: VersionPayload }
-  | { readonly command: Command.alert }
-  | { readonly command: Command.merkleblock; readonly payload: MerkleBlockPayload }
-  | { readonly command: Command.notfound }
-  | { readonly command: Command.ping }
-  | { readonly command: Command.pong }
-  | { readonly command: Command.reject };
+  | { readonly command: Command.Addr; readonly payload: AddrPayload }
+  | { readonly command: Command.Block; readonly payload: Block }
+  | { readonly command: Command.Consensus; readonly payload: ConsensusPayload }
+  | { readonly command: Command.FilterAdd; readonly payload: FilterAddPayload }
+  | { readonly command: Command.FilterClear }
+  | { readonly command: Command.FilterLoad; readonly payload: FilterLoadPayload }
+  | { readonly command: Command.GetAddr }
+  | { readonly command: Command.GetBlocks; readonly payload: GetBlocksPayload }
+  | { readonly command: Command.GetBlockByIndex; readonly payload: GetBlockByIndexPayload }
+  | { readonly command: Command.GetData; readonly payload: InvPayload }
+  | { readonly command: Command.GetHeaders; readonly payload: GetBlockByIndexPayload }
+  | { readonly command: Command.Headers; readonly payload: HeadersPayload }
+  | { readonly command: Command.Inv; readonly payload: InvPayload }
+  | { readonly command: Command.Mempool }
+  | { readonly command: Command.Transaction; readonly payload: Transaction }
+  | { readonly command: Command.Verack }
+  | { readonly command: Command.Version; readonly payload: VersionPayload }
+  | { readonly command: Command.Alert }
+  | { readonly command: Command.MerkleBlock; readonly payload: MerkleBlockPayload }
+  | { readonly command: Command.NotFound; readonly payload: InvPayload }
+  | { readonly command: Command.Ping; readonly payload: PingPayload }
+  | { readonly command: Command.Pong; readonly payload: PingPayload }
+  | { readonly command: Command.Reject };
+
 export interface MessageAdd {
   readonly magic: number;
   readonly value: MessageValue;
 }
 
-export const COMMAND_LENGTH = 12;
 export const PAYLOAD_MAX_SIZE = 0x02000000;
+const compressionMinSize = 128;
+const compressionThreshold = 64;
 
 const calculateChecksum = (buffer: Buffer) => common.toUInt32LE(crypto.hash256(buffer));
-
-const deserializeMessageHeader = ({
-  context,
-  reader,
-}: DeserializeWireBaseOptions): {
-  readonly command: Command;
-  readonly length: number;
-  readonly checksum: number;
-} => {
-  if (reader.readUInt32LE() !== context.messageMagic) {
-    throw new InvalidFormatError(
-      `Expected BinaryReader readUInt32LE(0) to equal ${context.messageMagic}. Received: ${context.messageMagic}`,
-    );
-  }
-  const command = assertCommand(reader.readFixedString(COMMAND_LENGTH));
-  const length = reader.readUInt32LE();
-  if (length > PAYLOAD_MAX_SIZE) {
-    throw new InvalidFormatError(
-      `Expected buffer readout to be less than max payload size of ${PAYLOAD_MAX_SIZE}. Received: ${length}`,
-    );
-  }
-  const checksum = reader.readUInt32LE();
-
-  return { command, length, checksum };
-};
 
 export class Message implements SerializableWire {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Message {
     const { reader, context } = options;
-    const { command, length, checksum } = deserializeMessageHeader(options);
-    const payloadBuffer = reader.readBytes(length);
-    const payloadBufferChecksum = calculateChecksum(payloadBuffer);
-    if (payloadBufferChecksum !== checksum) {
-      throw new InvalidFormatError(
-        `Expected payloadBuffer checksum to be ${checksum}. Received: ${payloadBufferChecksum}`,
-      );
-    }
+
+    const flags = assertMessageFlags(reader.readInt8());
+    const command = assertCommand(reader.readInt8());
+    const payloadBuffer = reader.readVarBytesLE(PAYLOAD_MAX_SIZE);
+
+    // TODO: pickup here, we need to work out compressing / decompressing the message payload
+    // and how that will be stored in the class;
 
     const payloadOptions = {
       context: options.context,
@@ -108,123 +87,137 @@ export class Message implements SerializableWire {
 
     let value: MessageValue;
     switch (command) {
-      case Command.addr:
+      case Command.Addr:
         value = {
-          command: Command.addr,
+          command: Command.Addr,
           payload: AddrPayload.deserializeWire(payloadOptions),
         };
 
         break;
-      case Command.block:
+      case Command.Block:
         value = {
-          command: Command.block,
+          command: Command.Block,
           payload: Block.deserializeWire(payloadOptions),
         };
 
         break;
-      case Command.consensus:
+      case Command.Consensus:
         value = {
-          command: Command.consensus,
+          command: Command.Consensus,
           payload: ConsensusPayload.deserializeWire(payloadOptions),
         };
 
         break;
-      case Command.filteradd:
+      case Command.FilterAdd:
         value = {
-          command: Command.filteradd,
+          command: Command.FilterAdd,
           payload: FilterAddPayload.deserializeWire(payloadOptions),
         };
 
         break;
-      case Command.filterclear:
-        value = { command: Command.filterclear };
+      case Command.FilterClear:
+        value = { command: Command.FilterClear };
+
         break;
-      case Command.filterload:
+      case Command.FilterLoad:
         value = {
-          command: Command.filterload,
+          command: Command.FilterLoad,
           payload: FilterLoadPayload.deserializeWire(payloadOptions),
         };
 
         break;
-      case Command.getaddr:
-        value = { command: Command.getaddr };
+      case Command.GetAddr:
+        value = { command: Command.GetAddr };
+
         break;
-      case Command.getblocks:
+      case Command.GetBlocks:
         value = {
-          command: Command.getblocks,
+          command: Command.GetBlocks,
           payload: GetBlocksPayload.deserializeWire(payloadOptions),
         };
 
         break;
-      case Command.getdata:
+      case Command.GetBlockByIndex:
         value = {
-          command: Command.getdata,
+          command: Command.GetBlockByIndex,
+          payload: GetBlockByIndexPayload.deserializeWire(payloadOptions),
+        };
+
+        break;
+      case Command.GetData:
+        value = {
+          command: Command.GetData,
           payload: InvPayload.deserializeWire(payloadOptions),
         };
 
         break;
-      case Command.getheaders:
+      case Command.GetHeaders:
         value = {
-          command: Command.getheaders,
-          payload: GetBlocksPayload.deserializeWire(payloadOptions),
+          command: Command.GetHeaders,
+          payload: GetBlockByIndexPayload.deserializeWire(payloadOptions),
         };
 
         break;
-      case Command.headers:
+      case Command.Headers:
         value = {
-          command: Command.headers,
+          command: Command.Headers,
           payload: HeadersPayload.deserializeWire(payloadOptions),
         };
 
         break;
-      case Command.inv:
+      case Command.Inv:
         value = {
-          command: Command.inv,
+          command: Command.Inv,
           payload: InvPayload.deserializeWire(payloadOptions),
         };
 
         break;
-      case Command.mempool:
-        value = { command: Command.mempool };
+      case Command.Mempool:
+        value = { command: Command.Mempool };
+
         break;
-      case Command.tx:
+      case Command.Transaction:
         value = {
-          command: Command.tx,
-          payload: deserializeTransactionWire(payloadOptions),
+          command: Command.Transaction,
+          payload: Transaction.deserializeWire(payloadOptions),
         };
 
         break;
-      case Command.verack:
-        value = { command: Command.verack };
+      case Command.Verack:
+        value = { command: Command.Verack };
         break;
-      case Command.version:
+      case Command.Version:
         value = {
-          command: Command.version,
+          command: Command.Version,
           payload: VersionPayload.deserializeWire(payloadOptions),
         };
 
         break;
-      case Command.alert:
-        value = { command: Command.alert };
+      case Command.Alert:
+        value = { command: Command.Alert };
+
         break;
-      case Command.merkleblock:
+      case Command.MerkleBlock:
         value = {
-          command: Command.merkleblock,
+          command: Command.MerkleBlock,
           payload: MerkleBlockPayload.deserializeWire(payloadOptions),
         };
 
         break;
-      case Command.notfound:
-        value = { command: Command.notfound };
+      case Command.NotFound:
+        value = { command: Command.NotFound, payload: InvPayload.deserializeWire(payloadOptions) };
         break;
-      case Command.ping:
-        value = { command: Command.ping };
+      case Command.Ping:
+        value = { command: Command.Ping, payload: PingPayload.deserializeWire(payloadOptions) };
+
         break;
-      case Command.pong:
-        value = { command: Command.pong };
+      case Command.Pong:
+        value = { command: Command.Pong, payload: PingPayload.deserializeWire(payloadOptions) };
+
         break;
-      case Command.reject:
-        value = { command: Command.reject };
+      case Command.Reject:
+        value = { command: Command.Reject };
+
         break;
       default:
         utils.assertNever(command);
@@ -258,62 +251,62 @@ export class Message implements SerializableWire {
 
     let payload = Buffer.alloc(0);
     switch (value.command) {
-      case Command.addr:
+      case Command.Addr:
         payload = value.payload.serializeWire();
         break;
-      case Command.block:
+      case Command.Block:
         payload = value.payload.serializeWire();
         break;
-      case Command.consensus:
+      case Command.Consensus:
         payload = value.payload.serializeWire();
         break;
-      case Command.filteradd:
+      case Command.FilterAdd:
         payload = value.payload.serializeWire();
         break;
-      case Command.filterclear:
+      case Command.FilterClear:
         break;
-      case Command.filterload:
+      case Command.FilterLoad:
         payload = value.payload.serializeWire();
         break;
-      case Command.getaddr:
+      case Command.GetAddr:
         break;
-      case Command.getblocks:
+      case Command.GetBlocks:
         payload = value.payload.serializeWire();
         break;
-      case Command.getdata:
+      case Command.GetData:
         payload = value.payload.serializeWire();
         break;
-      case Command.getheaders:
+      case Command.GetHeaders:
         payload = value.payload.serializeWire();
         break;
-      case Command.headers:
+      case Command.Headers:
         payload = value.payload.serializeWire();
         break;
-      case Command.inv:
+      case Command.Inv:
         payload = value.payload.serializeWire();
         break;
-      case Command.mempool:
+      case Command.Mempool:
         break;
-      case Command.tx:
+      case Command.Transaction:
         payload = value.payload.serializeWire();
         break;
-      case Command.verack:
+      case Command.Verack:
         break;
-      case Command.version:
+      case Command.Version:
         payload = value.payload.serializeWire();
         break;
-      case Command.alert:
+      case Command.Alert:
         break;
-      case Command.merkleblock:
+      case Command.MerkleBlock:
         payload = value.payload.serializeWire();
         break;
-      case Command.notfound:
+      case Command.NotFound:
         break;
-      case Command.ping:
+      case Command.Ping:
         break;
-      case Command.pong:
+      case Command.Pong:
         break;
-      case Command.reject:
+      case Command.Reject:
         break;
       default:
         utils.assertNever(value);

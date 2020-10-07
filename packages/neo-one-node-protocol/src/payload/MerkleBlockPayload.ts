@@ -1,25 +1,58 @@
 import { BinaryWriter, IOHelper, SerializableWire, UInt256 } from '@neo-one/client-common';
 import {
   BinaryReader,
+  Block,
   BlockBase,
   BlockBaseAdd,
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
+  MerkleTree,
   utils,
 } from '@neo-one/node-core';
 export interface MerkleBlockPayloadAdd extends BlockBaseAdd {
-  readonly transactionCount: number;
+  readonly contentCount: number;
   readonly hashes: readonly UInt256[];
   readonly flags: Buffer;
 }
 
 export class MerkleBlockPayload extends BlockBase implements SerializableWire {
+  public static create({
+    block,
+    flags,
+  }: {
+    readonly block: Block;
+    readonly flags: readonly boolean[];
+  }): MerkleBlockPayload {
+    const tree = new MerkleTree(block.transactions.map((transaction) => transaction.hash)).trim(flags);
+
+    const mutableBuffer = Buffer.allocUnsafe(Math.floor((flags.length + 7) / 8));
+    // tslint:disable-next-line no-loop-statement
+    for (let i = 0; i < flags.length; i += 1) {
+      if (flags[i]) {
+        // tslint:disable-next-line no-bitwise
+        mutableBuffer[Math.floor(i / 8)] |= 1 << i % 8;
+      }
+    }
+
+    return new MerkleBlockPayload({
+      version: block.version,
+      previousHash: block.previousHash,
+      merkleRoot: block.merkleRoot,
+      timestamp: block.timestamp,
+      index: block.index,
+      nextConsensus: block.nextConsensus,
+      witness: block.witness,
+      contentCount: block.transactions.length + 1,
+      hashes: tree.toHashArray(),
+      flags: mutableBuffer,
+    });
+  }
   public static deserializeWireBase(options: DeserializeWireBaseOptions): MerkleBlockPayload {
     const { reader } = options;
-    const blockBase = super.deserializeBlockBaseWireBase(options);
-    const transactionCount = reader.readVarUIntLE(utils.INT_MAX_VALUE).toNumber();
-    const hashes = reader.readArray(() => reader.readUInt256());
-    const flags = reader.readVarBytesLE();
+    const blockBase = super.deserializeWireBase(options);
+    const contentCount = reader.readVarUIntLE(Block.MaxTransactionsPerBlock.addn(1)).toNumber();
+    const hashes = reader.readArray(() => reader.readUInt256(), contentCount);
+    const flags = reader.readVarBytesLE((contentCount + 7) / 8);
 
     return new this({
       version: blockBase.version,
@@ -27,10 +60,9 @@ export class MerkleBlockPayload extends BlockBase implements SerializableWire {
       merkleRoot: blockBase.merkleRoot,
       timestamp: blockBase.timestamp,
       index: blockBase.index,
-      consensusData: blockBase.consensusData,
       nextConsensus: blockBase.nextConsensus,
-      script: blockBase.script,
-      transactionCount,
+      witness: blockBase.witness,
+      contentCount,
       hashes,
       flags,
     });
@@ -43,7 +75,7 @@ export class MerkleBlockPayload extends BlockBase implements SerializableWire {
     });
   }
 
-  public readonly transactionCount: number;
+  public readonly contentCount: number;
   public readonly hashes: readonly UInt256[];
   public readonly flags: Buffer;
   private readonly merkleBlockPayloadSizeInternal: () => number;
@@ -54,10 +86,9 @@ export class MerkleBlockPayload extends BlockBase implements SerializableWire {
     merkleRoot,
     timestamp,
     index,
-    consensusData,
     nextConsensus,
-    script,
-    transactionCount,
+    witness,
+    contentCount,
     hashes,
     flags,
   }: MerkleBlockPayloadAdd) {
@@ -67,12 +98,11 @@ export class MerkleBlockPayload extends BlockBase implements SerializableWire {
       merkleRoot,
       timestamp,
       index,
-      consensusData,
       nextConsensus,
-      script,
+      witness,
     });
 
-    this.transactionCount = transactionCount;
+    this.contentCount = contentCount;
     this.hashes = hashes;
     this.flags = flags;
 
@@ -91,7 +121,7 @@ export class MerkleBlockPayload extends BlockBase implements SerializableWire {
 
   public serializeWireBase(writer: BinaryWriter): void {
     super.serializeWireBase(writer);
-    writer.writeVarUIntLE(this.transactionCount);
+    writer.writeVarUIntLE(this.contentCount);
     writer.writeArray(this.hashes, (hash) => {
       writer.writeUInt256(hash);
     });

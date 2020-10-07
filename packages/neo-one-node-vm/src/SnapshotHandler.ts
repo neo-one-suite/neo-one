@@ -96,6 +96,15 @@ export class SnapshotHandler {
     });
   }
 
+  public hasPersistingBlock() {
+    return this.dispatch({
+      method: 'snapshot_has_persisting_block',
+      args: {
+        snapshot: this.snapshot,
+      },
+    });
+  }
+
   public commit(partial?: SnapshotPartial) {
     return this.dispatch({
       method: 'snapshot_commit',

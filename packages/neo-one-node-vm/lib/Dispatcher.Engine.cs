@@ -16,7 +16,7 @@ namespace NEOONE
             create,
             execute,
             loadscript,
-            loadclonedcontext,
+            setinstructionpointer,
             getvmstate,
             getresultstack,
             gettrigger,
@@ -43,9 +43,9 @@ namespace NEOONE
                     CallFlags flag = (CallFlags)((byte)args.flag);
                     return this._loadScript(script, flag);
 
-                case EngineMethod.loadclonedcontext:
+                case EngineMethod.setinstructionpointer:
                     int position = (int)args.position;
-                    return this._loadClonedContext(position);
+                    return this._setInstructionPointer(position);
 
                 case EngineMethod.getvmstate:
                     return this._getVMState();
@@ -102,7 +102,7 @@ namespace NEOONE
             return true;
         }
 
-        private bool _loadClonedContext(int initialPosition)
+        private bool _setInstructionPointer(int initialPosition)
         {
             this.isEngineInitialized();
             this.engine.LoadClonedContext(initialPosition);

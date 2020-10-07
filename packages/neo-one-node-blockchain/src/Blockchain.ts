@@ -1,21 +1,30 @@
-import { UInt256 } from '@neo-one/client-common';
+import { common, UInt256, VerifyResultModel } from '@neo-one/client-common';
 import {
   Block,
   Blockchain as BlockchainType,
   BlockchainSettings,
   CallReceipt,
+  ConsensusPayload,
   DeserializeWireContext,
   Header,
+  Mempool,
   NativeContainer,
+  RunEngineOptions,
+  Signers,
   Storage,
+  Transaction,
+  TransactionVerificationContext,
   TriggerType,
+  VerifyConsensusPayloadOptions,
+  VerifyOptions,
   VM,
+  Witness,
 } from '@neo-one/node-core';
 import { Labels } from '@neo-one/utils';
 import PriorityQueue from 'js-priority-queue';
 import { Observable, Subject } from 'rxjs';
 import { flatMap, map, toArray } from 'rxjs/operators';
-import { BlockVerifyError, GenesisBlockNotRegisteredError } from './errors';
+import { BlockVerifyError, ConsensusPayloadVerifyError, GenesisBlockNotRegisteredError } from './errors';
 import { PersistingBlockchain } from './PersistingBlockchain';
 import { utils } from './utils';
 import { verifyWitnesses } from './verify';
@@ -176,6 +185,25 @@ export class Blockchain {
     return this.mutablePersistingBlocks;
   }
 
+  public get verifyOptions(): VerifyOptions {
+    return {
+      vm: this.vm,
+      storage: this.storage,
+      native: this.native,
+      verifyWitnesses: this.verifyWitnesses,
+    };
+  }
+
+  public get verifyConsensusPayloadOptions(): VerifyConsensusPayloadOptions {
+    return {
+      vm: this.vm,
+      storage: this.storage,
+      native: this.native,
+      verifyWitnesses: this.verifyWitnesses,
+      height: this.currentBlockIndex,
+    };
+  }
+
   public get blocks() {
     return this.storage.blocks;
   }
@@ -206,6 +234,12 @@ export class Blockchain {
 
   public get contractID() {
     return this.storage.contractID;
+  }
+
+  public get serializeJSONContext() {
+    return {
+      addressVersion: this.settings.addressVersion,
+    };
   }
 
   public async stop(): Promise<void> {
@@ -240,10 +274,102 @@ export class Blockchain {
   }
 
   public async verifyBlock(block: Block): Promise<void> {
-    const verification = await block.verify(this.vm, this.storage, this.verifyWitnesses);
+    const verification = await block.verify(this.verifyOptions);
     if (!verification) {
       throw new BlockVerifyError(block.hashHex);
     }
+  }
+
+  public async verifyTransaction(
+    transaction: Transaction,
+    mempool: Mempool,
+    context?: TransactionVerificationContext,
+  ): Promise<VerifyResultModel> {
+    const containsTransaction = await this.containsTransaction(transaction.hash, mempool);
+    if (containsTransaction) {
+      return VerifyResultModel.AlreadyExists;
+    }
+
+    // TODO: to save some compute time we could keep a local cache of the current blocks return values
+    // from native contract calls and pass those in, instead of passing the whole native container.
+    const verifyOptions = {
+      native: this.native,
+      vm: this.vm,
+      storage: this.storage,
+      verifyWitnesses: this.verifyWitnesses,
+    };
+
+    return transaction.verify(verifyOptions, context);
+  }
+
+  public async verifyConsensusPayload(payload: ConsensusPayload) {
+    const verification = await payload.verify(this.verifyConsensusPayloadOptions);
+    if (!verification) {
+      throw new ConsensusPayloadVerifyError(payload.hashHex);
+    }
+  }
+
+  public async getBlock(hashOrIndex: UInt256 | number): Promise<Block | undefined> {
+    const hash = typeof hashOrIndex === 'number' ? this.getBlockHash(hashOrIndex) : hashOrIndex;
+    if (hash === undefined) {
+      return undefined;
+    }
+
+    if (this.currentBlock.hash.equals(hash)) {
+      return this.currentBlock;
+    }
+
+    if (this.previousBlock?.hash.equals(hash)) {
+      return this.previousBlock;
+    }
+
+    // TODO: this should really just take a hash, and then the rpc handler can call `blockchain.getBlockHash` if its an index.
+    const trimmedBlock = await this.blocks.tryGet({ hashOrIndex: hash });
+    if (trimmedBlock === undefined) {
+      return undefined;
+    }
+
+    if (!trimmedBlock.isBlock) {
+      return undefined;
+    }
+
+    return trimmedBlock.getBlock(this.transactions);
+  }
+
+  public getBlockHash(index: number): UInt256 | undefined {
+    if (this.headerIndex.length <= index) {
+      return undefined;
+    }
+
+    return this.headerIndex[index];
+  }
+
+  public async getHeader(hashOrIndex: UInt256 | number): Promise<Header | undefined> {
+    const hash = typeof hashOrIndex === 'number' ? this.getBlockHash(hashOrIndex) : hashOrIndex;
+    if (hash === undefined) {
+      return undefined;
+    }
+
+    if (this.currentBlock.hash.equals(hash)) {
+      return this.currentBlock.header;
+    }
+
+    if (this.previousBlock?.hash.equals(hash)) {
+      return this.previousBlock.header;
+    }
+
+    const block = await this.blocks.tryGet({ hashOrIndex: hash });
+
+    return block?.header;
+  }
+
+  public async getNextBlockHash(hash: UInt256): Promise<UInt256 | undefined> {
+    const header = await this.getHeader(hash);
+    if (header === undefined) {
+      return undefined;
+    }
+
+    return this.getBlockHash(header.index + 1);
   }
 
   public async persistBlock({
@@ -273,10 +399,13 @@ export class Blockchain {
     });
   }
 
-  public invokeScript(script: Buffer): CallReceipt {
-    const transaction = { script };
-
-    return this.invokeTransaction(transaction, 100);
+  public invokeScript(script: Buffer, signers?: Signers): CallReceipt {
+    return this.runEngineWrapper({
+      script,
+      snapshot: 'main',
+      container: signers === undefined ? undefined : { type: 'Signers', buffer: signers.serializeWire() },
+      gas: 10,
+    });
   }
 
   public invokeTransaction<TTransaction extends { readonly script: Buffer }>(
@@ -287,7 +416,7 @@ export class Blockchain {
       {
         trigger: TriggerType.Application,
         gas,
-        // container: transaction, TODO: implement this
+        // container: transaction, //TODO: implement this
         snapshot: 'main',
         testMode: true,
       },
@@ -297,6 +426,53 @@ export class Blockchain {
         return wrapExecuteScripts(engine);
       },
     );
+  }
+
+  private runEngineWrapper({
+    script,
+    snapshot,
+    container,
+    persistingBlock,
+    offset = 0,
+    testMode = false,
+    gas = 0,
+  }: RunEngineOptions): CallReceipt {
+    return this.vm.withSnapshots(({ main, clone }) => {
+      const handler = snapshot === 'main' ? main : clone;
+      if (persistingBlock !== undefined) {
+        handler.setPersistingBlock(persistingBlock);
+      } else if (!handler.hasPersistingBlock()) {
+        handler.setPersistingBlock(this.createDummyBlock());
+      }
+
+      return this.vm.withApplicationEngine(
+        {
+          trigger: TriggerType.Application,
+          container,
+          snapshot,
+          gas,
+          testMode,
+        },
+        (engine) => {
+          engine.loadScript(script);
+          engine.setInstructionPointer(offset);
+          engine.execute();
+
+          return utils.getCallReceipt(engine);
+        },
+      );
+    });
+  }
+
+  private async containsTransaction(hash: UInt256, mempool: Mempool) {
+    const hashHex = common.uInt256ToHex(hash);
+    if (mempool[hashHex] !== undefined) {
+      return true;
+    }
+
+    const state = await this.transactions.tryGet(hash);
+
+    return state !== undefined;
   }
 
   private async persistBlocksAsync(): Promise<void> {
@@ -417,6 +593,22 @@ export class Blockchain {
       onPersistNativeContractScript: this.onPersistNativeContractScript,
       storage: this.storage,
       vm: this.vm,
+    });
+  }
+
+  private createDummyBlock(): Block {
+    return new Block({
+      version: 0,
+      previousHash: this.currentBlock.hash,
+      merkleRoot: common.ZERO_UINT256,
+      timestamp: this.currentBlock.timestamp.addn(this.settings.millisecondsPerBlock),
+      index: this.currentBlockIndex + 1,
+      nextConsensus: this.currentBlock.nextConsensus,
+      witness: new Witness({
+        invocation: Buffer.from([]),
+        verification: Buffer.from([]),
+      }),
+      transactions: [],
     });
   }
 }

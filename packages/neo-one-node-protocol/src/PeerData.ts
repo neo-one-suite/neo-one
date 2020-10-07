@@ -7,4 +7,5 @@ export interface PeerData {
   readonly startHeight: number;
   mutableBloomFilter: BloomFilter | undefined;
   readonly address?: NetworkAddress;
+  readonly listenPort: number;
 }

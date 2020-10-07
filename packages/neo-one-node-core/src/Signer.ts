@@ -9,7 +9,7 @@ import {
   witnessScopeHasFlag,
   WitnessScopeModel,
 } from '@neo-one/client-common';
-import { DeserializeWireBaseOptions, SerializableJSON, SerializeJSONContext } from './Serializable';
+import { DeserializeWireBaseOptions, SerializableJSON } from './Serializable';
 import { utils } from './utils';
 
 const hasCustomContracts = (scopes: WitnessScopeModel) =>
@@ -51,7 +51,7 @@ export class Signer extends SignerModel implements SerializableJSON<SignerJSON> 
     return this.sizeInternal();
   }
 
-  public serializeJSON(_context: SerializeJSONContext): SignerJSON {
+  public serializeJSON(): SignerJSON {
     return {
       account: JSONHelper.writeUInt160(this.account),
       scopes: toJSONWitnessScope(this.scopes),

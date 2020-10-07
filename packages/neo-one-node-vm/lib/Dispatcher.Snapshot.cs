@@ -27,6 +27,7 @@ namespace NEOONE
             snapshot_change_block_hash_index,
             snapshot_change_header_hash_index,
             snapshot_set_persisting_block,
+            snapshot_has_persisting_block,
             snapshot_get_change_set,
             snapshot_transactions_delete,
         }
@@ -105,6 +106,9 @@ namespace NEOONE
                     this.selectSnapshot(args.snapshot).PersistingBlock = persisting;
 
                     return true;
+
+                case SnapshotMethod.snapshot_has_persisting_block:
+                    return this.selectSnapshot(args.snapshot).PersistingBlock != null;
 
 
                 case SnapshotMethod.snapshot_reset:

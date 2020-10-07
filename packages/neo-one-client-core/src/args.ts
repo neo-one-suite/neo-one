@@ -956,7 +956,7 @@ export const assertTransfer = (name: string, value?: unknown): Transfer => {
 
   return {
     amount: assertProperty(value, 'Transfer', 'amount', assertBigNumber),
-    asset: assertProperty(value, 'Transfer', 'asset', assertHash256),
+    asset: assertProperty(value, 'Transfer', 'asset', assertAddress),
     to: assertProperty(value, 'Transfer', 'to', assertAddress),
   };
 };

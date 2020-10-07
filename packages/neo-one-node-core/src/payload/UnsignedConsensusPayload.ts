@@ -1,4 +1,4 @@
-import { BinaryWriter, createSerializeWire, UInt256 } from '@neo-one/client-common';
+import { BinaryWriter, common, createGetHashData, createSerializeWire, crypto, UInt256 } from '@neo-one/client-common';
 import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableWire } from '../Serializable';
 import { BinaryReader, utils } from '../utils';
 import { ConsensusMessage, deserializeConsensusMessageWire } from './message/ConsensusMessage';
@@ -11,6 +11,7 @@ export interface UnsignedConsensusPayloadAdd {
   readonly data?: Buffer;
   readonly getConsensusMessage?: () => ConsensusMessage;
   readonly consensusMessage?: ConsensusMessage;
+  readonly magic?: number;
 }
 
 export class UnsignedConsensusPayload implements SerializableWire {
@@ -36,6 +37,7 @@ export class UnsignedConsensusPayload implements SerializableWire {
       validatorIndex,
       data,
       getConsensusMessage,
+      magic: options.context.messageMagic,
     };
   }
 
@@ -54,10 +56,13 @@ export class UnsignedConsensusPayload implements SerializableWire {
   public readonly previousHash: UInt256;
   public readonly blockIndex: number;
   public readonly validatorIndex: number;
+  public readonly magic: number | undefined;
 
   public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly consensusMessageInternal: (() => ConsensusMessage) | undefined;
   private readonly dataInternal?: Buffer;
+  private readonly messageInternal = utils.lazy(() => createGetHashData(this.serializeWire, this.magic)());
+  private readonly hashInternal = utils.lazy(() => crypto.hash256(this.messageInternal()));
 
   public constructor({
     version,
@@ -67,6 +72,7 @@ export class UnsignedConsensusPayload implements SerializableWire {
     data,
     getConsensusMessage,
     consensusMessage,
+    magic,
   }: UnsignedConsensusPayloadAdd) {
     this.version = version;
     this.previousHash = previousHash;
@@ -75,6 +81,7 @@ export class UnsignedConsensusPayload implements SerializableWire {
     this.dataInternal = data;
 
     this.consensusMessageInternal = consensusMessage ? () => consensusMessage : getConsensusMessage;
+    this.magic = magic;
   }
 
   public get consensusMessage() {
@@ -92,6 +99,14 @@ export class UnsignedConsensusPayload implements SerializableWire {
     }
 
     return this.dataInternal;
+  }
+
+  public get hash() {
+    return this.hashInternal();
+  }
+
+  public get hashHex() {
+    return common.uInt256ToHex(this.hash);
   }
 
   public serializeWireBase(writer: BinaryWriter) {

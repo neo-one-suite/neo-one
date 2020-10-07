@@ -1,12 +1,13 @@
-import { common, UInt160 } from '@neo-one/client-common';
+import { common, UInt160, VMState } from '@neo-one/client-common';
 import {
   BlockchainStorage,
   CallFlags,
   ContractMethodDescriptor,
+  ExecuteScriptResult,
+  NativeContainer,
   SerializableWire,
   TriggerType,
   Verifiable,
-  VerifyResult,
   VM,
 } from '@neo-one/node-core';
 import { ContractMethodError, ContractStateFetchError, WitnessVerifyError } from './errors';
@@ -61,19 +62,19 @@ export const verifyWithApplicationEngine = (
   gas: number,
   offset: number,
   init?: ContractMethodDescriptor,
-): VerifyResult =>
+): ExecuteScriptResult =>
   vm.withApplicationEngine(
     { trigger: TriggerType.Verification, container: verifiable, snapshot: 'main', gas, testMode: true },
     (engine) => {
       engine.loadScript(verification, CallFlags.None);
-      engine.loadClonedContext(offset);
+      engine.setInstructionPointer(offset);
       if (init !== undefined) {
-        engine.loadClonedContext(init.offset);
+        engine.setInstructionPointer(init.offset);
       }
       engine.loadScript(verifiable.witnesses[index].invocation, CallFlags.None);
 
       const state = engine.execute();
-      if (state === 'FAULT') {
+      if (state === VMState.FAULT) {
         return { result: false, gas };
       }
 
@@ -93,7 +94,7 @@ export const tryVerifyHash = async (
   storage: BlockchainStorage,
   verifiable: Verifiable & SerializableWire,
   gas: number,
-): Promise<VerifyResult> => {
+): Promise<ExecuteScriptResult> => {
   const { verification: verificationScript, scriptHash } = verifiable.witnesses[index];
   try {
     const { verification, offset, init } = await getApplicationEngineVerifyOptions(
@@ -113,6 +114,7 @@ export const verifyWitnesses = async (
   vm: VM,
   verifiable: Verifiable & SerializableWire,
   storage: BlockchainStorage,
+  native: NativeContainer,
   gasIn: number,
 ): Promise<boolean> => {
   if (gasIn < 0) {
@@ -123,7 +125,7 @@ export const verifyWitnesses = async (
 
   let hashes: readonly UInt160[];
   try {
-    hashes = await verifiable.getScriptHashesForVerifying(storage);
+    hashes = await verifiable.getScriptHashesForVerifying({ storage, native });
   } catch {
     return false;
   }
@@ -134,21 +136,24 @@ export const verifyWitnesses = async (
 
   const { next, previous } = await hashes
     .slice(1)
-    .reduce<Promise<{ readonly next: Promise<VerifyResult>; readonly previous: boolean }>>(async (acc, hash, index) => {
-      const { next: accNext, previous: accPrevious } = await acc;
-      const { result, gas: newGas } = await accNext;
-      if (!result) {
-        return {
-          next: Promise.resolve({ result: false, gas: newGas }),
-          previous: false,
-        };
-      }
+    .reduce<Promise<{ readonly next: Promise<ExecuteScriptResult>; readonly previous: boolean }>>(
+      async (acc, hash, index) => {
+        const { next: accNext, previous: accPrevious } = await acc;
+        const { result, gas: newGas } = await accNext;
+        if (!result) {
+          return {
+            next: Promise.resolve({ result: false, gas: newGas }),
+            previous: false,
+          };
+        }
 
-      return {
-        next: tryVerifyHash(vm, hash, index, storage, verifiable, newGas),
-        previous: accPrevious && result,
-      };
-    }, Promise.resolve({ next: tryVerifyHash(vm, hashes[0], 0, storage, verifiable, gas), previous: true }));
+        return {
+          next: tryVerifyHash(vm, hash, index, storage, verifiable, newGas),
+          previous: accPrevious && result,
+        };
+      },
+      Promise.resolve({ next: tryVerifyHash(vm, hashes[0], 0, storage, verifiable, gas), previous: true }),
+    );
 
   const { result: finalResult } = await next;
 

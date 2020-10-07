@@ -28,6 +28,7 @@ import {
   ContractPermissionDescriptorJSON,
   ContractPermissionJSON,
   DeveloperProvider,
+  FeelessTransactionModel,
   GetOptions,
   Hash256String,
   InvocationDataJSON,
@@ -148,7 +149,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     );
   }
 
-  public async testInvoke(transaction: TransactionModel): Promise<RawCallReceipt> {
+  public async testInvoke(transaction: FeelessTransactionModel): Promise<RawCallReceipt> {
     const receipt = await this.mutableClient.testInvocation(transaction.serializeWire().toString('hex'));
 
     return convertCallReceipt(receipt);
@@ -220,8 +221,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
   ): Promise<RawCallReceipt> {
-    const testTransaction = new TransactionModel({
-      systemFee: utils.ZERO, // TODO: need to get the systemFee?
+    const testTransaction = new FeelessTransactionModel({
       script: clientUtils.getInvokeMethodScript({
         address: contract,
         method,
@@ -280,6 +280,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     };
   }
 
+  // TODO: implement this;
   private convertBlock(block: BlockJSON): Block {
     return {
       version: block.version,
@@ -288,7 +289,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
       merkleRoot: block.merkleroot,
       time: new BigNumber(block.time),
       consensusData:
-        block.consensusdata === undefined // TODO: check
+        block.consensusdata === undefined
           ? undefined
           : {
               primaryIndex: block.consensusdata.primary,
@@ -307,7 +308,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return {
       version: transaction.version,
       nonce: transaction.nonce,
-      sender: scriptHashToAddress(transaction.sender),
+      sender: transaction.sender ? scriptHashToAddress(transaction.sender) : undefined,
       hash: transaction.hash,
       size: transaction.size,
       validUntilBlock: transaction.validuntilblock,
@@ -433,7 +434,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
       ? '*'
       : descriptor.isGroup
       ? common.stringToECPoint(descriptor.hashOrGroup)
-      : common.stringToUInt160(descriptor.hashOrGroup); // TODO: check
+      : common.stringToUInt160(descriptor.hashOrGroup);
 
     return {
       hashOrGroup,

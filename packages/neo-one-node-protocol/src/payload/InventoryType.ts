@@ -1,9 +1,9 @@
 import { makeErrorWithCode } from '@neo-one/utils';
 
 export enum InventoryType {
-  Transaction = 0x01,
-  Block = 0x02,
-  Consensus = 0xe0,
+  TX = 0x2b,
+  Block = 0x2c,
+  Consensus = 0x2d,
 }
 
 export const InvalidInventoryTypeError = makeErrorWithCode(

@@ -20,6 +20,10 @@ export const BlockVerifyError = makeErrorWithCode(
   'BLOCK_VERIFICATION_FAILED',
   (hash: string) => `Block with hash: ${hash} failed to verify.`,
 );
+export const ConsensusPayloadVerifyError = makeErrorWithCode(
+  'CONSENSUS_PAYLOAD_VERIFICATION_FAILED',
+  (hash: string) => `ConsensusPayload with hash: ${hash} failed to verify`,
+);
 export const PersistNativeContractsError = makeErrorWithCode(
   'PERSIST_NATIVE_CONTRACTS_FAILED',
   () => 'Engine state !== HALT when persisting native contract scripts',

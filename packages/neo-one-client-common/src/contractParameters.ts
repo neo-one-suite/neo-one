@@ -1,6 +1,6 @@
-import { utils as commonUtils } from '@neo-one/utils';
+import { utils as commonUtils, JSONObject } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import { common } from './common';
+import { common, InvalidFormatError } from './common';
 import { crypto } from './crypto';
 import { InvalidContractParameterError } from './errors';
 import { JSONHelper } from './JSONHelper';
@@ -29,6 +29,12 @@ import {
   VoidABI,
 } from './types';
 import { utils } from './utils';
+import {
+  assertContractParameterType,
+  toContractParameterType,
+  assertContractParameterTypeJSON,
+  ContractParameterTypeModel,
+} from './models';
 
 const toBufferBuffer = (contractParameter: ContractParameter): Buffer => {
   let value;

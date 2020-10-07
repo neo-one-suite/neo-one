@@ -5,6 +5,8 @@ import {
   AttributeModel,
   Block,
   common,
+  crypto,
+  FeelessTransactionModel,
   ForwardValue,
   GetOptions,
   Hash256String,
@@ -89,16 +91,16 @@ export interface ExecuteInvokeMethodOptions<T extends TransactionReceipt> extend
   readonly invokeMethodOptions: InvokeMethodOptions;
 }
 
-export interface ExecuteInvokeClaimOptions {
-  readonly contract: AddressString;
-  readonly unclaimedAmount: BigNumber;
-  readonly attributes: readonly Attribute[];
-  readonly method: string;
-  readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
-  readonly paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>;
-  readonly from: UserAccountID;
-  readonly sourceMaps?: SourceMaps;
-}
+// export interface ExecuteInvokeClaimOptions {
+//   readonly contract: AddressString;
+//   readonly unclaimedAmount: BigNumber;
+//   readonly attributes: readonly Attribute[];
+//   readonly method: string;
+//   readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
+//   readonly paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>;
+//   readonly from: UserAccountID;
+//   readonly sourceMaps?: SourceMaps;
+// }
 
 export interface Provider {
   readonly networks$: Observable<readonly NetworkType[]>;
@@ -110,7 +112,7 @@ export interface Provider {
     options?: GetOptions,
   ) => Promise<TransactionReceipt>;
   readonly getInvocationData: (network: NetworkType, hash: Hash256String) => Promise<RawInvocationData>;
-  readonly testInvoke: (network: NetworkType, transaction: TransactionModel) => Promise<RawCallReceipt>;
+  readonly testInvoke: (network: NetworkType, transaction: FeelessTransactionModel) => Promise<RawCallReceipt>;
   readonly call: (
     network: NetworkType,
     contract: AddressString,
@@ -183,9 +185,9 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
   }
 
   public async claim(options?: TransactionOptions): Promise<TransactionResult> {
-    const { from, attributes, networkFee } = this.getTransactionOptions(options);
+    const { from, networkFee } = this.getTransactionOptions(options);
 
-    return this.capture(async () => this.executeClaim(from, attributes, networkFee), {
+    return this.capture(async () => this.executeClaim(from, networkFee), {
       name: 'neo_claim',
     });
   }
@@ -451,17 +453,65 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     return this.provider.call(network, contract, method, params);
   }
 
-  protected getTransactionOptions(options: TransactionOptions = {}): TransactionOptionsFull {
-    const { attributes = [], networkFee = utils.ZERO_BIG_NUMBER, systemFee = utils.ZERO_BIG_NUMBER } = options;
+  public async checkSystemFees({
+    script,
+    from,
+    systemFee,
+    attributes = [],
+    witnesses = [],
+    sourceMaps,
+  }: {
+    readonly script: Buffer;
+    readonly transfers?: ReadonlyArray<FullTransfer>;
+    readonly from: UserAccountID;
+    readonly networkFee: BigNumber;
+    readonly systemFee: BigNumber;
+    readonly attributes?: ReadonlyArray<Attribute>;
+    readonly witnesses?: ReadonlyArray<WitnessModel>;
+    readonly sourceMaps?: SourceMaps;
+  }): Promise<{
+    readonly gas: BigNumber;
+    readonly attributes: ReadonlyArray<Attribute>;
+  }> {
+    const testTransaction = new TransactionModel({
+      systemFee: common.TEN_THOUSAND_FIXED8,
+      attributes: this.convertAttributes(attributes),
+      networkFee: common.TEN_THOUSAND_FIXED8,
+      script,
+      witnesses,
+    });
 
-    const { from: fromIn } = options;
-    let from = fromIn;
+    const callReceipt = await this.provider.testInvoke(from.network, testTransaction);
+    if (callReceipt.result.state === 'FAULT') {
+      const message = await processActionsAndMessage({
+        actions: callReceipt.actions,
+        message: callReceipt.result.message,
+        sourceMaps,
+      });
+      throw new InvokeError(message);
+    }
+
+    const gas = callReceipt.result.gasConsumed.integerValue(BigNumber.ROUND_UP);
+    if (gas.gt(utils.ZERO_BIG_NUMBER) && systemFee.lt(gas) && !systemFee.eq(utils.NEGATIVE_ONE_BIG_NUMBER)) {
+      throw new InsufficientSystemFeeError(systemFee, gas);
+    }
+
+    return { gas, attributes };
+  }
+
+  protected getTransactionOptions(options: TransactionOptions = {}): TransactionOptionsFull {
+    const { attributes = [], networkFee = utils.ZERO_BIG_NUMBER, systemFee = utils.ZERO_BIG_NUMBER, from } = options;
+
+    let accounts: readonly AddressString[] = [];
     if (from === undefined) {
       const fromAccount = this.getCurrentUserAccount();
       if (fromAccount === undefined) {
-        throw new NoAccountError();
+        accounts = this.getUserAccounts().map((account) =>
+          common.uInt160ToString(
+            crypto.addressToScriptHash({ addressVersion: common.NEO_ADDRESS_VERSION, address: account.id.address }),
+          ),
+        );
       }
-      from = fromAccount.id;
     }
 
     return {
@@ -599,10 +649,8 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     readonly gas: BigNumber;
     readonly attributes: ReadonlyArray<Attribute>;
   }> {
-    const testTransaction = new TransactionModel({
-      systemFee: common.TEN_THOUSAND_FIXED8,
+    const testTransaction = new FeelessTransactionModel({
       attributes: this.convertAttributes(attributes),
-      networkFee: common.TEN_THOUSAND_FIXED8,
       script,
       witnesses,
     });
@@ -617,52 +665,6 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     }
 
     const gas = callReceipt.result.gasConsumed.integerValue(BigNumber.ROUND_UP);
-
-    return { gas, attributes };
-  }
-
-  protected async checkSystemFees({
-    script,
-    from,
-    systemFee,
-    attributes = [],
-    witnesses = [],
-    sourceMaps,
-  }: {
-    readonly script: Buffer;
-    readonly transfers?: ReadonlyArray<FullTransfer>;
-    readonly from: UserAccountID;
-    readonly networkFee: BigNumber;
-    readonly systemFee: BigNumber;
-    readonly attributes?: ReadonlyArray<Attribute>;
-    readonly witnesses?: ReadonlyArray<WitnessModel>;
-    readonly sourceMaps?: SourceMaps;
-  }): Promise<{
-    readonly gas: BigNumber;
-    readonly attributes: ReadonlyArray<Attribute>;
-  }> {
-    const testTransaction = new TransactionModel({
-      systemFee: common.TEN_THOUSAND_FIXED8,
-      attributes: this.convertAttributes(attributes),
-      networkFee: common.TEN_THOUSAND_FIXED8,
-      script,
-      witnesses,
-    });
-
-    const callReceipt = await this.provider.testInvoke(from.network, testTransaction);
-    if (callReceipt.result.state === 'FAULT') {
-      const message = await processActionsAndMessage({
-        actions: callReceipt.actions,
-        message: callReceipt.result.message,
-        sourceMaps,
-      });
-      throw new InvokeError(message);
-    }
-
-    const gas = callReceipt.result.gasConsumed.integerValue(BigNumber.ROUND_UP);
-    if (gas.gt(utils.ZERO_BIG_NUMBER) && systemFee.lt(gas) && !systemFee.eq(utils.NEGATIVE_ONE_BIG_NUMBER)) {
-      throw new InsufficientSystemFeeError(systemFee, gas);
-    }
 
     return { gas, attributes };
   }
@@ -675,7 +677,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     options: ExecuteInvokeScriptOptions<T>,
   ): Promise<TransactionResult<T>>;
 
-  protected abstract async executeInvokeClaim(options: ExecuteInvokeClaimOptions): Promise<TransactionResult>;
+  // protected abstract async executeInvokeClaim(options: ExecuteInvokeClaimOptions): Promise<TransactionResult>;
 
   protected abstract async executeTransfer(
     transfers: readonly Transfer[],
@@ -684,11 +686,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     networkFee: BigNumber,
   ): Promise<TransactionResult>;
 
-  protected abstract async executeClaim(
-    from: UserAccountID,
-    attributes: readonly Attribute[],
-    networkFee: BigNumber,
-  ): Promise<TransactionResult>;
+  protected abstract async executeClaim(from: UserAccountID, networkFee: BigNumber): Promise<TransactionResult>;
 
   protected async invokeRaw<T extends TransactionReceipt>({
     invokeMethodOptionsOrScript,

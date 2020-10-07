@@ -43,5 +43,6 @@ export interface SnapshotMethods extends DefaultMethods {
   readonly snapshot_change_block_hash_index: DispatchMethod<boolean, ChangeHashIndexArgs>;
   readonly snapshot_change_header_hash_index: DispatchMethod<boolean, ChangeHashIndexArgs>;
   readonly snapshot_set_persisting_block: DispatchMethod<boolean, SetPersistingBlockArgs>;
+  readonly snapshot_has_persisting_block: DispatchMethod<boolean, SnapshotChoice>;
   readonly snapshot_get_change_set: DispatchMethod<readonly ChangeReturn[], SnapshotChoice>;
 }

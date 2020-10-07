@@ -57,3 +57,19 @@ export const InvalidPrimitiveStackItemError = makeErrorWithCode(
   'INVALID_PRIMITIVE_STACK_ITEM_ERROR',
   () => 'Invalid PrimitiveStackItem found; expected one of [Boolean, ByteString, Integer].',
 );
+export const InvalidTransactionConsensusOptionsError = makeErrorWithCode(
+  'INVALID_TRANSACTION_CONSENSUS_OPTIONS_ERROR',
+  (property: string) => `Expected fully formed transaction for this method, but ${property} was undefined.`,
+);
+export const InvalidServerCapabilityTypeError = makeErrorWithCode(
+  'INVALID_SERVER_CAPABILITY_TYPE_ERROR',
+  (value: number) => `Expected type to be 0x01 or 0x02, found ${value}`,
+);
+export const InvalidFullNodeCapabilityTypeError = makeErrorWithCode(
+  'INVALID_FULL_NODE_CAPABILITY_TYPE_ERROR',
+  (value: number) => `Expected type to be 0x10, found ${value}`,
+);
+export const InvalidOpCodeError = makeErrorWithCode(
+  'INVALID_OP_CODE_ERROR',
+  (value: number) => `Cannot find fee for OpCode ${value}.`,
+);

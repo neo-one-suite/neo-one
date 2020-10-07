@@ -1,6 +1,7 @@
 import {
   AddressString,
   Block,
+  FeelessTransactionModel,
   GetOptions,
   Hash256String,
   IterOptions,
@@ -75,7 +76,7 @@ export class NEOONEProvider implements Provider {
     return this.getProvider(network).getInvocationData(hash);
   }
 
-  public async testInvoke(network: NetworkType, transaction: TransactionModel): Promise<RawCallReceipt> {
+  public async testInvoke(network: NetworkType, transaction: FeelessTransactionModel): Promise<RawCallReceipt> {
     return this.getProvider(network).testInvoke(transaction);
   }
 
