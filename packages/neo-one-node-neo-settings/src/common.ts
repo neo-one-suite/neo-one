@@ -74,6 +74,7 @@ const getDeployNativeContracts = () => {
     version: 0,
     script,
     systemFee: new BN(0),
+    networkFee: new BN(0),
     signers: [
       new Signer({
         account: crypto.hash160(Buffer.from([Op.PUSH1])),
@@ -92,7 +93,7 @@ interface GetGenesisBlockOptions {
 const getGenesisBlock = ({ consensusAddress }: GetGenesisBlockOptions) =>
   new Block({
     previousHash: clientCommon.ZERO_UINT256,
-    timestamp: new BN(Date.UTC(2016, 7, 15, 15, 8, 21)),
+    timestamp: new BN(Date.UTC(2016, 6, 15, 15, 8, 21)),
     index: 0,
     nextConsensus: consensusAddress,
     witness: getDeployWitness(),

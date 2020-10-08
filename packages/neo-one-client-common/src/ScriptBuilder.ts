@@ -52,7 +52,7 @@ export class ScriptBuilder extends BaseScriptBuilder {
     this.emitPushParams(...params);
     this.emitPushParam(params.length);
 
-    return params.length === 0 ? this.emitOp('PACK') : this.emitOp('NEWARRAY');
+    return params.length !== 0 ? this.emitOp('PACK') : this.emitOp('NEWARRAY');
   }
 
   // tslint:disable-next-line readonly-array

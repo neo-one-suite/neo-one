@@ -1,5 +1,6 @@
-import { SerializableWire, UInt160 } from '@neo-one/client-common';
+import { UInt160 } from '@neo-one/client-common';
 import { NativeContainer } from './Native';
+import { SerializableContainer } from './Serializable';
 import { BlockchainStorage } from './Storage';
 import { VM } from './vm';
 import { Witness } from './Witness';
@@ -19,7 +20,7 @@ export interface ExecuteScriptResult {
 
 export type VerifyWitnesses = (
   vm: VM,
-  verifiable: Verifiable & SerializableWire,
+  verifiable: Verifiable & SerializableContainer,
   storage: BlockchainStorage,
   native: NativeContainer,
   gasIn: number,

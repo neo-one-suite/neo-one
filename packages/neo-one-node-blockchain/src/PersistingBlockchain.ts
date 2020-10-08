@@ -90,7 +90,7 @@ export class PersistingBlockchain {
           (engine) => {
             engine.loadScript(this.onPersistNativeContractScript);
             const result = engine.execute();
-            if (result !== 'HALT') {
+            if (result !== VMState.HALT) {
               throw new PersistNativeContractsError();
             }
 
@@ -105,8 +105,6 @@ export class PersistingBlockchain {
       main.clone();
 
       const executedTransactions = this.persistTransactions(block, main, clone);
-
-      main.changeBlockHashIndex(block.index, block.hash);
       const finalApplicationsExecuted = appsExecuted.concat(executedTransactions);
 
       return { changeBatch: main.getChangeSet(), applicationsExecuted: finalApplicationsExecuted };
@@ -170,7 +168,7 @@ export class PersistingBlockchain {
       (engine) => {
         engine.loadScript(transaction.script);
         const state = engine.execute();
-        if (state === 'HALT') {
+        if (state === VMState.HALT) {
           clone.deleteTransaction(transaction.hash);
           clone.addTransaction(transaction, index, VMState.HALT);
           clone.commit();

@@ -1,6 +1,7 @@
 import { UInt160, UInt256, VMState } from '@neo-one/client-common';
 import { Block } from './Block';
 import { CallFlags } from './CallFlags';
+import { SerializableContainer } from './Serializable';
 import { StackItem } from './StackItems';
 import { Transaction } from './transaction';
 
@@ -18,7 +19,7 @@ export interface SerializedScriptContainer {
 }
 
 export interface Notification {
-  readonly scriptContainer: SerializedScriptContainer;
+  readonly scriptContainer: SerializableContainer;
   readonly scriptHash: UInt160;
   readonly eventName: string;
   readonly state: readonly StackItem[];
@@ -35,7 +36,7 @@ export type SnapshotName = 'main' | 'clone';
 
 export interface ApplicationEngineOptions {
   readonly trigger: TriggerType;
-  readonly container?: SerializedScriptContainer;
+  readonly container?: SerializableContainer;
   readonly snapshot?: SnapshotName;
   readonly gas: number;
   readonly testMode: boolean;
@@ -44,7 +45,7 @@ export interface ApplicationEngineOptions {
 export interface RunEngineOptions {
   readonly script: Buffer;
   readonly snapshot: SnapshotName;
-  readonly container?: SerializedScriptContainer;
+  readonly container?: SerializableContainer;
   readonly persistingBlock?: Block;
   readonly offset?: number;
   readonly testMode?: boolean;

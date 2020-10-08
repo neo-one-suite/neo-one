@@ -1,11 +1,11 @@
 import { VMState } from '@neo-one/client-common';
-import { CallFlags, SnapshotName, TriggerType, Verifiable } from '@neo-one/node-core';
+import { CallFlags, SerializedScriptContainer, SnapshotName, TriggerType } from '@neo-one/node-core';
 import { NotificationReturn, StackItemReturn } from '../converters';
 import { DefaultMethods, DispatchMethod } from '../types';
 
 interface CreateEngineArgs {
   readonly trigger: TriggerType;
-  readonly container?: Verifiable;
+  readonly container?: SerializedScriptContainer;
   readonly gas: string;
   readonly snapshot?: SnapshotName;
   readonly testMode: boolean;

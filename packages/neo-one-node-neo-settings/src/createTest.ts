@@ -1,79 +1,52 @@
-import { common as clientCommon, crypto, UInt160 } from '@neo-one/client-common';
-import { Settings, TransactionType } from '@neo-one/node-core';
+import { common as clientCommon, crypto } from '@neo-one/client-common';
+import { Settings } from '@neo-one/node-core';
 import { common } from './common';
 
 const DEFAULT_VALIDATORS: readonly string[] = [
-  '0327da12b5c40200e9f65569476bbff2218da4f32548ff43b6387ec1416a231ee8',
-  '026ce35b29147ad09e4afe4ec4a7319095f08198fa8babbe3c56e970b143528d22',
-  '0209e7fd41dfb5c2f8dc72eb30358ac100ea8c72da18847befe06eade68cebfcb9',
-  '039dafd8571a641058ccc832c5e2111ea39b09c0bde36050914384f7a48bce9bf9',
-  '038dddc06ce687677a53d54f096d2591ba2302068cf123c1f2d75c2dddc5425579',
-  '02d02b1873a0863cd042cc717da31cea0d7cf9db32b74d4c72c01b0011503e2e22',
-  '034ff5ceeac41acf22cd5ed2da17a6df4dd8358fcb2bfb1a43208ad0feaab2746b',
+  '023e9b32ea89b94d066e649b124fd50e396ee91369e8e2a6ae1b11c170d022256d',
+  '03009b7540e10f2562e5fd8fac9eaec25166a58b26e412348ff5a86927bfac22a2',
+  '02ba2c70f5996f357a43198705859fae2cfea13e1172962800772b3d588a9d4abd',
+  '03408dcd416396f64783ac587ea1e1593c57d9fea880c8a6a1920e92a259477806',
+  '02a7834be9b32e2981d157cb5bbd3acb42cfd11ea5c3b10224d7a44e98c5910f1b',
+  '0214baf0ceea3a66f17e7e1e839ea25fd8bed6cd82e6bb6e68250189065f44ff01',
+  '030205e9cefaea5a1dfc580af20c8d5aa2468bb0148f1a5e4605fc622c80e604ba',
 ];
 
 export const createTest = ({
   privateNet,
   standbyValidators: standbyValidatorsIn = DEFAULT_VALIDATORS,
-  secondsPerBlock,
-  address: addressIn,
+  extraCommitteeMembers: extraCommitteeMembersIn = [],
+  millisecondsPerBlock,
 }: {
   readonly privateNet?: boolean;
-  readonly secondsPerBlock?: number;
   readonly standbyValidators?: readonly string[];
-  readonly address?: string;
+  readonly extraCommitteeMembers?: readonly string[];
+  readonly millisecondsPerBlock?: number;
 } = {}): Settings => {
   const standbyValidators = standbyValidatorsIn.map((value) => clientCommon.stringToECPoint(value));
+  const standbyMembers = extraCommitteeMembersIn.map((value) => clientCommon.stringToECPoint(value));
+  const standbyCommittee = standbyValidators.concat(standbyMembers);
 
-  const consensusAddress =
-    standbyValidatorsIn === DEFAULT_VALIDATORS
-      ? clientCommon.asUInt160(Buffer.from('f3812db982f3b0089a21a278988efeec6a027b25', 'hex'))
-      : crypto.getConsensusAddress(standbyValidators);
-  let address: UInt160;
-  if (addressIn === undefined) {
-    address =
-      standbyValidatorsIn === DEFAULT_VALIDATORS
-        ? clientCommon.asUInt160(Buffer.from('197ff6783d512a740d42f4cc4f5572955fa44c95', 'hex'))
-        : crypto.toScriptHash(
-            crypto.createMultiSignatureVerificationScript(standbyValidators.length / 2 + 1, standbyValidators),
-          );
-  } else {
-    address = clientCommon.stringToUInt160(addressIn);
-  }
+  const consensusAddress = crypto.getConsensusAddress(standbyValidators);
 
   const commonSettings = common({
     privateNet,
-    address,
     consensusAddress,
   });
 
   return {
     genesisBlock: commonSettings.genesisBlock,
-    governingToken: commonSettings.governingToken,
-    utilityToken: commonSettings.utilityToken,
     decrementInterval: commonSettings.decrementInterval,
     generationAmount: commonSettings.generationAmount,
-    secondsPerBlock: secondsPerBlock === undefined ? commonSettings.secondsPerBlock : secondsPerBlock,
-    maxTransactionsPerBlock: commonSettings.maxTransactionsPerBlock,
-    memPoolSize: commonSettings.memPoolSize,
-    fees: {
-      [TransactionType.Enrollment]: clientCommon.fixed8FromDecimal(10),
-      [TransactionType.Issue]: clientCommon.fixed8FromDecimal(5),
-      [TransactionType.Publish]: clientCommon.fixed8FromDecimal(5),
-      [TransactionType.Register]: clientCommon.fixed8FromDecimal(100),
-    },
-
-    registerValidatorFee: clientCommon.fixed8FromDecimal(1000),
-    messageMagic: 1953787457,
+    millisecondsPerBlock:
+      millisecondsPerBlock === undefined ? commonSettings.millisecondsPerBlock : millisecondsPerBlock,
+    standbyCommittee,
+    committeeMembersCount: standbyCommittee.length,
+    memoryPoolMaxTransactions: commonSettings.memoryPoolMaxTransactions,
+    validatorsCount: standbyValidators.length,
+    messageMagic: 1951352142,
     addressVersion: clientCommon.NEO_ADDRESS_VERSION,
     privateKeyVersion: clientCommon.NEO_PRIVATE_KEY_VERSION,
     standbyValidators,
-    vm: {
-      storageContext: {
-        v0: {
-          index: 163594,
-        },
-      },
-    },
   };
 };

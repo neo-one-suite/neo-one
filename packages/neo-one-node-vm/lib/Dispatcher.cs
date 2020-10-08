@@ -3,9 +3,7 @@ using System.Threading.Tasks;
 using Neo.SmartContract;
 using System.Dynamic;
 using System.Collections.Generic;
-using NEOONE.Storage;
 using Neo.Persistence;
-using Neo.SmartContract.Native;
 using Microsoft.Extensions.Configuration;
 
 namespace NEOONE
@@ -16,6 +14,7 @@ namespace NEOONE
         private ApplicationEngine engine;
         private IStore store;
         private bool init = false;
+        private string path;
 
         private enum BaseMethod
         {
@@ -65,7 +64,7 @@ namespace NEOONE
             if (!this.init)
             {
                 Neo.ProtocolSettings.Initialize(config);
-                this.store = new LevelDBStore(path).GetStore();
+                this.path = path;
                 this.resetSnapshots();
 
                 this.init = true;
@@ -79,7 +78,6 @@ namespace NEOONE
             if (!this.init)
             {
                 Neo.ProtocolSettings.Initialize(config);
-                this.store = new MemoryStore();
                 this.resetSnapshots();
 
                 this.init = true;
@@ -92,7 +90,7 @@ namespace NEOONE
         {
             if (!this.init)
             {
-                this.store = new LevelDBStore(path).GetStore();
+                this.path = path;
                 this.resetSnapshots();
 
                 this.init = true;
@@ -105,7 +103,6 @@ namespace NEOONE
         {
             if (!this.init)
             {
-                this.store = new MemoryStore();
                 this.resetSnapshots();
 
                 this.init = true;
@@ -128,7 +125,8 @@ namespace NEOONE
 
         private dynamic _test()
         {
-            return NativeContract.Policy.Hash.ToString();
+            // return BitConverter.ToString(Blockchain.onPersistNativeContractScript);
+            return true;
         }
 
         private NEOONE.ReturnHelpers.ProtocolSettingsReturn _getConfig()

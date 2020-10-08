@@ -15,8 +15,8 @@ import { Header } from './Header';
 import {
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
+  SerializableContainer,
   SerializableJSON,
-  SerializableWire,
   SerializeJSONContext,
 } from './Serializable';
 import { Transaction } from './transaction';
@@ -61,7 +61,7 @@ const getCombinedModels = (
   return init.concat(transactions);
 };
 
-export class Block extends BlockBase implements SerializableWire, SerializableJSON<BlockJSON> {
+export class Block extends BlockBase implements SerializableContainer, SerializableJSON<BlockJSON> {
   public static readonly MaxContentsPerBlock = utils.USHORT_MAX;
   public static readonly MaxTransactionsPerBlock = utils.USHORT_MAX.subn(1);
   // public static async calculateNetworkFee(context: FeeContext, transactions: readonly Transaction[]): Promise<BN> {
@@ -111,7 +111,6 @@ export class Block extends BlockBase implements SerializableWire, SerializableJS
       reader: new BinaryReader(options.buffer),
     });
   }
-
   public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   public readonly serializeUnsigned = createSerializeWire(super.serializeUnsignedBase.bind(this));
   public readonly transactions: readonly Transaction[];

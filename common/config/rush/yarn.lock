@@ -2501,10 +2501,14 @@
   dependencies:
     "@types/jest" "^24.0.18"
     "@types/js-priority-queue" "^0.0.5"
+    "@types/leveldown" "^4.0.0"
+    "@types/levelup" "^3.1.1"
     "@types/lodash" "^4.14.138"
     bn.js "^5.0.0"
     gulp "~4.0.2"
     js-priority-queue "^0.1.5"
+    leveldown "^5.1.1"
+    levelup "4.1.0"
     lodash "^4.17.15"
     rxjs "^6.5.3"
     tslib "^1.10.0"
@@ -2556,6 +2560,7 @@
     gulp "~4.0.2"
     lodash "^4.17.15"
     rxjs "^6.5.3"
+    through "^2.3.8"
     tslib "^1.10.0"
 
 "@rush-temp/node-http-rpc@file:./projects/node-http-rpc.tgz":
@@ -2577,6 +2582,18 @@
     koa-router "^7.4.0"
     koa-static "^5.0.0"
     lodash "^4.17.15"
+    tslib "^1.10.0"
+
+"@rush-temp/node-native@file:./projects/node-native.tgz":
+  version "0.0.0"
+  resolved "file:./projects/node-native.tgz"
+  dependencies:
+    "@types/jest" "^24.0.18"
+    "@types/lodash" "^4.14.138"
+    bn.js "^5.0.0"
+    gulp "~4.0.2"
+    lodash "^4.17.15"
+    rxjs "^6.5.3"
     tslib "^1.10.0"
 
 "@rush-temp/node-neo-settings@file:./projects/node-neo-settings.tgz":
@@ -2657,12 +2674,15 @@
   version "0.0.0"
   resolved "file:./projects/node-storage-levelup.tgz"
   dependencies:
+    "@types/abstract-leveldown" "^5.0.1"
     "@types/jest" "^24.0.18"
     "@types/levelup" "^3.1.1"
     "@types/memdown" "^3.0.0"
+    "@types/rocksdb" "3.0.0"
     gulp "~4.0.2"
     levelup "4.1.0"
     memdown "^5.0.0"
+    rocksdb "^4.1.0"
     rxjs "^6.5.3"
     tslib "^1.10.0"
 
@@ -2702,13 +2722,18 @@
   dependencies:
     "@types/abstract-leveldown" "^5.0.1"
     "@types/fs-extra" "^8.0.0"
+    "@types/jest" "^24.0.18"
     "@types/leveldown" "^4.0.0"
     "@types/levelup" "^3.1.1"
+    "@types/rocksdb" "3.0.0"
     abstract-leveldown "^6.0.3"
+    bn.js "^5.0.0"
     fs-extra "^8.1.0"
     gulp "~4.0.2"
     leveldown "^5.1.1"
     levelup "4.1.0"
+    rocksdb "^4.1.0"
+    rxjs "^6.5.3"
     tslib "^1.10.0"
 
 "@rush-temp/react-common@file:./projects/react-common.tgz":
@@ -3954,6 +3979,14 @@
   dependencies:
     "@types/node" "*"
 
+"@types/rocksdb@3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@types/rocksdb/-/rocksdb-3.0.0.tgz#6d2cacb6809a53c7eeb09c078699e3009b2d8fe2"
+  integrity sha512-idP99dvZ0P8Q1cGXkUQhcvJrKdFJIfYQ46plfgoe8RB3/OkE88n8RmgL/LE8+gbe6mTRyvb6MOaeRZu59qL4cQ==
+  dependencies:
+    "@types/abstract-leveldown" "*"
+    "@types/node" "*"
+
 "@types/sax@^1.2.0":
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/@types/sax/-/sax-1.2.1.tgz#e0248be936ece791a82db1a57f3fb5f7c87e8172"
@@ -4007,13 +4040,6 @@
   integrity sha512-Z7AVMMlkI8NTWF0qGhC4QIX0zkV/+y0J8x7b/RsHrN0310+YNjoJd8UrApCiGBCWtKjxS9QhNqLi2UJNToh5hA==
   dependencies:
     "@types/minipass" "*"
-    "@types/node" "*"
-
-"@types/through@^0.0.29":
-  version "0.0.29"
-  resolved "https://registry.yarnpkg.com/@types/through/-/through-0.0.29.tgz#72943aac922e179339c651fa34a4428a4d722f93"
-  integrity sha512-9a7C5VHh+1BKblaYiq+7Tfc+EOmjMdZaD1MYtkQjSoxgB69tBjW98ry6SKsi4zEIWztLOMRuL87A3bdT/Fc/4w==
-  dependencies:
     "@types/node" "*"
 
 "@types/toposort@^2.0.1":
@@ -4360,6 +4386,14 @@ abstract-leveldown@~6.0.0, abstract-leveldown@~6.0.1:
   version "6.0.3"
   resolved "https://registry.yarnpkg.com/abstract-leveldown/-/abstract-leveldown-6.0.3.tgz#b4b6159343c74b0c5197b2817854782d8f748c4a"
   integrity sha512-jzewKKpZbaYUa6HTThnrl+GrJhzjEAeuc7hTVpZdzg7kupXZFoqQDFwyOwLNbmJKJlmzw8yiipMPkDiuKkT06Q==
+  dependencies:
+    level-concat-iterator "~2.0.0"
+    xtend "~4.0.0"
+
+abstract-leveldown@~6.1.1:
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/abstract-leveldown/-/abstract-leveldown-6.1.1.tgz#f44bad5862d71c7b418110d7698ac25bedf24396"
+  integrity sha512-7fK/KySVqzKIomdhkSWzX4YBQhzkzEMbWSiaB6mSN9e+ZdV3KEeKxia/8xQzCkATA5xnnukdP88cFR0D2FsFXw==
   dependencies:
     level-concat-iterator "~2.0.0"
     xtend "~4.0.0"
@@ -17785,6 +17819,15 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
   dependencies:
     hash-base "^3.0.0"
     inherits "^2.0.1"
+
+rocksdb@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/rocksdb/-/rocksdb-4.1.0.tgz#79c2cb716ffb9b317bdb48f80d1985410179ecac"
+  integrity sha512-NtjezNMuxk9NsC1kGybZ8Y9eWKqAohug88xbtxCwb5n7MhDDgtKJuL7VYUk8s8Q9U4Mzolt026k3hD8eHtoUvQ==
+  dependencies:
+    abstract-leveldown "~6.1.1"
+    napi-macros "~2.0.0"
+    node-gyp-build "~4.1.0"
 
 rollup-plugin-string@^3.0.0:
   version "3.0.0"

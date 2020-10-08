@@ -1,5 +1,11 @@
 import { common, VMState } from '@neo-one/client-common';
-import { CallFlags, SnapshotName, TriggerType, Verifiable } from '@neo-one/node-core';
+import {
+  CallFlags,
+  SerializableContainer,
+  serializeScriptContainer,
+  SnapshotName,
+  TriggerType,
+} from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import { parseNotifications, parseStackItems } from './converters';
@@ -8,7 +14,7 @@ import { DispatcherFunc } from './types';
 
 export interface CreateOptions {
   readonly trigger: TriggerType;
-  readonly container?: Verifiable;
+  readonly container?: SerializableContainer;
   readonly snapshot?: SnapshotName;
   readonly gas: number;
   readonly testMode: boolean;
@@ -76,7 +82,7 @@ export class ApplicationEngine {
       method: 'create',
       args: {
         trigger,
-        container,
+        container: container ? serializeScriptContainer(container) : undefined,
         gas: common.fixed8FromDecimal(gas.toString()).toString(),
         snapshot,
         testMode,

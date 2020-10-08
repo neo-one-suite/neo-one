@@ -1,4 +1,4 @@
-import { AddChange, Change, ChangeSet, DeleteChange, ReadStorage } from '@neo-one/node-core';
+import { AddChange, Change, ChangeSet, DeleteChange, ReadMetadataStorage, ReadStorage } from '@neo-one/node-core';
 
 interface DeleteMetadataTrackedChanged {
   readonly type: 'delete';
@@ -261,3 +261,34 @@ export class ReadAddStorageCache<Key, Value> extends ReadStorageCache<Key, Value
     });
   }
 }
+
+// interface BaseReadMetadataStorageCacheOptions<Value> {
+//   readonly readStorage: () => ReadMetadataStorage<Value>;
+//   readonly name: string;
+//   readonly createAddChange: CreateAddChange<Value>;
+// }
+
+// class BaseReadMetadataStorageCache<Value> {
+//   public readonly get: ReadMetadataStorage<Value>['get'];
+//   public readonly tryGet: ReadMetadataStorage<Value>['tryGet'];
+//   public readonly tryGetValue: ReadMetadataStorage<Value>['tryGet'];
+//   public readonly name: string;
+//   public readonly mutableValues: { [key: string]: TrackedChange<Key, Value>}
+//   public constructor(options: BaseReadMetadataStorageCacheOptions<Value>) {
+
+//   }
+// }
+
+// export class ReadMetaDataStorageCache<Value> extends BaseReadMetadataStorageCache<Value> {
+
+// }
+
+// export class ReadUpdateMetadataStorageCache<Value> extends ReadMetaDataStorageCache<Value> {
+//   public readonly update: (value: Value) => Promise<void>;
+
+//   public constructor(options: ReadUpdateMetadataStorageCacheOptions<Value>) {
+//     super({
+//       readStorage:
+//     })
+//   }
+// }

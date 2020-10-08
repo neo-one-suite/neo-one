@@ -5,7 +5,7 @@ import {
   ContractMethodDescriptor,
   ExecuteScriptResult,
   NativeContainer,
-  SerializableWire,
+  SerializableContainer,
   TriggerType,
   Verifiable,
   VM,
@@ -44,7 +44,7 @@ const getApplicationEngineVerifyOptions = async (
   }
 
   // tslint:disable-next-line: possible-timing-attack TODO: look into this `possible-timing-attack` warning
-  if (hash !== scriptHash) {
+  if (!hash.equals(scriptHash)) {
     throw new WitnessVerifyError();
   }
 
@@ -56,7 +56,7 @@ const getApplicationEngineVerifyOptions = async (
 
 export const verifyWithApplicationEngine = (
   vm: VM,
-  verifiable: Verifiable & SerializableWire,
+  verifiable: Verifiable & SerializableContainer,
   verification: Buffer,
   index: number,
   gas: number,
@@ -64,7 +64,7 @@ export const verifyWithApplicationEngine = (
   init?: ContractMethodDescriptor,
 ): ExecuteScriptResult =>
   vm.withApplicationEngine(
-    { trigger: TriggerType.Verification, container: verifiable, snapshot: 'main', gas, testMode: true },
+    { trigger: TriggerType.Verification, container: verifiable, snapshot: 'clone', gas, testMode: true },
     (engine) => {
       engine.loadScript(verification, CallFlags.None);
       engine.setInstructionPointer(offset);
@@ -92,7 +92,7 @@ export const tryVerifyHash = async (
   hash: UInt160,
   index: number,
   storage: BlockchainStorage,
-  verifiable: Verifiable & SerializableWire,
+  verifiable: Verifiable & SerializableContainer,
   gas: number,
 ): Promise<ExecuteScriptResult> => {
   const { verification: verificationScript, scriptHash } = verifiable.witnesses[index];
@@ -112,7 +112,7 @@ export const tryVerifyHash = async (
 
 export const verifyWitnesses = async (
   vm: VM,
-  verifiable: Verifiable & SerializableWire,
+  verifiable: Verifiable & SerializableContainer,
   storage: BlockchainStorage,
   native: NativeContainer,
   gasIn: number,

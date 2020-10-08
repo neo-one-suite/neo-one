@@ -23,7 +23,9 @@ export interface SerializableJSON<TJSON> {
  * from `Blockchain` or `Settings`
  */
 
-export const createGetHashData = (serializeWire: () => Buffer, magic = 5195086) => () => {
+// mainnet: 5195086
+// testnet: 1951352142
+export const createGetHashData = (serializeWire: () => Buffer, magic = 1951352142) => () => {
   const writer = new BinaryWriter();
   writer.writeUInt32LE(magic);
   writer.writeBytes(serializeWire());

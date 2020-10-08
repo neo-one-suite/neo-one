@@ -33,7 +33,7 @@ export class HashIndexState implements SerializableWire {
 
   public readonly hash: UInt256;
   public readonly index: number;
-  public readonly serializeWire = createSerializeWire(this.serializeWireBase);
+  public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   private readonly sizeInternal = utils.lazy(() => IOHelper.sizeOfUInt256 + IOHelper.sizeOfUInt32LE);
 
