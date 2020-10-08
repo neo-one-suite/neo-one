@@ -10,6 +10,7 @@ import {
   Mempool,
   NativeContainer,
   RunEngineOptions,
+  serializeScriptContainer,
   Signers,
   Storage,
   Transaction,
@@ -403,7 +404,7 @@ export class Blockchain {
     return this.runEngineWrapper({
       script,
       snapshot: 'main',
-      container: signers === undefined ? undefined : { type: 'Signers', buffer: signers.serializeWire() },
+      container: signers === undefined ? undefined : signers,
       gas: 10,
     });
   }

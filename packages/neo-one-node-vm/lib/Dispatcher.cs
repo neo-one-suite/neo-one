@@ -5,8 +5,8 @@ using System.Dynamic;
 using System.Collections.Generic;
 using NEOONE.Storage;
 using Neo.Persistence;
-using Neo.SmartContract.Native;
 using Microsoft.Extensions.Configuration;
+using Neo.SmartContract.Native;
 
 namespace NEOONE
 {
@@ -128,7 +128,7 @@ namespace NEOONE
 
         private dynamic _test()
         {
-            return NativeContract.Policy.Hash.ToString();
+            return NativeContract.NEO.Hash.ToString();
         }
 
         private NEOONE.ReturnHelpers.ProtocolSettingsReturn _getConfig()

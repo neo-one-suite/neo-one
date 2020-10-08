@@ -68,7 +68,6 @@ export const createMain = ({
     //   [TransactionType.Publish]: clientCommon.fixed8FromDecimal(500),
     //   [TransactionType.Register]: clientCommon.fixed8FromDecimal(10000),
     // },
-
     // registerValidatorFee: clientCommon.fixed8FromDecimal(1000),
     messageMagic: 5195086,
     addressVersion: clientCommon.NEO_ADDRESS_VERSION,

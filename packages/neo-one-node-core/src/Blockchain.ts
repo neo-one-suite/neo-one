@@ -29,7 +29,7 @@ export interface Blockchain extends BlockchainStorage {
   readonly isPersistingBlock: boolean;
   readonly verifyOptions: VerifyOptions;
 
-  readonly persistBlock: (options: { readonly block: Block; readonly unsafe?: boolean }) => Promise<void>;
+  readonly persistBlock: (options: { readonly block: Block; readonly verify?: boolean }) => Promise<void>;
 
   readonly verifyWitnesses: VerifyWitnesses;
   readonly verifyBlock: (block: Block) => Promise<void>;

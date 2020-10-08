@@ -5,7 +5,7 @@ import {
   ContractMethodDescriptor,
   ExecuteScriptResult,
   NativeContainer,
-  SerializableWire,
+  SerializableContainer,
   TriggerType,
   Verifiable,
   VM,
@@ -43,8 +43,7 @@ const getApplicationEngineVerifyOptions = async (
     };
   }
 
-  // tslint:disable-next-line: possible-timing-attack TODO: look into this `possible-timing-attack` warning
-  if (hash !== scriptHash) {
+  if (!hash.equals(scriptHash)) {
     throw new WitnessVerifyError();
   }
 
@@ -56,7 +55,7 @@ const getApplicationEngineVerifyOptions = async (
 
 export const verifyWithApplicationEngine = (
   vm: VM,
-  verifiable: Verifiable & SerializableWire,
+  verifiable: Verifiable & SerializableContainer,
   verification: Buffer,
   index: number,
   gas: number,
@@ -64,24 +63,43 @@ export const verifyWithApplicationEngine = (
   init?: ContractMethodDescriptor,
 ): ExecuteScriptResult =>
   vm.withApplicationEngine(
-    { trigger: TriggerType.Verification, container: verifiable, snapshot: 'main', gas, testMode: true },
+    {
+      trigger: TriggerType.Verification,
+      container: verifiable,
+      snapshot: 'clone',
+      gas,
+      testMode: true,
+    },
     (engine) => {
+      // console.log('VWAE 0');
+      // console.log('loading verification script:');
+      // console.log(verification.toString('base64'));
       engine.loadScript(verification, CallFlags.None);
       engine.setInstructionPointer(offset);
       if (init !== undefined) {
         engine.setInstructionPointer(init.offset);
       }
+      // console.log('VWAE 03');
+      // console.log('loading invocation script:');
+      // console.log(verifiable.witnesses[index].invocation.toString('base64'));
       engine.loadScript(verifiable.witnesses[index].invocation, CallFlags.None);
 
+      // console.log('VWAE 04');
       const state = engine.execute();
       if (state === VMState.FAULT) {
         return { result: false, gas };
       }
 
+      // console.log('just before result stack');
       const stack = engine.resultStack;
+      // console.log('just after reuslt stack');
       if (stack.length !== 1 || !stack[0].getBoolean()) {
+        // console.log('VWPE 2');
+
         return { result: false, gas };
       }
+
+      // console.log('returning from VWPE 06');
 
       return { result: true, gas: gas - engine.gasConsumed };
     },
@@ -92,7 +110,7 @@ export const tryVerifyHash = async (
   hash: UInt160,
   index: number,
   storage: BlockchainStorage,
-  verifiable: Verifiable & SerializableWire,
+  verifiable: Verifiable & SerializableContainer,
   gas: number,
 ): Promise<ExecuteScriptResult> => {
   const { verification: verificationScript, scriptHash } = verifiable.witnesses[index];
@@ -103,16 +121,20 @@ export const tryVerifyHash = async (
       hash,
       scriptHash,
     );
+    // console.log('trying verifyHash w/ AppEngine');
 
     return verifyWithApplicationEngine(vm, verifiable, verification, index, gas, offset, init);
-  } catch {
+  } catch (e) {
+    // console.log('appengine threw');
+    // console.log(e);
+
     return { gas, result: false };
   }
 };
 
 export const verifyWitnesses = async (
   vm: VM,
-  verifiable: Verifiable & SerializableWire,
+  verifiable: Verifiable & SerializableContainer,
   storage: BlockchainStorage,
   native: NativeContainer,
   gasIn: number,

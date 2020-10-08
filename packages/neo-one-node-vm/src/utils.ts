@@ -47,6 +47,18 @@ export const validateProtocolSettings = (settings: ProtocolSettings) => {
     millisecondsPerBlock,
     memoryPoolMaxTransactions,
   } = settings;
+  if (
+    // tslint:disable: strict-type-predicates
+    magic == undefined &&
+    addressVersion == undefined &&
+    committeeMembersCount == undefined &&
+    validatorsCount == undefined &&
+    millisecondsPerBlock == undefined &&
+    memoryPoolMaxTransactions == undefined
+    // tslint:enable: strict-type-predicates
+  ) {
+    throw new Error('Cannot return an empty settings object');
+  }
   if (magic !== undefined && !numIsUint(magic)) {
     throw new InvalidUIntError(magic);
   }

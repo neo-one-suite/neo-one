@@ -15,8 +15,9 @@ import { Header } from './Header';
 import {
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
+  SerializableContainer,
+  SerializableContainerType,
   SerializableJSON,
-  SerializableWire,
   SerializeJSONContext,
 } from './Serializable';
 import { Transaction } from './transaction';
@@ -61,8 +62,16 @@ const getCombinedModels = (
   return init.concat(transactions);
 };
 
-export class Block extends BlockBase implements SerializableWire, SerializableJSON<BlockJSON> {
+export class Block extends BlockBase implements SerializableContainer, SerializableJSON<BlockJSON> {
+  public get header(): Header {
+    return this.headerInternal();
+  }
+
+  public get allHashes(): readonly UInt256[] {
+    return this.allHashesInternal();
+  }
   public static readonly MaxContentsPerBlock = utils.USHORT_MAX;
+
   public static readonly MaxTransactionsPerBlock = utils.USHORT_MAX.subn(1);
   // public static async calculateNetworkFee(context: FeeContext, transactions: readonly Transaction[]): Promise<BN> {
   //   const fees = await Promise.all(transactions.map(async (transaction) => transaction.getNetworkFee(context)));
@@ -111,6 +120,7 @@ export class Block extends BlockBase implements SerializableWire, SerializableJS
       reader: new BinaryReader(options.buffer),
     });
   }
+  public readonly type: SerializableContainerType = 'Block';
 
   public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   public readonly serializeUnsigned = createSerializeWire(super.serializeUnsignedBase.bind(this));
@@ -161,14 +171,6 @@ export class Block extends BlockBase implements SerializableWire, SerializableJS
 
     this.transactions = transactions;
     this.consensusData = consensusData;
-  }
-
-  public get header(): Header {
-    return this.headerInternal();
-  }
-
-  public get allHashes(): readonly UInt256[] {
-    return this.allHashesInternal();
   }
 
   public clone({

@@ -1,4 +1,5 @@
 // this should be an e2e actually but zoom zoom
+import { NativeContainer } from '@neo-one/node-native';
 import { main } from '@neo-one/node-neo-settings';
 import { storage as levelupStorage } from '@neo-one/node-storage-levelup';
 import { Dispatcher } from '@neo-one/node-vm';
@@ -19,10 +20,13 @@ describe('blockchain persist genesis block test', () => {
 
     const dispatcher = new Dispatcher({ levelDBPath });
 
+    const native = new NativeContainer(blockchainSettings);
+
     const blockchain = await Blockchain.create({
       settings: blockchainSettings,
       storage,
       vm: dispatcher,
+      native,
     });
 
     const genesis = await blockchain.blocks.tryGet({ hashOrIndex: genesisHash });

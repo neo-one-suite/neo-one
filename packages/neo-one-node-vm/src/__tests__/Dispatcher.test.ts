@@ -1,7 +1,9 @@
-import { ScriptBuilder } from '@neo-one/client-common';
+import { ScriptBuilder, VMState } from '@neo-one/client-common';
 import { TriggerType } from '@neo-one/node-core';
+import { test as createTest } from '@neo-one/node-neo-settings';
 import { ApplicationEngine } from '../ApplicationEngine';
 import { Dispatcher } from '../Dispatcher';
+import { blockchainSettingsToProtocolSettings } from '../utils';
 
 describe('Dispatcher Tests', () => {
   const dispatcher = new Dispatcher();
@@ -17,7 +19,7 @@ describe('Dispatcher Tests', () => {
         gas: 0,
       },
       (engine) => {
-        expect(engine.state).toEqual('BREAK');
+        expect(engine.state).toEqual(VMState.BREAK);
 
         const script = new ScriptBuilder();
         script.emitOp('NOP');
@@ -28,13 +30,13 @@ describe('Dispatcher Tests', () => {
       },
     );
 
-    expect(state).toEqual('HALT');
+    expect(state).toEqual(VMState.HALT);
 
     // check that the dispatcher reset the engine.
     const postEngine = new ApplicationEngine(dispatcher);
     expect(postEngine.resultStack).toEqual([]);
     expect(postEngine.gasConsumed).toEqual(0);
-    expect(postEngine.state).toEqual('BREAK');
+    expect(postEngine.state).toEqual(VMState.BREAK);
     expect(() => postEngine.execute()).toThrow();
   });
 
@@ -93,7 +95,16 @@ describe('Dispatcher Tests', () => {
     expect(result.memoryPoolMaxTransactions).toEqual(input.memoryPoolMaxTransactions);
   });
 
-  test('', () => {
+  test('Dispatcher returns config without initializing config', () => {
+    expect(dispatcher.getConfig()).toBeDefined();
+  });
+
+  test('Dispatcher initializes with testnet settings', () => {
+    const newDis = new Dispatcher({ protocolSettings: blockchainSettingsToProtocolSettings(createTest()) });
+    expect(newDis.getConfig()).toBeDefined();
+  });
+
+  test('Dispatcher initializes and returns expected test value', () => {
     console.log(dispatcher.test());
   });
 });

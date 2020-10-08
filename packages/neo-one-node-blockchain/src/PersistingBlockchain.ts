@@ -158,6 +158,9 @@ export class PersistingBlockchain {
   ): ApplicationExecuted {
     clone.addTransaction(transaction, index);
     clone.commit('transactions');
+    // console.log('SPENCER persistTransaction');
+    // console.log(transaction.hashHex);
+    // console.log(transaction.hash.toString('hex'));
 
     return this.vm.withApplicationEngine(
       {

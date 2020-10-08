@@ -1,10 +1,13 @@
 using System;
 using System.Linq;
+using System.IO;
 using Neo.Network.P2P.Payloads;
 using Neo.Persistence;
 using Neo.SmartContract;
 using Neo.VM;
 using Neo.VM.Types;
+using System.Threading;
+using System.Text;
 
 namespace NEOONE
 {
@@ -25,6 +28,55 @@ namespace NEOONE
             dispose_engine,
         }
 
+        private enum ContainerType
+        {
+            Block,
+            Transaction,
+            Signer,
+        }
+
+        private IVerifiable deserializeContainer(dynamic args)
+        {
+            byte[] serializedContainer = (byte[])args.buffer;
+            string typeIn = (string)args.type;
+            IVerifiable container;
+
+            ContainerType type;
+            if (Enum.TryParse<ContainerType>(typeIn, out type))
+            {
+
+                switch (type)
+                {
+                    case ContainerType.Block:
+                        container = new Block();
+                        break;
+                    case ContainerType.Transaction:
+                        container = new Transaction();
+                        break;
+                    // case ContainerType.Signer:
+                    // container = new Witness();
+                    default:
+                        throw new ArgumentException($"{typeIn} is not a valid container type");
+                }
+                using (MemoryStream ms = new MemoryStream(serializedContainer))
+                using (BinaryReader reader = new BinaryReader(ms))
+                {
+                    container.Deserialize(reader);
+                }
+                if (type == ContainerType.Block)
+                {
+                    // Console.WriteLine("Printing Block: ");
+                    // Console.WriteLine(((Block)container).ToJson());
+                    // Console.WriteLine(Encoding.UTF8.GetString(((Block)container).Witness.VerificationScript));
+                    // Console.WriteLine(Encoding.UTF8.GetString(((Block)container).Witness.InvocationScript));
+                    // Thread.Sleep(5000);
+                }
+                return container;
+            }
+
+            throw new ArgumentException($"{typeIn} is not a valid container type");
+        }
+
         private dynamic dispatchEngineMethod(EngineMethod method, dynamic args)
         {
             switch (method)
@@ -33,7 +85,16 @@ namespace NEOONE
                     TriggerType trigger = (TriggerType)args.trigger;
                     long gas = long.Parse((string)args.gas);
                     bool testMode = (bool)args.testMode;
-                    return this._create(trigger, null, this.selectSnapshot(args.snapshot, false), gas, testMode);
+                    IVerifiable container = null;
+                    if (args.container != null)
+                    {
+                        container = deserializeContainer(args.container);
+                    }
+                    // Console.WriteLine(((Transaction)container).Hash.ToString());
+                    // Thread.Sleep(5000);
+
+
+                    return this._create(trigger, container, this.selectSnapshot(args.snapshot, false), gas, testMode);
 
                 case EngineMethod.execute:
                     return this._execute();

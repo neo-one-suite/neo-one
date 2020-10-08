@@ -16,7 +16,14 @@ import {
 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import _ from 'lodash';
-import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableWire } from '../Serializable';
+import {
+  DeserializeWireBaseOptions,
+  DeserializeWireOptions,
+  SerializableContainer,
+  SerializableContainerType,
+  SerializableJSON,
+  SerializeJSONContext,
+} from '../Serializable';
 import { Signer } from '../Signer';
 import { TransactionVerificationContext } from '../TransactionVerificationContext';
 import { BinaryReader, utils } from '../utils';
@@ -160,6 +167,7 @@ export class Transaction extends TransactionModel<Attribute, Witness, Signer> im
       return attribute;
     });
   }
+  public readonly type: SerializableContainerType = 'Transaction';
 
   private readonly sizeInternal = utils.lazy(
     () =>

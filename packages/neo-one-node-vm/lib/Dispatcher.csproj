@@ -24,8 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="/Users/danielbyrne/neo/src/neo/neo.csproj" />
-    <ProjectReference Include="/Users/danielbyrne/neo-vm/src/neo-vm/neo-vm.csproj" />
+    <ProjectReference Include="/Users/spencercorwin/neo/src/neo/neo.csproj" />
+    <ProjectReference Include="/Users/spencercorwin/neo-vm/src/neo-vm/neo-vm.csproj" />
   </ItemGroup>
 
 </Project>

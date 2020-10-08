@@ -74,6 +74,7 @@ const getDeployNativeContracts = () => {
     version: 0,
     script,
     systemFee: new BN(0),
+    networkFee: new BN(0),
     signers: [
       new Signer({
         account: crypto.hash160(Buffer.from([Op.PUSH1])),
@@ -92,14 +93,19 @@ interface GetGenesisBlockOptions {
 const getGenesisBlock = ({ consensusAddress }: GetGenesisBlockOptions) =>
   new Block({
     previousHash: clientCommon.ZERO_UINT256,
-    timestamp: new BN(Date.UTC(2016, 7, 15, 15, 8, 21)),
+    timestamp: new BN(Date.UTC(2016, 6, 15, 15, 8, 21)),
     index: 0,
     nextConsensus: consensusAddress,
+    // nextConsensus: crypto.addressToScriptHash({
+    //   addressVersion: clientCommon.NEO_ADDRESS_VERSION,
+    //   address: 'NgPkjjLTNcQad99iRYeXRUuowE4gxLAnDL',
+    // }),
     witness: getDeployWitness(),
     consensusData: new ConsensusData({
       primaryIndex: 0,
       nonce: new BN(2083236893),
     }),
+    // merkleRoot: clientCommon.stringToUInt256('0x948aad0908a742eec79c52a0a4d5f95b1683a9adc3c2700211f425d49693878d'),
     transactions: [getDeployNativeContracts()],
   });
 
