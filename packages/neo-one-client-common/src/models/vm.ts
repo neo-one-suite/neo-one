@@ -1,5 +1,6 @@
 import { createHash } from 'crypto';
 import _ from 'lodash';
+import { InvalidFormatError } from '../common';
 import { InvalidSysCallError, InvalidVMByteCodeError, InvalidVMStateError } from '../errors';
 
 export enum Op {
@@ -309,12 +310,15 @@ export const getSysCallHash = (sysCall: SysCallName) => {
   return maybeHash;
 };
 
+// TODO: probably good to drop the implementation in node-core and just use this one
 export enum VMState {
   NONE = 0x00,
   HALT = 0x01,
   FAULT = 0x02,
   BREAK = 0x04,
 }
+
+export type VMStateJSON = keyof typeof VMState;
 
 const isVMState = (state: number): state is VMState =>
   // tslint:disable-next-line strict-type-predicates
@@ -326,6 +330,19 @@ export const assertVMState = (state: number): VMState => {
   }
   throw new InvalidVMStateError(state);
 };
+
+// tslint:disable-next-line: strict-type-predicates no-any
+export const isVMStateJSON = (state: string): state is VMStateJSON => VMState[state as any] !== undefined;
+
+export const assertVMStateJSON = (state: string): VMStateJSON => {
+  if (isVMStateJSON(state)) {
+    return state;
+  }
+
+  throw new InvalidFormatError();
+};
+
+export const toVMStateJSON = (state: VMState) => assertVMStateJSON(VMState[state]);
 
 export type SysCallHash = number & { readonly __uint256: undefined };
 

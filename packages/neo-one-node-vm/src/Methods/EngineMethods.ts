@@ -22,6 +22,6 @@ export interface EngineMethods extends DefaultMethods {
   readonly getnotifications: DispatchMethod<readonly NotificationReturn[]>;
   // methods
   readonly execute: DispatchMethod<keyof typeof VMState>;
-  readonly loadclonedcontext: DispatchMethod<boolean, { readonly position: number }>;
+  readonly setinstructionpointer: DispatchMethod<boolean, { readonly position: number }>;
   readonly loadscript: DispatchMethod<boolean, { readonly script: Buffer; readonly flag: CallFlags }>;
 }

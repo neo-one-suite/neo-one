@@ -115,6 +115,7 @@ export const startFullNode = async ({
 
     const node = new Node({
       blockchain,
+      native,
       options: nodeOptions,
       createNetwork: (options) =>
         new Network({

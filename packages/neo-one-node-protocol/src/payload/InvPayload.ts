@@ -1,10 +1,13 @@
 import { BinaryWriter, createSerializeWire, SerializableWire, SerializeWire, UInt256 } from '@neo-one/client-common';
 import { BinaryReader, DeserializeWireBaseOptions, DeserializeWireOptions } from '@neo-one/node-core';
+import { range } from 'lodash';
 import { assertInventoryType, InventoryType } from './InventoryType';
 export interface InvPayloadAdd {
   readonly type: InventoryType;
   readonly hashes: readonly UInt256[];
 }
+
+export const maxHashesCount = 500;
 
 export class InvPayload implements SerializableWire {
   public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): InvPayload {
@@ -18,6 +21,18 @@ export class InvPayload implements SerializableWire {
     return this.deserializeWireBase({
       context: options.context,
       reader: new BinaryReader(options.buffer),
+    });
+  }
+
+  public static createGroup(type: InventoryType, hashes: readonly UInt256[]) {
+    return range(0, hashes.length, maxHashesCount).map((idx) => {
+      const newEndIndex = idx + maxHashesCount;
+      const endIndex = newEndIndex > hashes.length ? hashes.length : newEndIndex;
+
+      return new InvPayload({
+        type,
+        hashes: hashes.slice(idx, endIndex),
+      });
     });
   }
 

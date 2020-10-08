@@ -1,4 +1,4 @@
-import { common } from '@neo-one/client-common';
+import { common, VMState } from '@neo-one/client-common';
 import { CallFlags, SnapshotName, TriggerType, Verifiable } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
@@ -26,9 +26,11 @@ export class ApplicationEngine {
   }
 
   public get trigger() {
-    return this.dispatch({
-      method: 'gettrigger',
-    });
+    return TriggerType[
+      this.dispatch({
+        method: 'gettrigger',
+      })
+    ];
   }
 
   public get gasConsumed() {
@@ -44,9 +46,11 @@ export class ApplicationEngine {
   }
 
   public get state() {
-    return this.dispatch({
-      method: 'getvmstate',
-    });
+    return VMState[
+      this.dispatch({
+        method: 'getvmstate',
+      })
+    ];
   }
 
   public get resultStack() {
@@ -81,9 +85,11 @@ export class ApplicationEngine {
   }
 
   public execute() {
-    return this.dispatch({
-      method: 'execute',
-    });
+    return VMState[
+      this.dispatch({
+        method: 'execute',
+      })
+    ];
   }
 
   public loadScript(script: Buffer, flag = CallFlags.All) {
@@ -102,9 +108,9 @@ export class ApplicationEngine {
     });
   }
 
-  public loadClonedContext(position: number) {
+  public setInstructionPointer(position: number) {
     return this.dispatch({
-      method: 'loadclonedcontext',
+      method: 'setinstructionpointer',
       args: { position },
     });
   }

@@ -1,14 +1,15 @@
+import { VMState } from '@neo-one/client-common';
 import { ApplicationEngine, CallReceipt } from '@neo-one/node-core';
 
-// TODO: we might need to visit this again if we implement error handling in the VM
+// TODO: implement the notification grabbing
 export const wrapExecuteScripts = (applicationEngine: ApplicationEngine): CallReceipt => {
   const result = applicationEngine.execute();
-  if (result === 'HALT') {
+  if (result === VMState.HALT) {
     return {
-      state: 'HALT',
+      state: result,
       gasConsumed: applicationEngine.gasConsumed,
       stack: applicationEngine.resultStack,
-      notifications: applicationEngine.notifications,
+      // notifications: applicationEngine.notifications,
     };
   }
 
@@ -16,6 +17,6 @@ export const wrapExecuteScripts = (applicationEngine: ApplicationEngine): CallRe
     state: result,
     gasConsumed: applicationEngine.gasConsumed,
     stack: applicationEngine.resultStack,
-    notifications: [],
+    // notifications: [],
   };
 };

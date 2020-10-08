@@ -1,4 +1,4 @@
-import { ECPoint, UInt160 } from '@neo-one/client-common';
+// import { ECPoint, UInt160 } from '@neo-one/client-common';
 // import { Action } from './action';
 // import { Asset } from './Asset';
 // import { Contract } from './Contract';
@@ -33,27 +33,20 @@ export function createDeserializeWire<T>(deserializeWireBase: DeserializeWireBas
     });
 }
 
-export interface SerializableInvocationData {
-  readonly asset: Asset | undefined;
-  readonly contracts: readonly Contract[];
-  readonly deletedContractHashes: readonly UInt160[];
-  readonly migratedContractHashes: ReadonlyArray<readonly [UInt160, UInt160]>;
-  readonly voteUpdates: ReadonlyArray<readonly [UInt160, ReadonlyArray<ECPoint>]>;
-  readonly result: InvocationResult;
-  readonly actions: readonly Action[];
-  readonly storageChanges: readonly StorageChange[];
-}
+// export interface SerializableInvocationData {
+//   readonly asset: Asset | undefined;
+//   readonly contracts: readonly Contract[];
+//   readonly deletedContractHashes: readonly UInt160[];
+//   readonly migratedContractHashes: ReadonlyArray<readonly [UInt160, UInt160]>;
+//   readonly voteUpdates: ReadonlyArray<readonly [UInt160, ReadonlyArray<ECPoint>]>;
+//   readonly result: InvocationResult;
+//   readonly actions: readonly Action[];
+//   readonly storageChanges: readonly StorageChange[];
+// }
 
 // TODO: what did all of these `TransactionData` helpers do? How should we re implement?
 export interface SerializeJSONContext {
   readonly addressVersion: number;
-  // readonly feeContext: FeeContext;
-  // readonly tryGetInvocationData: (
-  //   transaction: InvocationTransaction,
-  // ) => Promise<SerializableInvocationData | undefined>;
-  // readonly tryGetTransactionData: (transaction: Transaction) => Promise<TransactionData | undefined>;
-  // readonly getUnclaimed: (hash: UInt160) => Promise<readonly Input[]>;
-  // readonly getUnspent: (hash: UInt160) => Promise<readonly Input[]>;
 }
 
 export type SerializeJSON<TJSON> = (context: SerializeJSONContext) => TJSON | Promise<TJSON>;

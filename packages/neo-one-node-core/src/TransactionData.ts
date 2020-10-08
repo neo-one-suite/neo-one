@@ -30,7 +30,7 @@ export interface TransactionDataKey {
   readonly hash: UInt256;
 }
 
-export class TransactionData extends BaseState implements SerializableWire<TransactionData> {
+export class TransactionData extends BaseState implements SerializableWire {
   public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): TransactionData {
     const version = reader.readUInt8();
     const hash = reader.readUInt256();

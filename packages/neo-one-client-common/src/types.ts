@@ -254,11 +254,6 @@ export interface Header {
  */
 export interface ConsensusData {
   /**
-   * `ConsensusData` hash.
-   * TODO: should this be optional or no?
-   */
-  readonly hash: Hash256String;
-  /**
    * TODO: add description
    */
   readonly primaryIndex: number;
@@ -421,7 +416,7 @@ export interface Transfer {
    * may want to just change this to "NEO" | "GAS". Or, more likely, it can represent any "asset"
    * created by any NEP5 contract
    */
-  readonly asset: Hash256String;
+  readonly asset: AddressString;
   /**
    * Destination address.
    */
@@ -1766,9 +1761,9 @@ export interface ContractParameterDefinition {
    * The type of the contract parameter. See `ContractParameterType` for information on possible contract parameter types.
    */
   readonly type: ContractParameter['type'];
-  /**
-   * The name of the contract parameter.
-   */
+  // /**
+  //  * The name of the contract parameter.
+  //  */
   readonly name: string;
 }
 

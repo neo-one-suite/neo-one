@@ -18,8 +18,7 @@ import { UnsignedBlockError } from './errors';
 import { createSerializeWire, DeserializeWireBaseOptions, SerializeJSONContext, SerializeWire } from './Serializable';
 import { BlockchainStorage } from './Storage';
 import { utils } from './utils';
-import { Verifiable, VerifyWitnesses } from './Verifiable';
-import { VM } from './vm';
+import { Verifiable, VerifyOptions } from './Verifiable';
 import { Witness } from './Witness';
 
 export interface BlockBaseAdd {
@@ -81,20 +80,22 @@ export abstract class BlockBase implements EquatableKey, SerializableWire, Verif
   public readonly timestamp: BN;
   public readonly index: number;
   public readonly nextConsensus: UInt160;
-  public readonly getScriptHashesForVerifying = utils.lazyAsync(async ({ blocks }: BlockchainStorage) => {
-    if (this.previousHash === common.ZERO_UINT256) {
-      return [this.witness.scriptHash];
-    }
+  public readonly getScriptHashesForVerifying = utils.lazyAsync(
+    async (context: { readonly storage: BlockchainStorage }) => {
+      if (this.previousHash === common.ZERO_UINT256) {
+        return [this.witness.scriptHash];
+      }
 
-    const prevBlock = await blocks.tryGet({ hashOrIndex: this.previousHash });
-    const prevHeader = prevBlock?.header;
-    if (prevHeader === undefined) {
-      // TODO: implement this as a makeError InvalidStorageHeaderFetch
-      throw new Error(`previous header hash ${this.previousHash} did not return a valid Header from storage`);
-    }
+      const prevBlock = await context.storage.blocks.tryGet({ hashOrIndex: this.previousHash });
+      const prevHeader = prevBlock?.header;
+      if (prevHeader === undefined) {
+        // TODO: implement this as a makeError InvalidStorageHeaderFetch
+        throw new Error(`previous header hash ${this.previousHash} did not return a valid Header from storage`);
+      }
 
-    return [prevHeader.nextConsensus];
-  });
+      return [prevHeader.nextConsensus];
+    },
+  );
   // tslint:disable-next-line no-any
   public readonly equals: Equals = utils.equals(this.constructor as any, this, (other: any) =>
     common.uInt256Equal(this.hash, other.hash),
@@ -197,12 +198,12 @@ export abstract class BlockBase implements EquatableKey, SerializableWire, Verif
         scriptHash: this.nextConsensus,
       }),
 
-      witnesses: [this.witness.serializeJSON(context)],
+      witnesses: [this.witness.serializeJSON()],
       // confirmations: [] TODO: this is a property we used to use, do we still need?
     };
   }
 
-  public async verify(vm: VM, storage: BlockchainStorage, verifyWitnesses: VerifyWitnesses) {
+  public async verify({ vm, storage, verifyWitnesses, native }: VerifyOptions): Promise<boolean> {
     const prevBlock = await storage.blocks.tryGet({ hashOrIndex: this.previousHash });
     const prevHeader = prevBlock?.header;
     if (prevHeader === undefined) {
@@ -217,7 +218,7 @@ export abstract class BlockBase implements EquatableKey, SerializableWire, Verif
       return false;
     }
 
-    return verifyWitnesses(vm, this, storage, 1);
+    return verifyWitnesses(vm, this, storage, native, 1);
   }
 
   protected readonly sizeExclusive: () => number = () => 0;

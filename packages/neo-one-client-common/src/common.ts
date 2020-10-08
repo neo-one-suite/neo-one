@@ -219,6 +219,12 @@ const FIVE_THOUSAND_FIXED8 = fixed8FromDecimal(5000);
 const TEN_THOUSAND_FIXED8 = fixed8FromDecimal(10000);
 const ONE_HUNDRED_MILLION_FIXED8 = fixed8FromDecimal(100000000);
 
+const nativeHashes = {
+  GAS: hexToUInt160('bcaf41d684c7d4ad6ee0d99da9707b9d1f0c8e66'),
+  NEO: hexToUInt160('25059ecb4878d3a875f91c51ceded330d4575fde'),
+  Policy: hexToUInt160('e9ff4ca7cc252e1dfddb26315869cd79505906ce'),
+};
+
 export const common = {
   D8,
   NEO_ADDRESS_VERSION: 0x35,
@@ -244,10 +250,6 @@ export const common = {
   FIVE_THOUSAND_FIXED8,
   TEN_THOUSAND_FIXED8,
   ONE_HUNDRED_MILLION_FIXED8,
-  NEO_ASSET_HASH: '0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b',
-  GAS_ASSET_HASH: '0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7',
-  NEO_CONTRACT_SCRIPT_HASH: '0x43cf98eddbe047e198a3e5d57006311442a0ca15',
-  GAS_CONTRACT_SCRIPT_HASH: '0xa1760976db5fcdfab2a9930e8f6ce875b2d18225',
   uInt160ToBuffer,
   add0x,
   strip0x,
@@ -294,4 +296,5 @@ export const common = {
   fixedToDecimal,
   reverse,
   isWildcard,
+  nativeHashes,
 };

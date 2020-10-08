@@ -1,4 +1,4 @@
-import { common, createSerializeWire, crypto, IOHelper, UInt160 } from '@neo-one/client-common';
+import { common, createSerializeWire, crypto, IOHelper, JSONHelper, UInt160 } from '@neo-one/client-common';
 import { ContractStateModel } from '@neo-one/client-full-common';
 import { ContractManifest } from './manifest';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from './Serializable';
@@ -54,5 +54,14 @@ export class ContractState extends ContractStateModel<ContractManifest> {
       script: this.script,
       manifest: this.manifest,
     });
+  }
+
+  public serializeJSON() {
+    return {
+      id: this.id,
+      hash: JSONHelper.writeUInt160(this.scriptHash),
+      script: JSONHelper.writeBuffer(this.script),
+      manifest: this.manifest.serializeJSON(),
+    };
   }
 }

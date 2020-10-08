@@ -1,4 +1,4 @@
-import { JSONObject } from '@neo-one/utils';
+import { JSONArray, JSONObject } from '@neo-one/utils';
 import { ContractParameterTypeModel } from './ContractParameterTypeModel';
 import { StorageFlagsModel } from './StorageFlagsModel';
 import { AttributeTypeModel } from './transaction/attribute/AttributeTypeModel';
@@ -257,7 +257,7 @@ export interface TransactionJSON {
   readonly size: number;
   readonly version: number;
   readonly nonce: number;
-  readonly sender: string;
+  readonly sender?: string;
   readonly sysfee: string;
   readonly netfee: string;
   readonly validuntilblock: number;
@@ -269,6 +269,7 @@ export interface TransactionJSON {
   readonly data?: TransactionReceiptJSON;
 }
 
+// TODO: not going to use this right now because still copying C# code
 export interface TransactionWithInvocationDataJSON extends TransactionJSON {
   // TODO: this may be off slightly. Not sure where script and gas belong. They may belong in TransactionJSON
   readonly script: string;
@@ -376,7 +377,7 @@ export interface ConsensusDataJSON {
 export interface HeaderJSON extends BlockBaseJSON {}
 
 export interface BlockJSON extends BlockBaseJSON {
-  readonly tx: readonly TransactionWithInvocationDataJSON[];
+  readonly tx: readonly TransactionJSON[];
   readonly consensusdata?: ConsensusDataJSON;
 }
 
@@ -389,9 +390,16 @@ export interface NetworkSettingsJSON {
   readonly issueGASFee: string;
 }
 
+// export interface CallReceiptJSON {
+//   readonly result: InvocationResultJSON;
+//   readonly actions: readonly ActionJSON[];
+// }
+
 export interface CallReceiptJSON {
-  readonly result: InvocationResultJSON;
-  readonly actions: readonly ActionJSON[];
+  readonly script: string;
+  readonly state: keyof typeof VMState;
+  readonly gasConsumed: string;
+  readonly stack: JSONArray | string;
 }
 
 export interface VerifyScriptResultJSON {

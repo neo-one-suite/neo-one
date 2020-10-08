@@ -235,61 +235,57 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     );
   }
 
-  protected async executeInvokeClaim({
-    contract,
-    unclaimedAmount,
-    attributes,
-    method,
-    params,
-    paramsZipped,
-    from,
-    sourceMaps,
-  }: {
-    readonly contract: AddressString;
-    readonly unclaimedAmount: BigNumber;
-    readonly attributes: readonly Attribute[];
-    readonly method: string;
-    readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
-    readonly paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>;
-    readonly from: UserAccountID;
-    readonly sourceMaps?: SourceMaps;
-  }): Promise<TransactionResult> {
-    const script = new ScriptBuilder()
-      .emitSysCall('System.Contract.Call', common.GAS_CONTRACT_SCRIPT_HASH, 'transfer', [
-        addressToScriptHash(contract),
-        common.GAS_CONTRACT_SCRIPT_HASH,
-        unclaimedAmount.toString(),
-      ])
-      .build();
+  // protected async executeInvokeClaim({
+  //   contract,
+  //   unclaimedAmount,
+  //   attributes,
+  //   method,
+  //   params,
+  //   paramsZipped,
+  //   from,
+  //   sourceMaps,
+  // }: {
+  //   readonly contract: AddressString;
+  //   readonly unclaimedAmount: BigNumber;
+  //   readonly attributes: readonly Attribute[];
+  //   readonly method: string;
+  //   readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
+  //   readonly paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>;
+  //   readonly from: UserAccountID;
+  //   readonly sourceMaps?: SourceMaps;
+  // }): Promise<TransactionResult> {
+  //   const builder = new ScriptBuilder();
+  //   builder.emitSysCall()
+  //     .emitSysCall('System.Contract.Call', common.GAS_CONTRACT_SCRIPT_HASH, 'transfer', [
+  //       addressToScriptHash(contract),
+  //       common.GAS_CONTRACT_SCRIPT_HASH,
+  //       unclaimedAmount.toString(),
+  //     ])
+  //     .build();
 
-    const { gas } = await this.getSystemFee({ from, script, attributes });
+  //   const { gas } = await this.getSystemFee({ from, script, attributes });
 
-    const transaction = new TransactionModel({
-      systemFee: utils.bigNumberToBN(gas, 8),
-      // Since the contract address is an input, we must add a witness for it.
-      witnesses: this.getInvokeScripts(method, params, true),
-      script,
-    });
+  //   const transaction = new TransactionModel({
+  //     systemFee: utils.bigNumberToBN(gas, 8),
+  //     // Since the contract address is an input, we must add a witness for it.
+  //     witnesses: this.getInvokeScripts(method, params, true),
+  //     script,
+  //   });
 
-    return this.sendTransaction<Transaction>({
-      from,
-      transaction,
-      onConfirm: async ({ receipt }) => receipt,
-      sourceMaps,
-    });
-  }
+  //   return this.sendTransaction<Transaction>({
+  //     from,
+  //     transaction,
+  //     onConfirm: async ({ receipt }) => receipt,
+  //     sourceMaps,
+  //   });
+  // }
 
   protected async executeTransfer(
-    // TODO: how to represent transfer objects now?
     transfers: readonly Transfer[],
     from: UserAccountID,
     attributes: readonly Attribute[],
     networkFee: BigNumber,
   ): Promise<TransactionResult> {
-    if (this.keystore.byteLimit === undefined) {
-      throw new NothingToTransferError();
-    }
-    // TODO: need to rebuild transfer script
     const sb = new ScriptBuilder();
     transfers.forEach((transfer) => {
       sb.emitSysCall(
@@ -301,7 +297,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     });
     const script = sb.build();
 
-    // TODO: can probably cache certain scripts if they call the same method on the same contract
     const { gas } = await this.getSystemFee({ from, attributes, script });
 
     const transaction = new TransactionModel({
@@ -319,16 +314,9 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     });
   }
 
-  protected async executeClaim(
-    from: UserAccountID,
-    attributes: readonly Attribute[] = [],
-    networkFee: BigNumber,
-  ): Promise<TransactionResult> {
-    const unclaimedAmount = await this.provider.getUnclaimed(from.network, from.address);
-    if (unclaimedAmount.eq(new BigNumber('0'))) {
-      throw new NothingToClaimError(from);
-    }
-
+  protected async executeClaim(from: UserAccountID, networkFee: BigNumber): Promise<TransactionResult> {
+    const toAccount = this.getUserAccount(from);
+    const toHash = crypto.toScriptHash(crypto.createSignatureRedeemScript(common.stringToECPoint(toAccount.publicKey)));
     const script = new ScriptBuilder()
       .emitSysCall('System.Contract.Call', common.GAS_CONTRACT_SCRIPT_HASH, 'transfer', [
         addressToScriptHash(from.address),

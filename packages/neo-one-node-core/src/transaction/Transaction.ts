@@ -4,33 +4,47 @@ import {
   InvalidFormatError,
   IOHelper,
   JSONHelper,
+  MAX_TRANSACTION_SIZE,
+  MAX_VALID_UNTIL_BLOCK_INCREMENT,
   scriptHashToAddress,
   TransactionJSON,
   TransactionModel,
   TransactionModelAdd,
-  TransactionWithInvocationDataJSON,
   UInt160,
+  VerifyResultModel,
+  VMStateJSON,
 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import _ from 'lodash';
-import {
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  SerializableJSON,
-  SerializableWire,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableWire } from '../Serializable';
 import { Signer } from '../Signer';
+import { TransactionVerificationContext } from '../TransactionVerificationContext';
 import { BinaryReader, utils } from '../utils';
+import { Verifiable, VerifyOptions } from '../Verifiable';
 import { Witness } from '../Witness';
 import { Attribute, deserializeAttribute } from './attributes';
 
-export type TransactionAddUnsigned = Omit<TransactionModelAdd<Attribute, Witness, Signer>, 'witnesses'>;
 export type TransactionAdd = TransactionModelAdd<Attribute, Witness, Signer>;
+export type TransactionAddUnsigned = Omit<TransactionModelAdd<Attribute, Witness, Signer>, 'witnesses'>;
 
-export class Transaction
-  extends TransactionModel<Attribute, Witness, Signer>
-  implements SerializableWire, SerializableJSON<TransactionJSON> {
+export interface VerboseData {
+  readonly blockhash: string;
+  readonly confirmations: number;
+  readonly blocktime: string;
+  readonly vmstate: VMStateJSON;
+}
+
+export class Transaction extends TransactionModel<Attribute, Witness, Signer> implements SerializableWire, Verifiable {
+  public static readonly headerSize =
+    IOHelper.sizeOfUInt8 +
+    IOHelper.sizeOfUInt32LE +
+    IOHelper.sizeOfUInt64LE +
+    IOHelper.sizeOfUInt64LE +
+    IOHelper.sizeOfUInt32LE;
+
+  public get size() {
+    return this.sizeInternal();
+  }
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Transaction {
     const {
       version,
@@ -147,57 +161,127 @@ export class Transaction
     });
   }
 
-  private readonly headerSizeInternal = utils.lazy(
-    () =>
-      IOHelper.sizeOfUInt8 +
-      IOHelper.sizeOfUInt32LE +
-      IOHelper.sizeOfUInt64LE +
-      IOHelper.sizeOfUInt64LE +
-      IOHelper.sizeOfUInt32LE,
-  );
-
   private readonly sizeInternal = utils.lazy(
     () =>
-      this.headerSize +
+      Transaction.headerSize +
       IOHelper.sizeOfArray(this.signers, (signer) => signer.size) +
       IOHelper.sizeOfArray(this.attributes, (attr) => attr.size) +
       IOHelper.sizeOfVarBytesLE(this.script) +
       IOHelper.sizeOfArray(this.witnesses, (witness) => witness.size),
   );
 
-  public get headerSize() {
-    return this.headerSizeInternal();
-  }
-
-  public get size() {
-    return this.sizeInternal();
-  }
-
   public getScriptHashesForVerifying(): readonly UInt160[] {
     return this.signers.map((signer) => signer.account);
   }
 
-  public serializeJSON(options: SerializeJSONContext): TransactionJSON {
+  public async verifyForEachBlock(
+    verifyOptions: VerifyOptions,
+    transactionContext?: TransactionVerificationContext,
+  ): Promise<VerifyResultModel> {
+    const { storage, native } = verifyOptions;
+    const { index } = await storage.blockHashIndex.get();
+    if (this.validUntilBlock < index || this.validUntilBlock > index + MAX_VALID_UNTIL_BLOCK_INCREMENT) {
+      return VerifyResultModel.Expired;
+    }
+
+    const hashes = this.getScriptHashesForVerifying();
+    const setHashes = new Set(hashes);
+    const blockedAccounts = await native.Policy.getBlockedAccounts(storage);
+    if (blockedAccounts.some((account) => setHashes.has(account))) {
+      return VerifyResultModel.PolicyFail;
+    }
+
+    const maxBlockSysFee = await native.Policy.getMaxBlockSystemFee(storage);
+    const sysFee = this.systemFee;
+    if (sysFee.gtn(maxBlockSysFee)) {
+      return VerifyResultModel.PolicyFail;
+    }
+
+    const checkTxPromise = transactionContext?.checkTransaction(this, storage) ?? Promise.resolve(true);
+    const checkTx = await checkTxPromise;
+    if (!checkTx) {
+      return VerifyResultModel.InsufficientFunds;
+    }
+
+    const attrVerifications = await Promise.all(this.attributes.map(async (attr) => attr.verify(verifyOptions, this)));
+    if (attrVerifications.some((verification) => !verification)) {
+      return VerifyResultModel.Invalid;
+    }
+
+    if (hashes.length !== this.witnesses.length) {
+      return VerifyResultModel.Invalid;
+    }
+
+    const verifyHashes = await Promise.all(
+      hashes.map(async (hash, idx) => {
+        if (this.witnesses[idx].verification.length > 0) {
+          return true;
+        }
+        const state = await storage.contracts.tryGet(hash);
+
+        return state !== undefined;
+      }),
+    );
+
+    if (verifyHashes.some((value) => !value)) {
+      return VerifyResultModel.Invalid;
+    }
+
+    return VerifyResultModel.Succeed;
+  }
+
+  public async verify(
+    verifyOptions: VerifyOptions,
+    verifyContext?: TransactionVerificationContext,
+  ): Promise<VerifyResultModel> {
+    const { native, storage, verifyWitnesses, vm } = verifyOptions;
+    const result = await this.verifyForEachBlock(verifyOptions, verifyContext);
+    if (result !== VerifyResultModel.Succeed) {
+      return result;
+    }
+    if (this.size > MAX_TRANSACTION_SIZE) {
+      return VerifyResultModel.Invalid;
+    }
+    const feePerByte = await native.Policy.getFeePerByte(storage);
+    const netFee = this.networkFee.subn(this.size * feePerByte);
+    if (netFee.ltn(0)) {
+      return VerifyResultModel.InsufficientFunds;
+    }
+
+    const witnessVerify = await verifyWitnesses(vm, this, storage, native, common.fixed8ToDecimal(netFee).toNumber());
+    if (!witnessVerify) {
+      return VerifyResultModel.Invalid;
+    }
+
+    return VerifyResultModel.Succeed;
+  }
+
+  public serializeJSON(): TransactionJSON {
     return {
       hash: JSONHelper.writeUInt256(this.hash),
       size: this.size,
       version: this.version,
-      nonce: this.nonce ? this.nonce : 0,
+      nonce: this.nonce,
       sender: this.sender ? scriptHashToAddress(common.uInt160ToString(this.sender)) : undefined,
       sysfee: JSONHelper.writeUInt64LE(this.systemFee),
-      netfee: JSONHelper.writeUInt64LE(this.networkFee),
-      validuntilblock: this.validUntilBlock ? this.validUntilBlock : 0,
-      signers: this.signers.map((signer) => signer.serializeJSON(options)),
-      attributes: this.attributes.map((attr) => attr.serializeJSON(options)),
+      netfee: JSONHelper.writeUInt64(this.networkFee),
+      validuntilblock: this.validUntilBlock,
+      signers: this.signers.map((signer) => signer.serializeJSON()),
+      attributes: this.attributes.map((attr) => attr.serializeJSON()),
       script: JSONHelper.writeBuffer(this.script),
-      witnesses: this.witnesses.map((witness) => witness.serializeJSON(options)),
+      witnesses: this.witnesses.map((witness) => witness.serializeJSON()),
     };
   }
 
-  public async serializeJSONWithInvocationData(
-    _options: SerializeJSONContext,
-  ): Promise<TransactionWithInvocationDataJSON> {
-    // TODO: Implement method similar to old InvocationTransaction.serializeJSON(), which includes extra invocation data
-    return Promise.reject();
+  public serializeJSONWithInvocationData(data: VerboseData) {
+    const base = this.serializeJSON();
+
+    return {
+      ...base,
+      blockhash: data.blockhash,
+      confirmations: data.confirmations,
+      blocktime: data.blocktime,
+      vmstate: data.vmstate,
+    };
   }
 }

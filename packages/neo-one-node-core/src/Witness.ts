@@ -1,11 +1,6 @@
 import { crypto, IOHelper, JSONHelper, WitnessJSON, WitnessModel } from '@neo-one/client-common';
 import { WITNESS_INVOCATION_SIZE, WITNESS_VERIFICATION_SIZE } from './constants';
-import {
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  SerializableJSON,
-  SerializeJSONContext,
-} from './Serializable';
+import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableJSON } from './Serializable';
 import { BinaryReader, utils } from './utils';
 
 export interface WitnessAdd {
@@ -45,7 +40,7 @@ export class Witness extends WitnessModel implements SerializableJSON<WitnessJSO
     return this.sizeInternal();
   }
 
-  public serializeJSON(_context: SerializeJSONContext): WitnessJSON {
+  public serializeJSON(): WitnessJSON {
     return {
       invocation: JSONHelper.writeBuffer(this.invocation),
       verification: JSONHelper.writeBuffer(this.verification),

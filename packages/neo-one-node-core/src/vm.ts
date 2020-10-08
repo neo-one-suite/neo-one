@@ -1,9 +1,8 @@
-import { SerializableWire, UInt160, UInt256, VMState } from '@neo-one/client-common';
+import { UInt160, UInt256, VMState } from '@neo-one/client-common';
 import { Block } from './Block';
 import { CallFlags } from './CallFlags';
 import { StackItem } from './StackItems';
 import { Transaction } from './transaction';
-import { Verifiable } from './Verifiable';
 
 export enum TriggerType {
   Verification = 0x00,
@@ -11,39 +10,56 @@ export enum TriggerType {
   Application = 0x10,
 }
 
+export type ScriptContainerType = 'Signers' | 'Transaction' | 'Block';
+
+export interface SerializedScriptContainer {
+  readonly type: ScriptContainerType;
+  readonly buffer: Buffer;
+}
+
 export interface Notification {
-  readonly scriptContainer: Buffer;
+  readonly scriptContainer: SerializedScriptContainer;
   readonly scriptHash: UInt160;
   readonly eventName: string;
   readonly state: readonly StackItem[];
 }
 
 export interface CallReceipt {
-  readonly state: keyof typeof VMState;
+  readonly state: VMState;
   readonly gasConsumed: number;
   readonly stack: readonly StackItem[];
-  readonly notifications: readonly Notification[];
+  // readonly notifications: readonly Notification[];
 }
 
 export type SnapshotName = 'main' | 'clone';
 
 export interface ApplicationEngineOptions {
   readonly trigger: TriggerType;
-  readonly container?: Verifiable & SerializableWire;
+  readonly container?: SerializedScriptContainer;
   readonly snapshot?: SnapshotName;
   readonly gas: number;
   readonly testMode: boolean;
 }
 
+export interface RunEngineOptions {
+  readonly script: Buffer;
+  readonly snapshot: SnapshotName;
+  readonly container?: SerializedScriptContainer;
+  readonly persistingBlock?: Block;
+  readonly offset?: number;
+  readonly testMode?: boolean;
+  readonly gas?: number;
+}
+
 export interface ApplicationEngine {
-  readonly trigger: keyof typeof TriggerType;
+  readonly trigger: TriggerType;
   readonly gasConsumed: number;
   readonly resultStack: readonly StackItem[];
-  readonly state: keyof typeof VMState;
+  readonly state: VMState;
   readonly notifications: readonly Notification[];
   readonly loadScript: (script: Buffer, flag?: CallFlags) => boolean;
-  readonly execute: () => keyof typeof VMState;
-  readonly loadClonedContext: (position: number) => boolean;
+  readonly execute: () => VMState;
+  readonly setInstructionPointer: (position: number) => boolean;
 }
 
 export type SnapshotPartial = 'blocks' | 'transactions';
@@ -57,6 +73,7 @@ export interface SnapshotHandler {
   readonly changeBlockHashIndex: (index: number, hash: UInt256) => boolean;
   readonly changeHeaderHashIndex: (index: number, hash: UInt256) => boolean;
   readonly setPersistingBlock: (block: Block) => boolean;
+  readonly hasPersistingBlock: () => boolean;
   // TODO: type the returning changeSet
   readonly getChangeSet: () => any;
   readonly clone: () => void;
@@ -64,8 +81,8 @@ export interface SnapshotHandler {
 
 export interface ApplicationExecuted {
   readonly transaction?: Transaction;
-  readonly trigger: keyof typeof TriggerType;
-  readonly state: keyof typeof VMState;
+  readonly trigger: TriggerType;
+  readonly state: VMState;
   readonly gasConsumed: number;
   readonly stack: readonly StackItem[];
   // readonly notifications: readonly Notification[];

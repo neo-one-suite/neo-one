@@ -7,6 +7,8 @@ import {
   toJSONAttributeType,
 } from '@neo-one/client-common';
 import { DeserializeWireBaseOptions, SerializableJSON, SerializeJSONContext } from '../../Serializable';
+import { VerifyOptions } from '../../Verifiable';
+import { Transaction } from '../Transaction';
 
 export const createDeserializeAttributeType = (type: AttributeTypeModel) => (options: DeserializeWireBaseOptions) => {
   const { reader } = options;
@@ -19,14 +21,18 @@ export const createDeserializeAttributeType = (type: AttributeTypeModel) => (opt
 };
 
 export abstract class AttributeBase extends AttributeBaseModel implements SerializableJSON<AttributeJSON> {
-  public serializeJSON(_context: SerializeJSONContext): AttributeJSON {
+  public get size() {
+    return IOHelper.sizeOfUInt8 + this.sizeExclusive();
+  }
+  public serializeJSON(): AttributeJSON {
     return {
       type: toJSONAttributeType(this.type),
     };
   }
 
-  public get size() {
-    return IOHelper.sizeOfUInt8 + this.sizeExclusive();
+  // Must not be implemented in C# land yet?
+  public async verify(_verifyOptions: VerifyOptions, _tx: Transaction) {
+    return Promise.resolve(true);
   }
 
   protected sizeExclusive(): number {

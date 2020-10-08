@@ -1,7 +1,7 @@
 import { BN } from 'bn.js';
 import { keys } from '../../../__data__/keys';
 import { BinaryWriter } from '../../../BinaryWriter';
-import { SignerModel, TransactionModel, TransactionModelAdd } from '../../../models';
+import { SignerModel, TransactionModel, TransactionModelAdd, WitnessScopeModel } from '../../../models';
 
 const testSender = keys[0].scriptHash;
 const testPrivKey = keys[1].privateKey;
@@ -12,10 +12,9 @@ const optionsBuilder = ({
   systemFee = new BN(0),
   networkFee = new BN(0),
   validUntilBlock = 100000,
-  sender = testSender,
   attributes = [],
   witnesses = [],
-  signers = [],
+  signers = [new SignerModel({ account: testSender, scopes: WitnessScopeModel.None })],
   hash,
   script = Buffer.from([0x10]),
 }: Partial<TransactionModelAdd>): TransactionModelAdd => ({
@@ -24,7 +23,6 @@ const optionsBuilder = ({
   systemFee,
   networkFee,
   validUntilBlock,
-  sender,
   attributes,
   witnesses,
   signers,
@@ -34,7 +32,6 @@ const optionsBuilder = ({
 
 // tslint:disable-next-line:no-let
 let testWriter: BinaryWriter = new BinaryWriter();
-
 const resetWriter = () => {
   testWriter = new BinaryWriter();
 };
@@ -55,7 +52,7 @@ describe('Transaction Model', () => {
   test('Serialize Base - With Cosigners', () => {
     const signer = new SignerModel({
       account: testSender,
-      scopes: 'Global',
+      scopes: WitnessScopeModel.Global,
     });
 
     const cosignerTransaction = new TransactionModel({

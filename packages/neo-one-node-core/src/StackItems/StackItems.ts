@@ -1,3 +1,5 @@
+import { InvalidFormatError, JSONHelper } from '@neo-one/client-common';
+import { JSONObject } from '@neo-one/utils';
 import { InvalidPrimitiveStackItemError, InvalidStackItemError, InvalidStackItemTypeError } from '../errors';
 import { ArrayStackItem } from './ArrayStackItem';
 import { BooleanStackItem } from './BooleanStackItem';
@@ -120,4 +122,63 @@ export const assertPrimitiveStackItem = (item: any): PrimitiveStackItem => {
   }
 
   throw new InvalidPrimitiveStackItemError();
+};
+
+export const stackItemToJSON = (item: StackItem, context?: Set<StackItem>): JSONObject => {
+  const type = StackItemType[item.type];
+  switch (item.type) {
+    case StackItemType.Array:
+      const array = assertArrayStackItem(item);
+      const arrayContext = context ?? new Set<StackItem>();
+      if (arrayContext.has(array)) {
+        throw new InvalidFormatError();
+      }
+      arrayContext.add(array);
+
+      return { type, value: array.array.map((subItem) => stackItemToJSON(subItem, arrayContext)) };
+
+    case StackItemType.Boolean:
+      const booleanItem = assertBooleanStackItem(item);
+
+      return { type, value: booleanItem.getBoolean() };
+
+    case StackItemType.Buffer:
+      const buffer = assertBufferStackItem(item);
+
+      return { type, value: JSONHelper.writeBuffer(buffer.getBuffer()) };
+
+    case StackItemType.ByteString:
+      const byteString = assertByteStringStackItem(item);
+
+      return { type, value: JSONHelper.writeBuffer(byteString.getBuffer()) };
+
+    case StackItemType.Integer:
+      const integer = assertIntegerStackItem(item);
+
+      return { type, value: integer.getInteger().toString() };
+
+    case StackItemType.Map:
+      const map = assertMapStackItem(item);
+      const mapContext = context ?? new Set<StackItem>();
+      if (mapContext.has(map)) {
+        throw new InvalidFormatError();
+      }
+      mapContext.add(map);
+
+      return {
+        type,
+        value: Array.from(map.dictionary.entries()).map(([key, value]) => ({
+          key: stackItemToJSON(key, mapContext),
+          value: stackItemToJSON(value, mapContext),
+        })),
+      };
+
+    case StackItemType.Pointer:
+      const pointer = assertPointerStackItem(item);
+
+      return { type, value: pointer.position };
+
+    default:
+      throw new InvalidFormatError(`didn't expect stack item of type: ${type} on return`);
+  }
 };

@@ -410,13 +410,11 @@ export class Client<
    *
    * Accepts either a single transfer or an array of transfer objects.
    *
-   * Note that we use an `InvocationTransaction` for transfers in order to reduce the overall bundle size since they can be used equivalently to `ContractTransaction`s.
-   *
-   * @returns `Promise<TransactionResult<TransactionReceipt, InvocationTransaction>>`.
+   * @returns `Promise<TransactionResult<TransactionReceipt, Transaction>>`.
    */
   public async transfer(
     amount: BigNumber,
-    asset: Hash256String,
+    asset: AddressString,
     to: AddressString,
     options?: TransactionOptions,
   ): Promise<TransactionResult>;

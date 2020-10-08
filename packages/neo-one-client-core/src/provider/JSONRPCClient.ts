@@ -102,24 +102,6 @@ export class JSONRPCClient {
     );
   }
 
-  public async relayStrippedTransaction(verificationTransaction: BufferString, relayTransaction: BufferString) {
-    return this.withInstance(async (provider) =>
-      provider
-        .request({
-          method: 'relaystrippedtransaction',
-          params: [verificationTransaction, relayTransaction],
-        })
-        .catch((error) => {
-          const [message, code]: [string, string] = error.message.split(':');
-          if (error.code === 'JSON_RPC' && code === '-110') {
-            throw new RelayTransactionError(message);
-          }
-
-          throw error;
-        }),
-    );
-  }
-
   public async sendRawTransaction(value: BufferString): Promise<boolean> {
     return this.withInstance(async (provider) =>
       provider

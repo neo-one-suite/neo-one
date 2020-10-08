@@ -619,6 +619,69 @@ const isMultiSigContract = (script: Buffer) => {
 };
 // tslint:enable
 
+type MultiSigResult = { readonly result: true; readonly m: number; readonly n: number } | { readonly result: false };
+// tslint:disable
+const isMultiSigContractWithResult = (script: Buffer): MultiSigResult => {
+  let m = 0;
+  let n = 0;
+  let i = 0;
+  if (script.length < 43) return { result: false };
+  if (script[i] > Op.PUSH16) return { result: false };
+  if (script[i] < Op.PUSH1 && script[i] !== 1 && script[i] !== 2) return { result: false };
+  switch (script[i]) {
+    case Op.PUSHINT8:
+      m = script[++i];
+      ++i;
+      break;
+    case Op.PUSHINT16:
+      m = script.readUInt16LE(++i);
+      i += 2;
+      break;
+    default:
+      const b = script[i];
+      if (b >= Op.PUSH1 && b <= Op.PUSH16) {
+        m = b - Op.PUSH0;
+        ++i;
+        break;
+      }
+      return { result: false };
+  }
+  if (m < 1 || m > 1024) return { result: false };
+  while (script[i] == Op.PUSHDATA1) {
+    if (script.length <= i + 35) return { result: false };
+    if (script[++i] !== 33) return { result: false };
+    // points?.push(script.slice(i + 1, i + 1 + 33)); // TODO: add "points" List from C#
+
+    i += 34;
+    ++n;
+  }
+  if (n < m || n > 1024) return { result: false };
+  switch (script[i]) {
+    case Op.PUSHINT8:
+      if (n != script[++i]) return { result: false };
+      ++i;
+      break;
+    case Op.PUSHINT16:
+      if (script.length < i + 3 || n != script.readUInt16LE(++i)) return { result: false };
+      i += 2;
+      break;
+    default:
+      const b = script[i];
+      if (b >= Op.PUSH1 && b <= Op.PUSH16) {
+        if (n !== b - Op.PUSH0) return { result: false };
+        ++i;
+        break;
+      }
+      return { result: false };
+  }
+  if (script[i++] !== Op.PUSHNULL) return { result: false };
+  if (script[i++] !== Op.SYSCALL) return { result: false };
+  if (script.length !== i + 4) return { result: false };
+  if (script.slice(i) !== checkMultiSigUint) return { result: false };
+  return { result: true, m, n };
+};
+// tslint:enable
+
 const isSignatureContract = (script: Buffer) =>
   script.length === 41 &&
   script[0] === Op.PUSHDATA1 &&
@@ -847,6 +910,7 @@ export const crypto = {
   decryptNEP2,
   createPrivateKey,
   isMultiSigContract,
+  isMultiSigContractWithResult,
   isSignatureContract,
   isStandardContract,
   parseExtendedKey,

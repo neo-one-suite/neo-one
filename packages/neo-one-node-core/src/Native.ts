@@ -16,6 +16,9 @@ export interface NativeContract {
 export interface NEP5NativeContract extends NativeContract {
   readonly symbol: string;
   readonly decimals: number;
+
+  readonly totalSupply: (storage: NativeContractStorageContext) => Promise<BN>;
+  readonly balanceOf: (storage: NativeContractStorageContext, account: UInt160) => Promise<BN>;
 }
 
 export interface GASContract extends NEP5NativeContract {}
@@ -51,9 +54,3 @@ export interface NativeContainer {
   readonly NEO: NEOContract;
   readonly Policy: PolicyContract;
 }
-
-export const NativeHashes = {
-  GAS: common.hexToUInt160('bcaf41d684c7d4ad6ee0d99da9707b9d1f0c8e66'),
-  NEO: common.hexToUInt160('25059ecb4878d3a875f91c51ceded330d4575fde'),
-  Policy: common.hexToUInt160('e9ff4ca7cc252e1dfddb26315869cd79505906ce'),
-};

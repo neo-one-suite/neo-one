@@ -1,7 +1,17 @@
-import { common, crypto, UInt256Hex, utils } from '@neo-one/client-common';
+import {
+  AttributeTypeModel,
+  common,
+  InvalidFormatError,
+  UInt256,
+  UInt256Hex,
+  utils,
+  VerifyResultModel,
+} from '@neo-one/client-common';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import { Consensus, ConsensusOptions } from '@neo-one/node-consensus';
 import {
+  assertFullNodeCapability,
+  assertServerCapability,
   Block,
   Blockchain,
   ConnectedPeer,
@@ -9,21 +19,20 @@ import {
   createEndpoint,
   CreateNetwork,
   Endpoint,
+  FullNodeCapability,
   getEndpointConfig,
-  Header,
-  Input,
-  MerkleTree,
+  NativeContainer,
   NegotiateResult,
   Network,
   NetworkEventMessage,
   Node as INode,
-  Output,
+  NodeCapability,
+  NodeCapabilityType,
   Peer,
-  RegisterTransaction,
   RelayTransactionResult,
+  ServerCapability,
   Transaction,
-  TransactionType,
-  VerifyTransactionResult,
+  Version,
 } from '@neo-one/node-core';
 import { composeDisposables, Disposable, Labels, noopDisposable, utils as commonUtils } from '@neo-one/utils';
 import { ScalingBloem } from 'bloem';
@@ -35,27 +44,25 @@ import { Address6 } from 'ip-address';
 import _ from 'lodash';
 import LRUCache from 'lru-cache';
 import { Command } from './Command';
-import {
-  AlreadyConnectedError,
-  InvalidRelayStrippedTransactionType,
-  NegotiationError,
-  RelayStrippedTransactionMismatch,
-} from './errors';
+import { AlreadyConnectedError, NegotiationError } from './errors';
 import { Message, MessageTransform, MessageValue } from './Message';
 import {
   AddrPayload,
   FilterAddPayload,
   FilterLoadPayload,
+  GetBlockByIndexPayload,
   GetBlocksPayload,
   HeadersPayload,
   InventoryType,
   InvPayload,
   MerkleBlockPayload,
   NetworkAddress,
-  SERVICES,
+  PingPayload,
   VersionPayload,
 } from './payload';
+import { maxHashesCount } from './payload/InvPayload';
 import { PeerData } from './PeerData';
+import { TransactionVerificationContext } from './TransactionVerificationContext';
 
 const logger = createChild(nodeLogger, { component: 'node-protocol' });
 
@@ -63,6 +70,21 @@ export interface TransactionAndFee {
   readonly transaction: Transaction;
   readonly networkFee: BN;
 }
+
+const compareBool = (a: boolean, b: boolean) => {
+  if (a) {
+    if (b) {
+      return 0;
+    }
+
+    return 1;
+  }
+  if (b) {
+    return -1;
+  }
+
+  return 0;
+};
 
 export interface Options {
   readonly externalPort?: number;
@@ -93,20 +115,28 @@ const createScalingBloomFilter = () =>
   });
 
 const compareTransactionAndFees = (val1: TransactionAndFee, val2: TransactionAndFee) => {
-  const a = val1.networkFee.divn(val1.transaction.size);
-  const b = val2.networkFee.divn(val2.transaction.size);
-  if (a.lt(b)) {
-    return -1;
+  const attrComp = compareBool(
+    val1.transaction.attributes.some((attr) => attr.type === AttributeTypeModel.HighPriority),
+    val2.transaction.attributes.some((attr) => attr.type === AttributeTypeModel.HighPriority),
+  );
+  if (attrComp !== 0) {
+    return attrComp;
   }
-  if (b.lt(a)) {
-    return 1;
+
+  const feePerByteComp = val1.networkFee.divn(val1.transaction.size).cmp(val2.networkFee.divn(val2.transaction.size));
+  if (feePerByteComp !== 0) {
+    return feePerByteComp;
+  }
+
+  const feeComp = val1.networkFee.cmp(val2.networkFee);
+  if (feeComp !== 0) {
+    return feeComp;
   }
 
   return val1.transaction.hash.compare(val2.transaction.hash);
 };
 
 const MEM_POOL_SIZE = 5000;
-const GET_ADDR_PEER_COUNT = 200;
 const GET_BLOCKS_COUNT = 500;
 // Assume that we get 500 back, but if not, at least request every 10 seconds
 const GET_BLOCKS_BUFFER = GET_BLOCKS_COUNT / 3;
@@ -124,34 +154,16 @@ interface PeerHealth {
 }
 
 export class Node implements INode {
-  public get version(): Version {
-    return {
-      tcpPort: this.externalPort,
-      wsPort: -1,
-      nonce: this.nonce,
-      useragent: this.userAgent,
-    };
-  }
-
-  public get consensus(): Consensus | undefined {
-    return this.mutableConsensus;
-  }
-
-  public get connectedPeers(): readonly Endpoint[] {
-    return this.network.connectedPeers.map((peer) => peer.endpoint);
-  }
-
-  public get memPool(): { readonly [hash: string]: Transaction } {
-    return this.mutableMemPool;
-  }
   public readonly blockchain: Blockchain;
   // tslint:disable-next-line readonly-keyword
   private mutableMemPool: { [hash: string]: Transaction };
+  private readonly transactionVerificationContext: TransactionVerificationContext;
   private readonly network: Network<Message, PeerData>;
   private readonly options: Options;
   private readonly externalPort: number;
   private readonly nonce: number;
   private readonly userAgent: string;
+  private readonly capabilities: readonly NodeCapability[];
   private mutableKnownBlockHashes: ScalingBloem;
   private readonly tempKnownBlockHashes: Set<UInt256Hex>;
   private mutableKnownTransactionHashes: ScalingBloem;
@@ -187,9 +199,9 @@ export class Node implements INode {
         this.sendMessage(
           peer,
           this.createMessage({
-            command: Command.getblocks,
+            command: Command.GetBlocks,
             payload: new GetBlocksPayload({
-              hashStart: [block.hash],
+              hashStart: block.hash,
             }),
           }),
         );
@@ -199,7 +211,7 @@ export class Node implements INode {
     }
   }, GET_BLOCKS_THROTTLE_MS);
   private readonly onRequestEndpoints = _.throttle((): void => {
-    this.relay(this.createMessage({ command: Command.getaddr }));
+    this.relay(this.createMessage({ command: Command.GetAddr }));
     // tslint:disable-next-line no-floating-promises
     this.fetchEndpointsFromRPC();
   }, 5000);
@@ -210,12 +222,8 @@ export class Node implements INode {
     if (memPool.length > MEM_POOL_SIZE) {
       const transactionAndFees = await Promise.all(
         memPool.map<Promise<TransactionAndFee>>(async (transaction) => {
-          const networkFee = await transaction.getNetworkFee({
-            getOutput: this.blockchain.output.get,
-            governingToken: this.blockchain.settings.governingToken,
-            utilityToken: this.blockchain.settings.utilityToken,
+          const networkFee = await transaction.networkFee({
             fees: this.blockchain.settings.fees,
-            registerValidatorFee: this.blockchain.settings.registerValidatorFee,
           });
 
           return { transaction, networkFee };
@@ -225,7 +233,7 @@ export class Node implements INode {
       const hashesToRemove = _.take<TransactionAndFee>(
         // tslint:disable-next-line no-array-mutation
         transactionAndFees.slice().sort(compareTransactionAndFees),
-        this.blockchain.settings.memPoolSize,
+        this.blockchain.settings.memoryPoolMaxTransactions,
       ).map((transactionAndFee) => transactionAndFee.transaction.hashHex);
       hashesToRemove.forEach((hash) => {
         // tslint:disable-next-line no-dynamic-delete
@@ -236,10 +244,12 @@ export class Node implements INode {
 
   public constructor({
     blockchain,
+    native,
     createNetwork,
     options,
   }: {
     readonly blockchain: Blockchain;
+    readonly native: NativeContainer;
     readonly createNetwork: CreateNetwork;
     readonly options: Options;
   }) {
@@ -260,9 +270,12 @@ export class Node implements INode {
     const { externalPort = 0 } = options;
     this.externalPort = externalPort;
     this.nonce = Math.floor(Math.random() * utils.UINT_MAX_NUMBER);
-    this.userAgent = `NEO:neo-one-js:1.0.0-preview`;
+    this.userAgent = `NEO:neo-one-js:3.0.0-preview`;
 
     this.mutableMemPool = {};
+    this.transactionVerificationContext = new TransactionVerificationContext({
+      getGasBalance: native.GAS.balanceOf,
+    });
     this.mutableKnownBlockHashes = createScalingBloomFilter();
     this.tempKnownBlockHashes = new Set();
     this.mutableKnownTransactionHashes = createScalingBloomFilter();
@@ -272,6 +285,31 @@ export class Node implements INode {
     this.mutableGetBlocksRequestsCount = 1;
     this.consensusCache = new LRUCache(10000);
     this.mutableBlockIndex = {};
+
+    const fullNodeCapability = new FullNodeCapability({ startHeight: this.blockchain.currentBlockIndex });
+    const tcpCapability = new ServerCapability({ type: NodeCapabilityType.TcpServer, port: this.externalPort });
+    this.capabilities = [fullNodeCapability, tcpCapability];
+  }
+
+  public get version(): Version {
+    return {
+      tcpPort: this.externalPort,
+      wsPort: -1,
+      nonce: this.nonce,
+      useragent: this.userAgent,
+    };
+  }
+
+  public get consensus(): Consensus | undefined {
+    return this.mutableConsensus;
+  }
+
+  public get connectedPeers(): readonly Endpoint[] {
+    return this.network.connectedPeers.map((peer) => peer.endpoint);
+  }
+
+  public get memPool(): { readonly [hash: string]: Transaction } {
+    return this.mutableMemPool;
   }
 
   public async reset(): Promise<void> {
@@ -330,14 +368,8 @@ export class Node implements INode {
       forceAdd: false,
     },
   ): Promise<RelayTransactionResult> {
-    const result = {};
-
-    if (
-      transaction.type === TransactionType.Miner ||
-      (this.mutableMemPool[transaction.hashHex] as Transaction | undefined) !== undefined ||
-      this.tempKnownTransactionHashes.has(transaction.hashHex)
-    ) {
-      return result;
+    if (this.tempKnownTransactionHashes.has(transaction.hashHex)) {
+      return {};
     }
 
     if (!this.mutableKnownTransactionHashes.has(transaction.hash)) {
@@ -348,36 +380,35 @@ export class Node implements INode {
         if (memPool.length > MEM_POOL_SIZE / 2 && !forceAdd) {
           this.mutableKnownTransactionHashes.add(transaction.hash);
 
-          return result;
+          return {};
         }
-        // tslint:disable-next-line prefer-immediate-return
+
         let logLabels: {} = { [Labels.NEO_TRANSACTION_HASH]: transaction.hashHex };
         let finalResult: RelayTransactionResult;
         try {
           let foundTransaction;
           try {
-            foundTransaction = await this.blockchain.transaction.tryGet({
-              hash: transaction.hash,
-            });
+            foundTransaction = await this.blockchain.transactions.tryGet(transaction.hash);
           } finally {
             logLabels = {
               [Labels.NEO_TRANSACTION_FOUND]: foundTransaction !== undefined,
               ...logLabels,
             };
           }
-          let verifyResult: VerifyTransactionResult | undefined;
+          let verifyResult: VerifyResultModel | undefined;
           if (foundTransaction === undefined) {
-            verifyResult = await this.blockchain.verifyTransaction({
+            verifyResult = await this.blockchain.verifyTransaction(
               transaction,
-              memPool: Object.values(this.mutableMemPool),
-            });
-            const verified = verifyResult.verifications.every(({ failureMessage }) => failureMessage === undefined);
+              this.mutableMemPool,
+              this.transactionVerificationContext,
+            );
 
-            if (verified) {
+            if (verifyResult === VerifyResultModel.Succeed) {
               this.mutableMemPool[transaction.hashHex] = transaction;
               if (this.mutableConsensus !== undefined) {
                 this.mutableConsensus.onTransactionReceived(transaction);
               }
+              this.transactionVerificationContext.addTransaction(transaction);
               this.relayTransactionInternal(transaction);
               await this.trimMemPool();
             }
@@ -407,114 +438,7 @@ export class Node implements INode {
       }
     }
 
-    return result;
-  }
-
-  public async relayStrippedTransaction(
-    verificationTransaction: Transaction,
-    relayTransaction: Transaction,
-    {
-      throwVerifyError = false,
-      forceAdd = false,
-    }: { readonly throwVerifyError?: boolean; readonly forceAdd?: boolean } = {
-      throwVerifyError: false,
-      forceAdd: false,
-    },
-  ): Promise<RelayTransactionResult> {
-    const result = {};
-
-    // this should only be called by our special invocation transaction (this helps with TS);
-    if (
-      verificationTransaction.type !== TransactionType.Invocation ||
-      relayTransaction.type !== TransactionType.Invocation
-    ) {
-      throw new InvalidRelayStrippedTransactionType(verificationTransaction.type);
-    }
-
-    // verify they are still the same transaction besides witnesses/attributes
-    if (
-      verificationTransaction.inputs.length !== relayTransaction.inputs.length ||
-      verificationTransaction.outputs.length !== relayTransaction.outputs.length ||
-      !(_.zip(verificationTransaction.inputs, relayTransaction.inputs) as ReadonlyArray<
-        [Input, Input]
-      >).every(([verify, relay]) => verify.equals(relay)) ||
-      !(_.zip(verificationTransaction.outputs, relayTransaction.outputs) as ReadonlyArray<
-        [Output, Output]
-      >).every(([verify, relay]) => verify.equals(relay)) ||
-      !verificationTransaction.script.equals(relayTransaction.script)
-    ) {
-      throw new RelayStrippedTransactionMismatch();
-    }
-
-    if (!this.mutableKnownTransactionHashes.has(relayTransaction.hash)) {
-      this.tempKnownTransactionHashes.add(relayTransaction.hashHex);
-
-      try {
-        const memPool = Object.values(this.mutableMemPool);
-        if (memPool.length > MEM_POOL_SIZE / 2 && !forceAdd) {
-          this.mutableKnownTransactionHashes.add(relayTransaction.hash);
-
-          return result;
-        }
-        // tslint:disable-next-line prefer-immediate-return
-        let logLabels: {} = { [Labels.NEO_TRANSACTION_HASH]: relayTransaction.hashHex };
-        let finalResult: RelayTransactionResult;
-        try {
-          let foundTransaction;
-          try {
-            foundTransaction = await this.blockchain.transaction.tryGet({
-              hash: relayTransaction.hash,
-            });
-          } finally {
-            logLabels = {
-              [Labels.NEO_TRANSACTION_FOUND]: foundTransaction !== undefined,
-              ...logLabels,
-            };
-          }
-          let verifyResult: VerifyTransactionResult | undefined;
-          if (foundTransaction === undefined) {
-            // if we haven't verified it yet then use the verificationTransaction to do that
-            verifyResult = await this.blockchain.verifyTransaction({
-              transaction: verificationTransaction,
-              memPool: Object.values(this.mutableMemPool),
-            });
-            const verified = verifyResult.verifications.every(({ failureMessage }) => failureMessage === undefined);
-
-            if (verified) {
-              this.mutableMemPool[relayTransaction.hashHex] = relayTransaction;
-              if (this.mutableConsensus !== undefined) {
-                this.mutableConsensus.onTransactionReceived(relayTransaction);
-              }
-              this.relayTransactionInternal(relayTransaction);
-              await this.trimMemPool();
-            }
-          }
-
-          this.mutableKnownTransactionHashes.add(relayTransaction.hash);
-
-          finalResult = { verifyResult };
-          logger.debug({ name: 'neo_relay_transaction', ...logLabels });
-        } catch (err) {
-          logger.error({ name: 'neo_relay_transaction', err, ...logLabels });
-          throw err;
-        }
-
-        return finalResult;
-      } catch (error) {
-        if (
-          error.code === undefined ||
-          typeof error.code !== 'string' ||
-          !error.code.includes('VERIFY') ||
-          throwVerifyError
-        ) {
-          throw error;
-        }
-      } finally {
-        this.tempKnownTransactionHashes.delete(relayTransaction.hashHex);
-      }
-    }
-
-    return result;
+    return {};
   }
 
   public async relayBlock(block: Block): Promise<void> {
@@ -523,7 +447,7 @@ export class Node implements INode {
 
   public relayConsensusPayload(payload: ConsensusPayload): void {
     const message = this.createMessage({
-      command: Command.inv,
+      command: Command.Inv,
       payload: new InvPayload({
         type: InventoryType.Consensus,
         hashes: [payload.hash],
@@ -535,7 +459,7 @@ export class Node implements INode {
   }
 
   public syncMemPool(): void {
-    this.relay(this.createMessage({ command: Command.mempool }));
+    this.relay(this.createMessage({ command: Command.Mempool }));
   }
 
   private relay(message: Message): void {
@@ -544,9 +468,9 @@ export class Node implements INode {
 
   private relayTransactionInternal(transaction: Transaction): void {
     const message = this.createMessage({
-      command: Command.inv,
+      command: Command.Inv,
       payload: new InvPayload({
-        type: InventoryType.Transaction,
+        type: InventoryType.TX,
         hashes: [transaction.hash],
       }),
     });
@@ -566,57 +490,86 @@ export class Node implements INode {
     this.sendMessage(
       peer,
       this.createMessage({
-        command: Command.version,
-        payload: new VersionPayload({
-          protocolVersion: 0,
-          services: SERVICES.NODE_NETWORK,
-          timestamp: Math.round(Date.now() / 1000),
-          port: this.externalPort,
+        command: Command.Version,
+        payload: VersionPayload.create({
+          magic: this.blockchain.settings.messageMagic,
+          version: 0,
           nonce: this.nonce,
           userAgent: this.userAgent,
-          startHeight: this.blockchain.currentBlockIndex,
-          relay: true,
+          capabilities: this.capabilities,
         }),
       }),
     );
 
     const message = await peer.receiveMessage(30000);
-    let versionPayload;
-    if (message.value.command === Command.version) {
-      versionPayload = message.value.payload;
-    } else {
+    const value = message.value;
+    if (value.command !== Command.Version) {
       throw new NegotiationError(message);
     }
+
+    const versionPayload = value.payload;
 
     this.checkVersion(peer, message, versionPayload);
 
     const { host } = getEndpointConfig(peer.endpoint);
-    let address;
-    if (NetworkAddress.isValid(host)) {
-      address = new NetworkAddress({
-        host,
-        port: versionPayload.port,
-        timestamp: versionPayload.timestamp,
-        services: versionPayload.services,
-      });
-    }
 
-    this.sendMessage(peer, this.createMessage({ command: Command.verack }));
+    const address = NetworkAddress.isValid(host)
+      ? new NetworkAddress({
+          timestamp: versionPayload.timestamp,
+          address: host,
+          capabilities: versionPayload.capabilities,
+        })
+      : undefined;
+
+    this.sendMessage(peer, this.createMessage({ command: Command.Verack }));
 
     const nextMessage = await peer.receiveMessage(30000);
-    if (nextMessage.value.command !== Command.verack) {
+    if (nextMessage.value.command !== Command.Verack) {
       throw new NegotiationError(nextMessage);
     }
+
+    const { relay, port, startHeight } = versionPayload.capabilities.reduce(
+      (acc, capability) => {
+        switch (capability.type) {
+          case NodeCapabilityType.FullNode:
+            const fullCap = assertFullNodeCapability(capability);
+
+            return {
+              ...acc,
+              relay: true,
+              lastBlockIndex: fullCap.startHeight,
+            };
+
+          case NodeCapabilityType.TcpServer:
+            const tcpCap = assertServerCapability(capability);
+
+            return {
+              ...acc,
+              port: tcpCap.port,
+            };
+
+          case NodeCapabilityType.WsServer:
+            return acc;
+
+          default:
+            throw new InvalidFormatError();
+        }
+      },
+      { relay: false, port: 0, startHeight: 0 },
+    );
+
+    this.mutableBlockIndex[peer.endpoint] = startHeight;
 
     return {
       data: {
         nonce: versionPayload.nonce,
-        startHeight: versionPayload.startHeight,
+        startHeight,
         mutableBloomFilter: undefined,
         address,
+        listenPort: port,
       },
 
-      relay: versionPayload.relay,
+      relay,
     };
   };
   private readonly checkPeerHealth = (peer: ConnectedPeer<Message, PeerData>, prevHealth?: PeerHealth) => {
@@ -799,76 +752,76 @@ export class Node implements INode {
     try {
       new Promise<void>(async (resolve) => {
         switch (message.value.command) {
-          case Command.addr:
+          case Command.Addr:
             this.onAddrMessageReceived(message.value.payload);
             break;
-          case Command.block:
+          case Command.Block:
             await this.onBlockMessageReceived(peer, message.value.payload);
 
             break;
-          case Command.consensus:
+          case Command.Consensus:
             await this.onConsensusMessageReceived(message.value.payload);
 
             break;
-          case Command.filteradd:
+          case Command.FilterAdd:
             this.onFilterAddMessageReceived(peer, message.value.payload);
 
             break;
-          case Command.filterclear:
+          case Command.FilterClear:
             this.onFilterClearMessageReceived(peer);
             break;
-          case Command.filterload:
+          case Command.FilterLoad:
             this.onFilterLoadMessageReceived(peer, message.value.payload);
 
             break;
-          case Command.getaddr:
+          case Command.GetAddr:
             this.onGetAddrMessageReceived(peer);
             break;
-          case Command.getblocks:
+          case Command.GetBlocks:
             await this.onGetBlocksMessageReceived(peer, message.value.payload);
 
             break;
-          case Command.getdata:
+          case Command.GetBlockByIndex:
+            await this.onGetBlockByIndexMessageReceived(peer, message.value.payload);
+
+            break;
+          case Command.GetData:
             await this.onGetDataMessageReceived(peer, message.value.payload);
 
             break;
-          case Command.getheaders:
+          case Command.GetHeaders:
             await this.onGetHeadersMessageReceived(peer, message.value.payload);
 
             break;
-          case Command.headers:
-            await this.onHeadersMessageReceived(peer, message.value.payload);
+          case Command.Inv:
+            this.onInvMessageReceived(peer, message.value.payload);
 
             break;
-          case Command.inv:
-            this.onInvMessageReceived(peer, message.value.payload);
-            break;
-          case Command.mempool:
+          case Command.Mempool:
             this.onMemPoolMessageReceived(peer);
+
             break;
-          case Command.tx:
+          case Command.Ping:
+            this.onPingMessageReceived(peer, message.value.payload);
+
+            break;
+          case Command.Pong:
+            this.onPongMessageReceived(peer, message.value.payload);
+
+            break;
+          case Command.Transaction:
             await this.onTransactionReceived(message.value.payload);
+
             break;
-          case Command.verack:
-            this.onVerackMessageReceived(peer);
-            break;
-          case Command.version:
-            this.onVersionMessageReceived(peer);
-            break;
-          case Command.alert:
-            break;
-          case Command.merkleblock:
-            break;
-          case Command.notfound:
-            break;
-          case Command.ping:
-            break;
-          case Command.pong:
-            break;
-          case Command.reject:
-            break;
+          case Command.Verack:
+          case Command.Version:
+            throw new InvalidFormatError();
+          case Command.Alert:
+          case Command.Headers:
+          case Command.MerkleBlock:
+          case Command.NotFound:
+          case Command.Reject:
           default:
-            commonUtils.assertNever(message.value);
         }
         resolve();
       }).catch(() => {
@@ -880,15 +833,10 @@ export class Node implements INode {
   }
 
   private onAddrMessageReceived(addr: AddrPayload): void {
-    addr.addresses
-      .filter((address) => !LOCAL_HOST_ADDRESSES.has(address.host))
-      .map((address) =>
-        createEndpoint({
-          type: 'tcp',
-          host: address.host,
-          port: address.port,
-        }),
-      )
+    addr.addressList
+      .filter((address) => !LOCAL_HOST_ADDRESSES.has(address.address))
+      .filter((address) => address.port > 0)
+      .map((address) => address.endpoint)
       .forEach((endpoint) => this.network.addEndpoint(endpoint));
   }
 
@@ -908,7 +856,7 @@ export class Node implements INode {
       this.tempKnownBlockHashes.add(block.hashHex);
 
       try {
-        const foundBlock = await this.blockchain.block.tryGet({
+        const foundBlock = await this.blockchain.blocks.tryGet({
           hashOrIndex: block.hash,
         });
 
@@ -923,7 +871,7 @@ export class Node implements INode {
             if (peer !== undefined && block.index > peer.data.startHeight) {
               this.relay(
                 this.createMessage({
-                  command: Command.inv,
+                  command: Command.Inv,
                   payload: new InvPayload({
                     type: InventoryType.Block,
                     hashes: [block.hash],
@@ -976,19 +924,22 @@ export class Node implements INode {
   }
 
   private onGetAddrMessageReceived(peer: ConnectedPeer<Message, PeerData>): void {
-    const addresses = _.take(
+    const addressList = _.take(
       _.shuffle(
-        this.network.connectedPeers.map((connectedPeer) => connectedPeer.data.address).filter(commonUtils.notNull),
+        this.network.connectedPeers
+          .filter((connectedPeer) => connectedPeer.data.listenPort > 0)
+          .map((connectedPeer) => connectedPeer.data.address)
+          .filter(commonUtils.notNull),
       ),
-      GET_ADDR_PEER_COUNT,
+      AddrPayload.maxCountToSend,
     );
 
-    if (addresses.length > 0) {
+    if (addressList.length > 0) {
       this.sendMessage(
         peer,
         this.createMessage({
-          command: Command.addr,
-          payload: new AddrPayload({ addresses }),
+          command: Command.Addr,
+          payload: new AddrPayload({ addressList }),
         }),
       );
     }
@@ -996,40 +947,103 @@ export class Node implements INode {
 
   private async onGetBlocksMessageReceived(
     peer: ConnectedPeer<Message, PeerData>,
-    getBlocks: GetBlocksPayload,
+    payload: GetBlocksPayload,
   ): Promise<void> {
-    const headers = await this.getHeaders(getBlocks, this.blockchain.currentBlockIndex);
+    const hashStart = payload.hashStart;
+    const count = payload.count < 0 || payload.count > maxHashesCount ? maxHashesCount : payload.count;
+
+    const state = await this.blockchain.blocks.tryGet({ hashOrIndex: hashStart });
+    if (state === undefined) {
+      return;
+    }
+
+    const currentHeaderIndex = this.blockchain.currentHeaderIndex;
+
+    const tempHashes = await Promise.all(
+      _.range(1, count).map(async (idx) => {
+        const index = state.index + idx;
+        if (index > currentHeaderIndex) {
+          return undefined;
+        }
+
+        return this.blockchain.getBlockHash(index);
+      }),
+    );
+
+    const hashes = tempHashes.filter(commonUtils.notNull);
 
     this.sendMessage(
       peer,
       this.createMessage({
-        command: Command.inv,
+        command: Command.Inv,
         payload: new InvPayload({
           type: InventoryType.Block,
-          hashes: headers.map((header) => header.hash),
+          hashes,
         }),
       }),
     );
   }
 
+  private async onGetBlockByIndexMessageReceived(
+    peer: ConnectedPeer<Message, PeerData>,
+    payload: GetBlockByIndexPayload,
+  ): Promise<void> {
+    const count = payload.count === -1 ? maxHashesCount : Math.min(payload.count, maxHashesCount);
+    const max = payload.indexStart + count;
+    // tslint:disable-next-line: no-loop-statement
+    for (let idx = payload.indexStart; idx < max; idx += 1) {
+      const block = await this.blockchain.getBlock(idx);
+      if (block === undefined) {
+        break;
+      }
+
+      if (peer.data.mutableBloomFilter === undefined) {
+        this.sendMessage(
+          peer,
+          this.createMessage({
+            command: Command.Block,
+            payload: block,
+          }),
+        );
+      } else {
+        this.sendMessage(
+          peer,
+          this.createMessage({
+            command: Command.MerkleBlock,
+            payload: MerkleBlockPayload.create({
+              block,
+              flags: block.transactions.map((transaction) =>
+                this.testFilter(peer.data.mutableBloomFilter, transaction),
+              ),
+            }),
+          }),
+        );
+      }
+    }
+  }
+
   private async onGetDataMessageReceived(peer: ConnectedPeer<Message, PeerData>, getData: InvPayload): Promise<void> {
+    let notFound: readonly UInt256[] = [];
     switch (getData.type) {
-      case InventoryType.Transaction:
+      case InventoryType.TX:
         await Promise.all(
           getData.hashes.map(async (hash) => {
             let transaction = this.mutableMemPool[common.uInt256ToHex(hash)] as Transaction | undefined;
             if (transaction === undefined) {
-              transaction = await this.blockchain.transaction.tryGet({ hash });
+              const state = await this.blockchain.transactions.tryGet(hash);
+              transaction = state?.transaction;
             }
 
             if (transaction !== undefined) {
               this.sendMessage(
                 peer,
                 this.createMessage({
-                  command: Command.tx,
+                  command: Command.Transaction,
                   payload: transaction,
                 }),
               );
+            } else {
+              notFound = notFound.concat(hash);
             }
           }),
         );
@@ -1038,16 +1052,14 @@ export class Node implements INode {
       case InventoryType.Block: // Block
         await Promise.all(
           getData.hashes.map(async (hash) => {
-            const block = await this.blockchain.block.tryGet({
-              hashOrIndex: hash,
-            });
+            const block = await this.blockchain.getBlock(hash);
 
             if (block !== undefined) {
               if (peer.data.mutableBloomFilter === undefined) {
                 this.sendMessage(
                   peer,
                   this.createMessage({
-                    command: Command.block,
+                    command: Command.Block,
                     payload: block,
                   }),
                 );
@@ -1055,8 +1067,8 @@ export class Node implements INode {
                 this.sendMessage(
                   peer,
                   this.createMessage({
-                    command: Command.merkleblock,
-                    payload: this.createMerkleBlockPayload({
+                    command: Command.MerkleBlock,
+                    payload: MerkleBlockPayload.create({
                       block,
                       flags: block.transactions.map((transaction) =>
                         this.testFilter(peer.data.mutableBloomFilter, transaction),
@@ -1065,6 +1077,8 @@ export class Node implements INode {
                   }),
                 );
               }
+            } else {
+              notFound = notFound.concat(hash);
             }
           }),
         );
@@ -1077,74 +1091,72 @@ export class Node implements INode {
             this.sendMessage(
               peer,
               this.createMessage({
-                command: Command.consensus,
+                command: Command.Consensus,
                 payload,
               }),
             );
           }
         });
         break;
+
       default:
         commonUtils.assertNever(getData.type);
+    }
+
+    if (notFound.length > 0) {
+      InvPayload.createGroup(getData.type, notFound).forEach((payload) => {
+        this.sendMessage(
+          peer,
+          this.createMessage({
+            command: Command.NotFound,
+            payload,
+          }),
+        );
+      });
     }
   }
 
   private async onGetHeadersMessageReceived(
     peer: ConnectedPeer<Message, PeerData>,
-    getBlocks: GetBlocksPayload,
+    payload: GetBlockByIndexPayload,
   ): Promise<void> {
-    const headers = await this.getHeaders(getBlocks, this.blockchain.currentHeader.index);
+    const startIndex = payload.indexStart;
+    const count = payload.count === -1 ? HeadersPayload.maxHeadersCount : payload.count;
+    if (startIndex > this.blockchain.currentHeaderIndex) {
+      return;
+    }
+
+    const currentHeaderIndex = this.blockchain.currentHeaderIndex;
+
+    const tempHeaders = await Promise.all(
+      _.range(count).map(async (idx) => {
+        if (startIndex + idx > currentHeaderIndex) {
+          return undefined;
+        }
+
+        return this.blockchain.getHeader(startIndex + idx);
+      }),
+    );
+
+    const headers = tempHeaders.filter(commonUtils.notNull);
+
+    if (headers.length === 0) {
+      return;
+    }
 
     this.sendMessage(
       peer,
       this.createMessage({
-        command: Command.headers,
+        command: Command.Headers,
         payload: new HeadersPayload({ headers }),
       }),
     );
   }
 
-  private async onHeadersMessageReceived(
-    peer: ConnectedPeer<Message, PeerData>,
-    headersPayload: HeadersPayload,
-  ): Promise<void> {
-    const headers = headersPayload.headers.filter(
-      (header) => !this.mutableKnownHeaderHashes.has(header.hash) && !this.tempKnownHeaderHashes.has(header.hashHex),
-    );
-
-    if (headers.length > 0) {
-      headers.forEach((header) => {
-        this.tempKnownHeaderHashes.add(header.hashHex);
-      });
-      try {
-        await this.blockchain.persistHeaders(headers);
-        headers.forEach((header) => {
-          this.mutableKnownHeaderHashes.add(header.hash);
-        });
-      } finally {
-        headers.forEach((header) => {
-          this.tempKnownHeaderHashes.delete(header.hashHex);
-        });
-      }
-    }
-
-    if (this.blockchain.currentHeader.index < peer.data.startHeight) {
-      this.sendMessage(
-        peer,
-        this.createMessage({
-          command: Command.getheaders,
-          payload: new GetBlocksPayload({
-            hashStart: [this.blockchain.currentHeader.hash],
-          }),
-        }),
-      );
-    }
-  }
-
   private onInvMessageReceived(peer: ConnectedPeer<Message, PeerData>, inv: InvPayload): void {
     let hashes;
     switch (inv.type) {
-      case InventoryType.Transaction: // Transaction
+      case InventoryType.TX: // Transaction
         hashes = inv.hashes.filter(
           (hash) =>
             !this.mutableKnownTransactionHashes.has(hash) &&
@@ -1171,7 +1183,7 @@ export class Node implements INode {
       this.sendMessage(
         peer,
         this.createMessage({
-          command: Command.getdata,
+          command: Command.GetData,
           payload: new InvPayload({ type: inv.type, hashes }),
         }),
       );
@@ -1179,68 +1191,39 @@ export class Node implements INode {
   }
 
   private onMemPoolMessageReceived(peer: ConnectedPeer<Message, PeerData>): void {
-    this.sendMessage(
-      peer,
-      this.createMessage({
-        command: Command.inv,
-        payload: new InvPayload({
-          type: InventoryType.Transaction,
-          hashes: Object.values(this.mutableMemPool).map((transaction) => transaction.hash),
+    InvPayload.createGroup(
+      InventoryType.TX,
+      Object.values(this.mutableMemPool).map((tx) => tx.hash),
+    ).forEach((payload) => {
+      this.sendMessage(
+        peer,
+        this.createMessage({
+          command: Command.Inv,
+          payload,
         }),
-      }),
-    );
+      );
+    });
   }
 
   private async onTransactionReceived(transaction: Transaction): Promise<void> {
     if (this.ready()) {
-      if (transaction.type === TransactionType.Miner) {
-        if (this.mutableConsensus !== undefined) {
-          this.mutableConsensus.onTransactionReceived(transaction);
-        }
-      } else {
-        await this.relayTransaction(transaction);
-      }
+      await this.relayTransaction(transaction);
     }
   }
 
-  private onVerackMessageReceived(peer: ConnectedPeer<Message, PeerData>): void {
-    peer.close();
-  }
-
-  private onVersionMessageReceived(peer: ConnectedPeer<Message, PeerData>): void {
-    peer.close();
-  }
-
-  private async getHeaders(getBlocks: GetBlocksPayload, maxHeight: number): Promise<readonly Header[]> {
-    let hashStopIndexPromise = Promise.resolve(maxHeight);
-    if (!getBlocks.hashStop.equals(common.ZERO_UINT256)) {
-      hashStopIndexPromise = this.blockchain.header
-        .tryGet({ hashOrIndex: getBlocks.hashStop })
-        .then((hashStopHeader) =>
-          hashStopHeader === undefined ? maxHeight : Math.min(hashStopHeader.index, maxHeight),
-        );
-    }
-    const [hashStartHeaders, hashEnd] = await Promise.all([
-      Promise.all(getBlocks.hashStart.map(async (hash) => this.blockchain.header.tryGet({ hashOrIndex: hash }))),
-
-      hashStopIndexPromise,
-    ]);
-
-    const hashStartHeader = _.head(_.orderBy(hashStartHeaders.filter(commonUtils.notNull), [(header) => header.index]));
-
-    if (hashStartHeader === undefined) {
-      return [];
-    }
-    const hashStart = hashStartHeader.index + 1;
-    if (hashStart > maxHeight) {
-      return [];
-    }
-
-    return Promise.all(
-      _.range(hashStart, Math.min(hashStart + GET_BLOCKS_COUNT, hashEnd)).map(async (index) =>
-        this.blockchain.header.get({ hashOrIndex: index }),
-      ),
+  private onPingMessageReceived(peer: ConnectedPeer<Message, PeerData>, payload: PingPayload): void {
+    this.updateLastBlockIndex(peer.endpoint, payload);
+    this.sendMessage(
+      peer,
+      this.createMessage({
+        command: Command.Pong,
+        payload: PingPayload.create(this.blockchain.currentBlockIndex, payload.nonce),
+      }),
     );
+  }
+
+  private onPongMessageReceived(peer: ConnectedPeer<Message, PeerData>, payload: PingPayload) {
+    this.updateLastBlockIndex(peer.endpoint, payload);
   }
 
   private testFilter(bloomFilterIn: BloomFilter | undefined, transaction: Transaction): boolean {
@@ -1251,46 +1234,14 @@ export class Node implements INode {
 
     return (
       bloomFilter.contains(transaction.hash) ||
-      transaction.outputs.some((output) => bloomFilter.contains(output.address)) ||
-      transaction.inputs.some((input) => bloomFilter.contains(input.serializeWire())) ||
-      transaction.scripts.some((script) => bloomFilter.contains(crypto.toScriptHash(script.verification))) ||
-      (transaction.type === TransactionType.Register &&
-        transaction instanceof RegisterTransaction &&
-        bloomFilter.contains(transaction.asset.admin))
+      transaction.witnesses.some((witness) => bloomFilter.contains(witness.scriptHash))
     );
   }
 
-  private createMerkleBlockPayload({
-    block,
-    flags,
-  }: {
-    readonly block: Block;
-    readonly flags: readonly boolean[];
-  }): MerkleBlockPayload {
-    const tree = new MerkleTree(block.transactions.map((transaction) => transaction.hash)).trim(flags);
-
-    const mutableBuffer = Buffer.allocUnsafe(Math.floor((flags.length + 7) / 8));
-    // tslint:disable-next-line no-loop-statement
-    for (let i = 0; i < flags.length; i += 1) {
-      if (flags[i]) {
-        // tslint:disable-next-line no-bitwise
-        mutableBuffer[Math.floor(i / 8)] |= 1 << i % 8;
-      }
+  private updateLastBlockIndex(endpoint: string, payload: PingPayload) {
+    if (payload.lastBlockIndex > (this.mutableBlockIndex[endpoint] ?? 0)) {
+      this.mutableBlockIndex[endpoint] = payload.lastBlockIndex;
     }
-
-    return new MerkleBlockPayload({
-      version: block.version,
-      previousHash: block.previousHash,
-      merkleRoot: block.merkleRoot,
-      timestamp: block.timestamp,
-      index: block.index,
-      consensusData: block.consensusData,
-      nextConsensus: block.nextConsensus,
-      script: block.script,
-      transactionCount: block.transactions.length,
-      hashes: tree.toHashArray(),
-      flags: mutableBuffer,
-    });
   }
 
   private createMessage(value: MessageValue): Message {

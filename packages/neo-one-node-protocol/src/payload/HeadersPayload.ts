@@ -5,6 +5,7 @@ export interface HeadersPayloadAdd {
 }
 
 export class HeadersPayload implements SerializableWire {
+  public static readonly maxHeadersCount = 2000;
   public static deserializeWireBase(options: DeserializeWireBaseOptions): HeadersPayload {
     const { reader } = options;
     const headers = reader.readArray(() => Header.deserializeWireBase(options));
