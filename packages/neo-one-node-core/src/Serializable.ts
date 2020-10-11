@@ -9,7 +9,7 @@ import { BinaryReader } from './utils';
 
 export { SerializeWire, SerializableWire, createSerializeWire } from '@neo-one/client-common';
 
-export type SerializableContainerType = 'Block' | 'Signers' | 'Transaction';
+export type SerializableContainerType = 'Block' | 'Signers' | 'Transaction' | 'ConsensusPayload';
 
 export interface SerializableContainer extends SerializableWire {
   readonly type: SerializableContainerType;

@@ -1,11 +1,5 @@
 import { BinaryWriter, createSerializeWire } from '@neo-one/client-common';
-import {
-  BinaryReader,
-  DeserializeWire,
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  utils,
-} from '@neo-one/node-core';
+import { BinaryReader, DeserializeWireBaseOptions, DeserializeWireOptions, utils } from '@neo-one/node-core';
 
 export interface PingPayloadAdd {
   readonly lastBlockIndex: number;
@@ -49,7 +43,7 @@ export class PingPayload {
   public readonly timestamp: number;
   public readonly nonce: number;
 
-  public readonly serializeWire = createSerializeWire(this.serializeWireBase);
+  public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   public constructor({ lastBlockIndex, timestamp, nonce }: PingPayloadAdd) {
     this.lastBlockIndex = lastBlockIndex;

@@ -1,4 +1,4 @@
-import { BinaryWriter, createSerializeWire } from '@neo-one/client-common';
+import { BinaryWriter, createSerializeWire, InvalidFormatError } from '@neo-one/client-common';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from '../../Serializable';
 import { BinaryReader } from '../../utils';
 import { NodeCapabilityBase } from './NodeCapabilityBase';
@@ -11,7 +11,10 @@ export interface FullNodeCapabilityAdd {
 export class FullNodeCapability extends NodeCapabilityBase {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): FullNodeCapability {
     const { reader } = options;
-
+    const { type } = super.deserializeWireBase(options);
+    if (type !== NodeCapabilityType.FullNode) {
+      throw new InvalidFormatError();
+    }
     const startHeight = reader.readUInt32LE();
 
     return new this({
@@ -27,7 +30,7 @@ export class FullNodeCapability extends NodeCapabilityBase {
   }
 
   public readonly startHeight: number;
-  public readonly serializeWire = createSerializeWire(this.serializeWireBase);
+  public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   public constructor({ startHeight }: FullNodeCapabilityAdd) {
     super({ type: NodeCapabilityType.FullNode });

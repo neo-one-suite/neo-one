@@ -37,7 +37,7 @@ export class ChangeViewPayloadCompact implements SerializableWire {
   public readonly originalViewNumber: number;
   public readonly timestamp: BN;
   public readonly invocationScript: Buffer;
-  public readonly serializeWire = createSerializeWire(this.serializeWireBase);
+  public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   public constructor({ validatorIndex, originalViewNumber, timestamp, invocationScript }: ChangeViewPayloadCompactAdd) {
     this.validatorIndex = validatorIndex;

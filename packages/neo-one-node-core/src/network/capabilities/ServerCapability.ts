@@ -30,7 +30,7 @@ export class ServerCapability extends NodeCapabilityBase {
   }
 
   public readonly port: number;
-  public readonly serializeWire = createSerializeWire(this.serializeWireBase);
+  public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   public constructor({ type, port }: ServerCapabilityAdd) {
     super({ type });

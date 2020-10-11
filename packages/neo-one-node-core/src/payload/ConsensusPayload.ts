@@ -1,6 +1,11 @@
 import { BinaryWriter, createSerializeWire, crypto, InvalidFormatError } from '@neo-one/client-common';
 import { NativeContainer } from '../Native';
-import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableWire } from '../Serializable';
+import {
+  DeserializeWireBaseOptions,
+  DeserializeWireOptions,
+  SerializableContainer,
+  SerializableContainerType,
+} from '../Serializable';
 import { BlockchainStorage } from '../Storage';
 import { BinaryReader, utils } from '../utils';
 import { Verifiable, VerifyOptions } from '../Verifiable';
@@ -15,7 +20,7 @@ export interface VerifyConsensusPayloadOptions extends VerifyOptions {
   readonly height: number;
 }
 
-export class ConsensusPayload extends UnsignedConsensusPayload implements SerializableWire, Verifiable {
+export class ConsensusPayload extends UnsignedConsensusPayload implements SerializableContainer, Verifiable {
   public static deserializeWireBase(options: DeserializeWireBaseOptions, validatorsCount = 7): ConsensusPayload {
     const { reader } = options;
     const {
@@ -49,6 +54,7 @@ export class ConsensusPayload extends UnsignedConsensusPayload implements Serial
     });
   }
 
+  public readonly type: SerializableContainerType = 'ConsensusPayload';
   public readonly witness: Witness;
   public readonly serializeUnsigned = createSerializeWire(this.serializeWireBaseUnsigned);
   public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));

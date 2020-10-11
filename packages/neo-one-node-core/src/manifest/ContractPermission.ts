@@ -21,12 +21,12 @@ export class ContractPermission extends ContractPermissionModel<ContractPermissi
   }
 
   public isAllowed(manifest: ContractManifest, method: string) {
-    if (this.contract.isHash()) {
+    if (this.contract.isHash) {
       if (!(this.contract.hashOrGroup as UInt160).equals(manifest.hash)) {
         return false;
       }
     } else if (
-      this.contract.isGroup() &&
+      this.contract.isGroup &&
       manifest.groups.every((group) => !group.publicKey.equals(this.contract.hashOrGroup as ECPoint))
     ) {
       return false;

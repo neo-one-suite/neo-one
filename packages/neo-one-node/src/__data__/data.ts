@@ -1,7 +1,7 @@
 import { BlockJSON, common, crypto, JSONHelper, toWitnessScope, WitnessScopeModel } from '@neo-one/client-common';
 import { Block, ConsensusData, Signer, Transaction, Witness } from '@neo-one/node-core';
 import { BN } from 'bn.js';
-import { genesisJSON, secondBlockJSON, thirdBlockJSON } from './jsonBlocks';
+import { debugBlockJSON, genesisJSON, secondBlockJSON, thirdBlockJSON } from './jsonBlocks';
 
 const convertBlock = (json: BlockJSON) =>
   new Block({
@@ -15,8 +15,8 @@ const convertBlock = (json: BlockJSON) =>
     }),
     merkleRoot: JSONHelper.readUInt256(json.merkleroot),
     witness: new Witness({
-      invocation: Buffer.from(json.witnesses[0].invocation, 'base64'),
-      verification: Buffer.from(json.witnesses[0].verification, 'base64'),
+      invocation: JSONHelper.readBase64Buffer(json.witnesses[0].invocation),
+      verification: JSONHelper.readBase64Buffer(json.witnesses[0].verification),
     }),
     transactions: json.tx.map(
       (tx) =>
@@ -24,15 +24,15 @@ const convertBlock = (json: BlockJSON) =>
           hash: JSONHelper.readUInt256(tx.hash),
           nonce: tx.nonce,
           attributes: [],
-          script: Buffer.from(tx.script, 'base64'),
+          script: JSONHelper.readBase64Buffer(tx.script),
           systemFee: new BN(tx.sysfee),
           networkFee: new BN(tx.netfee),
           validUntilBlock: tx.validuntilblock,
           witnesses: tx.witnesses.map(
             (witness) =>
               new Witness({
-                invocation: Buffer.from(witness.invocation, 'base64'),
-                verification: Buffer.from(witness.verification, 'base64'),
+                invocation: JSONHelper.readBase64Buffer(witness.invocation),
+                verification: JSONHelper.readBase64Buffer(witness.verification),
               }),
           ),
           version: tx.version,
@@ -53,12 +53,9 @@ const convertBlock = (json: BlockJSON) =>
       : undefined,
   });
 
-const genesisBlockFromJSON = convertBlock(genesisJSON as any);
-const secondBlockFromJSON = convertBlock(secondBlockJSON as any);
-const thirdBlockFromJSON = convertBlock(thirdBlockJSON as any);
-
 export const data = {
-  genesisBlock: genesisBlockFromJSON,
-  secondBlock: secondBlockFromJSON,
-  thirdBlock: thirdBlockFromJSON,
+  genesisBlock: convertBlock(genesisJSON as any),
+  secondBlock: convertBlock(secondBlockJSON as any),
+  thirdBlock: convertBlock(thirdBlockJSON as any),
+  debugBlock: convertBlock(debugBlockJSON as any),
 };

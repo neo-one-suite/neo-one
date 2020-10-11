@@ -1,10 +1,7 @@
 import {
   BinaryWriter,
-  common,
   createSerializeWire,
-  crypto,
   InvalidFormatError,
-  IOHelper,
   SerializableWire,
   SerializeWire,
 } from '@neo-one/client-common';
@@ -20,7 +17,8 @@ import {
 import { makeErrorWithCode, utils } from '@neo-one/utils';
 import { Transform } from 'stream';
 import { assertCommand, Command } from './Command';
-import { assertMessageFlags } from './MessageFlags';
+import { lz4Helper } from './lz4Helper';
+import { assertMessageFlags, MessageFlags } from './MessageFlags';
 import {
   AddrPayload,
   FilterAddPayload,
@@ -33,6 +31,7 @@ import {
   PingPayload,
   VersionPayload,
 } from './payload';
+
 export type MessageValue =
   | { readonly command: Command.Addr; readonly payload: AddrPayload }
   | { readonly command: Command.Block; readonly payload: Block }
@@ -59,7 +58,8 @@ export type MessageValue =
   | { readonly command: Command.Reject };
 
 export interface MessageAdd {
-  readonly magic: number;
+  readonly flags: MessageFlags;
+  readonly payloadBuffer: Buffer;
   readonly value: MessageValue;
 }
 
@@ -67,9 +67,145 @@ export const PAYLOAD_MAX_SIZE = 0x02000000;
 const compressionMinSize = 128;
 const compressionThreshold = 64;
 
-const calculateChecksum = (buffer: Buffer) => common.toUInt32LE(crypto.hash256(buffer));
+export const deserializeMessageValue = (command: Command, options: DeserializeWireOptions): MessageValue => {
+  switch (command) {
+    case Command.Addr:
+      return {
+        command: Command.Addr,
+        payload: AddrPayload.deserializeWire(options),
+      };
+
+    case Command.Block:
+      return {
+        command: Command.Block,
+        payload: Block.deserializeWire(options),
+      };
+
+    case Command.Consensus:
+      return {
+        command: Command.Consensus,
+        payload: ConsensusPayload.deserializeWire(options),
+      };
+
+    case Command.FilterAdd:
+      return {
+        command: Command.FilterAdd,
+        payload: FilterAddPayload.deserializeWire(options),
+      };
+
+    case Command.FilterClear:
+      return { command: Command.FilterClear };
+
+    case Command.FilterLoad:
+      return {
+        command: Command.FilterLoad,
+        payload: FilterLoadPayload.deserializeWire(options),
+      };
+
+    case Command.GetAddr:
+      return { command: Command.GetAddr };
+
+    case Command.GetBlocks:
+      return {
+        command: Command.GetBlocks,
+        payload: GetBlocksPayload.deserializeWire(options),
+      };
+
+    case Command.GetBlockByIndex:
+      return {
+        command: Command.GetBlockByIndex,
+        payload: GetBlockByIndexPayload.deserializeWire(options),
+      };
+
+    case Command.GetData:
+      return {
+        command: Command.GetData,
+        payload: InvPayload.deserializeWire(options),
+      };
+
+    case Command.GetHeaders:
+      return {
+        command: Command.GetHeaders,
+        payload: GetBlockByIndexPayload.deserializeWire(options),
+      };
+
+    case Command.Headers:
+      return {
+        command: Command.Headers,
+        payload: HeadersPayload.deserializeWire(options),
+      };
+
+    case Command.Inv:
+      return {
+        command: Command.Inv,
+        payload: InvPayload.deserializeWire(options),
+      };
+
+    case Command.Mempool:
+      return { command: Command.Mempool };
+
+    case Command.Transaction:
+      return {
+        command: Command.Transaction,
+        payload: Transaction.deserializeWire(options),
+      };
+
+    case Command.Verack:
+      return { command: Command.Verack };
+    case Command.Version:
+      return {
+        command: Command.Version,
+        payload: VersionPayload.deserializeWire(options),
+      };
+
+    case Command.Alert:
+      return { command: Command.Alert };
+
+    case Command.MerkleBlock:
+      return {
+        command: Command.MerkleBlock,
+        payload: MerkleBlockPayload.deserializeWire(options),
+      };
+
+    case Command.NotFound:
+      return { command: Command.NotFound, payload: InvPayload.deserializeWire(options) };
+    case Command.Ping:
+      return { command: Command.Ping, payload: PingPayload.deserializeWire(options) };
+
+    case Command.Pong:
+      return { command: Command.Pong, payload: PingPayload.deserializeWire(options) };
+
+    case Command.Reject:
+      return { command: Command.Reject };
+
+    default:
+      utils.assertNever(command);
+      throw new InvalidFormatError(``);
+  }
+};
 
 export class Message implements SerializableWire {
+  public static create(value: MessageValue): Message {
+    // tslint:disable-next-line: no-any
+    const payloadBuffer = (value as any)?.payload?.serializeWire() ?? Buffer.alloc(0);
+    if (payloadBuffer.length > compressionMinSize) {
+      const compressed = lz4Helper.compress(payloadBuffer);
+      if (compressed.length < payloadBuffer.length - compressionThreshold) {
+        return new Message({
+          flags: MessageFlags.Compressed,
+          value,
+          payloadBuffer: compressed,
+        });
+      }
+    }
+
+    return new Message({
+      flags: MessageFlags.None,
+      payloadBuffer,
+      value,
+    });
+  }
+
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Message {
     const { reader, context } = options;
 
@@ -77,154 +213,17 @@ export class Message implements SerializableWire {
     const command = assertCommand(reader.readInt8());
     const payloadBuffer = reader.readVarBytesLE(PAYLOAD_MAX_SIZE);
 
-    // TODO: pickup here, we need to work out compressing / decompressing the message payload
-    // and how that will be stored in the class;
+    const decompressed =
+      flags === MessageFlags.Compressed ? lz4Helper.decompress(payloadBuffer, PAYLOAD_MAX_SIZE) : payloadBuffer;
 
     const payloadOptions = {
-      context: options.context,
-      buffer: payloadBuffer,
+      context,
+      buffer: decompressed,
     };
 
-    let value: MessageValue;
-    switch (command) {
-      case Command.Addr:
-        value = {
-          command: Command.Addr,
-          payload: AddrPayload.deserializeWire(payloadOptions),
-        };
+    const value = deserializeMessageValue(command, payloadOptions);
 
-        break;
-      case Command.Block:
-        value = {
-          command: Command.Block,
-          payload: Block.deserializeWire(payloadOptions),
-        };
-
-        break;
-      case Command.Consensus:
-        value = {
-          command: Command.Consensus,
-          payload: ConsensusPayload.deserializeWire(payloadOptions),
-        };
-
-        break;
-      case Command.FilterAdd:
-        value = {
-          command: Command.FilterAdd,
-          payload: FilterAddPayload.deserializeWire(payloadOptions),
-        };
-
-        break;
-      case Command.FilterClear:
-        value = { command: Command.FilterClear };
-
-        break;
-      case Command.FilterLoad:
-        value = {
-          command: Command.FilterLoad,
-          payload: FilterLoadPayload.deserializeWire(payloadOptions),
-        };
-
-        break;
-      case Command.GetAddr:
-        value = { command: Command.GetAddr };
-
-        break;
-      case Command.GetBlocks:
-        value = {
-          command: Command.GetBlocks,
-          payload: GetBlocksPayload.deserializeWire(payloadOptions),
-        };
-
-        break;
-      case Command.GetBlockByIndex:
-        value = {
-          command: Command.GetBlockByIndex,
-          payload: GetBlockByIndexPayload.deserializeWire(payloadOptions),
-        };
-
-        break;
-      case Command.GetData:
-        value = {
-          command: Command.GetData,
-          payload: InvPayload.deserializeWire(payloadOptions),
-        };
-
-        break;
-      case Command.GetHeaders:
-        value = {
-          command: Command.GetHeaders,
-          payload: GetBlockByIndexPayload.deserializeWire(payloadOptions),
-        };
-
-        break;
-      case Command.Headers:
-        value = {
-          command: Command.Headers,
-          payload: HeadersPayload.deserializeWire(payloadOptions),
-        };
-
-        break;
-      case Command.Inv:
-        value = {
-          command: Command.Inv,
-          payload: InvPayload.deserializeWire(payloadOptions),
-        };
-
-        break;
-      case Command.Mempool:
-        value = { command: Command.Mempool };
-
-        break;
-      case Command.Transaction:
-        value = {
-          command: Command.Transaction,
-          payload: Transaction.deserializeWire(payloadOptions),
-        };
-
-        break;
-      case Command.Verack:
-        value = { command: Command.Verack };
-        break;
-      case Command.Version:
-        value = {
-          command: Command.Version,
-          payload: VersionPayload.deserializeWire(payloadOptions),
-        };
-
-        break;
-      case Command.Alert:
-        value = { command: Command.Alert };
-
-        break;
-      case Command.MerkleBlock:
-        value = {
-          command: Command.MerkleBlock,
-          payload: MerkleBlockPayload.deserializeWire(payloadOptions),
-        };
-
-        break;
-      case Command.NotFound:
-        value = { command: Command.NotFound, payload: InvPayload.deserializeWire(payloadOptions) };
-        break;
-      case Command.Ping:
-        value = { command: Command.Ping, payload: PingPayload.deserializeWire(payloadOptions) };
-
-        break;
-      case Command.Pong:
-        value = { command: Command.Pong, payload: PingPayload.deserializeWire(payloadOptions) };
-
-        break;
-      case Command.Reject:
-        value = { command: Command.Reject };
-
-        break;
-      default:
-        utils.assertNever(command);
-        throw new InvalidFormatError(``);
-    }
-
-    return new this({ magic: context.messageMagic, value });
+    return new this({ flags, value, payloadBuffer });
   }
 
   public static deserializeWire(options: DeserializeWireOptions): Message {
@@ -234,88 +233,21 @@ export class Message implements SerializableWire {
     });
   }
 
-  public readonly magic: number;
+  public readonly flags: MessageFlags;
+  public readonly payloadBuffer: Buffer;
   public readonly value: MessageValue;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
-  public constructor({ magic, value }: MessageAdd) {
-    this.magic = magic;
+  public constructor({ flags, payloadBuffer, value }: MessageAdd) {
+    this.flags = flags;
+    this.payloadBuffer = payloadBuffer;
     this.value = value;
   }
 
   public serializeWireBase(writer: BinaryWriter): void {
-    const { value } = this;
-
-    writer.writeUInt32LE(this.magic);
-    writer.writeFixedString(value.command, COMMAND_LENGTH);
-
-    let payload = Buffer.alloc(0);
-    switch (value.command) {
-      case Command.Addr:
-        payload = value.payload.serializeWire();
-        break;
-      case Command.Block:
-        payload = value.payload.serializeWire();
-        break;
-      case Command.Consensus:
-        payload = value.payload.serializeWire();
-        break;
-      case Command.FilterAdd:
-        payload = value.payload.serializeWire();
-        break;
-      case Command.FilterClear:
-        break;
-      case Command.FilterLoad:
-        payload = value.payload.serializeWire();
-        break;
-      case Command.GetAddr:
-        break;
-      case Command.GetBlocks:
-        payload = value.payload.serializeWire();
-        break;
-      case Command.GetData:
-        payload = value.payload.serializeWire();
-        break;
-      case Command.GetHeaders:
-        payload = value.payload.serializeWire();
-        break;
-      case Command.Headers:
-        payload = value.payload.serializeWire();
-        break;
-      case Command.Inv:
-        payload = value.payload.serializeWire();
-        break;
-      case Command.Mempool:
-        break;
-      case Command.Transaction:
-        payload = value.payload.serializeWire();
-        break;
-      case Command.Verack:
-        break;
-      case Command.Version:
-        payload = value.payload.serializeWire();
-        break;
-      case Command.Alert:
-        break;
-      case Command.MerkleBlock:
-        payload = value.payload.serializeWire();
-        break;
-      case Command.NotFound:
-        break;
-      case Command.Ping:
-        break;
-      case Command.Pong:
-        break;
-      case Command.Reject:
-        break;
-      default:
-        utils.assertNever(value);
-        throw new InvalidFormatError('Command does not exist');
-    }
-
-    writer.writeUInt32LE(payload.length);
-    writer.writeUInt32LE(calculateChecksum(payload));
-    writer.writeBytes(payload);
+    writer.writeUInt8(this.flags);
+    writer.writeUInt8(this.value.command);
+    writer.writeVarBytesLE(this.payloadBuffer);
   }
 }
 
@@ -324,11 +256,16 @@ export const InvalidMessageTransformEncodingError = makeErrorWithCode(
   (message: string) => message,
 );
 
-const SIZE_OF_MESSAGE_HEADER =
-  IOHelper.sizeOfUInt32LE +
-  IOHelper.sizeOfFixedString(COMMAND_LENGTH) +
-  IOHelper.sizeOfUInt32LE +
-  IOHelper.sizeOfUInt32LE;
+const SIZE_OF_MESSAGE_HEADER = 3;
+
+const deserializeMessageHeader = (data: Buffer) => {
+  const header = data.slice(0, 3);
+  const flags = assertMessageFlags(header[0]);
+  const command = assertCommand(header[1]);
+  const length = header[2];
+
+  return { length, flags, command };
+};
 
 export class MessageTransform extends Transform {
   public readonly context: DeserializeWireContext;
@@ -378,10 +315,7 @@ export class MessageTransform extends Transform {
       return { remainingBuffer: reader.remainingBuffer, mutableMessages: [] };
     }
 
-    const { length } = deserializeMessageHeader({
-      context: this.context,
-      reader: reader.clone(),
-    });
+    const { length } = deserializeMessageHeader(reader.clone().remainingBuffer);
 
     if (reader.remaining < SIZE_OF_MESSAGE_HEADER + length) {
       return { remainingBuffer: reader.remainingBuffer, mutableMessages: [] };

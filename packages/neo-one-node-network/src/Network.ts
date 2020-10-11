@@ -324,8 +324,9 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
       }
     }
 
+    const allEndpoints = endpoints.concat([...this.mutablePeerSeeds]);
     // tslint:disable-next-line promise-function-async
-    endpoints.concat([...this.mutablePeerSeeds]).forEach((endpoint) => this.connectToPeer({ endpoint }));
+    allEndpoints.forEach((endpoint) => this.connectToPeer({ endpoint }));
   }
 
   private checkPeerHealth(): void {
@@ -500,7 +501,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
       this.endpointBlacklist.delete(endpoint);
     }
 
-    logger.debug(
+    logger.trace(
       { [Labels.PEER_ADDRESS]: peer.endpoint, name: 'neo_network_peer_closed' },
       `Peer closed at ${peer.endpoint}`,
     );

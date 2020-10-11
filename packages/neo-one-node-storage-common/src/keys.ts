@@ -2,7 +2,7 @@ import { BinaryWriter, common, InvalidFormatError, UInt160, UInt256 } from '@neo
 import { BlockKey, StorageKey, StreamOptions } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 
-enum Prefix {
+export enum Prefix {
   Block = 0x01,
   Transaction = 0x02,
   Contract = 0x50,

@@ -74,7 +74,7 @@ export class VersionPayload {
   public readonly userAgent: string;
   public readonly capabilities: readonly NodeCapability[];
 
-  public readonly serializeWire = createSerializeWire(this.serializeWireBase);
+  public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   public constructor({ magic, version, timestamp, nonce, userAgent, capabilities }: VersionPayloadAdd) {
     this.magic = magic;

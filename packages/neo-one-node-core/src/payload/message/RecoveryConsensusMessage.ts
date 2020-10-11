@@ -82,7 +82,7 @@ export class RecoveryConsensusMessage extends ConsensusMessageBase {
   public readonly changeViewMessages: _.NumericDictionary<ChangeViewPayloadCompact>;
   public readonly preparationMessages: _.NumericDictionary<PreparationPayloadCompact>;
   public readonly commitMessages: _.NumericDictionary<CommitPayloadCompact>;
-  public readonly serializeWire = createSerializeWire(this.serializeWireBase);
+  public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   public constructor({
     viewNumber,

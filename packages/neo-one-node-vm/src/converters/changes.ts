@@ -46,13 +46,13 @@ const addPrefixToKey = (type: ItemType, key: Buffer) => {
  * we should export them from a common place like `node-core` for use in
  * `node-storage-levelup` and here.
  */
-interface PutBatch {
+export interface PutBatch {
   readonly type: 'put';
   readonly key: Buffer;
   readonly value: Buffer;
 }
 
-interface DeleteBatch {
+export interface DeleteBatch {
   readonly type: 'del';
   readonly key: Buffer;
 }

@@ -25,6 +25,7 @@
     "@neo-one/build-tools": "^1.0.0",
     "@types/jest": "^24.0.18",
     "@types/lodash": "^4.14.138",
+    "@types/through": "^0.0.30",
     "gulp": "~4.0.2",
     "tslib": "^1.10.0"
   }

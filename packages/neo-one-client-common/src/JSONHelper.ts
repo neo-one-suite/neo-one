@@ -18,4 +18,6 @@ export const JSONHelper = {
   readECPoint: (value: string): ECPoint => common.stringToECPoint(value),
   writeBuffer: (value: Buffer): string => value.toString('hex'),
   readBuffer: (value: string): Buffer => Buffer.from(value, 'hex'),
+  writeBase64Buffer: (value: Buffer): string => value.toString('base64'),
+  readBase64Buffer: (value: string): Buffer => Buffer.from(value, 'base64'),
 };

@@ -33,7 +33,7 @@ export class ContractIDState implements SerializableWire {
 
   public readonly nextId: number;
   public readonly size = IOHelper.sizeOfUInt32LE;
-  public readonly serializeWire = createSerializeWire(this.serializeWireBase);
+  public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   public constructor({ nextId }: ContractIDStateAdd) {
     this.nextId = nextId;

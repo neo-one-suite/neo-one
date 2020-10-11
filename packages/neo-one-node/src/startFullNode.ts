@@ -11,8 +11,8 @@ import { blockchainSettingsToProtocolSettings, Dispatcher } from '@neo-one/node-
 import { composeDisposables, Disposable, noopDisposable } from '@neo-one/utils';
 import { AbstractLevelDOWN } from 'abstract-leveldown';
 import fs from 'fs-extra';
-import LevelDOWN from 'leveldown';
 import LevelUp from 'levelup';
+import RocksDB from 'rocksdb';
 
 export interface LoggingOptions {
   readonly level?: 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace' | 'silent';
@@ -59,10 +59,10 @@ export const startFullNode = async ({
       setGlobalLogLevel(telemetry.logging.level);
     }
 
-    const levelDown = customLeveldown === undefined ? LevelDOWN(dataPath) : customLeveldown;
+    const rocks = customLeveldown === undefined ? RocksDB(dataPath) : customLeveldown;
     disposable = composeDisposables(disposable, async () => {
       await new Promise((resolve, reject) => {
-        levelDown.close((err) => {
+        rocks.close((err) => {
           if (err) {
             reject(err);
           } else {
@@ -73,7 +73,7 @@ export const startFullNode = async ({
     });
 
     const storage = levelupStorage({
-      db: LevelUp(levelDown),
+      db: LevelUp(rocks),
       context: { messageMagic: blockchainSettings.messageMagic },
     });
 
