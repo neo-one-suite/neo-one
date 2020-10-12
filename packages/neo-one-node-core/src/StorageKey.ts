@@ -11,7 +11,7 @@ export interface StorageKeyAdd {
 export class StorageKey implements Equatable, SerializableWire {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): StorageKey {
     const { reader } = options;
-    const id = reader.readUInt32LE();
+    const id = reader.readInt32LE();
     const key = reader.readBytes(reader.remaining);
 
     return new this({
@@ -57,7 +57,7 @@ export class StorageKey implements Equatable, SerializableWire {
   }
 
   public serializeWireBase(writer: BinaryWriter) {
-    writer.writeUInt32LE(this.id);
+    writer.writeInt32LE(this.id);
     writer.writeBytes(this.key);
   }
 }

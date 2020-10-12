@@ -15,7 +15,7 @@ export type ContractKey = UInt160;
 export class ContractState extends ContractStateModel<ContractManifest> {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): ContractState {
     const { reader } = options;
-    const id = reader.readUInt32LE();
+    const id = reader.readInt32LE();
     const script = reader.readVarBytesLE();
     const manifest = ContractManifest.deserializeWireBase(options);
 

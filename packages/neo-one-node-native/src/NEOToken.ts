@@ -87,7 +87,8 @@ export class NEOToken extends NEP5NativeContract {
   }
 
   public async getNextBlockValidators({ storages }: NativeContractStorageContext): Promise<readonly ECPoint[]> {
-    const storage = await storages.tryGet(this.createStorageKey(this.prefixes.nextValidators).toStorageKey());
+    const key = this.createStorageKey(this.prefixes.nextValidators).toStorageKey();
+    const storage = await storages.tryGet(key);
     if (storage === undefined) {
       return this.settings.standbyValidators;
     }

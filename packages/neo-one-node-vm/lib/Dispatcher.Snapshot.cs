@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Threading;
 using Neo;
 using Neo.Ledger;
 using Neo.Network.P2P.Payloads;
@@ -124,6 +122,9 @@ namespace NEOONE
 
         private void resetSnapshots()
         {
+            this.store?.Dispose();
+            this.store = null;
+            this.store = this.path != null ? new RocksDBStore(this.path).GetStore() : new MemoryStore();
             this.snapshot = new SnapshotView(this.store);
             this.clonedSnapshot = this.snapshot.Clone();
         }

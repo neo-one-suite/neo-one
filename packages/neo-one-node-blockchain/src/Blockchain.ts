@@ -4,8 +4,10 @@ import {
   Blockchain as BlockchainType,
   BlockchainSettings,
   CallReceipt,
+  Change,
   ConsensusPayload,
   DeserializeWireContext,
+  HashIndexState,
   Header,
   Mempool,
   NativeContainer,
@@ -42,8 +44,8 @@ export interface CreateBlockchainOptions {
 }
 
 export interface BlockchainOptions extends CreateBlockchainOptions {
-  // readonly currentBlock: Block | undefined;
-  // readonly previousBlockIndex: HashIndexState | undefined;
+  readonly currentBlock?: Block;
+  // readonly previousBlockIndex?: number;
   // tslint:disable-next-line: readonly-array
   readonly headerIndex: UInt256[];
 }
@@ -55,7 +57,6 @@ interface Entry {
   readonly verify: boolean;
 }
 
-// TODO: revisit this with more context into how the headerIndex is being used.
 export const recoverHeaderIndex = async (storage: Storage) => {
   const initHeaderIndex = await storage.headerHashList.all$
     .pipe(
@@ -93,6 +94,24 @@ export const recoverHeaderIndex = async (storage: Storage) => {
 export class Blockchain {
   public static async create({ settings, storage, native, vm }: CreateBlockchainOptions): Promise<BlockchainType> {
     const headerIndex = await recoverHeaderIndex(storage);
+    if (headerIndex.length > 0) {
+      const currentBlockTrimmed = await storage.blocks.tryGet({ hashOrIndex: headerIndex[headerIndex.length - 1] });
+      if (currentBlockTrimmed === undefined) {
+        throw new Error('testing');
+      }
+
+      const currentBlock = await currentBlockTrimmed.getBlock(storage.transactions);
+
+      return new Blockchain({
+        headerIndex,
+        settings,
+        storage,
+        native,
+        vm,
+        currentBlock,
+      });
+    }
+
     const blockchain = new Blockchain({
       headerIndex,
       settings,
@@ -101,14 +120,7 @@ export class Blockchain {
       vm,
     });
 
-    if (headerIndex.length === 0) {
-      await blockchain.persistBlock({ block: settings.genesisBlock });
-
-      return blockchain;
-    }
-
-    // TODO: see if we need something similar and how we'll implement it.
-    // blockchain.loadMempoolPolicy(storage);
+    await blockchain.persistBlock({ block: settings.genesisBlock });
 
     return blockchain;
   }
@@ -117,10 +129,10 @@ export class Blockchain {
 
   public readonly verifyWitnesses = verifyWitnesses;
   public readonly settings: BlockchainSettings;
+  public readonly onPersistNativeContractScript: Buffer;
 
   // tslint:disable-next-line: readonly-array
   private readonly headerIndex: UInt256[];
-  private readonly onPersistNativeContractScript: Buffer;
   private readonly storage: Storage;
   private readonly native: NativeContainer;
   private readonly vm: VM;
@@ -150,6 +162,7 @@ export class Blockchain {
     this.deserializeWireContext = {
       messageMagic: this.settings.messageMagic,
     };
+    this.mutableCurrentBlock = options.currentBlock;
     this.start();
   }
 
@@ -403,7 +416,7 @@ export class Blockchain {
     return this.runEngineWrapper({
       script,
       snapshot: 'main',
-      container: signers === undefined ? undefined : { type: 'Signers', buffer: signers.serializeWire() },
+      container: signers,
       gas: 10,
     });
   }
@@ -416,7 +429,7 @@ export class Blockchain {
       {
         trigger: TriggerType.Application,
         gas,
-        // container: transaction, //TODO: implement this
+        // container: transaction,
         snapshot: 'main',
         testMode: true,
       },
@@ -567,6 +580,27 @@ export class Blockchain {
     this.mutableStoredHeaderCount += countIncrement;
   }
 
+  private async updateBlockMetadata(block: Block): Promise<void> {
+    const newHashIndexState = new HashIndexState({ hash: block.hash, index: block.index });
+    const updateBlockHashIndex: Change = {
+      type: 'add',
+      change: { type: 'blockHashIndex', value: newHashIndexState },
+      subType: 'update',
+    };
+
+    const updateHeaderHashIndex: Change = {
+      type: 'add',
+      change: { type: 'headerHashIndex', value: newHashIndexState },
+      subType: 'update',
+    };
+
+    this.mutablePreviousBlock = this.mutableCurrentBlock;
+    this.mutableCurrentBlock = block;
+    this.mutableCurrentHeader = block.header;
+
+    return this.storage.commit([updateBlockHashIndex, updateHeaderHashIndex]);
+  }
+
   private async persistBlockInternal(block: Block, verify?: boolean): Promise<void> {
     if (verify) {
       await this.verifyBlock(block);
@@ -583,9 +617,7 @@ export class Blockchain {
     await this.storage.commitBatch(changeBatch);
     await this.saveHeaderHashList();
 
-    this.mutablePreviousBlock = this.mutableCurrentBlock;
-    this.mutableCurrentBlock = block;
-    this.mutableCurrentHeader = block.header;
+    await this.updateBlockMetadata(block);
   }
 
   private createPersistingBlockchain(): PersistingBlockchain {

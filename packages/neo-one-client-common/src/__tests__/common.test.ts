@@ -24,6 +24,7 @@ describe('fixedFromDecimal', () => {
     expect(common.fixedFromDecimal(new BN(expected, 10), decimals).toString(10)).toEqual(expected);
   });
 });
+
 describe('UInt160', () => {
   const uInt160 = common.ZERO_UINT160;
   const buffer160 = Buffer.from(uInt160);

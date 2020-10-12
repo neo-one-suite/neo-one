@@ -7,7 +7,6 @@ import {
   InvalidFormatError,
   IOHelper,
   JSONHelper,
-  SerializableWire,
   UInt160,
   UInt256,
   UInt256Hex,
@@ -15,7 +14,14 @@ import {
 import { BN } from 'bn.js';
 import { Equals, EquatableKey } from './Equatable';
 import { UnsignedBlockError } from './errors';
-import { createSerializeWire, DeserializeWireBaseOptions, SerializeJSONContext, SerializeWire } from './Serializable';
+import {
+  createSerializeWire,
+  DeserializeWireBaseOptions,
+  SerializableContainer,
+  SerializableContainerType,
+  SerializeJSONContext,
+  SerializeWire,
+} from './Serializable';
 import { BlockchainStorage } from './Storage';
 import { utils } from './utils';
 import { Verifiable, VerifyOptions } from './Verifiable';
@@ -32,7 +38,7 @@ export interface BlockBaseAdd {
   readonly hash?: UInt256;
 }
 
-export abstract class BlockBase implements EquatableKey, SerializableWire, Verifiable {
+export abstract class BlockBase implements EquatableKey, SerializableContainer, Verifiable {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): BlockBaseAdd {
     const { version, previousHash, merkleRoot, timestamp, index, nextConsensus } = this.deserializeWireBaseUnsigned(
       options,
@@ -74,6 +80,7 @@ export abstract class BlockBase implements EquatableKey, SerializableWire, Verif
     };
   }
 
+  public readonly type: SerializableContainerType = 'Block';
   public readonly version: number;
   public readonly previousHash: UInt256;
   public readonly merkleRoot: UInt256;

@@ -288,13 +288,13 @@ export interface TransactionReceiptJSON {
 }
 
 export type Wildcard = '*';
-export type WildcardContainerJSON<T> = readonly T[] | Wildcard;
+export type WildcardContainerJSON = readonly string[] | Wildcard;
 
 export interface ContractMethodDescriptorJSON {
   readonly name: string;
   readonly parameters: readonly ContractParameterDefinitionJSON[];
   readonly offset: number;
-  readonly returnType: ContractParameterTypeJSON;
+  readonly returntype: ContractParameterTypeJSON;
 }
 
 export interface ContractEventDescriptorJSON {
@@ -322,7 +322,7 @@ export interface ContractPermissionDescriptorJSON {
 
 export interface ContractPermissionJSON {
   readonly contract: ContractPermissionDescriptorJSON;
-  readonly methods: WildcardContainerJSON<string>;
+  readonly methods: WildcardContainerJSON;
 }
 
 export interface ContractManifestJSON {
@@ -332,13 +332,13 @@ export interface ContractManifestJSON {
   readonly abi: ContractABIJSON;
   readonly groups: readonly ContractGroupJSON[];
   readonly permissions: readonly ContractPermissionJSON[];
-  readonly trusts: WildcardContainerJSON<string>;
-  readonly safeMethods: WildcardContainerJSON<string>;
+  readonly trusts: WildcardContainerJSON;
+  readonly safemethods: WildcardContainerJSON;
   readonly features: {
     readonly storage: boolean;
     readonly payable: boolean;
   };
-  readonly supportedStandards: readonly string[];
+  readonly supportedstandards: readonly string[];
   readonly extra?: JSONObject;
 }
 

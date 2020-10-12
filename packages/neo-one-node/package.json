@@ -30,13 +30,20 @@
     "fs-extra": "^8.1.0",
     "leveldown": "^5.1.1",
     "levelup": "4.1.0",
+    "rocksdb": "^4.1.0",
+    "rxjs": "^6.5.3",
     "tslib": "^1.10.0"
   },
   "devDependencies": {
+    "@neo-one/client-common": "^2.7.0",
     "@neo-one/build-tools": "^1.0.0",
+    "@neo-one/node-neo-settings": "^2.7.0",
     "@types/fs-extra": "^8.0.0",
+    "@types/jest": "^24.0.18",
     "@types/leveldown": "^4.0.0",
     "@types/levelup": "^3.1.1",
+    "@types/rocksdb": "3.0.0",
+    "bn.js": "^5.0.0",
     "gulp": "~4.0.2"
   }
 }

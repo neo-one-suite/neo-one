@@ -1055,6 +1055,10 @@
       "allowedCategories": [ "tools" ]
     },
     {
+      "name": "rocksdb",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "rollup",
       "allowedCategories": [ "tools" ]
     },

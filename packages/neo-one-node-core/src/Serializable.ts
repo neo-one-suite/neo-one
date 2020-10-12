@@ -4,9 +4,26 @@
 // import { Contract } from './Contract';
 // import { InvocationResult } from './invocationResult';
 // import { StorageChange } from './storageChange';
+import { SerializableWire } from '@neo-one/client-common';
 import { BinaryReader } from './utils';
 
 export { SerializeWire, SerializableWire, createSerializeWire } from '@neo-one/client-common';
+
+export type SerializableContainerType = 'Block' | 'Signers' | 'Transaction';
+
+export interface SerializableContainer extends SerializableWire {
+  readonly type: SerializableContainerType;
+}
+
+export interface SerializedScriptContainer {
+  readonly type: SerializableContainerType;
+  readonly buffer: Buffer;
+}
+
+export const serializeScriptContainer = (item: SerializableContainer): SerializedScriptContainer => ({
+  buffer: item.serializeWire(),
+  type: item.type,
+});
 
 export interface DeserializeWireContext {
   readonly messageMagic: number;

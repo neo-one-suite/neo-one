@@ -1,4 +1,11 @@
-import { BinaryWriter, HeaderJSON, InvalidFormatError, IOHelper, UInt256Hex } from '@neo-one/client-common';
+import {
+  BinaryWriter,
+  createSerializeWire,
+  HeaderJSON,
+  InvalidFormatError,
+  IOHelper,
+  UInt256Hex,
+} from '@neo-one/client-common';
 import { BlockBase, BlockBaseAdd } from './BlockBase';
 import {
   DeserializeWireBaseOptions,
@@ -39,9 +46,10 @@ export class Header extends BlockBase implements SerializableWire, SerializableJ
       reader: new BinaryReader(options.buffer),
     });
   }
+  public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
+  public readonly serializeUnsigned = createSerializeWire(super.serializeUnsignedBase.bind(this));
 
   protected readonly sizeExclusive: () => number = utils.lazy(() => IOHelper.sizeOfUInt8);
-
   public trim(): TrimmedBlock {
     return new TrimmedBlock({
       version: this.version,

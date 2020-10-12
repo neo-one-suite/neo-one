@@ -220,9 +220,9 @@ const TEN_THOUSAND_FIXED8 = fixed8FromDecimal(10000);
 const ONE_HUNDRED_MILLION_FIXED8 = fixed8FromDecimal(100000000);
 
 const nativeHashes = {
-  GAS: hexToUInt160('bcaf41d684c7d4ad6ee0d99da9707b9d1f0c8e66'),
-  NEO: hexToUInt160('25059ecb4878d3a875f91c51ceded330d4575fde'),
-  Policy: hexToUInt160('e9ff4ca7cc252e1dfddb26315869cd79505906ce'),
+  GAS: hexToUInt160('0x668e0c1f9d7b70a99dd9e06eadd4c784d641afbc'),
+  NEO: hexToUInt160('0xde5f57d430d3dece511cf975a8d37848cb9e0525'),
+  Policy: hexToUInt160('0xce06595079cd69583126dbfd1d2e25cca74cffe9'),
 };
 
 export const common = {

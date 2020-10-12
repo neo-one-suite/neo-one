@@ -200,6 +200,20 @@ const wildCardFromJSON = <T>(json: WildcardContainerJSON, selector: (input: stri
   throw new InvalidFormatError();
 };
 
+/* crude method but it does what we want it to do */
+const generateSearchRange = (lookupKey: Buffer): StreamOptions => {
+  const asBN = new BN(lookupKey);
+  const lte = asBN.addn(1).toBuffer();
+  if (lte.length !== lookupKey.length) {
+    throw new InvalidFormatError('not sure how this happened');
+  }
+
+  return {
+    gte: lookupKey,
+    lte,
+  };
+};
+
 export const utils = {
   ...clientUtils,
   toASCII,
@@ -213,4 +227,5 @@ export const utils = {
   weightedAverage,
   weightedFilter,
   wildCardFromJSON,
+  generateSearchRange,
 };

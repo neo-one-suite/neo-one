@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using Neo.Network.P2P.Payloads;
 using Neo.Persistence;
@@ -10,6 +11,46 @@ namespace NEOONE
 {
     partial class Dispatcher
     {
+
+        private enum ContainerType
+        {
+            Block,
+            Transaction,
+            Signer,
+        }
+
+        private IVerifiable deserializeContainer(dynamic args)
+        {
+            byte[] serializedContainer = (byte[])args.buffer;
+            string typeIn = (string)args.type;
+            IVerifiable container;
+
+            ContainerType type;
+            if (Enum.TryParse<ContainerType>(typeIn, out type))
+            {
+
+                switch (type)
+                {
+                    case ContainerType.Block:
+                        container = new Block();
+                        break;
+                    case ContainerType.Transaction:
+                        container = new Transaction();
+                        break;
+                    default:
+                        throw new ArgumentException($"{typeIn} is not a valid container type");
+                }
+                using (MemoryStream ms = new MemoryStream(serializedContainer))
+                using (BinaryReader reader = new BinaryReader(ms))
+                {
+                    container.Deserialize(reader);
+                }
+
+                return container;
+            }
+
+            throw new ArgumentException($"{typeIn} is not a valid container type");
+        }
 
         private enum EngineMethod
         {
@@ -33,7 +74,12 @@ namespace NEOONE
                     TriggerType trigger = (TriggerType)args.trigger;
                     long gas = long.Parse((string)args.gas);
                     bool testMode = (bool)args.testMode;
-                    return this._create(trigger, null, this.selectSnapshot(args.snapshot, false), gas, testMode);
+                    IVerifiable container = null;
+                    if (args.container != null)
+                    {
+                        container = deserializeContainer(args.container);
+                    }
+                    return this._create(trigger, container, this.selectSnapshot(args.snapshot, false), gas, testMode);
 
                 case EngineMethod.execute:
                     return this._execute();

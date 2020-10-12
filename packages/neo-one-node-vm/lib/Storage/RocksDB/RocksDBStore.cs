@@ -1,20 +1,15 @@
 using Neo.Persistence;
-using NEOONE.Storage.LevelDB;
+using NEOONE.Storage.RocksDB;
 
 namespace NEOONE.Storage
 {
-    public class LevelDBStore
+    public class RocksDBStore
     {
         private string path;
 
-        public LevelDBStore(string path)
+        public RocksDBStore(string path)
         {
             this.path = path;
-        }
-
-        public void Repar()
-        {
-            DB.Repair(path, Options.Default);
         }
 
         public IStore GetStore()
