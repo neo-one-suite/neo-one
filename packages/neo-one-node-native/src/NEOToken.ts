@@ -37,10 +37,10 @@ export class NEOToken extends NEP5NativeContract {
   }
 
   public async getCandidates(storage: NativeContractStorageContext): Promise<readonly Candidate[]> {
-    const searchRange = this.createStorageKey(this.prefixes.candidate).toSearchRange();
+    const searchKey = this.createStorageKey(this.prefixes.candidate).toStorageKey().serializeWire();
 
     return storage.storages
-      .find$(searchRange)
+      .find$(searchKey)
       .pipe(
         map(({ key, value }) => ({
           point: common.bufferToECPoint(key.key.slice(1)),

@@ -103,6 +103,7 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
 
     storages: read.createReadFindStorage({
       db,
+      getSearchRange: keys.getStorageSearchRange,
       serializeKey: keys.createStorageKey,
       deserializeKey: (buffer) =>
         StorageKey.deserializeWire({

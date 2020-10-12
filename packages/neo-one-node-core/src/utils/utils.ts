@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
 import { randomBytes } from 'crypto';
 import _ from 'lodash';
+import { StreamOptions } from '../Storage';
 
 const toASCII = (bytes: Buffer) => {
   let result = '';
