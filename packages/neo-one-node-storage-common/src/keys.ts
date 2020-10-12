@@ -1,5 +1,6 @@
-import { BinaryWriter, common, UInt160, UInt256 } from '@neo-one/client-common';
-import { BlockKey, StorageKey } from '@neo-one/node-core';
+import { BinaryWriter, common, InvalidFormatError, UInt160, UInt256 } from '@neo-one/client-common';
+import { BlockKey, StorageKey, StreamOptions } from '@neo-one/node-core';
+import { BN } from 'bn.js';
 
 enum Prefix {
   Block = 0x01,
@@ -30,6 +31,33 @@ const serializeHeaderHashListKey = (key: number) => {
   writer.writeUInt32LE(key);
 
   return writer.toBuffer();
+};
+
+/* crude method but it does what we want it to do */
+const generateSearchRange = (lookupKey: Buffer): Required<StreamOptions> => {
+  const asBN = new BN(lookupKey, 'le');
+  const lte = asBN.addn(1).toBuffer();
+  if (lte.length !== lookupKey.length) {
+    throw new InvalidFormatError('not sure how this happened');
+  }
+
+  return {
+    gte: lookupKey,
+    lte,
+  };
+};
+
+const createGetSearchRange = (prefix: Prefix) => {
+  const bufferKey = Buffer.from([prefix]);
+
+  return (lookupKey: Buffer): Required<StreamOptions> => {
+    const { gte: initGte, lte: initLte } = generateSearchRange(lookupKey);
+
+    return {
+      gte: Buffer.concat([bufferKey, initGte]),
+      lte: Buffer.concat([bufferKey, initLte]),
+    };
+  };
 };
 
 const createBlockKey = getCreateKey<BlockKey>({
@@ -82,11 +110,14 @@ const maxBlockKey = createBlockKey({ hashOrIndex: common.MAX_UINT256 });
 const minHeaderHashListKey = createHeaderHashListKey(0);
 const maxHeaderHashListKey = createHeaderHashListKey(0xffffffff);
 
+const getStorageSearchRange = createGetSearchRange(Prefix.Storage);
+
 export const keys = {
   createBlockKey,
   createTransactionKey,
   createContractKey,
   createStorageKey,
+  getStorageSearchRange,
   createHeaderHashListKey,
   blockHashIndexKey,
   headerHashIndexKey,

@@ -36,7 +36,7 @@ export interface ReadAllStorage<Key, Value> extends ReadStorage<Key, Value> {
 }
 
 export interface ReadFindStorage<Key, Value> extends ReadStorage<Key, Value> {
-  readonly find$: (range: StreamOptions) => Observable<StorageReturn<Key, Value>>;
+  readonly find$: (lookup: Buffer) => Observable<StorageReturn<Key, Value>>;
 }
 
 export interface ReadGetAllStorage<Key, Value> extends ReadStorage<Key, Value> {

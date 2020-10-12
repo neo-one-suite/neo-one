@@ -126,26 +126,30 @@ export function createReadAllStorage<Key, Value>({
 
 export function createFind$<Key, Value>({
   db,
+  getSearchRange,
   deserializeKey,
   deserializeValue,
 }: {
   readonly db: LevelUp;
+  readonly getSearchRange: (key: Buffer) => StreamOptions;
   readonly deserializeKey: (key: Buffer) => Key;
   readonly deserializeValue: (value: Buffer) => Value;
-}): (range: StreamOptions) => Observable<StorageReturn<Key, Value>> {
-  return (range: StreamOptions) =>
-    streamToObservable<StorageReturn<Buffer, Buffer>>(() => db.createReadStream(range)).pipe(
+}): (lookup: Buffer) => Observable<StorageReturn<Key, Value>> {
+  return (lookup: Buffer) =>
+    streamToObservable<StorageReturn<Buffer, Buffer>>(() => db.createReadStream(getSearchRange(lookup))).pipe(
       map(({ key, value }) => ({ key: deserializeKey(key), value: deserializeValue(value) })),
     );
 }
 
 export function createReadFindStorage<Key, Value>({
   db,
+  getSearchRange,
   serializeKey,
   deserializeKey,
   deserializeValue,
 }: {
   readonly db: LevelUp;
+  readonly getSearchRange: (key: Buffer) => StreamOptions;
   readonly serializeKey: SerializeKey<Key>;
   readonly deserializeKey: (value: Buffer) => Key;
   readonly deserializeValue: (value: Buffer) => Value;
@@ -161,6 +165,7 @@ export function createReadFindStorage<Key, Value>({
     tryGet: readStorage.tryGet,
     find$: createFind$({
       db,
+      getSearchRange,
       deserializeKey,
       deserializeValue,
     }),

@@ -16,10 +16,12 @@
     "@neo-one/client-common": "^2.7.0",
     "@neo-one/node-core": "^2.7.0",
     "@neo-one/utils": "^2.6.1",
+    "bn.js": "^5.0.0",
     "tslib": "^1.10.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
+    "@types/bn.js": "^4.11.5",
     "gulp": "~4.0.2"
   }
 }

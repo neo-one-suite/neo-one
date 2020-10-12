@@ -1,4 +1,4 @@
-import { SerializableWire, StorageKey, StreamOptions } from '@neo-one/node-core';
+import { SerializableWire, StorageKey } from '@neo-one/node-core';
 
 export class KeyBuilder {
   private readonly id: number;
@@ -28,21 +28,6 @@ export class KeyBuilder {
 
   public toSearchPrefix(): Buffer {
     return StorageKey.createSearchPrefix(this.id, this.mutableBuffer);
-  }
-
-  public toSearchRange(): StreamOptions {
-    const prefix = this.mutableBuffer;
-    const lastBit = prefix[prefix.length - 1];
-    const ltePrefix = Buffer.concat([prefix.slice(0, prefix.length - 1), Buffer.from([lastBit + 1])]);
-    if (ltePrefix.length !== prefix.length) {
-      // TODO: implement a real error, this is a failsafe because buffer manipulation
-      throw new Error('Unexpected error constructing search range');
-    }
-
-    return {
-      gte: StorageKey.createSearchPrefix(this.id, prefix),
-      lte: StorageKey.createSearchPrefix(this.id, ltePrefix),
-    };
   }
 
   public toStorageKey(): StorageKey {
