@@ -1,4 +1,5 @@
 import { common, UInt256, VerifyResultModel } from '@neo-one/client-common';
+import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   Block,
   Blockchain as BlockchainType,
@@ -32,8 +33,7 @@ import { utils } from './utils';
 import { verifyWitnesses } from './verify';
 import { wrapExecuteScripts } from './wrapExecuteScripts';
 
-// TODO: bring logger over when its time;
-const logger = console;
+const logger = createChild(nodeLogger, { service: 'blockchain' });
 
 export interface CreateBlockchainOptions {
   readonly onPersistNativeContractScript?: Buffer;
@@ -44,10 +44,10 @@ export interface CreateBlockchainOptions {
 }
 
 export interface BlockchainOptions extends CreateBlockchainOptions {
-  readonly currentBlock?: Block;
-  // readonly previousBlockIndex?: number;
   // tslint:disable-next-line: readonly-array
   readonly headerIndex: UInt256[];
+  readonly storedHeaderCount: number;
+  readonly currentBlock?: Block;
 }
 
 interface Entry {
@@ -57,6 +57,7 @@ interface Entry {
   readonly verify: boolean;
 }
 
+const hashListBatchSize = 2000;
 export const recoverHeaderIndex = async (storage: Storage) => {
   const initHeaderIndex = await storage.headerHashList.all$
     .pipe(
@@ -66,6 +67,7 @@ export const recoverHeaderIndex = async (storage: Storage) => {
     .toPromise();
 
   const storedHeaderCount = initHeaderIndex.length;
+  logger.debug({ name: 'recover_header_index_stored_count', count: storedHeaderCount });
 
   if (storedHeaderCount !== 0) {
     const hashIndex = await storage.headerHashIndex.get();
@@ -79,21 +81,23 @@ export const recoverHeaderIndex = async (storage: Storage) => {
         hash = previousHash;
       }
 
-      return initHeaderIndex.concat(extraHashes);
+      return { headerIndex: initHeaderIndex.concat(extraHashes), storedHeaderCount };
     }
   }
 
-  return storage.blocks.all$
+  const sortedTrimmedBlocks = await storage.blocks.all$
     .pipe(
-      map((block) => block.header.hash),
       toArray(),
+      map((blocks) => blocks.slice().sort(utils.blockComparator)),
     )
     .toPromise();
+
+  return { headerIndex: sortedTrimmedBlocks.map((block) => block.header.hash), storedHeaderCount: 0 };
 };
 
 export class Blockchain {
   public static async create({ settings, storage, native, vm }: CreateBlockchainOptions): Promise<BlockchainType> {
-    const headerIndex = await recoverHeaderIndex(storage);
+    const { headerIndex, storedHeaderCount } = await recoverHeaderIndex(storage);
     if (headerIndex.length > 0) {
       const currentBlockTrimmed = await storage.blocks.tryGet({ hashOrIndex: headerIndex[headerIndex.length - 1] });
       if (currentBlockTrimmed === undefined) {
@@ -104,6 +108,7 @@ export class Blockchain {
 
       return new Blockchain({
         headerIndex,
+        storedHeaderCount,
         settings,
         storage,
         native,
@@ -114,6 +119,7 @@ export class Blockchain {
 
     const blockchain = new Blockchain({
       headerIndex,
+      storedHeaderCount,
       settings,
       storage,
       native,
@@ -152,7 +158,7 @@ export class Blockchain {
 
   public constructor(options: BlockchainOptions) {
     this.headerIndex = options.headerIndex;
-    this.mutableStoredHeaderCount = this.headerIndex.length;
+    this.mutableStoredHeaderCount = options.storedHeaderCount;
     this.settings = options.settings;
     this.storage = options.storage;
     this.native = options.native;
@@ -567,7 +573,7 @@ export class Blockchain {
   }
 
   private async saveHeaderHashList(): Promise<void> {
-    if (this.headerIndex.length - this.storedHeaderCount < utils.hashListBatchSize) {
+    if (this.headerIndex.length - this.storedHeaderCount < hashListBatchSize) {
       return;
     }
 
@@ -606,8 +612,14 @@ export class Blockchain {
       await this.verifyBlock(block);
     }
 
-    const blockchain = this.createPersistingBlockchain();
     const currentHeaderCount = this.headerIndex.length;
+    if (block.transactions.length !== 0) {
+      logger.debug({ name: 'BLOCK_PERSIST_WITH_TRANSACTION', block: block.serializeJSON(this.serializeJSONContext) });
+      logger.error({ name: 'SEE THIS ONE LOOK AT IT' });
+      logger.error({ name: 'SEE THIS ONE LOOK AT IT' });
+    }
+
+    const blockchain = this.createPersistingBlockchain();
 
     if (block.index === currentHeaderCount) {
       this.headerIndex.push(block.hash);

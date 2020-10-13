@@ -42,8 +42,8 @@ export class Witness extends WitnessModel implements SerializableJSON<WitnessJSO
 
   public serializeJSON(): WitnessJSON {
     return {
-      invocation: JSONHelper.writeBuffer(this.invocation),
-      verification: JSONHelper.writeBuffer(this.verification),
+      invocation: JSONHelper.writeBase64Buffer(this.invocation),
+      verification: JSONHelper.writeBase64Buffer(this.verification),
     };
   }
 }

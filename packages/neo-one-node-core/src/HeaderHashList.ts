@@ -31,7 +31,7 @@ export class HeaderHashList implements SerializableWire {
   }
 
   public readonly hashes: readonly UInt256[];
-  public readonly serializeWire = createSerializeWire(this.serializeWireBase);
+  public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   public constructor({ hashes }: HeaderHashListAdd) {
     this.hashes = hashes;
   }

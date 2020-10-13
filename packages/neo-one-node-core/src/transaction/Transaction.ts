@@ -11,6 +11,7 @@ import {
   TransactionModel,
   TransactionModelAdd,
   UInt160,
+  VerboseTransactionJSON,
   VerifyResultModel,
   VMStateJSON,
 } from '@neo-one/client-common';
@@ -275,12 +276,12 @@ export class Transaction
       validuntilblock: this.validUntilBlock,
       signers: this.signers.map((signer) => signer.serializeJSON()),
       attributes: this.attributes.map((attr) => attr.serializeJSON()),
-      script: JSONHelper.writeBuffer(this.script),
+      script: JSONHelper.writeBase64Buffer(this.script),
       witnesses: this.witnesses.map((witness) => witness.serializeJSON()),
     };
   }
 
-  public serializeJSONWithInvocationData(data: VerboseData) {
+  public serializeJSONWithInvocationData(data: VerboseData): VerboseTransactionJSON {
     const base = this.serializeJSON();
 
     return {

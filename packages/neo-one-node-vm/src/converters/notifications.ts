@@ -1,9 +1,9 @@
 import { common } from '@neo-one/client-common';
-import { Notification } from '@neo-one/node-core';
+import { Notification, SerializableContainer } from '@neo-one/node-core';
 import { parseStackItems, StackItemReturn } from './stackItems';
 
 export interface NotificationReturn {
-  readonly scriptContainer: Buffer;
+  readonly scriptContainer: SerializableContainer;
   readonly scriptHash: Buffer;
   readonly eventName: string;
   readonly state: readonly StackItemReturn[];

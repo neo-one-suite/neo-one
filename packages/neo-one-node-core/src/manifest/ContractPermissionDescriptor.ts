@@ -3,13 +3,15 @@ import { ContractPermissionDescriptorModel } from '@neo-one/client-full-common';
 
 export class ContractPermissionDescriptor extends ContractPermissionDescriptorModel {
   public static deserializeJSON(json: ContractPermissionDescriptorJSON): ContractPermissionDescriptor {
-    if (json.length === 42) {
-      return new ContractPermissionDescriptor({ hashOrGroup: JSONHelper.readUInt160(json) });
+    // TODO: Verify this is even close to being the same
+    const jsonString = JSON.stringify(json);
+    if (jsonString.length === 42) {
+      return new ContractPermissionDescriptor({ hashOrGroup: JSONHelper.readUInt160(jsonString) });
     }
-    if (json.length === 66) {
-      return new ContractPermissionDescriptor({ hashOrGroup: JSONHelper.readECPoint(json) });
+    if (jsonString.length === 66) {
+      return new ContractPermissionDescriptor({ hashOrGroup: JSONHelper.readECPoint(jsonString) });
     }
-    if (json === '*') {
+    if (jsonString === '*') {
       return new ContractPermissionDescriptor();
     }
 

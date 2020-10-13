@@ -8,6 +8,6 @@ export { InvPayload } from './InvPayload';
 export { MerkleBlockPayload } from './MerkleBlockPayload';
 export { NetworkAddress } from './NetworkAddress';
 export { PingPayload } from './PingPayload';
-export { VersionPayload, SERVICES } from './VersionPayload';
+export { VersionPayload } from './VersionPayload';
 
 export { InventoryType } from './InventoryType';

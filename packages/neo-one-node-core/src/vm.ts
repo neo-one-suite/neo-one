@@ -11,13 +11,6 @@ export enum TriggerType {
   Application = 0x10,
 }
 
-export type ScriptContainerType = 'Signers' | 'Transaction' | 'Block';
-
-export interface SerializedScriptContainer {
-  readonly type: ScriptContainerType;
-  readonly buffer: Buffer;
-}
-
 export interface Notification {
   readonly scriptContainer: SerializableContainer;
   readonly scriptHash: UInt160;

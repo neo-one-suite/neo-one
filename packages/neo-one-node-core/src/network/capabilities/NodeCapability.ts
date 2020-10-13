@@ -14,8 +14,6 @@ export const deserializeNodeCapabilityWireBase = (options: DeserializeWireBaseOp
 
   switch (type) {
     case NodeCapabilityType.TcpServer:
-      return ServerCapability.deserializeWireBase(options);
-
     case NodeCapabilityType.WsServer:
       return ServerCapability.deserializeWireBase(options);
 

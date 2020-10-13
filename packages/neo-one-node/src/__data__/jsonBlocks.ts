@@ -98,3 +98,53 @@ export const thirdBlockJSON = {
   confirmations: 311250,
   nextblockhash: '0xfd4d6fdf33eaec2d574590af1c8cbfcaa9d990b4ecc1cf0e60670b951be214a2',
 };
+
+export const debugBlockJSON = {
+  version: 0,
+  hash: '0x62b9c6556b0acfc6e8c1f650bf02b6e68970840fbfadc5a60ef3b2c15adba1d2',
+  size: 948,
+  previousblockhash: '0x4ee710e3c8ab3355782ea19bc6e8015a64dba5cb518aaba5f2a9e8191ecc44da',
+  merkleroot: '0x9ab319ff358ef291ce343994d5b6cb323254e00f3bd3dfa855ef8003cf0ac21e',
+  time: '1596623855243',
+  index: 5363,
+  nextconsensus: 'NUQ6Q4BWvHU71HNxPQ4LMSHPMK1jSz1nw4',
+  witnesses: [
+    {
+      invocation:
+        'DEAIdyv6wls3FN47Rw4//yXM2L0TE2ci3Eo3lC2cx7OmrzU6rlk5HKtg0NVS2tuAAgcV48h3cWVBf082zJiGzbCyDEDnYdZuYpaICaSdp1dReL2EEa7gNWm+UZhG1Deus04IPA6tzLrvbd2GR9WNHAUeZMleS1pxTOe/tfajscwTxOcPDEDpfcTZoKaK0qp9vwkgDw5ysaLsQgcH4++NCcXc9z+dCl9wBkuJ+PGIKAPsV9JUGEXhMtJBCx1t8hdlUJKXy6JIDEAZet+oQR2V7A6VCRh0OPy8ai1fxi3uHnKlQqi7UrYC2PnD3/E6YFMR/hRLYUdZuyX+MYeLP+svnOQ/QLd63DdbDECF+j8cO7NY612P4TBjh+4Bifsa93mpbmRWzPDHnCik+mSPqE4MqMoiPyXYKyxekJyzMm95WHQm/f3KniYT6j4q',
+      verification:
+        'FQwhAwCbdUDhDyVi5f2PrJ6uwlFmpYsm5BI0j/WoaSe/rCKiDCEDAgXpzvrqWh38WAryDI1aokaLsBSPGl5GBfxiLIDmBLoMIQIUuvDO6jpm8X5+HoOeol/YvtbNgua7bmglAYkGX0T/AQwhAj6bMuqJuU0GbmSbEk/VDjlu6RNp6OKmrhsRwXDQIiVtDCEDQI3NQWOW9keDrFh+oeFZPFfZ/qiAyKahkg6SollHeAYMIQKng0vpsy4pgdFXy1u9OstCz9EepcOxAiTXpE6YxZEPGwwhAroscPWZbzV6QxmHBYWfriz+oT4RcpYoAHcrPViKnUq9FwtBE43vrw==',
+    },
+  ],
+  consensusdata: {
+    primary: 1,
+    nonce: '3d40ebb6a5bfe606',
+  },
+  tx: [
+    {
+      hash: '0x759ae7ce80a3a4349f6260dd5de13f9bd1edacf2acba736a4cdc958cd94d20f8',
+      size: 248,
+      version: 0,
+      nonce: 206553393,
+      sender: 'NTZJ91cwZWiad8uj8sLMF7X6j8Ed41Cim6',
+      sysfee: '0000000000897376',
+      netfee: '1248390',
+      validuntilblock: 2107762,
+      signers: [
+        {
+          account: '0x41546d4fee9fe73744a08fc5055d76a88b17d853',
+          scopes: 'CalledByEntry',
+        },
+      ],
+      attributes: [],
+      script:
+        'AkBLTAAMFPpfQslsEOq7tFQTMHff69ZOoqWYDBRT2BeLqHZdBcWPoEQ355/uT21UQRPADAh0cmFuc2ZlcgwUJQWey0h406h1+RxRzt7TMNRXX95BYn1bUjg=',
+      witnesses: [
+        {
+          invocation: 'DECNS6h+iFmdfL+CvqUBTAC7Wp1kka5WryQuXegpFelHdAye03+uhx2obUC8ULJ1Iz0tG3RM8iv5auSrT2cQexGN',
+          verification: 'DCEDWRO5WI2iOlw84Usohqa467ag65K9qpSFEN+1rlGU1ssLQZVEDXg=',
+        },
+      ],
+    },
+  ],
+};

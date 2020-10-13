@@ -11,6 +11,7 @@ import {
 } from '@neo-one/client-common';
 import {
   ApplicationEngine,
+  BlockBase,
   BlockchainStorage,
   CallFlags,
   ECDsaVerifyPrice,
@@ -33,8 +34,6 @@ const getOnPersistNativeContractScript = coreUtils.lazy(() => {
 
   return script.build();
 });
-
-const hashListBatchSize = 2000;
 
 const getApplicationExecuted = (engine: ApplicationEngine, transaction?: Transaction) => ({
   transaction,
@@ -167,12 +166,24 @@ const verifyContract = async (
   return { fee: coreUtils.ZERO, size: 0 };
 };
 
+const blockComparator = <TBlock extends BlockBase>({ index: aIndex }: TBlock, { index: bIndex }: TBlock) => {
+  if (aIndex > bIndex) {
+    return 1;
+  }
+
+  if (aIndex < bIndex) {
+    return -1;
+  }
+
+  return 0;
+};
+
 export const utils = {
   ...coreUtils,
-  hashListBatchSize,
   getApplicationExecuted,
   getCallReceipt,
   getOnPersistNativeContractScript,
   verifyContract,
   getCalculateNetworkFee,
+  blockComparator,
 };

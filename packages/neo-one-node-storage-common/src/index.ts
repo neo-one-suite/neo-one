@@ -1,2 +1,2 @@
 // tslint:disable-next-line export-name
-export { keys } from './keys';
+export { keys, Prefix as StoragePrefix } from './keys';

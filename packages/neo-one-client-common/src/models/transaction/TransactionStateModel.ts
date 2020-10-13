@@ -14,7 +14,7 @@ export class TransactionStateModel<TTransactionModel extends TransactionModel = 
   public readonly blockIndex: number;
   public readonly state: VMState;
   public readonly transaction: TTransactionModel;
-  public readonly serializeWire = createSerializeWire(this.serializeWireBase);
+  public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   public constructor(options: TransactionStateModelAdd<TTransactionModel>) {
     this.blockIndex = options.blockIndex;

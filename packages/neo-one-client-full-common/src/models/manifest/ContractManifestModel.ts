@@ -94,11 +94,11 @@ export class ContractManifestModel<
         storage: this.hasStorage,
         payable: this.payable,
       },
-      supportedStandards: this.supportedStandards,
+      supportedstandards: this.supportedStandards,
       abi: this.abi.serializeJSON(),
       permissions: this.permissions.map((permission) => permission.serializeJSON()),
       trusts: common.isWildcard(this.trusts) ? this.trusts : this.trusts.map((trust) => JSONHelper.writeUInt160(trust)),
-      safeMethods: this.safeMethods,
+      safemethods: this.safeMethods,
       extra: this.extra,
     };
   }

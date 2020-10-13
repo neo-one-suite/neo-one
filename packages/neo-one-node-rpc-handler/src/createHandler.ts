@@ -6,6 +6,7 @@ import {
   JSONHelper,
   RelayTransactionResultJSON,
   ScriptBuilder,
+  toJSONVerifyResult,
   toVMStateJSON,
   toWitnessScope,
   TransactionJSON,
@@ -28,7 +29,7 @@ import {
   TransactionState,
 } from '@neo-one/node-core';
 import { Labels } from '@neo-one/utils';
-import { filter, switchMap, take, timeout, toArray } from 'rxjs/operators';
+import { filter, map, switchMap, take, timeout, toArray } from 'rxjs/operators';
 
 const logger = createChild(nodeLogger, { component: 'rpc-handler' });
 
@@ -352,7 +353,7 @@ export const createHandler = ({
     [RPC_METHODS.getblockhash]: async (args) => {
       const height = args[0];
       checkHeight(height);
-      const hash = await blockchain.getBlockHash(height);
+      const hash = blockchain.getBlockHash(height);
 
       return hash === undefined ? undefined : JSONHelper.writeUInt256(hash);
     },
@@ -630,49 +631,49 @@ export const createHandler = ({
         address: common.uInt160ToString(hash),
       };
     },
-    [RPC_METHODS.getnep5balances]: async (args) => {
-      const hash = JSONHelper.readUInt160(args[0]);
-      const account = await blockchain.account.tryGet({ hash });
-      if (account === undefined) {
-        throw new JSONRPCError(-100, 'Unknown account');
-      }
-      const resultBalances: Array<{
-        readonly assethash: string;
-        readonly amount: string;
-        readonly lastupdatedblock: number;
-      }> = [];
-      const balances = Object.entries(account.balances);
-      // tslint:disable-next-line: no-loop-statement
-      for (const balance of balances) {
-        // tslint:disable-next-line: no-array-mutation
-        resultBalances.push({
-          assethash: balance[0],
-          amount: balance[1]?.toString() ?? '0',
-          lastupdatedblock: -1, // TODO: in account balance in blockchain.account we need to store the "lastUpdateBlock" as well
-        });
-      }
+    // [RPC_METHODS.getnep5balances]: async (args) => {
+    //   const hash = JSONHelper.readUInt160(args[0]);
+    //   const account = await blockchain.account.tryGet({ hash });
+    //   if (account === undefined) {
+    //     throw new JSONRPCError(-100, 'Unknown account');
+    //   }
+    //   const resultBalances: Array<{
+    //     readonly assethash: string;
+    //     readonly amount: string;
+    //     readonly lastupdatedblock: number;
+    //   }> = [];
+    //   const balances = Object.entries(account.balances);
+    //   // tslint:disable-next-line: no-loop-statement
+    //   for (const balance of balances) {
+    //     // tslint:disable-next-line: no-array-mutation
+    //     resultBalances.push({
+    //       assethash: balance[0],
+    //       amount: balance[1]?.toString() ?? '0',
+    //       lastupdatedblock: -1, // TODO: in account balance in blockchain.account we need to store the "lastUpdateBlock" as well
+    //     });
+    //   }
 
-      return {
-        balance: resultBalances,
-        address: common.uInt160ToString(hash),
-      };
-    },
+    //   return {
+    //     balance: resultBalances,
+    //     address: common.uInt160ToString(hash),
+    //   };
+    // },
 
     // Settings
-    [RPC_METHODS.updatesettings]: async (args) => {
-      const { settings } = blockchain;
-      const newSettings = {
-        ...settings,
-        secondsPerBlock: args[0].secondsPerBlock,
-      };
+    // [RPC_METHODS.updatesettings]: async (args) => {
+    //   const { settings } = blockchain;
+    //   const newSettings = {
+    //     ...settings,
+    //     secondsPerBlock: args[0].secondsPerBlock,
+    //   };
 
-      blockchain.updateSettings(newSettings);
+    //   blockchain.updateSettings(newSettings);
 
-      return true;
-    },
-    [RPC_METHODS.getsettings]: async () => ({
-      millisecondsPerBlock: blockchain.settings.millisecondsPerBlock,
-    }),
+    //   return true;
+    // },
+    // [RPC_METHODS.getsettings]: async () => ({
+    //   millisecondsPerBlock: blockchain.settings.millisecondsPerBlock,
+    // }),
 
     // NEO•ONE
     // TODO: I think we can get away with not using this but we need to make the change in the provider
@@ -701,28 +702,31 @@ export const createHandler = ({
 
       try {
         const [transactionJSON, result] = await Promise.all<TransactionJSON, RelayTransactionResult>([
-          transaction.serializeJSON(blockchain.serializeJSONContext),
+          transaction.serializeJSON(),
           node.relayTransaction(transaction, { forceAdd: true, throwVerifyError: true }),
         ]);
-        const resultJSON =
-          result.verifyResult === undefined
-            ? {}
-            : {
-                verifyResult: {
-                  verifications: result.verifyResult.verifications.map((verification) => ({
-                    hash: JSONHelper.writeUInt160(verification.hash),
-                    witness: verification.witness.serializeJSON(blockchain.serializeJSONContext),
-                    actions: verification.actions.map((action) =>
-                      action.serializeJSON(blockchain.serializeJSONContext),
-                    ),
-                    failureMessage: verification.failureMessage,
-                  })),
-                },
-              };
+
+        const resultJSON = result.verifyResult !== undefined ? toJSONVerifyResult(result.verifyResult) : undefined;
+
+        // const resultJSON =
+        //   result.verifyResult === undefined
+        //     ? {}
+        //     : {
+        //         verifyResult: {
+        //           verifications: result.verifyResult.verifications.map((verification) => ({
+        //             hash: JSONHelper.writeUInt160(verification.hash),
+        //             witness: verification.witness.serializeJSON(blockchain.serializeJSONContext),
+        //             actions: verification.actions.map((action) =>
+        //               action.serializeJSON(blockchain.serializeJSONContext),
+        //             ),
+        //             failureMessage: verification.failureMessage,
+        //           })),
+        //         },
+        //       };
 
         return {
-          ...resultJSON,
           transaction: transactionJSON,
+          verifyResult: resultJSON,
         };
       } catch (error) {
         throw new JSONRPCError(-110, `Relay transaction failed: ${error.message}`);
@@ -730,13 +734,18 @@ export const createHandler = ({
     },
     [RPC_METHODS.getallstorage]: async (args) => {
       const hash = JSONHelper.readUInt160(args[0]);
-      const contract = await blockchain.contract.tryGet({ hash });
+      const contract = await blockchain.contracts.tryGet(hash);
       if (contract === undefined) {
         return [];
       }
-      const items = await blockchain.storageItem.getAll$({ id: contract.id }).pipe(toArray()).toPromise();
 
-      return items.map((item) => item.serializeJSON(blockchain.serializeJSONContext));
+      return blockchain.storages
+        .find$(Buffer.from([contract.id]))
+        .pipe(
+          map(({ key, value }) => value.serializeJSON(key)),
+          toArray(),
+        )
+        .toPromise();
     },
 
     [RPC_METHODS.gettransactionreceipt]: async (args) => {

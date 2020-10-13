@@ -45,7 +45,7 @@ import _ from 'lodash';
 import LRUCache from 'lru-cache';
 import { Command } from './Command';
 import { AlreadyConnectedError, NegotiationError } from './errors';
-import { Message, MessageTransform, MessageValue } from './Message';
+import { Message, MessageTransform } from './Message';
 import {
   AddrPayload,
   FilterAddPayload,
@@ -140,7 +140,7 @@ const MEM_POOL_SIZE = 5000;
 const GET_BLOCKS_COUNT = 500;
 // Assume that we get 500 back, but if not, at least request every 10 seconds
 const GET_BLOCKS_BUFFER = GET_BLOCKS_COUNT / 3;
-const GET_BLOCKS_TIME_MS = 10000;
+const GET_BLOCKS_TIME_MS = 5000;
 const GET_BLOCKS_THROTTLE_MS = 1000;
 const TRIM_MEMPOOL_THROTTLE = 5000;
 const GET_BLOCKS_CLOSE_COUNT = 2;
@@ -153,6 +153,8 @@ interface PeerHealth {
   readonly checkTimeSeconds: number;
 }
 
+const trimMemPool = () => Promise.reject(new Error('not implemented yet'));
+
 export class Node implements INode {
   public readonly blockchain: Blockchain;
   // tslint:disable-next-line readonly-keyword
@@ -163,7 +165,6 @@ export class Node implements INode {
   private readonly externalPort: number;
   private readonly nonce: number;
   private readonly userAgent: string;
-  private readonly capabilities: readonly NodeCapability[];
   private mutableKnownBlockHashes: ScalingBloem;
   private readonly tempKnownBlockHashes: Set<UInt256Hex>;
   private mutableKnownTransactionHashes: ScalingBloem;
@@ -179,11 +180,12 @@ export class Node implements INode {
   // tslint:disable-next-line readonly-keyword
   private mutableBlockIndex: { [endpoint: string]: number };
   private mutableConsensus: Consensus | undefined;
+
   private readonly requestBlocks = _.debounce(() => {
     const peer = this.mutableBestPeer;
     const previousBlock = this.blockchain.previousBlock;
     const block = previousBlock === undefined ? this.blockchain.currentBlock : previousBlock;
-    if (peer !== undefined && block.index < peer.data.startHeight) {
+    if (peer !== undefined && block.index < this.mutableBlockIndex[peer.endpoint]) {
       if (this.mutableGetBlocksRequestsCount > GET_BLOCKS_CLOSE_COUNT) {
         this.mutableBestPeer = this.findBestPeer(peer);
         this.network.blacklistAndClose(peer);
@@ -198,10 +200,11 @@ export class Node implements INode {
         this.mutableGetBlocksRequestTime = Date.now();
         this.sendMessage(
           peer,
-          this.createMessage({
+          Message.create({
             command: Command.GetBlocks,
             payload: new GetBlocksPayload({
               hashStart: block.hash,
+              count: this.mutableGetBlocksRequestsCount * 100,
             }),
           }),
         );
@@ -210,37 +213,38 @@ export class Node implements INode {
       this.requestBlocks();
     }
   }, GET_BLOCKS_THROTTLE_MS);
+
   private readonly onRequestEndpoints = _.throttle((): void => {
-    this.relay(this.createMessage({ command: Command.GetAddr }));
+    this.relay(Message.create({ command: Command.GetAddr }));
     // tslint:disable-next-line no-floating-promises
     this.fetchEndpointsFromRPC();
   }, 5000);
 
   // tslint:disable-next-line no-unnecessary-type-annotation
-  private readonly trimMemPool = _.throttle(async (): Promise<void> => {
-    const memPool = Object.values(this.mutableMemPool);
-    if (memPool.length > MEM_POOL_SIZE) {
-      const transactionAndFees = await Promise.all(
-        memPool.map<Promise<TransactionAndFee>>(async (transaction) => {
-          const networkFee = await transaction.networkFee({
-            fees: this.blockchain.settings.fees,
-          });
+  // private readonly trimMemPool = _.throttle(async (): Promise<void> => {
+  //   const memPool = Object.values(this.mutableMemPool);
+  //   if (memPool.length > MEM_POOL_SIZE) {
+  //     const transactionAndFees = await Promise.all(
+  //       memPool.map<Promise<TransactionAndFee>>(async (transaction) => {
+  //         const networkFee = await transaction.networkFee({
+  //           fees: this.blockchain.settings.fees,
+  //         });
 
-          return { transaction, networkFee };
-        }),
-      );
+  //         return { transaction, networkFee };
+  //       }),
+  //     );
 
-      const hashesToRemove = _.take<TransactionAndFee>(
-        // tslint:disable-next-line no-array-mutation
-        transactionAndFees.slice().sort(compareTransactionAndFees),
-        this.blockchain.settings.memoryPoolMaxTransactions,
-      ).map((transactionAndFee) => transactionAndFee.transaction.hashHex);
-      hashesToRemove.forEach((hash) => {
-        // tslint:disable-next-line no-dynamic-delete
-        delete this.mutableMemPool[hash];
-      });
-    }
-  }, TRIM_MEMPOOL_THROTTLE);
+  //     const hashesToRemove = _.take<TransactionAndFee>(
+  //       // tslint:disable-next-line no-array-mutation
+  //       transactionAndFees.slice().sort(compareTransactionAndFees),
+  //       this.blockchain.settings.memoryPoolMaxTransactions,
+  //     ).map((transactionAndFee) => transactionAndFee.transaction.hashHex);
+  //     hashesToRemove.forEach((hash) => {
+  //       // tslint:disable-next-line no-dynamic-delete
+  //       delete this.mutableMemPool[hash];
+  //     });
+  //   }
+  // }, TRIM_MEMPOOL_THROTTLE);
 
   public constructor({
     blockchain,
@@ -285,10 +289,6 @@ export class Node implements INode {
     this.mutableGetBlocksRequestsCount = 1;
     this.consensusCache = new LRUCache(10000);
     this.mutableBlockIndex = {};
-
-    const fullNodeCapability = new FullNodeCapability({ startHeight: this.blockchain.currentBlockIndex });
-    const tcpCapability = new ServerCapability({ type: NodeCapabilityType.TcpServer, port: this.externalPort });
-    this.capabilities = [fullNodeCapability, tcpCapability];
   }
 
   public get version(): Version {
@@ -298,6 +298,13 @@ export class Node implements INode {
       nonce: this.nonce,
       useragent: this.userAgent,
     };
+  }
+
+  public get capabilities(): readonly NodeCapability[] {
+    const fullNodeCapability = new FullNodeCapability({ startHeight: this.blockchain.currentBlockIndex });
+    const tcpCapability = new ServerCapability({ type: NodeCapabilityType.TcpServer, port: this.externalPort });
+
+    return [fullNodeCapability, tcpCapability];
   }
 
   public get consensus(): Consensus | undefined {
@@ -410,7 +417,7 @@ export class Node implements INode {
               }
               this.transactionVerificationContext.addTransaction(transaction);
               this.relayTransactionInternal(transaction);
-              await this.trimMemPool();
+              await trimMemPool();
             }
           }
 
@@ -446,7 +453,7 @@ export class Node implements INode {
   }
 
   public relayConsensusPayload(payload: ConsensusPayload): void {
-    const message = this.createMessage({
+    const message = Message.create({
       command: Command.Inv,
       payload: new InvPayload({
         type: InventoryType.Consensus,
@@ -459,7 +466,7 @@ export class Node implements INode {
   }
 
   public syncMemPool(): void {
-    this.relay(this.createMessage({ command: Command.Mempool }));
+    this.relay(Message.create({ command: Command.Mempool }));
   }
 
   private relay(message: Message): void {
@@ -467,7 +474,7 @@ export class Node implements INode {
   }
 
   private relayTransactionInternal(transaction: Transaction): void {
-    const message = this.createMessage({
+    const message = Message.create({
       command: Command.Inv,
       payload: new InvPayload({
         type: InventoryType.TX,
@@ -489,7 +496,7 @@ export class Node implements INode {
   private readonly negotiate = async (peer: Peer<Message>): Promise<NegotiateResult<PeerData>> => {
     this.sendMessage(
       peer,
-      this.createMessage({
+      Message.create({
         command: Command.Version,
         payload: VersionPayload.create({
           magic: this.blockchain.settings.messageMagic,
@@ -521,8 +528,8 @@ export class Node implements INode {
         })
       : undefined;
 
-    this.sendMessage(peer, this.createMessage({ command: Command.Verack }));
-
+    const verackMessage = Message.create({ command: Command.Verack });
+    this.sendMessage(peer, verackMessage);
     const nextMessage = await peer.receiveMessage(30000);
     if (nextMessage.value.command !== Command.Verack) {
       throw new NegotiationError(nextMessage);
@@ -537,7 +544,7 @@ export class Node implements INode {
             return {
               ...acc,
               relay: true,
-              lastBlockIndex: fullCap.startHeight,
+              startHeight: fullCap.startHeight,
             };
 
           case NodeCapabilityType.TcpServer:
@@ -557,13 +564,11 @@ export class Node implements INode {
       },
       { relay: false, port: 0, startHeight: 0 },
     );
-
     this.mutableBlockIndex[peer.endpoint] = startHeight;
 
     return {
       data: {
         nonce: versionPayload.nonce,
-        startHeight,
         mutableBloomFilter: undefined,
         address,
         listenPort: port,
@@ -601,13 +606,14 @@ export class Node implements INode {
 
     return { healthy: false, checkTimeSeconds, blockIndex };
   };
+
   private readonly onEvent = (event: NetworkEventMessage<Message, PeerData>) => {
     if (event.event === 'PEER_CONNECT_SUCCESS') {
       const { connectedPeer } = event;
       if (
         this.mutableBestPeer === undefined ||
         // Only change best peer at most every 100 blocks
-        this.mutableBestPeer.data.startHeight + 100 < connectedPeer.data.startHeight
+        this.mutableBlockIndex[this.mutableBestPeer.endpoint] + 100 < this.mutableBlockIndex[connectedPeer.endpoint]
       ) {
         this.mutableBestPeer = connectedPeer;
         this.resetRequestBlocks();
@@ -629,12 +635,14 @@ export class Node implements INode {
     if (bestPeer !== undefined) {
       peers = peers.filter((peer) => peer.endpoint !== bestPeer.endpoint);
     }
-    const result = _.maxBy(peers, (peer) => peer.data.startHeight);
+    const result = _.maxBy(peers, (peer) => this.mutableBlockIndex[peer.endpoint]);
     if (result === undefined) {
       return undefined;
     }
 
-    return _.shuffle(peers.filter((peer) => peer.data.startHeight === result.data.startHeight))[0];
+    return _.shuffle(
+      peers.filter((peer) => this.mutableBlockIndex[peer.endpoint] === this.mutableBlockIndex[result.endpoint]),
+    )[0];
   }
 
   private resetRequestBlocks(): void {
@@ -671,7 +679,7 @@ export class Node implements INode {
     const peer = this.mutableBestPeer;
     const block = this.blockchain.currentBlock;
 
-    return peer !== undefined && block.index >= peer.data.startHeight;
+    return peer !== undefined && block.index >= this.mutableBlockIndex[peer.endpoint];
   }
 
   private async fetchEndpointsFromRPC(): Promise<void> {
@@ -842,12 +850,13 @@ export class Node implements INode {
 
   private async onBlockMessageReceived(peer: ConnectedPeer<Message, PeerData>, block: Block): Promise<void> {
     const blockIndex = this.mutableBlockIndex[peer.endpoint] as number | undefined;
-    this.mutableBlockIndex[peer.endpoint] = Math.max(block.index, blockIndex === undefined ? 0 : blockIndex);
+    this.mutableBlockIndex[peer.endpoint] = Math.max(block.index, blockIndex ?? 0);
 
     await this.relayBlock(block);
   }
 
   private async persistBlock(block: Block): Promise<void> {
+    const startTime = Date.now();
     if (this.blockchain.currentBlockIndex > block.index || this.tempKnownBlockHashes.has(block.hashHex)) {
       return;
     }
@@ -868,9 +877,9 @@ export class Node implements INode {
             }
 
             const peer = this.mutableBestPeer;
-            if (peer !== undefined && block.index > peer.data.startHeight) {
+            if (peer !== undefined && block.index > this.mutableBlockIndex[peer.endpoint]) {
               this.relay(
-                this.createMessage({
+                Message.create({
                   command: Command.Inv,
                   payload: new InvPayload({
                     type: InventoryType.Block,
@@ -879,7 +888,11 @@ export class Node implements INode {
                 }),
               );
             }
-            logger.info({ name: 'neo_relay_block', [Labels.NEO_BLOCK_INDEX]: block.index });
+            logger.info({
+              name: 'neo_relay_block',
+              [Labels.NEO_BLOCK_INDEX]: block.index,
+              timeToPersist: `${(Date.now() - startTime) / 1000} seconds`,
+            });
           } catch (err) {
             logger.error({ name: 'neo_relay_block', [Labels.NEO_BLOCK_INDEX]: block.index, err });
             throw err;
@@ -937,7 +950,7 @@ export class Node implements INode {
     if (addressList.length > 0) {
       this.sendMessage(
         peer,
-        this.createMessage({
+        Message.create({
           command: Command.Addr,
           payload: new AddrPayload({ addressList }),
         }),
@@ -974,7 +987,7 @@ export class Node implements INode {
 
     this.sendMessage(
       peer,
-      this.createMessage({
+      Message.create({
         command: Command.Inv,
         payload: new InvPayload({
           type: InventoryType.Block,
@@ -1000,7 +1013,7 @@ export class Node implements INode {
       if (peer.data.mutableBloomFilter === undefined) {
         this.sendMessage(
           peer,
-          this.createMessage({
+          Message.create({
             command: Command.Block,
             payload: block,
           }),
@@ -1008,7 +1021,7 @@ export class Node implements INode {
       } else {
         this.sendMessage(
           peer,
-          this.createMessage({
+          Message.create({
             command: Command.MerkleBlock,
             payload: MerkleBlockPayload.create({
               block,
@@ -1037,7 +1050,7 @@ export class Node implements INode {
             if (transaction !== undefined) {
               this.sendMessage(
                 peer,
-                this.createMessage({
+                Message.create({
                   command: Command.Transaction,
                   payload: transaction,
                 }),
@@ -1058,7 +1071,7 @@ export class Node implements INode {
               if (peer.data.mutableBloomFilter === undefined) {
                 this.sendMessage(
                   peer,
-                  this.createMessage({
+                  Message.create({
                     command: Command.Block,
                     payload: block,
                   }),
@@ -1066,7 +1079,7 @@ export class Node implements INode {
               } else {
                 this.sendMessage(
                   peer,
-                  this.createMessage({
+                  Message.create({
                     command: Command.MerkleBlock,
                     payload: MerkleBlockPayload.create({
                       block,
@@ -1090,7 +1103,7 @@ export class Node implements INode {
           if (payload !== undefined) {
             this.sendMessage(
               peer,
-              this.createMessage({
+              Message.create({
                 command: Command.Consensus,
                 payload,
               }),
@@ -1107,7 +1120,7 @@ export class Node implements INode {
       InvPayload.createGroup(getData.type, notFound).forEach((payload) => {
         this.sendMessage(
           peer,
-          this.createMessage({
+          Message.create({
             command: Command.NotFound,
             payload,
           }),
@@ -1146,7 +1159,7 @@ export class Node implements INode {
 
     this.sendMessage(
       peer,
-      this.createMessage({
+      Message.create({
         command: Command.Headers,
         payload: new HeadersPayload({ headers }),
       }),
@@ -1182,7 +1195,7 @@ export class Node implements INode {
     if (hashes.length > 0) {
       this.sendMessage(
         peer,
-        this.createMessage({
+        Message.create({
           command: Command.GetData,
           payload: new InvPayload({ type: inv.type, hashes }),
         }),
@@ -1197,7 +1210,7 @@ export class Node implements INode {
     ).forEach((payload) => {
       this.sendMessage(
         peer,
-        this.createMessage({
+        Message.create({
           command: Command.Inv,
           payload,
         }),
@@ -1215,7 +1228,7 @@ export class Node implements INode {
     this.updateLastBlockIndex(peer.endpoint, payload);
     this.sendMessage(
       peer,
-      this.createMessage({
+      Message.create({
         command: Command.Pong,
         payload: PingPayload.create(this.blockchain.currentBlockIndex, payload.nonce),
       }),
@@ -1242,12 +1255,5 @@ export class Node implements INode {
     if (payload.lastBlockIndex > (this.mutableBlockIndex[endpoint] ?? 0)) {
       this.mutableBlockIndex[endpoint] = payload.lastBlockIndex;
     }
-  }
-
-  private createMessage(value: MessageValue): Message {
-    return new Message({
-      magic: this.blockchain.settings.messageMagic,
-      value,
-    });
   }
 }

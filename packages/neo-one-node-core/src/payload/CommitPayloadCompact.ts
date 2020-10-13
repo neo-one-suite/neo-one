@@ -36,7 +36,7 @@ export class CommitPayloadCompact implements SerializableWire {
   public readonly viewNumber: number;
   public readonly signature: Buffer;
   public readonly invocationScript: Buffer;
-  public readonly serializeWire = createSerializeWire(this.serializeWireBase);
+  public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   public constructor({ validatorIndex, viewNumber, signature, invocationScript }: CommitPayloadCompactAdd) {
     this.validatorIndex = validatorIndex;

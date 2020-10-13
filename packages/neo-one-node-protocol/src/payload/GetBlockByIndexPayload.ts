@@ -38,7 +38,7 @@ export class GetBlockByIndexPayload {
 
   public readonly indexStart: number;
   public readonly count: number;
-  public readonly serializeWire = createSerializeWire(this.serializeWireBase);
+  public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   public constructor({ indexStart, count }: GetBlockByIndexPayloadAdd) {
     this.indexStart = indexStart;

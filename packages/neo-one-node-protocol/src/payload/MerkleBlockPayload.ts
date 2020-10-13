@@ -1,4 +1,4 @@
-import { BinaryWriter, IOHelper, SerializableWire, UInt256 } from '@neo-one/client-common';
+import { BinaryWriter, createSerializeWire, IOHelper, SerializableWire, UInt256 } from '@neo-one/client-common';
 import {
   BinaryReader,
   Block,
@@ -75,6 +75,7 @@ export class MerkleBlockPayload extends BlockBase implements SerializableWire {
     });
   }
 
+  public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   public readonly contentCount: number;
   public readonly hashes: readonly UInt256[];
   public readonly flags: Buffer;

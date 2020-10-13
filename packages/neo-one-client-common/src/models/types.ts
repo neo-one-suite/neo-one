@@ -1,9 +1,10 @@
 import { JSONArray, JSONObject } from '@neo-one/utils';
+import { UInt256Hex } from '../common';
 import { ContractParameterTypeModel } from './ContractParameterTypeModel';
 import { StorageFlagsModel } from './StorageFlagsModel';
 import { AttributeTypeModel } from './transaction/attribute/AttributeTypeModel';
 import { VerifyResultModel } from './VerifyResultModel';
-import { VMState } from './vm';
+import { VMState, VMStateJSON } from './vm';
 import { WitnessScopeModel } from './WitnessScopeModel';
 
 export interface ContractParameterDefinitionJSON {
@@ -269,6 +270,14 @@ export interface TransactionJSON {
   readonly data?: TransactionReceiptJSON;
 }
 
+// TODO: temporary using this instead of TransactionWithInvocationDataJSON
+export interface VerboseTransactionJSON extends TransactionJSON {
+  readonly blockhash: UInt256Hex;
+  readonly confirmations: number;
+  readonly blocktime: string;
+  readonly vmstate: VMStateJSON;
+}
+
 // TODO: not going to use this right now because still copying C# code
 export interface TransactionWithInvocationDataJSON extends TransactionJSON {
   // TODO: this may be off slightly. Not sure where script and gas belong. They may belong in TransactionJSON
@@ -414,8 +423,10 @@ export interface VerifyTransactionResultJSON {
 }
 
 export interface RelayTransactionResultJSON {
-  readonly transaction: TransactionWithInvocationDataJSON;
-  readonly verifyResult?: VerifyTransactionResultJSON;
+  // TODO: reimplement transactionJSONWithInvocationData
+  readonly transaction: TransactionJSON;
+  // TODO: reimplement the longform verify transaction result
+  readonly verifyResult?: VerifyResultJSON;
 }
 
 export interface ValidatorJSON {
