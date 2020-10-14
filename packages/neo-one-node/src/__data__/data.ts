@@ -25,8 +25,8 @@ const convertBlock = (json: BlockJSON) =>
           nonce: tx.nonce,
           attributes: [],
           script: JSONHelper.readBase64Buffer(tx.script),
-          systemFee: new BN(tx.sysfee),
-          networkFee: new BN(tx.netfee),
+          systemFee: JSONHelper.readUInt64LE(tx.sysfee),
+          networkFee: JSONHelper.readUInt64LE(tx.netfee),
           validUntilBlock: tx.validuntilblock,
           witnesses: tx.witnesses.map(
             (witness) =>

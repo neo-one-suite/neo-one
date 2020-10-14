@@ -37,6 +37,6 @@ export class HeaderHashList implements SerializableWire {
   }
 
   public serializeWireBase(writer: BinaryWriter) {
-    writer.writeArray(this.hashes, writer.writeUInt256);
+    writer.writeArray(this.hashes, (hash) => writer.writeUInt256(hash));
   }
 }

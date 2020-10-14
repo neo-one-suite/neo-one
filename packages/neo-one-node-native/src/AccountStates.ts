@@ -1,12 +1,5 @@
 import { common, ECPoint } from '@neo-one/client-common';
-import {
-  assertBooleanStackItem,
-  assertBufferStackItem,
-  assertIntegerStackItem,
-  assertStructStackItem,
-  StackItem,
-  StructStackItem,
-} from '@neo-one/node-core';
+import { assertIntegerStackItem, assertStructStackItem, StackItem, StructStackItem } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 
 export interface AccountStateAdd {
@@ -38,10 +31,8 @@ export class NEOAccountState extends AccountState {
   public static fromStackItem(item: StackItem) {
     const structItem = assertStructStackItem(item);
     const { balance } = super.fromStackItem(structItem);
-    const balanceHeight = assertIntegerStackItem(structItem.array[1]).getInteger();
-    const voteTo = structItem.array[2].isNull
-      ? undefined
-      : common.bufferToECPoint(assertBufferStackItem(structItem.array[2]).getBuffer());
+    const balanceHeight = structItem.array[1].getInteger();
+    const voteTo = structItem.array[2].isNull ? undefined : common.bufferToECPoint(structItem.array[2].getBuffer());
 
     return new NEOAccountState({
       balance,
@@ -68,8 +59,8 @@ export interface CandidateStateAdd {
 export class CandidateState {
   public static fromStackItem(item: StackItem) {
     const structItem = assertStructStackItem(item);
-    const registered = assertBooleanStackItem(structItem.array[0]).getBoolean();
-    const votes = assertIntegerStackItem(structItem.array[1]).getInteger();
+    const registered = structItem.array[0].getBoolean();
+    const votes = structItem.array[1].getInteger();
 
     return new CandidateState({
       registered,

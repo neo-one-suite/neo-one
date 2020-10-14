@@ -57,7 +57,6 @@ interface Entry {
   readonly verify: boolean;
 }
 
-const hashListBatchSize = 2000;
 export const recoverHeaderIndex = async (storage: Storage) => {
   const initHeaderIndex = await storage.headerHashList.all$
     .pipe(
@@ -573,7 +572,7 @@ export class Blockchain {
   }
 
   private async saveHeaderHashList(): Promise<void> {
-    if (this.headerIndex.length - this.storedHeaderCount < hashListBatchSize) {
+    if (this.headerIndex.length - this.storedHeaderCount < utils.hashListBatchSize) {
       return;
     }
 

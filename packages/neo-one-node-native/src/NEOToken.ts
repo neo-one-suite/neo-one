@@ -1,12 +1,11 @@
 import { common, crypto, ECPoint, UInt160 } from '@neo-one/client-common';
-import { BlockchainSettings, Candidate, NativeContractStorageContext } from '@neo-one/node-core';
+import { BlockchainSettings, Candidate, NativeContractStorageContext, utils } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import { filter, map, toArray } from 'rxjs/operators';
 import { CandidateState, NEOAccountState } from './AccountStates';
 import { GASToken } from './GASToken';
 import { NEP5NativeContract } from './Nep5';
-import { utils } from './utils';
 
 export class NEOToken extends NEP5NativeContract {
   public readonly totalAmount: BN;
@@ -37,7 +36,7 @@ export class NEOToken extends NEP5NativeContract {
   }
 
   public async getCandidates(storage: NativeContractStorageContext): Promise<readonly Candidate[]> {
-    const searchKey = this.createStorageKey(this.prefixes.candidate).toStorageKey().serializeWire();
+    const searchKey = this.createStorageKey(this.prefixes.candidate).toSearchPrefix();
 
     return storage.storages
       .find$(searchKey)

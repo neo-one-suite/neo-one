@@ -56,7 +56,7 @@ export const getAssertStackItemType = <T>(isFunc: (item: any) => item is T, type
     return item;
   }
 
-  throw new InvalidStackItemTypeError(StackItemType[type]);
+  throw new InvalidStackItemTypeError(StackItemType[type], item.type);
 };
 
 export const isNullStackItem: (item: any) => item is NullStackItem = getIsStackItemType(StackItemType.Any);

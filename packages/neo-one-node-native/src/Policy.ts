@@ -1,9 +1,8 @@
 import { common, UInt160 } from '@neo-one/client-common';
-import { NativeContractStorageContext } from '@neo-one/node-core';
+import { NativeContractStorageContext, utils } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import { GASToken } from './GASToken';
 import { NativeContract } from './NativeContract';
-import { utils } from './utils';
 
 // tslint:disable-next-line: export-name
 export class PolicyContract extends NativeContract {

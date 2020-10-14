@@ -22,7 +22,11 @@ const getCreateKey = <Key>({
 }: {
   readonly serializeKey: (key: Key) => Buffer;
   readonly prefix: Prefix;
-}) => (key: Key) => Buffer.concat([Buffer.from([prefix]), serializeKey(key)]);
+}) => {
+  const prefixKey = Buffer.from([prefix]);
+
+  return (key: Key) => Buffer.concat([prefixKey, serializeKey(key)]);
+};
 
 const getMetadataKey = ({ prefix }: { readonly prefix: Prefix }) => Buffer.from([prefix]);
 
@@ -35,7 +39,7 @@ const serializeHeaderHashListKey = (key: number) => {
 
 /* crude method but it does what we want it to do */
 const generateSearchRange = (lookupKey: Buffer): Required<StreamOptions> => {
-  const asBN = new BN(lookupKey, 'le');
+  const asBN = new BN(lookupKey);
   const lte = asBN.addn(1).toBuffer();
   if (lte.length !== lookupKey.length) {
     throw new InvalidFormatError('not sure how this happened');
