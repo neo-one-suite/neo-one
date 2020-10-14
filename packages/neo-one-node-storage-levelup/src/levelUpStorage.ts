@@ -1,4 +1,3 @@
-import { common } from '@neo-one/client-common';
 import {
   BinaryReader,
   BlockKey,
@@ -8,8 +7,12 @@ import {
   HashIndexState,
   // InvocationData,
   HeaderHashList,
-  Storage,
+  Nep5Balance,
   // TransactionData,
+  Nep5BalanceKey,
+  Nep5Transfer,
+  Nep5TransferKey,
+  Storage,
   StorageItem,
   StorageKey,
   TransactionState,
@@ -81,6 +84,42 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
 
   return {
     blocks,
+
+    nep5Balances: read.createReadFindStorage({
+      db,
+      getSearchRange: keys.getNep5BalanceSearchRange,
+      serializeKey: keys.createNep5BalanceKey,
+      deserializeValue: (buffer) =>
+        Nep5Balance.deserializeWire({
+          context,
+          buffer,
+        }),
+      deserializeKey: (buffer) => Nep5BalanceKey.deserializeWire({ context, buffer }),
+    }),
+
+    nep5TransfersReceived: read.createReadFindStorage({
+      db,
+      getSearchRange: keys.getNep5TransferReceivedSearchRange,
+      serializeKey: keys.createNep5TransferReceivedKey,
+      deserializeValue: (buffer) =>
+        Nep5Transfer.deserializeWire({
+          context,
+          buffer,
+        }),
+      deserializeKey: (buffer) => Nep5TransferKey.deserializeWire({ context, buffer }),
+    }),
+
+    nep5TransfersSent: read.createReadFindStorage({
+      db,
+      getSearchRange: keys.getNep5TransferSentSearchRange,
+      serializeKey: keys.createNep5TransferSentKey,
+      deserializeValue: (buffer) =>
+        Nep5Transfer.deserializeWire({
+          context,
+          buffer,
+        }),
+      deserializeKey: (buffer) => Nep5TransferKey.deserializeWire({ context, buffer }),
+    }),
 
     transactions: read.createReadStorage({
       db,

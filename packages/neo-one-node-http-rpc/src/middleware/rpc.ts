@@ -1,16 +1,26 @@
 import { loadConfiguration } from '@neo-one/cli-common-node';
 import { bodyParser } from '@neo-one/http';
 import { Blockchain, Node } from '@neo-one/node-core';
+import { NativeContainer } from '@neo-one/node-native';
 import { createHandler } from '@neo-one/node-rpc-handler';
 import execa from 'execa';
 import { Context } from 'koa';
 import compose from 'koa-compose';
 import koaCompress from 'koa-compress';
 
-export const rpc = ({ blockchain, node }: { readonly blockchain: Blockchain; readonly node: Node }) => {
+export const rpc = ({
+  blockchain,
+  node,
+  native,
+}: {
+  readonly blockchain: Blockchain;
+  readonly node: Node;
+  readonly native: NativeContainer;
+}) => {
   const handler = createHandler({
     blockchain,
     node,
+    native,
     handleGetNEOTrackerURL: async () => {
       const config = await loadConfiguration();
 

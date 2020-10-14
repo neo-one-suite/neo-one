@@ -12,7 +12,7 @@ export enum TriggerType {
 }
 
 export interface Notification {
-  readonly scriptContainer: SerializableContainer;
+  readonly scriptContainer: SerializedScriptContainer;
   readonly scriptHash: UInt160;
   readonly eventName: string;
   readonly state: readonly StackItem[];
@@ -22,7 +22,7 @@ export interface CallReceipt {
   readonly state: VMState;
   readonly gasConsumed: number;
   readonly stack: readonly StackItem[];
-  // readonly notifications: readonly Notification[];
+  readonly notifications: readonly Notification[];
 }
 
 export type SnapshotName = 'main' | 'clone';
@@ -79,7 +79,7 @@ export interface ApplicationExecuted {
   readonly state: VMState;
   readonly gasConsumed: number;
   readonly stack: readonly StackItem[];
-  // readonly notifications: readonly Notification[];
+  readonly notifications: readonly Notification[];
 }
 
 export interface VM {

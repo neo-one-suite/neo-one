@@ -1,4 +1,4 @@
-import { common, ECPoint, UInt160 } from '@neo-one/client-common';
+import { ECPoint, UInt160 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { ReadFindStorage } from './Storage';
 import { StorageItem } from './StorageItem';

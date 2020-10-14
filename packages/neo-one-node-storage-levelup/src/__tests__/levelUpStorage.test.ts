@@ -1,5 +1,14 @@
 import { common } from '@neo-one/client-common';
-import { AddChange, DeleteChange, Storage, StorageItem, StorageKey } from '@neo-one/node-core';
+import {
+  AddChange,
+  DeleteChange,
+  Nep5Balance,
+  Nep5BalanceKey,
+  Storage,
+  StorageItem,
+  StorageKey,
+} from '@neo-one/node-core';
+import { BN } from 'bn.js';
 import LevelUp from 'levelup';
 import MemDown from 'memdown';
 import { storage as levelUpStorage } from '../';
@@ -40,5 +49,27 @@ describe('levelUpStorage', () => {
 
     const thirdGet = await storage.storages.tryGet(key);
     expect(thirdGet).toEqual(undefined);
+  });
+
+  test('Can add and retrieve Nep5Balance', async () => {
+    const value = new Nep5Balance({ balanceBuffer: new BN(10).toBuffer('le'), lastUpdatedBlock: 1 });
+    const key = new Nep5BalanceKey({
+      userScriptHash: common.bufferToUInt160(Buffer.from('3775292229eccdf904f16fff8e83e7cffdc0f0ce', 'hex')),
+      assetScriptHash: common.bufferToUInt160(Buffer.from('3775292229eccdf904f16fff8e83e7cffdc0f0ce', 'hex')),
+    });
+
+    const addChange: AddChange = {
+      type: 'nep5Balance',
+      key,
+      value,
+    };
+
+    const firstGet = await storage.nep5Balances.tryGet(key);
+    expect(firstGet).toBeUndefined();
+    await storage.commit([{ type: 'add', change: addChange, subType: 'add' }]);
+    const secondGet = await storage.nep5Balances.tryGet(key);
+    expect(secondGet).toBeDefined();
+    expect(secondGet?.balance.toString()).toEqual('10');
+    expect(secondGet?.lastUpdatedBlock).toEqual(1);
   });
 });

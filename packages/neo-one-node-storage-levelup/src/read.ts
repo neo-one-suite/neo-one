@@ -131,14 +131,14 @@ export function createFind$<Key, Value>({
   deserializeValue,
 }: {
   readonly db: LevelUp;
-  readonly getSearchRange: (key: Buffer) => StreamOptions;
+  readonly getSearchRange: (key: Buffer, secondary?: Buffer) => StreamOptions;
   readonly deserializeKey: (key: Buffer) => Key;
   readonly deserializeValue: (value: Buffer) => Value;
-}): (lookup: Buffer) => Observable<StorageReturn<Key, Value>> {
-  return (lookup: Buffer) =>
-    streamToObservable<StorageReturn<Buffer, Buffer>>(() => db.createReadStream(getSearchRange(lookup))).pipe(
-      map(({ key, value }) => ({ key: deserializeKey(key.slice(1)), value: deserializeValue(value) })),
-    );
+}): (lookup: Buffer, secondaryLookup?: Buffer) => Observable<StorageReturn<Key, Value>> {
+  return (lookup: Buffer, secondaryLookup?: Buffer) =>
+    streamToObservable<StorageReturn<Buffer, Buffer>>(() =>
+      db.createReadStream(getSearchRange(lookup, secondaryLookup)),
+    ).pipe(map(({ key, value }) => ({ key: deserializeKey(key.slice(1)), value: deserializeValue(value) })));
 }
 
 export function createReadFindStorage<Key, Value>({
@@ -149,7 +149,7 @@ export function createReadFindStorage<Key, Value>({
   deserializeValue,
 }: {
   readonly db: LevelUp;
-  readonly getSearchRange: (key: Buffer) => StreamOptions;
+  readonly getSearchRange: (key: Buffer, secondary?: Buffer) => StreamOptions;
   readonly serializeKey: SerializeKey<Key>;
   readonly deserializeKey: (value: Buffer) => Key;
   readonly deserializeValue: (value: Buffer) => Value;

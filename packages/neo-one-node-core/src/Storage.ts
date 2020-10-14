@@ -3,6 +3,10 @@ import { ContractIDState } from './ContractIDState';
 import { ContractKey, ContractState } from './ContractState';
 import { HashIndexState } from './HashIndexState';
 import { HeaderHashList, HeaderKey } from './HeaderHashList';
+import { Nep5Balance } from './Nep5Balance';
+import { Nep5BalanceKey } from './Nep5BalanceKey';
+import { Nep5Transfer } from './Nep5Transfer';
+import { Nep5TransferKey } from './Nep5TransferKey';
 import { StorageItem } from './StorageItem';
 import { StorageKey } from './StorageKey';
 import { TransactionKey, TransactionState } from './transaction';
@@ -36,7 +40,7 @@ export interface ReadAllStorage<Key, Value> extends ReadStorage<Key, Value> {
 }
 
 export interface ReadFindStorage<Key, Value> extends ReadStorage<Key, Value> {
-  readonly find$: (lookup: Buffer) => Observable<StorageReturn<Key, Value>>;
+  readonly find$: (lookup: Buffer, secondaryLookup?: Buffer) => Observable<StorageReturn<Key, Value>>;
 }
 
 export interface ReadGetAllStorage<Key, Value> extends ReadStorage<Key, Value> {
@@ -110,11 +114,15 @@ export type AddChange =
   | { readonly type: 'headerHashList'; readonly key: HeaderKey; readonly value: HeaderHashList }
   | { readonly type: 'blockHashIndex'; readonly value: HashIndexState }
   | { readonly type: 'headerHashIndex'; readonly value: HashIndexState }
-  | { readonly type: 'contractID'; readonly value: ContractIDState };
+  | { readonly type: 'contractID'; readonly value: ContractIDState }
+  | { readonly type: 'nep5Balance'; readonly key: Nep5BalanceKey; readonly value: Nep5Balance }
+  | { readonly type: 'nep5TransferSent'; readonly key: Nep5TransferKey; readonly value: Nep5Transfer }
+  | { readonly type: 'nep5TransferReceived'; readonly key: Nep5TransferKey; readonly value: Nep5Transfer };
 
 export type DeleteChange =
   | { readonly type: 'contract'; readonly key: ContractKey }
-  | { readonly type: 'storage'; readonly key: StorageKey };
+  | { readonly type: 'storage'; readonly key: StorageKey }
+  | { readonly type: 'nep5Balance'; readonly key: Nep5BalanceKey };
 
 export type Change =
   | { readonly type: 'add'; readonly change: AddChange; readonly subType: 'add' | 'update' }
@@ -124,6 +132,9 @@ export type ChangeSet = readonly Change[];
 
 export interface BlockchainStorage {
   readonly blocks: ReadStorage<BlockKey, TrimmedBlock>;
+  readonly nep5Balances: ReadFindStorage<Nep5BalanceKey, Nep5Balance>;
+  readonly nep5TransfersSent: ReadFindStorage<Nep5TransferKey, Nep5Transfer>;
+  readonly nep5TransfersReceived: ReadFindStorage<Nep5TransferKey, Nep5Transfer>;
   readonly transactions: ReadStorage<TransactionKey, TransactionState>;
   readonly contracts: ReadStorage<ContractKey, ContractState>;
   readonly storages: ReadFindStorage<StorageKey, StorageItem>;

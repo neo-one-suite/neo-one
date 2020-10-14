@@ -33,3 +33,7 @@ export * from './Witness';
 export * from './CallFlags';
 export * from './TransactionData';
 export * from './Node';
+export * from './Nep5Balance';
+export * from './Nep5Transfer';
+export * from './Nep5BalanceKey';
+export * from './Nep5TransferKey';

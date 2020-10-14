@@ -28,6 +28,7 @@ import PriorityQueue from 'js-priority-queue';
 import { Observable, Subject } from 'rxjs';
 import { flatMap, map, toArray } from 'rxjs/operators';
 import { BlockVerifyError, ConsensusPayloadVerifyError, GenesisBlockNotRegisteredError } from './errors';
+import { getNep5ChangeSet } from './getNep5ChangeSet';
 import { PersistingBlockchain } from './PersistingBlockchain';
 import { utils } from './utils';
 import { verifyWitnesses } from './verify';
@@ -224,6 +225,18 @@ export class Blockchain {
 
   public get blocks() {
     return this.storage.blocks;
+  }
+
+  public get nep5Balances() {
+    return this.storage.nep5Balances;
+  }
+
+  public get nep5TransfersReceived() {
+    return this.storage.nep5TransfersReceived;
+  }
+
+  public get nep5TransfersSent() {
+    return this.storage.nep5TransfersSent;
   }
 
   public get transactions() {
@@ -614,8 +627,6 @@ export class Blockchain {
     const currentHeaderCount = this.headerIndex.length;
     if (block.transactions.length !== 0) {
       logger.debug({ name: 'BLOCK_PERSIST_WITH_TRANSACTION', block: block.serializeJSON(this.serializeJSONContext) });
-      logger.error({ name: 'SEE THIS ONE LOOK AT IT' });
-      logger.error({ name: 'SEE THIS ONE LOOK AT IT' });
     }
 
     const blockchain = this.createPersistingBlockchain();
@@ -626,6 +637,15 @@ export class Blockchain {
 
     const { changeBatch, applicationsExecuted } = blockchain.persistBlock(block, currentHeaderCount);
     await this.storage.commitBatch(changeBatch);
+
+    // This ordering could cause issues. Lookout.
+    const nep5ChangeSet = getNep5ChangeSet({
+      applicationsExecuted,
+      block,
+      settings: this.settings,
+      runEngineWrapper: this.runEngineWrapper,
+    });
+    await this.storage.commit(nep5ChangeSet);
     await this.saveHeaderHashList();
 
     await this.updateBlockMetadata(block);

@@ -2,6 +2,7 @@ import { cors, setupServer } from '@neo-one/http';
 import { context, onError as appOnError } from '@neo-one/http-context';
 import { createChild, nodeLogger, rpcLogger } from '@neo-one/logger';
 import { Blockchain, Node } from '@neo-one/node-core';
+import { NativeContainer } from '@neo-one/node-native';
 import { Disposable, Labels } from '@neo-one/utils';
 import * as nodeHttp from 'http';
 import Application from 'koa';
@@ -27,10 +28,12 @@ export interface Options {
 export const setupRPCServer = async ({
   blockchain,
   node,
+  native,
   options: { http, splashScreen, liveHealthCheck: liveHealthCheckOptions, readyHealthCheck: readyHealthCheckOptions },
 }: {
   readonly blockchain: Blockchain;
   readonly node: Node;
+  readonly native: NativeContainer;
   readonly options: Options;
 }): Promise<Disposable> => {
   if (http === undefined) {
@@ -48,7 +51,7 @@ export const setupRPCServer = async ({
   // tslint:disable-next-line:no-any
   const router = new Router<any, {}>();
 
-  const rpcMiddleware = rpc({ blockchain, node });
+  const rpcMiddleware = rpc({ blockchain, node, native });
   router.use(context(logger));
 
   if (liveHealthCheckOptions !== undefined) {
