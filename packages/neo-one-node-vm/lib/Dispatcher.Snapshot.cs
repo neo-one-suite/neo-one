@@ -183,7 +183,7 @@ namespace NEOONE
 
         private bool _snapshotChangeBlockHashIndex(StoreView snapshot, uint index, UInt256 hash)
         {
-            var hashIndex = snapshot.BlockHashIndex.GetAndChange();
+            HashIndexState hashIndex = snapshot.BlockHashIndex.GetAndChange();
             hashIndex.Index = index;
             hashIndex.Hash = hash;
 
@@ -192,7 +192,7 @@ namespace NEOONE
 
         private bool _snapshotChangeHeaderHashIndex(StoreView snapshot, uint index, UInt256 hash)
         {
-            var hashIndex = snapshot.HeaderHashIndex.GetAndChange();
+            HashIndexState hashIndex = snapshot.HeaderHashIndex.GetAndChange();
             hashIndex.Index = index;
             hashIndex.Hash = hash;
 

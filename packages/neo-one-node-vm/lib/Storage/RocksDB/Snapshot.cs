@@ -3,7 +3,6 @@ using Neo.Persistence;
 using RocksDbSharp;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace NEOONE.Storage.RocksDB
 {

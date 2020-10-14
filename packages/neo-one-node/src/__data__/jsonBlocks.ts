@@ -111,7 +111,7 @@ export const debugBlockJSON = {
   witnesses: [
     {
       invocation:
-        'DEAIdyv6wls3FN47Rw4//yXM2L0TE2ci3Eo3lC2cx7OmrzU6rlk5HKtg0NVS2tuAAgcV48h3cWVBf082zJiGzbCyDEDnYdZuYpaICaSdp1dReL2EEa7gNWm+UZhG1Deus04IPA6tzLrvbd2GR9WNHAUeZMleS1pxTOe/tfajscwTxOcPDEDpfcTZoKaK0qp9vwkgDw5ysaLsQgcH4++NCcXc9z+dCl9wBkuJ+PGIKAPsV9JUGEXhMtJBCx1t8hdlUJKXy6JIDEAZet+oQR2V7A6VCRh0OPy8ai1fxi3uHnKlQqi7UrYC2PnD3/E6YFMR/hRLYUdZuyX+MYeLP+svnOQ/QLd63DdbDECF+j8cO7NY612P4TBjh+4Bifsa93mpbmRWzPDHnCik+mSPqE4MqMoiPyXYKyxekJyzMm95WHQm/f3KniYT6j4q',
+        'DEAIdyv6wls3FN47Rw4//yXM2L0TE2ci3Eo3lC2cx7OmrzU6rlk5HKtg0NVS2tuAAgcV48h3cWVBf082zJiGzbCyDEDpfcTZoKaK0qp9vwkgDw5ysaLsQgcH4++NCcXc9z+dCl9wBkuJ+PGIKAPsV9JUGEXhMtJBCx1t8hdlUJKXy6JIDEAZet+oQR2V7A6VCRh0OPy8ai1fxi3uHnKlQqi7UrYC2PnD3/E6YFMR/hRLYUdZuyX+MYeLP+svnOQ/QLd63DdbDEB+XmnCR+UaOf4siFsjhtihcFc5DWKohAVSG8Nszak5RVaj3D5ot7JJmhba8rvO0mmyPkXSemmTsZeWMXLlhrL9DECF+j8cO7NY612P4TBjh+4Bifsa93mpbmRWzPDHnCik+mSPqE4MqMoiPyXYKyxekJyzMm95WHQm/f3KniYT6j4q',
       verification:
         'FQwhAwCbdUDhDyVi5f2PrJ6uwlFmpYsm5BI0j/WoaSe/rCKiDCEDAgXpzvrqWh38WAryDI1aokaLsBSPGl5GBfxiLIDmBLoMIQIUuvDO6jpm8X5+HoOeol/YvtbNgua7bmglAYkGX0T/AQwhAj6bMuqJuU0GbmSbEk/VDjlu6RNp6OKmrhsRwXDQIiVtDCEDQI3NQWOW9keDrFh+oeFZPFfZ/qiAyKahkg6SollHeAYMIQKng0vpsy4pgdFXy1u9OstCz9EepcOxAiTXpE6YxZEPGwwhAroscPWZbzV6QxmHBYWfriz+oT4RcpYoAHcrPViKnUq9FwtBE43vrw==',
     },
@@ -128,7 +128,7 @@ export const debugBlockJSON = {
       nonce: 206553393,
       sender: 'NTZJ91cwZWiad8uj8sLMF7X6j8Ed41Cim6',
       sysfee: '0000000000897376',
-      netfee: '1248390',
+      netfee: '0000000000130c86',
       validuntilblock: 2107762,
       signers: [
         {

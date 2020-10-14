@@ -89,12 +89,12 @@ export class Transaction
     }
 
     const nonce = reader.readUInt32LE();
-    const systemFee = reader.readUInt64LE();
+    const systemFee = reader.readInt64LE();
     if (systemFee.ltn(0)) {
       throw new InvalidFormatError(`Expected systemFee to be greater than 0, found: ${systemFee.toString()}`);
     }
 
-    const networkFee = reader.readUInt64LE();
+    const networkFee = reader.readInt64LE();
     if (networkFee.ltn(0)) {
       throw new InvalidFormatError(`Expected networkFee to be greater than 0, found: ${networkFee.toString()}`);
     }
@@ -272,7 +272,7 @@ export class Transaction
       nonce: this.nonce,
       sender: this.sender ? scriptHashToAddress(common.uInt160ToString(this.sender)) : undefined,
       sysfee: JSONHelper.writeUInt64LE(this.systemFee),
-      netfee: JSONHelper.writeUInt64(this.networkFee),
+      netfee: JSONHelper.writeUInt64LE(this.networkFee),
       validuntilblock: this.validUntilBlock,
       signers: this.signers.map((signer) => signer.serializeJSON()),
       attributes: this.attributes.map((attr) => attr.serializeJSON()),

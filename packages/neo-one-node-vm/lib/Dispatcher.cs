@@ -125,7 +125,6 @@ namespace NEOONE
 
         private dynamic _test()
         {
-            // return BitConverter.ToString(Blockchain.onPersistNativeContractScript);
             return true;
         }
 

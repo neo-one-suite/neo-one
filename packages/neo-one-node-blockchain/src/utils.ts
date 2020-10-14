@@ -24,6 +24,8 @@ import {
 import { BN } from 'bn.js';
 import { ScriptVerifyError } from './errors';
 
+const hashListBatchSize = 2000;
+
 const getOnPersistNativeContractScript = coreUtils.lazy(() => {
   const hashes = [common.nativeHashes.GAS, common.nativeHashes.NEO];
   const script = new ScriptBuilder();
@@ -180,6 +182,7 @@ const blockComparator = <TBlock extends BlockBase>({ index: aIndex }: TBlock, { 
 
 export const utils = {
   ...coreUtils,
+  hashListBatchSize,
   getApplicationExecuted,
   getCallReceipt,
   getOnPersistNativeContractScript,

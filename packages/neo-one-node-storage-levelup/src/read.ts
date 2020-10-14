@@ -137,7 +137,7 @@ export function createFind$<Key, Value>({
 }): (lookup: Buffer) => Observable<StorageReturn<Key, Value>> {
   return (lookup: Buffer) =>
     streamToObservable<StorageReturn<Buffer, Buffer>>(() => db.createReadStream(getSearchRange(lookup))).pipe(
-      map(({ key, value }) => ({ key: deserializeKey(key), value: deserializeValue(value) })),
+      map(({ key, value }) => ({ key: deserializeKey(key.slice(1)), value: deserializeValue(value) })),
     );
 }
 

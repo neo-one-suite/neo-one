@@ -51,7 +51,8 @@ export const InvalidStackItemError = makeErrorWithCode(
 );
 export const InvalidStackItemTypeError = makeErrorWithCode(
   'INVALID_STACK_ITEM_TYPE_ERROR',
-  (type: string) => `Invalid StackItemType, expected: ${type}`,
+  (type: string, found?: string) =>
+    `Invalid StackItemType, expected: ${type}${found !== undefined ? ` found: ${found}` : ''}`,
 );
 export const InvalidPrimitiveStackItemError = makeErrorWithCode(
   'INVALID_PRIMITIVE_STACK_ITEM_ERROR',
