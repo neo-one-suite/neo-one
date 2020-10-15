@@ -30,7 +30,7 @@ export const genesisJSON = {
       signers: [
         {
           account: '0xa7213b15cc18d19c810f644e37411d882ee561ca',
-          scopes: 'FeeOnly', // FeeOnly should be None. This indicates that this JSON data is from Preview 2 or earlier, not Preview 3
+          scopes: 'FeeOnly', // FeeOnly should be None. This indicates that this JSON data could be from Preview 2 or earlier, not Preview 3
         },
       ],
       attributes: [],

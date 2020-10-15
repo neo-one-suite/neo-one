@@ -43,14 +43,14 @@ const getApplicationExecuted = (engine: ApplicationEngine, transaction?: Transac
   state: engine.state,
   gasConsumed: engine.gasConsumed,
   stack: engine.resultStack,
-  // notifications: engine.notifications,
+  notifications: engine.notifications,
 });
 
 const getCallReceipt = (engine: ApplicationEngine) => ({
   state: engine.state,
   gasConsumed: engine.gasConsumed,
   stack: engine.resultStack,
-  // notifications: engine.notifications,
+  notifications: engine.notifications,
 });
 
 export interface TempWalletAccount {

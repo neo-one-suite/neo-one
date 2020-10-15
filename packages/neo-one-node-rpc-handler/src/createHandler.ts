@@ -1,26 +1,22 @@
 import {
-  assertVMStateJSON,
   CallReceiptJSON,
   common,
   crypto,
   JSONHelper,
   RelayTransactionResultJSON,
-  ScriptBuilder,
   toJSONVerifyResult,
   toVMStateJSON,
-  toWitnessScope,
   TransactionJSON,
-  VMState,
-  WitnessScopeModel,
 } from '@neo-one/client-common';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   Blockchain,
   getEndpointConfig,
   NativeContainer,
+  Nep5Transfer,
+  Nep5TransferKey,
   Node,
   RelayTransactionResult,
-  Signer,
   Signers,
   stackItemToJSON,
   StorageKey,
@@ -29,6 +25,7 @@ import {
   TransactionState,
 } from '@neo-one/node-core';
 import { Labels } from '@neo-one/utils';
+import { BN } from 'bn.js';
 import { filter, map, switchMap, take, timeout, toArray } from 'rxjs/operators';
 
 const logger = createChild(nodeLogger, { component: 'rpc-handler' });
@@ -111,10 +108,10 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   sendtoaddress: 'sendtoaddress',
 
   // NEP5
-  getnep5transfers: 'getnep5transfers', // add to RPCClient?
-  getnep5balances: 'getnep5balances', // add to RPCClient?
+  getnep5transfers: 'getnep5transfers',
+  getnep5balances: 'getnep5balances',
 
-  // I want to say both of these can be removed since you can make changes to policy contract storage
+  // TODO: I want to say both of these can be removed since you can make changes to policy contract storage
   updatesettings: 'updatesettings',
   getsettings: 'getsettings',
 
@@ -513,8 +510,8 @@ export const createHandler = ({
 
     // SmartContract
     // TODO: we didn't use invokefunction in the past, whether or not that will still be the case is up in the air
-    [RPC_METHODS.invokefunction]: async (args) => {
-      throw new Error('not implemented');
+    [RPC_METHODS.invokefunction]: async (_args) => {
+      throw new JSONRPCError(-101, 'Not implemented');
       // const scriptHash = JSONHelper.readUInt160(args[0]);
       // const operation = args[1];
       // const params = args.length >= 3 ? args[2].map((arg) => ContractParameter.fromJSON(arg)) : [];
@@ -568,7 +565,7 @@ export const createHandler = ({
       throw new JSONRPCError(-101, 'Not implemented');
     },
     [RPC_METHODS.getapplicationlog]: async () => {
-      // TODO: this is very similar to our "getinvocationdata"
+      // TODO: this looks very similar to our "getinvocationdata"
       throw new JSONRPCError(-101, 'Not implemented');
     },
 
@@ -609,55 +606,72 @@ export const createHandler = ({
 
     // Nep5
     [RPC_METHODS.getnep5transfers]: async (args) => {
-      const hash = JSONHelper.readUInt160(args[0]);
+      const scriptHash = JSONHelper.readUInt160(args[0]);
+      const address = crypto.scriptHashToAddress({ addressVersion: blockchain.settings.addressVersion, scriptHash });
+
       const SEVEN_DAYS_IN_MS = 7 * 24 * 60 * 60 * 1000;
       const startTime = args[1] === undefined ? Date.now() - SEVEN_DAYS_IN_MS : args[1];
       const endTime = args[2] === undefined ? Date.now() : args[2];
+
       if (endTime < startTime) {
         throw new JSONRPCError(-32602, 'Invalid params');
       }
 
-      // TODO:
-      // get all NEP5 transfers either by address or time specified
-      // or can get all blocks over the time period
-      // then get all transactions from those blocks
-      // then filter transactions by address
+      const startTimeBytes = new BN(startTime, 10).toBuffer('le').reverse();
+      const endTimeBytes = new BN(endTime, 10).toBuffer('le').reverse();
+      const mapToTransfers = ({ key, value }: { key: Nep5TransferKey; value: Nep5Transfer }) => ({
+        timestamp: key.timestampMS.toNumber(),
+        assethash: common.uInt160ToString(key.assetScriptHash),
+        transferaddress: common.uInt160ToString(value.userScriptHash),
+        amount: value.amount.toString(),
+        blockindex: value.blockIndex,
+        transfernotifyindex: key.blockXferNotificationIndex,
+        txhash: common.uInt256ToString(value.txHash),
+      });
+      const sentPromise = blockchain.nep5TransfersSent
+        .find$(startTimeBytes, endTimeBytes)
+        .pipe(take(1000), map(mapToTransfers), toArray())
+        .toPromise();
+      const receivedPromise = blockchain.nep5TransfersSent
+        .find$(startTimeBytes, endTimeBytes)
+        .pipe(take(1000), map(mapToTransfers), toArray())
+        .toPromise();
 
-      // possiblities: TransferData, InvocationData, Account, Transaction, Action
+      const [sent, received] = await Promise.all([sentPromise, receivedPromise]);
 
       return {
-        sent: [],
-        transfersReceived: [],
-        address: common.uInt160ToString(hash),
+        sent,
+        received,
+        address,
       };
     },
-    // [RPC_METHODS.getnep5balances]: async (args) => {
-    //   const hash = JSONHelper.readUInt160(args[0]);
-    //   const account = await blockchain.account.tryGet({ hash });
-    //   if (account === undefined) {
-    //     throw new JSONRPCError(-100, 'Unknown account');
-    //   }
-    //   const resultBalances: Array<{
-    //     readonly assethash: string;
-    //     readonly amount: string;
-    //     readonly lastupdatedblock: number;
-    //   }> = [];
-    //   const balances = Object.entries(account.balances);
-    //   // tslint:disable-next-line: no-loop-statement
-    //   for (const balance of balances) {
-    //     // tslint:disable-next-line: no-array-mutation
-    //     resultBalances.push({
-    //       assethash: balance[0],
-    //       amount: balance[1]?.toString() ?? '0',
-    //       lastupdatedblock: -1, // TODO: in account balance in blockchain.account we need to store the "lastUpdateBlock" as well
-    //     });
-    //   }
+    [RPC_METHODS.getnep5balances]: async (args) => {
+      const scriptHash = JSONHelper.readUInt160(args[0]);
+      const address = crypto.scriptHashToAddress({ addressVersion: blockchain.settings.addressVersion, scriptHash });
+      const nep5Balances = await blockchain.nep5Balances
+        .find$(scriptHash)
+        .pipe(
+          map(async ({ key, value }) => {
+            const assetStillExists = await blockchain.contracts.tryGet(key.assetScriptHash);
+            if (!assetStillExists) {
+              return undefined;
+            }
 
-    //   return {
-    //     balance: resultBalances,
-    //     address: common.uInt160ToString(hash),
-    //   };
-    // },
+            return {
+              assethash: common.uInt160ToString(key.assetScriptHash),
+              amount: value.balance.toString(),
+              lastupdatedblock: value.lastUpdatedBlock,
+            };
+          }),
+          toArray(),
+        )
+        .toPromise();
+
+      return {
+        balance: nep5Balances,
+        address,
+      };
+    },
 
     // Settings
     // [RPC_METHODS.updatesettings]: async (args) => {
@@ -667,7 +681,8 @@ export const createHandler = ({
     //     secondsPerBlock: args[0].secondsPerBlock,
     //   };
 
-    //   blockchain.updateSettings(newSettings);
+    // TODO: implement this
+    // blockchain.updateSettings(newSettings);
 
     //   return true;
     // },
@@ -738,6 +753,7 @@ export const createHandler = ({
       if (contract === undefined) {
         return [];
       }
+      // const items = await blockchain.storages.find$(contract.id).pipe(toArray()).toPromise();
 
       return blockchain.storages
         .find$(Buffer.from([contract.id]))
@@ -790,18 +806,17 @@ export const createHandler = ({
       return result;
     },
 
-    [RPC_METHODS.getinvocationdata]: async (args) => {
-      const transaction = await blockchain.transaction.get({
-        hash: JSONHelper.readUInt256(args[0]),
-      });
+    [RPC_METHODS.getinvocationdata]: async () => {
+      throw new JSONRPCError(-101, 'Not implemented');
+      // const transactionState = await blockchain.transactions.get(JSONHelper.readUInt256(args[0]));
+      // // TODO: check serializeJSON() method. Doesn't include `data`
+      // const result = transactionState.transaction.serializeJSONWithInvocationData();
 
-      const result = await transaction.serializeJSONWithInvocationData(blockchain.serializeJSONContext);
+      // if (result.data === undefined) {
+      //   throw new JSONRPCError(-103, 'Invalid Transaction');
+      // }
 
-      if (result.invocationData === undefined) {
-        throw new JSONRPCError(-103, 'Invalid Transaction');
-      }
-
-      return result.invocationData;
+      // return result.data;
     },
     [RPC_METHODS.getnetworksettings]: async () => {
       const settings = blockchain.settings;

@@ -130,6 +130,7 @@ export const startFullNode = async ({
       blockchain,
       node,
       options: rpcOptions,
+      native,
     });
     disposable = composeDisposables(disposable, rpcDisposable);
 

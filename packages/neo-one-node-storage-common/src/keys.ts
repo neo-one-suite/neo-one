@@ -1,5 +1,5 @@
 import { BinaryWriter, common, InvalidFormatError, UInt160, UInt256 } from '@neo-one/client-common';
-import { BlockKey, StorageKey, StreamOptions } from '@neo-one/node-core';
+import { BlockKey, Nep5BalanceKey, Nep5TransferKey, StorageKey, StreamOptions } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 
 export enum Prefix {
@@ -11,6 +11,9 @@ export enum Prefix {
   CurrentBlock = 0xc0,
   CurrentHeader = 0xc1,
   ContractID = 0xc2,
+  Nep5Balance = 0xf8,
+  Nep5TransferSent = 0xf9,
+  Nep5TransferReceived = 0xfa,
 
   // NEO•ONE prefix, watch out for future collisions with https://github.com/neo-project/neo/blob/master/src/neo/Persistence/Prefixes.cs
   Settings = 0xdd,
@@ -54,7 +57,13 @@ const generateSearchRange = (lookupKey: Buffer): Required<StreamOptions> => {
 const createGetSearchRange = (prefix: Prefix) => {
   const bufferKey = Buffer.from([prefix]);
 
-  return (lookupKey: Buffer): Required<StreamOptions> => {
+  return (lookupKey: Buffer, secondaryLookupKey?: Buffer): Required<StreamOptions> => {
+    if (secondaryLookupKey) {
+      return {
+        gte: Buffer.concat([bufferKey, lookupKey]),
+        lte: Buffer.concat([bufferKey, secondaryLookupKey]),
+      };
+    }
     const { gte: initGte, lte: initLte } = generateSearchRange(lookupKey);
 
     return {
@@ -91,6 +100,21 @@ const createStorageKey = getCreateKey<StorageKey>({
   prefix: Prefix.Storage,
 });
 
+const createNep5BalanceKey = getCreateKey<Nep5BalanceKey>({
+  serializeKey: (key) => key.serializeWire(),
+  prefix: Prefix.Nep5Balance,
+});
+
+const createNep5TransferSentKey = getCreateKey<Nep5TransferKey>({
+  serializeKey: (key) => key.serializeWire(),
+  prefix: Prefix.Nep5TransferSent,
+});
+
+const createNep5TransferReceivedKey = getCreateKey<Nep5TransferKey>({
+  serializeKey: (key) => key.serializeWire(),
+  prefix: Prefix.Nep5TransferReceived,
+});
+
 const createHeaderHashListKey = getCreateKey<number>({
   serializeKey: serializeHeaderHashListKey,
   prefix: Prefix.HeaderHashList,
@@ -116,12 +140,22 @@ const maxHeaderHashListKey = createHeaderHashListKey(0xffffffff);
 
 const getStorageSearchRange = createGetSearchRange(Prefix.Storage);
 
+const getNep5BalanceSearchRange = createGetSearchRange(Prefix.Nep5Balance);
+const getNep5TransferReceivedSearchRange = createGetSearchRange(Prefix.Nep5TransferReceived);
+const getNep5TransferSentSearchRange = createGetSearchRange(Prefix.Nep5TransferSent);
+
 export const keys = {
   createBlockKey,
+  createNep5BalanceKey,
+  createNep5TransferSentKey,
+  createNep5TransferReceivedKey,
   createTransactionKey,
   createContractKey,
   createStorageKey,
   getStorageSearchRange,
+  getNep5BalanceSearchRange,
+  getNep5TransferReceivedSearchRange,
+  getNep5TransferSentSearchRange,
   createHeaderHashListKey,
   blockHashIndexKey,
   headerHashIndexKey,

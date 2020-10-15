@@ -88,9 +88,10 @@ const getDeployNativeContracts = () => {
 
 interface GetGenesisBlockOptions {
   readonly consensusAddress: UInt160;
+  readonly privateNet?: boolean;
 }
 
-const getGenesisBlock = ({ consensusAddress }: GetGenesisBlockOptions) =>
+const getGenesisBlock = ({ consensusAddress, privateNet }: GetGenesisBlockOptions) =>
   new Block({
     previousHash: clientCommon.ZERO_UINT256,
     timestamp: new BN(Date.UTC(2016, 6, 15, 15, 8, 21)),
@@ -107,6 +108,7 @@ const getGenesisBlock = ({ consensusAddress }: GetGenesisBlockOptions) =>
 export const common = ({ privateNet, consensusAddress }: Options) => ({
   genesisBlock: getGenesisBlock({
     consensusAddress,
+    privateNet,
   }),
   decrementInterval: DECREMENT_INTERVAL,
   generationAmount: privateNet ? GENERATION_AMOUNT_PRIVATE : GENERATION_AMOUNT,

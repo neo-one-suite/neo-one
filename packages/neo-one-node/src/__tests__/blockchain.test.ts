@@ -1,4 +1,3 @@
-import { common } from '@neo-one/client-common';
 import { Blockchain } from '@neo-one/node-blockchain';
 import { StorageKey, StreamOptions } from '@neo-one/node-core';
 import { KeyBuilder, NativeContainer } from '@neo-one/node-native';
@@ -11,8 +10,8 @@ import RocksDB from 'rocksdb';
 import { map, toArray } from 'rxjs/operators';
 import { data } from '../__data__';
 
-describe('blockchain persists second block', () => {
-  test('test', async () => {
+describe('Blockchain storage works', () => {
+  test('Blockchain can persist and retrieve blocks', async () => {
     const blockchainSettings = createTest();
     const levelDBPath = '/Users/danielbyrne/Desktop/test-location';
     const db = LevelUp(RocksDB(levelDBPath));

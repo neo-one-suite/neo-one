@@ -16,7 +16,7 @@ namespace NEOONE
         {
             Block,
             Transaction,
-            Signer,
+            Signers,
         }
 
         private IVerifiable deserializeContainer(dynamic args)
