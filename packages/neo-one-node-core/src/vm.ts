@@ -1,6 +1,7 @@
-import { UInt160, UInt256, VMState } from '@neo-one/client-common';
+import { UInt256, VMState } from '@neo-one/client-common';
 import { Block } from './Block';
 import { CallFlags } from './CallFlags';
+import { Notification } from './Notification';
 import { SerializableContainer } from './Serializable';
 import { StackItem } from './StackItems';
 import { Transaction } from './transaction';
@@ -9,13 +10,6 @@ export enum TriggerType {
   Verification = 0x00,
   System = 0x01,
   Application = 0x10,
-}
-
-export interface Notification {
-  readonly scriptContainer: SerializedScriptContainer;
-  readonly scriptHash: UInt160;
-  readonly eventName: string;
-  readonly state: readonly StackItem[];
 }
 
 export interface CallReceipt {
@@ -50,7 +44,7 @@ export interface ApplicationEngine {
   readonly gasConsumed: number;
   readonly resultStack: readonly StackItem[];
   readonly state: VMState;
-  readonly notifications: readonly Notification[];
+  readonly notifications: readonly StackItem[];
   readonly loadScript: (script: Buffer, flag?: CallFlags) => boolean;
   readonly execute: () => VMState;
   readonly setInstructionPointer: (position: number) => boolean;
@@ -83,6 +77,7 @@ export interface ApplicationExecuted {
 }
 
 export interface VM {
+  readonly updateSnapshots: () => void;
   readonly withApplicationEngine: <T = void>(
     options: ApplicationEngineOptions,
     func: (engine: ApplicationEngine) => T,

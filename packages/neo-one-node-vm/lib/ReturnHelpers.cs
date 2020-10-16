@@ -142,22 +142,6 @@ namespace NEOONE
                 _ => convertStackItem((PrimitiveType)item)
             };
         }
-
-        public class NotifyEventReturn
-        {
-            public SerializedScriptContainer scriptContainer;
-            public byte[] scriptHash;
-            public string eventName;
-            public dynamic[] state;
-
-            public NotifyEventReturn(NotifyEventArgs notifyEvent)
-            {
-                this.scriptContainer = new SerializedScriptContainer(notifyEvent.ScriptContainer);
-                this.scriptHash = notifyEvent.ScriptHash.ToArray();
-                this.eventName = notifyEvent.EventName;
-                this.state = convertStackItem(notifyEvent.State);
-            }
-        }
         public class ProtocolSettingsReturn
         {
             public int magic;
@@ -179,47 +163,6 @@ namespace NEOONE
                 this.seedList = value.SeedList;
                 this.millisecondsPerBlock = Convert.ToInt32(value.MillisecondsPerBlock);
                 this.memoryPoolMaxTransactions = value.MemoryPoolMaxTransactions;
-            }
-        }
-
-        public enum ScriptContainerType
-        {
-            block,
-            transaction,
-            signers,
-            consensuspayload,
-        }
-
-        public class SerializedScriptContainer
-        {
-            public ScriptContainerType type;
-            public byte[] buffer;
-            public SerializedScriptContainer(ISerializable scriptContainer)
-            {
-                this.type = GetScriptContainerType(scriptContainer);
-                this.buffer = scriptContainer.ToArray();
-            }
-
-            private ScriptContainerType GetScriptContainerType(ISerializable scriptContainer)
-            {
-                if (scriptContainer is Block)
-                {
-                    return ScriptContainerType.block;
-                }
-                if (scriptContainer is Transaction)
-                {
-                    return ScriptContainerType.transaction;
-                }
-                if (scriptContainer is Signer)
-                {
-                    return ScriptContainerType.signers;
-                }
-                if (scriptContainer is ConsensusPayload)
-                {
-                    return ScriptContainerType.consensuspayload;
-                }
-
-                throw new ArgumentException($"{scriptContainer.ToString()} is not a valid serializable ScriptContainer");
             }
         }
     }

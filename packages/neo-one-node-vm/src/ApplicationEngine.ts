@@ -8,7 +8,7 @@ import {
 } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
-import { parseNotifications, parseStackItems } from './converters';
+import { parseStackItems } from './converters';
 import { EngineMethods } from './Methods';
 import { DispatcherFunc } from './types';
 
@@ -70,7 +70,7 @@ export class ApplicationEngine {
   }
 
   public get notifications() {
-    return parseNotifications(
+    return parseStackItems(
       this.dispatch({
         method: 'getnotifications',
       }),

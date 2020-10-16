@@ -34,7 +34,6 @@ export class Dispatcher {
   public withSnapshots<T = void>(
     func: (snapshots: { readonly main: SnapshotHandler; readonly clone: Omit<SnapshotHandler, 'clone'> }) => T,
   ) {
-    this.resetSnapshots();
     const main = new SnapshotHandler(this, 'main');
     const clone = new SnapshotHandler(this, 'clone');
 
@@ -65,7 +64,7 @@ export class Dispatcher {
     });
   }
 
-  public resetSnapshots(): void {
+  public updateSnapshots(): void {
     this.dispatch({
       method: 'snapshot_reset',
     });

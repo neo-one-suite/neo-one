@@ -47,10 +47,10 @@ namespace NEOONE.Storage.RocksDB
             byte[] fullKey = store.getFullKey(table, keyOrPrefix);
 
             if (direction == SeekDirection.Forward)
-                for (it.Seek(fullKey); it.Valid(); it.Next())
+                for (it.Seek(fullKey); it.Valid() && it.Key()[0] == table; it.Next())
                     yield return (it.Key(), it.Value());
             else
-                for (it.SeekForPrev(fullKey); it.Valid(); it.Prev())
+                for (it.SeekForPrev(fullKey); it.Valid() && it.Key()[0] == table; it.Prev())
                     yield return (it.Key(), it.Value());
         }
 

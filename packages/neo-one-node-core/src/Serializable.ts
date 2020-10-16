@@ -6,12 +6,13 @@
 // import { StorageChange } from './storageChange';
 import { SerializableWire } from '@neo-one/client-common';
 import { BinaryReader } from './utils';
+import { Verifiable } from './Verifiable';
 
 export { SerializeWire, SerializableWire, createSerializeWire } from '@neo-one/client-common';
 
 export type SerializableContainerType = 'Block' | 'Signers' | 'Transaction' | 'ConsensusPayload';
 
-export interface SerializableContainer extends SerializableWire {
+export interface SerializableContainer extends SerializableWire, Verifiable {
   readonly type: SerializableContainerType;
 }
 

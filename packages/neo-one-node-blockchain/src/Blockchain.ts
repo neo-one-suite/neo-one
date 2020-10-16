@@ -1,17 +1,20 @@
-import { common, UInt256, VerifyResultModel } from '@neo-one/client-common';
+import { common, ScriptBuilder, UInt256, VerifyResultModel } from '@neo-one/client-common';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
+  ApplicationExecuted,
   Block,
   Blockchain as BlockchainType,
   BlockchainSettings,
   CallReceipt,
   Change,
+  ChangeSet,
   ConsensusPayload,
   DeserializeWireContext,
   HashIndexState,
   Header,
   Mempool,
   NativeContainer,
+  Nep5Balance,
   RunEngineOptions,
   Signers,
   Storage,
@@ -26,9 +29,10 @@ import {
 import { Labels } from '@neo-one/utils';
 import PriorityQueue from 'js-priority-queue';
 import { Observable, Subject } from 'rxjs';
-import { flatMap, map, toArray } from 'rxjs/operators';
+import { map, toArray } from 'rxjs/operators';
 import { BlockVerifyError, ConsensusPayloadVerifyError, GenesisBlockNotRegisteredError } from './errors';
-import { getNep5ChangeSet } from './getNep5ChangeSet';
+import { getNep5UpdateOptions } from './getNep5UpdateOptions';
+import { HeaderIndexCache } from './HeaderIndexCache';
 import { PersistingBlockchain } from './PersistingBlockchain';
 import { utils } from './utils';
 import { verifyWitnesses } from './verify';
@@ -46,8 +50,7 @@ export interface CreateBlockchainOptions {
 
 export interface BlockchainOptions extends CreateBlockchainOptions {
   // tslint:disable-next-line: readonly-array
-  readonly headerIndex: UInt256[];
-  readonly storedHeaderCount: number;
+  readonly headerIndexCache: HeaderIndexCache;
   readonly currentBlock?: Block;
 }
 
@@ -59,30 +62,32 @@ interface Entry {
 }
 
 export const recoverHeaderIndex = async (storage: Storage) => {
-  const initHeaderIndex = await storage.headerHashList.all$
-    .pipe(
-      flatMap((value) => value.hashes),
-      toArray(),
-    )
-    .toPromise();
-
-  const storedHeaderCount = initHeaderIndex.length;
-  logger.debug({ name: 'recover_header_index_stored_count', count: storedHeaderCount });
-
+  const maybeHeaderHashIndex = await storage.headerHashIndex.tryGet();
+  const initHeaderListIndex =
+    maybeHeaderHashIndex === undefined ? 0 : Math.floor(maybeHeaderHashIndex.index / utils.hashListBatchSize);
+  const storedHeaderCount = initHeaderListIndex * utils.hashListBatchSize;
   if (storedHeaderCount !== 0) {
+    const { hashes: latestStoredHashes } = await storage.headerHashList.get(
+      storedHeaderCount - utils.hashListBatchSize,
+    );
     const hashIndex = await storage.headerHashIndex.get();
-    let extraHashes: readonly UInt256[] = [];
+    let currentHashes: readonly UInt256[] = [];
     if (hashIndex.index >= storedHeaderCount) {
       let hash = hashIndex.hash;
-      // tslint:disable-next-line: no-loop-statement possible-timing-attack
-      while (hash !== initHeaderIndex[storedHeaderCount - 1]) {
-        extraHashes = [hash].concat(extraHashes);
+      const finalHash = latestStoredHashes[latestStoredHashes.length - 1];
+      // tslint:disable-next-line: no-loop-statement
+      while (!hash.equals(finalHash)) {
+        currentHashes = [hash].concat(currentHashes);
         const { previousHash } = await storage.blocks.get({ hashOrIndex: hash });
         hash = previousHash;
       }
-
-      return { headerIndex: initHeaderIndex.concat(extraHashes), storedHeaderCount };
     }
+
+    return new HeaderIndexCache({
+      storage,
+      initStorageCount: storedHeaderCount,
+      initCurrentHeaderHashes: currentHashes,
+    });
   }
 
   const sortedTrimmedBlocks = await storage.blocks.all$
@@ -92,14 +97,20 @@ export const recoverHeaderIndex = async (storage: Storage) => {
     )
     .toPromise();
 
-  return { headerIndex: sortedTrimmedBlocks.map((block) => block.header.hash), storedHeaderCount: 0 };
+  return new HeaderIndexCache({
+    storage,
+    initStorageCount: 0,
+    initCurrentHeaderHashes: sortedTrimmedBlocks.map((block) => block.hash),
+  });
 };
 
 export class Blockchain {
   public static async create({ settings, storage, native, vm }: CreateBlockchainOptions): Promise<BlockchainType> {
-    const { headerIndex, storedHeaderCount } = await recoverHeaderIndex(storage);
-    if (headerIndex.length > 0) {
-      const currentBlockTrimmed = await storage.blocks.tryGet({ hashOrIndex: headerIndex[headerIndex.length - 1] });
+    const headerIndexCache = await recoverHeaderIndex(storage);
+    logger.debug({ name: 'header_index_length', length: headerIndexCache.length });
+    if (headerIndexCache.length > 0) {
+      const currentHeaderIndex = await headerIndexCache.get(headerIndexCache.length - 1);
+      const currentBlockTrimmed = await storage.blocks.tryGet({ hashOrIndex: currentHeaderIndex });
       if (currentBlockTrimmed === undefined) {
         throw new Error('testing');
       }
@@ -107,8 +118,7 @@ export class Blockchain {
       const currentBlock = await currentBlockTrimmed.getBlock(storage.transactions);
 
       return new Blockchain({
-        headerIndex,
-        storedHeaderCount,
+        headerIndexCache,
         settings,
         storage,
         native,
@@ -118,8 +128,7 @@ export class Blockchain {
     }
 
     const blockchain = new Blockchain({
-      headerIndex,
-      storedHeaderCount,
+      headerIndexCache,
       settings,
       storage,
       native,
@@ -138,12 +147,11 @@ export class Blockchain {
   public readonly onPersistNativeContractScript: Buffer;
 
   // tslint:disable-next-line: readonly-array
-  private readonly headerIndex: UInt256[];
+  private readonly headerIndexCache: HeaderIndexCache;
   private readonly storage: Storage;
   private readonly native: NativeContainer;
   private readonly vm: VM;
 
-  private mutableStoredHeaderCount: number;
   private mutableBlockQueue: PriorityQueue<Entry> = new PriorityQueue({
     comparator: (a, b) => a.block.index - b.block.index,
   });
@@ -157,8 +165,7 @@ export class Blockchain {
   private mutableBlock$: Subject<Block> = new Subject();
 
   public constructor(options: BlockchainOptions) {
-    this.headerIndex = options.headerIndex;
-    this.mutableStoredHeaderCount = options.storedHeaderCount;
+    this.headerIndexCache = options.headerIndexCache;
     this.settings = options.settings;
     this.storage = options.storage;
     this.native = options.native;
@@ -184,16 +191,12 @@ export class Blockchain {
     return this.mutablePreviousBlock;
   }
 
-  public get storedHeaderCount(): number {
-    return this.mutableStoredHeaderCount;
-  }
-
   public get currentBlockIndex(): number {
     return this.mutableCurrentBlock === undefined ? -1 : this.currentBlock.index;
   }
 
   public get currentHeaderIndex(): number {
-    return this.headerIndex.length;
+    return this.headerIndexCache.length;
   }
 
   public get block$(): Observable<Block> {
@@ -341,7 +344,8 @@ export class Blockchain {
   }
 
   public async getBlock(hashOrIndex: UInt256 | number): Promise<Block | undefined> {
-    const hash = typeof hashOrIndex === 'number' ? this.getBlockHash(hashOrIndex) : hashOrIndex;
+    const hashPromise = typeof hashOrIndex === 'number' ? this.getBlockHash(hashOrIndex) : Promise.resolve(hashOrIndex);
+    const hash = await hashPromise;
     if (hash === undefined) {
       return undefined;
     }
@@ -354,7 +358,6 @@ export class Blockchain {
       return this.previousBlock;
     }
 
-    // TODO: this should really just take a hash, and then the rpc handler can call `blockchain.getBlockHash` if its an index.
     const trimmedBlock = await this.blocks.tryGet({ hashOrIndex: hash });
     if (trimmedBlock === undefined) {
       return undefined;
@@ -367,16 +370,17 @@ export class Blockchain {
     return trimmedBlock.getBlock(this.transactions);
   }
 
-  public getBlockHash(index: number): UInt256 | undefined {
-    if (this.headerIndex.length <= index) {
+  public async getBlockHash(index: number): Promise<UInt256 | undefined> {
+    if (this.headerIndexCache.length <= index) {
       return undefined;
     }
 
-    return this.headerIndex[index];
+    return this.headerIndexCache.get(index);
   }
 
   public async getHeader(hashOrIndex: UInt256 | number): Promise<Header | undefined> {
-    const hash = typeof hashOrIndex === 'number' ? this.getBlockHash(hashOrIndex) : hashOrIndex;
+    const hashPromise = typeof hashOrIndex === 'number' ? this.getBlockHash(hashOrIndex) : Promise.resolve(hashOrIndex);
+    const hash = await hashPromise;
     if (hash === undefined) {
       return undefined;
     }
@@ -489,7 +493,7 @@ export class Blockchain {
           engine.setInstructionPointer(offset);
           engine.execute();
 
-          return utils.getCallReceipt(engine);
+          return utils.getCallReceipt(engine, container);
         },
       );
     });
@@ -584,21 +588,7 @@ export class Blockchain {
     logger.info({ name: 'neo_blockchain_start' }, 'Neo blockchain started.');
   }
 
-  private async saveHeaderHashList(): Promise<void> {
-    if (this.headerIndex.length - this.storedHeaderCount < utils.hashListBatchSize) {
-      return;
-    }
-
-    const blockchain = this.createPersistingBlockchain();
-    const { changeSet, countIncrement } = await blockchain.getHeaderHashListChanges(
-      this.headerIndex,
-      this.storedHeaderCount,
-    );
-    await this.storage.commit(changeSet);
-    this.mutableStoredHeaderCount += countIncrement;
-  }
-
-  private async updateBlockMetadata(block: Block): Promise<void> {
+  private updateBlockMetadata(block: Block): ChangeSet {
     const newHashIndexState = new HashIndexState({ hash: block.hash, index: block.index });
     const updateBlockHashIndex: Change = {
       type: 'add',
@@ -616,7 +606,71 @@ export class Blockchain {
     this.mutableCurrentBlock = block;
     this.mutableCurrentHeader = block.header;
 
-    return this.storage.commit([updateBlockHashIndex, updateHeaderHashIndex]);
+    return [updateBlockHashIndex, updateHeaderHashIndex];
+  }
+
+  private updateNep5Balances({
+    applicationsExecuted,
+    block,
+  }: {
+    readonly applicationsExecuted: readonly ApplicationExecuted[];
+    readonly block: Block;
+  }) {
+    const { assetKeys, transfersSent, transfersReceived } = getNep5UpdateOptions({
+      applicationsExecuted,
+      block,
+    });
+    const nep5BalancePairs = assetKeys.map((key) => {
+      const script = new ScriptBuilder().emitAppCall(key.assetScriptHash, 'balanceOf', key.userScriptHash).build();
+      const callReceipt = this.runEngineWrapper({ script, gas: 100000000, snapshot: 'main' });
+      const balanceBuffer = callReceipt.stack[0].getInteger().toBuffer();
+
+      return { key, value: new Nep5Balance({ balanceBuffer, lastUpdatedBlock: this.currentBlockIndex }) };
+    });
+
+    const nep5BalanceChangeSet: ChangeSet = nep5BalancePairs.map(({ key, value }) => {
+      if (value.balance.eqn(0)) {
+        return {
+          type: 'delete',
+          change: {
+            type: 'nep5Balance',
+            key,
+          },
+        };
+      }
+
+      return {
+        type: 'add',
+        change: {
+          type: 'nep5Balance',
+          key,
+          value,
+        },
+        subType: 'update',
+      };
+    });
+
+    const nep5TransfersSentChangeSet: ChangeSet = transfersSent.map(({ key, value }) => ({
+      type: 'add',
+      subType: 'add',
+      change: {
+        type: 'nep5TransferSent',
+        key,
+        value,
+      },
+    }));
+
+    const nep5TransfersReceivedChangeSet: ChangeSet = transfersReceived.map(({ key, value }) => ({
+      type: 'add',
+      subType: 'add',
+      change: {
+        type: 'nep5TransferReceived',
+        key,
+        value,
+      },
+    }));
+
+    return nep5BalanceChangeSet.concat(nep5TransfersReceivedChangeSet, nep5TransfersSentChangeSet);
   }
 
   private async persistBlockInternal(block: Block, verify?: boolean): Promise<void> {
@@ -624,37 +678,36 @@ export class Blockchain {
       await this.verifyBlock(block);
     }
 
-    const currentHeaderCount = this.headerIndex.length;
-    if (block.transactions.length !== 0) {
-      logger.debug({ name: 'BLOCK_PERSIST_WITH_TRANSACTION', block: block.serializeJSON(this.serializeJSONContext) });
+    if (block.transactions.length > 0) {
+      const hash =
+        block.transactions[0].sender !== undefined ? common.uInt160ToString(block.transactions[0].sender) : undefined;
+      logger.debug({ name: 'TRY_THIS_TEST_TRANSACTION_HASH', hash });
     }
-
     const blockchain = this.createPersistingBlockchain();
 
+    const currentHeaderCount = this.headerIndexCache.length;
     if (block.index === currentHeaderCount) {
-      this.headerIndex.push(block.hash);
+      await this.headerIndexCache.push(block.hash);
     }
 
-    const { changeBatch, applicationsExecuted } = blockchain.persistBlock(block, currentHeaderCount);
-    await this.storage.commitBatch(changeBatch);
+    const { changeBatch: persistBatch, applicationsExecuted } = blockchain.persistBlock(block, currentHeaderCount);
+    await this.storage.commitBatch(persistBatch);
 
-    // This ordering could cause issues. Lookout.
-    const nep5ChangeSet = getNep5ChangeSet({
-      applicationsExecuted,
-      block,
-      settings: this.settings,
-      runEngineWrapper: this.runEngineWrapper,
-    });
-    await this.storage.commit(nep5ChangeSet);
-    await this.saveHeaderHashList();
+    const blockMetadataBatch = this.updateBlockMetadata(block);
+    await this.storage.commit(blockMetadataBatch);
 
-    await this.updateBlockMetadata(block);
+    const nep5Updates = this.updateNep5Balances({ applicationsExecuted, block });
+    if (nep5Updates.length > 0) {
+      logger.debug({ name: 'incoming_nep5_updates', nep5Updates });
+    }
+    await this.storage.commit(nep5Updates);
+
+    this.vm.updateSnapshots();
   }
 
   private createPersistingBlockchain(): PersistingBlockchain {
     return new PersistingBlockchain({
       onPersistNativeContractScript: this.onPersistNativeContractScript,
-      storage: this.storage,
       vm: this.vm,
     });
   }

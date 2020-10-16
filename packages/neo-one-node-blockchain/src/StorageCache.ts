@@ -110,7 +110,7 @@ class BaseReadStorageCache<Key, Value> {
   public readonly onAdd: ((value: Value) => Promise<void>) | undefined;
   public readonly name: string;
   // tslint:disable-next-line readonly-keyword
-  public readonly mutableValues: { [key: string]: TrackedChange<Key, Value> };
+  public mutableValues: { [key: string]: TrackedChange<Key, Value> };
   protected readonly readStorage: () => ReadStorage<Key, Value>;
   protected readonly createAddChange: CreateAddChange<Key, Value>;
   protected readonly createDeleteChange: ((key: Key) => DeleteChange) | undefined;
@@ -149,6 +149,10 @@ class BaseReadStorageCache<Key, Value> {
 
       return { type: 'add', change: this.createAddChange(tracked.key, tracked.value), subType: tracked.subType };
     });
+  }
+
+  public clearChangeSet(): void {
+    this.mutableValues = {};
   }
 
   public getTrackedChangeSet(): TrackedChangeSet<Key, Value> {

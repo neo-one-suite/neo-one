@@ -27,6 +27,7 @@ describe('full node test', () => {
         'http://seed5t.neo.org:20333',
       ],
     };
+
     const rpcOptions = {
       http: {
         port: 8080,

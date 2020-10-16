@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using Neo.IO;
 using Neo.Network.P2P.Payloads;
 using Neo.Persistence;
 using Neo.SmartContract;
@@ -17,6 +18,7 @@ namespace NEOONE
             Block,
             Transaction,
             Signers,
+            ConsensusPayload,
         }
 
         private IVerifiable deserializeContainer(dynamic args)
@@ -36,6 +38,12 @@ namespace NEOONE
                         break;
                     case ContainerType.Transaction:
                         container = new Transaction();
+                        break;
+                    case ContainerType.Signers:
+                        container = new Signers();
+                        break;
+                    case ContainerType.ConsensusPayload:
+                        container = new ConsensusPayload();
                         break;
                     default:
                         throw new ArgumentException($"{typeIn} is not a valid container type");
@@ -172,21 +180,27 @@ namespace NEOONE
             return this.engine.Trigger;
         }
 
+        private dynamic _getContainer()
+        {
+            this.isEngineInitialized();
+            return this.engine.ScriptContainer;
+        }
+
         private long _getGasConsumed()
         {
             return this.engine != null ? this.engine.GasConsumed : 0;
         }
 
-        private ReturnHelpers.NotifyEventReturn[] _getNotifications()
+        private dynamic[] _getNotifications()
         {
             this.isEngineInitialized();
             var events = this.engine.Notifications;
             if (events == null || events.Count == 0)
             {
-                return new ReturnHelpers.NotifyEventReturn[] { };
+                return new dynamic[] { };
             }
 
-            return events.Select((p) => new ReturnHelpers.NotifyEventReturn(p)).ToArray();
+            return events.Select((p) => ReturnHelpers.convertStackItem(p.ToStackItem(new ReferenceCounter()))).ToArray();
         }
 
         private bool isEngineInitialized()
@@ -197,6 +211,53 @@ namespace NEOONE
             }
 
             return true;
+        }
+    }
+
+    internal class Signers : IVerifiable
+    {
+        private Signer[] _signers;
+        public Witness[] Witnesses { get; set; }
+        public int Size { get; }
+
+        public Signers(Signer[] signers)
+        {
+            _signers = signers;
+        }
+
+        public Signers()
+        {
+
+        }
+
+        public void Serialize(BinaryWriter writer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Deserialize(BinaryReader reader)
+        {
+            _signers = reader.ReadSerializableArray<Signer>();
+        }
+
+        public void DeserializeUnsigned(BinaryReader reader)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Neo.UInt160[] GetScriptHashesForVerifying(StoreView snapshot)
+        {
+            return _signers.Select(p => p.Account).ToArray();
+        }
+
+        public Signer[] GetSigners()
+        {
+            return _signers;
+        }
+
+        public void SerializeUnsigned(BinaryWriter writer)
+        {
+            throw new NotImplementedException();
         }
     }
 }

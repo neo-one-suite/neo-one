@@ -136,11 +136,16 @@ const compareTransactionAndFees = (val1: TransactionAndFee, val2: TransactionAnd
   return val1.transaction.hash.compare(val2.transaction.hash);
 };
 
+// TODO: We should note what some of these settings used to be, I've made them more aggressive
+// while we are testing syncing; and then testnet can be a bit slow.
+// const GET_BLOCKS_THROTTLE_MS = 1000;
+// const GET_BLOCKS_TIME_MS = 5000;
+
 const MEM_POOL_SIZE = 5000;
 const GET_BLOCKS_COUNT = 500;
 // Assume that we get 500 back, but if not, at least request every 10 seconds
 const GET_BLOCKS_BUFFER = GET_BLOCKS_COUNT / 3;
-const GET_BLOCKS_TIME_MS = 5000;
+const GET_BLOCKS_TIME_MS = 1000;
 const GET_BLOCKS_THROTTLE_MS = 1000;
 const TRIM_MEMPOOL_THROTTLE = 5000;
 const GET_BLOCKS_CLOSE_COUNT = 2;
@@ -204,7 +209,7 @@ export class Node implements INode {
             command: Command.GetBlocks,
             payload: new GetBlocksPayload({
               hashStart: block.hash,
-              count: this.mutableGetBlocksRequestsCount * 100,
+              count: this.mutableGetBlocksRequestsCount * 50,
             }),
           }),
         );
@@ -856,7 +861,6 @@ export class Node implements INode {
   }
 
   private async persistBlock(block: Block): Promise<void> {
-    const startTime = Date.now();
     if (this.blockchain.currentBlockIndex > block.index || this.tempKnownBlockHashes.has(block.hashHex)) {
       return;
     }
@@ -888,10 +892,9 @@ export class Node implements INode {
                 }),
               );
             }
-            logger.info({
+            logger.debug({
               name: 'neo_relay_block',
               [Labels.NEO_BLOCK_INDEX]: block.index,
-              timeToPersist: `${(Date.now() - startTime) / 1000} seconds`,
             });
           } catch (err) {
             logger.error({ name: 'neo_relay_block', [Labels.NEO_BLOCK_INDEX]: block.index, err });

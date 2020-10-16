@@ -8,6 +8,7 @@ import {
 } from '@neo-one/client-common';
 import { DeserializeWireBaseOptions, SerializableContainer, SerializableContainerType } from './Serializable';
 import { Signer } from './Signer';
+import { Witness } from './Witness';
 
 export interface SignersAdd {
   readonly signers: readonly Signer[];
@@ -45,9 +46,14 @@ export class Signers implements SerializableContainer {
   public readonly type: SerializableContainerType = 'Signers';
   public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   public readonly signers: readonly Signer[];
+  public readonly witnesses: readonly Witness[] = [];
 
   public constructor({ signers }: SignersAdd) {
     this.signers = signers;
+  }
+
+  public getScriptHashesForVerifying() {
+    return this.signers.map((signer) => signer.account);
   }
 
   public serializeWireBase(writer: BinaryWriter) {

@@ -16,7 +16,7 @@ export type HeaderKey = number;
 export class HeaderHashList implements SerializableWire {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): HeaderHashList {
     const { reader } = options;
-    const hashes = reader.readArray(reader.readUInt256);
+    const hashes = reader.readArray(() => reader.readUInt256());
 
     return new this({
       hashes,
