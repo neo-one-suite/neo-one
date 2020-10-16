@@ -73,6 +73,8 @@ export const isMapStackItem: (item: any) => item is MapStackItem = getIsStackIte
 export const isInteropInterface: (item: any) => item is InteropInterface = getIsStackItemType(
   StackItemType.InteropInterface,
 );
+export const isArrayLikeStackItem = (item: any): item is ArrayStackItem | StructStackItem =>
+  isArrayStackItem(item) || isStructStackItem(item);
 export const isPrimitiveStackItem = (item: any): item is PrimitiveStackItem =>
   isBooleanStackItem(item) || isByteStringStackItem(item) || isIntegerStackItem(item);
 
@@ -108,6 +110,13 @@ export const assertStructStackItem: (item: any) => StructStackItem = getAssertSt
   isStructStackItem,
   StackItemType.Struct,
 );
+export const assertArrayLikeStackItem = (item: any) => {
+  if (isArrayLikeStackItem(item)) {
+    return item;
+  }
+
+  throw new InvalidStackItemTypeError('ArrayLikeStackItem', item.type);
+};
 export const assertMapStackItem: (item: any) => MapStackItem = getAssertStackItemType(
   isMapStackItem,
   StackItemType.Map,
