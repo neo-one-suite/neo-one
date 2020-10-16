@@ -1,3 +1,4 @@
+import { common, crypto, JSONHelper } from '@neo-one/client-common';
 import { Blockchain } from '@neo-one/node-blockchain';
 import { StorageKey, StreamOptions } from '@neo-one/node-core';
 import { KeyBuilder, NativeContainer } from '@neo-one/node-native';
@@ -26,7 +27,9 @@ describe('Blockchain storage works', () => {
       protocolSettings: blockchainSettingsToProtocolSettings(blockchainSettings),
     });
 
-    console.log(dispatcher.test());
+    const balances = await storage.nep5Balances.all$.pipe(toArray()).toPromise();
+
+    console.log(balances);
 
     // const native = new NativeContainer(blockchainSettings);
     // const blockchain = await Blockchain.create({

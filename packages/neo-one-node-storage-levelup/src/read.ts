@@ -1,5 +1,6 @@
 // tslint:disable no-var-before-return prefer-immediate-return
 import {
+  ReadAllFindStorage,
   ReadAllStorage,
   ReadFindStorage,
   ReadMetadataStorage,
@@ -169,6 +170,42 @@ export function createReadFindStorage<Key, Value>({
       deserializeKey,
       deserializeValue,
     }),
+  };
+}
+
+export function createReadAllFindStorage<Key, Value>({
+  db,
+  searchRange,
+  getSearchRange,
+  serializeKey,
+  deserializeKey,
+  deserializeValue,
+}: {
+  readonly db: LevelUp;
+  readonly searchRange: StreamOptions;
+  readonly getSearchRange: (key: Buffer, secondary?: Buffer) => StreamOptions;
+  readonly serializeKey: SerializeKey<Key>;
+  readonly deserializeKey: (value: Buffer) => Key;
+  readonly deserializeValue: (value: Buffer) => Value;
+}): ReadAllFindStorage<Key, Value> {
+  const readStorage = createReadStorage({
+    db,
+    serializeKey,
+    deserializeValue,
+  });
+
+  const all$ = createAll$({ db, range: searchRange, deserializeValue });
+
+  return {
+    get: readStorage.get,
+    tryGet: readStorage.tryGet,
+    find$: createFind$({
+      db,
+      getSearchRange,
+      deserializeKey,
+      deserializeValue,
+    }),
+    all$,
   };
 }
 

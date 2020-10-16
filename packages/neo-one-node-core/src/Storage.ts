@@ -43,9 +43,7 @@ export interface ReadFindStorage<Key, Value> extends ReadStorage<Key, Value> {
   readonly find$: (lookup: Buffer, secondaryLookup?: Buffer) => Observable<StorageReturn<Key, Value>>;
 }
 
-export interface ReadGetAllStorage<Key, Value> extends ReadStorage<Key, Value> {
-  readonly getAll$: (key?: Partial<Key>) => Observable<Value>;
-}
+export interface ReadAllFindStorage<Key, Value> extends ReadAllStorage<Key, Value>, ReadFindStorage<Key, Value> {}
 
 export interface AddMetadataStorage<Value> {
   readonly add: (add: Value) => Promise<void>;
@@ -91,15 +89,9 @@ interface ReadAddUpdateMetadataStorage<Value, Update>
 interface ReadAddUpdateStorage<Key, Value, Update>
   extends ReadStorage<Key, Value>,
     AddUpdateStorage<Key, Value, Update> {}
-interface ReadGetAllAddDeleteStorage<Key, Value> extends ReadGetAllStorage<Key, Value>, AddDeleteStorage<Key, Value> {}
 interface ReadAllAddStorage<Key, Value> extends ReadAllStorage<Key, Value>, AddStorage<Key, Value> {}
 interface ReadAllAddUpdateDeleteStorage<Key, Value, Update>
   extends ReadAllStorage<Key, Value>,
-    AddUpdateDeleteStorage<Key, Value, Update> {}
-
-interface ReadGetAllAddStorage<Key, Value> extends ReadGetAllStorage<Key, Value>, AddStorage<Key, Value> {}
-interface ReadGetAllAddUpdateDeleteStorage<Key, Value, Update>
-  extends ReadGetAllStorage<Key, Value>,
     AddUpdateDeleteStorage<Key, Value, Update> {}
 
 export interface LatestReadStorage<Key, Value> extends ReadStorage<Key, Value> {
@@ -132,7 +124,7 @@ export type ChangeSet = readonly Change[];
 
 export interface BlockchainStorage {
   readonly blocks: ReadStorage<BlockKey, TrimmedBlock>;
-  readonly nep5Balances: ReadFindStorage<Nep5BalanceKey, Nep5Balance>;
+  readonly nep5Balances: ReadAllFindStorage<Nep5BalanceKey, Nep5Balance>;
   readonly nep5TransfersSent: ReadFindStorage<Nep5TransferKey, Nep5Transfer>;
   readonly nep5TransfersReceived: ReadFindStorage<Nep5TransferKey, Nep5Transfer>;
   readonly transactions: ReadStorage<TransactionKey, TransactionState>;

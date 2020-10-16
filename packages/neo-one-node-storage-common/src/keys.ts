@@ -137,6 +137,11 @@ const maxBlockKey = createBlockKey({ hashOrIndex: common.MAX_UINT256 });
 
 const getStorageSearchRange = createGetSearchRange(Prefix.Storage);
 
+const getAllNep5BalanceSearchRange = {
+  gte: Buffer.from([Prefix.Nep5Balance]),
+  lte: Buffer.from([Prefix.Nep5TransferSent]),
+};
+
 const getNep5BalanceSearchRange = createGetSearchRange(Prefix.Nep5Balance);
 const getNep5TransferReceivedSearchRange = createGetSearchRange(Prefix.Nep5TransferReceived);
 const getNep5TransferSentSearchRange = createGetSearchRange(Prefix.Nep5TransferSent);
@@ -151,6 +156,7 @@ export const keys = {
   createStorageKey,
   getStorageSearchRange,
   getNep5BalanceSearchRange,
+  getAllNep5BalanceSearchRange,
   getNep5TransferReceivedSearchRange,
   getNep5TransferSentSearchRange,
   createHeaderHashListKey,

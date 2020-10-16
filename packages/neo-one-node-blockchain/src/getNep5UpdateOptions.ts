@@ -1,36 +1,38 @@
-import { common, ScriptBuilder, VMState } from '@neo-one/client-common';
+import { common, VMState } from '@neo-one/client-common';
 import {
   ApplicationExecuted,
   Block,
-  BlockchainSettings,
-  CallReceipt,
-  ChangeSet,
-  Nep5Balance,
+  isByteStringStackItem,
+  isIntegerStackItem,
   Nep5BalanceKey,
   Nep5Transfer,
   Nep5TransferKey,
-  RunEngineOptions,
-  StackItemType,
-  Transaction,
 } from '@neo-one/node-core';
-import { BN } from 'bn.js';
+import { utils } from './utils';
 
-export function getNep5ChangeSet({
+export interface Nep5TransferReturn {
+  readonly key: Nep5TransferKey;
+  readonly value: Nep5Transfer;
+}
+
+export interface Nep5UpdateOptions {
+  readonly assetKeys: readonly Nep5BalanceKey[];
+  readonly transfersSent: readonly Nep5TransferReturn[];
+  readonly transfersReceived: readonly Nep5TransferReturn[];
+}
+
+export function getNep5UpdateOptions({
   applicationsExecuted,
   block,
-  settings,
-  runEngineWrapper,
 }: {
   readonly applicationsExecuted: readonly ApplicationExecuted[];
   readonly block: Block;
-  readonly settings: BlockchainSettings;
-  readonly runEngineWrapper: (options: RunEngineOptions) => CallReceipt;
-}): ChangeSet {
+}): Nep5UpdateOptions {
   let transferIndex = 0;
   const nep5BalancesChanged = new Set<string>();
   const mutableNep5BalancesChangedKeys: Nep5BalanceKey[] = [];
-  const mutableTransfersSent: Array<{ readonly key: Nep5TransferKey; readonly value: Nep5Transfer }> = [];
-  const mutableTransfersReceived: Array<{ readonly key: Nep5TransferKey; readonly value: Nep5Transfer }> = [];
+  const mutableTransfersSent: Nep5TransferReturn[] = [];
+  const mutableTransfersReceived: Nep5TransferReturn[] = [];
 
   applicationsExecuted.forEach((appExecuted) => {
     if (appExecuted.state === VMState.FAULT) {
@@ -38,7 +40,7 @@ export function getNep5ChangeSet({
     }
 
     appExecuted.notifications.forEach((notifyEventArgs) => {
-      const { scriptContainer, scriptHash, eventName, state: stateItems } = notifyEventArgs;
+      const { container, scriptHash, eventName, state: stateItems } = notifyEventArgs;
 
       if (stateItems.length === 0) {
         return;
@@ -49,14 +51,14 @@ export function getNep5ChangeSet({
       if (stateItems.length < 3) {
         return;
       }
-      if (!stateItems[0].isNull && stateItems[0].type !== StackItemType.ByteString) {
+      if (!stateItems[0].isNull && !isByteStringStackItem(stateItems[0])) {
         return;
       }
-      if (!stateItems[1].isNull && stateItems[1].type !== StackItemType.ByteString) {
+      if (!stateItems[1].isNull && isByteStringStackItem(stateItems[1])) {
         return;
       }
       const amountItem = stateItems[2];
-      if (!(amountItem.type === StackItemType.ByteString || amountItem.type === StackItemType.Integer)) {
+      if (!(isByteStringStackItem(amountItem) || isIntegerStackItem(amountItem))) {
         return;
       }
       const fromBytes = stateItems[0].isNull ? undefined : stateItems[0].getBuffer();
@@ -98,12 +100,9 @@ export function getNep5ChangeSet({
         }
       }
 
-      if (scriptContainer.type === 'Transaction') {
+      if (utils.isTransaction(container)) {
         const amount = amountItem.getInteger();
-        const txHash = Transaction.deserializeWire({
-          buffer: scriptContainer.buffer,
-          context: { messageMagic: settings.messageMagic },
-        }).hash;
+        const txHash = container.hash;
 
         if (!from.equals(common.ZERO_UINT160)) {
           mutableTransfersSent.push({
@@ -144,53 +143,9 @@ export function getNep5ChangeSet({
     });
   });
 
-  const nep5BalancePairs = mutableNep5BalancesChangedKeys.map((key) => {
-    const script = new ScriptBuilder().emitAppCall(key.assetScriptHash, 'balanceOf', key.userScriptHash).build();
-    const callReceipt = runEngineWrapper({ script, gas: 100000000, snapshot: 'main' });
-    const balanceBuffer = callReceipt.stack[0].getInteger().toBuffer();
-
-    return { key, value: new Nep5Balance({ balanceBuffer, lastUpdatedBlock: block.index }) };
-  });
-
-  const nep5BalanceChangeSet: ChangeSet = nep5BalancePairs.map(({ key, value }) => {
-    if (value.balance.eqn(0)) {
-      return {
-        type: 'delete',
-        change: {
-          type: 'nep5Balance',
-          key,
-        },
-      };
-    }
-
-    return {
-      type: 'add',
-      change: {
-        type: 'nep5Balance',
-        key,
-        value,
-      },
-      subType: 'update',
-    };
-  });
-  const nep5TransfersSentChangeSet: ChangeSet = mutableTransfersSent.map(({ key, value }) => ({
-    type: 'add',
-    subType: 'add',
-    change: {
-      type: 'nep5TransferSent',
-      key,
-      value,
-    },
-  }));
-  const nep5TransfersReceivedChangeSet: ChangeSet = mutableTransfersReceived.map(({ key, value }) => ({
-    type: 'add',
-    subType: 'add',
-    change: {
-      type: 'nep5TransferReceived',
-      key,
-      value,
-    },
-  }));
-
-  return nep5BalanceChangeSet.concat(nep5TransfersReceivedChangeSet, nep5TransfersSentChangeSet);
+  return {
+    assetKeys: mutableNep5BalancesChangedKeys,
+    transfersSent: mutableTransfersSent,
+    transfersReceived: mutableTransfersReceived,
+  };
 }

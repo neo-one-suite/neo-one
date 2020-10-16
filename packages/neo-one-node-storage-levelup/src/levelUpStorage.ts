@@ -85,8 +85,9 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
   return {
     blocks,
 
-    nep5Balances: read.createReadFindStorage({
+    nep5Balances: read.createReadAllFindStorage({
       db,
+      searchRange: keys.getAllNep5BalanceSearchRange,
       getSearchRange: keys.getNep5BalanceSearchRange,
       serializeKey: keys.createNep5BalanceKey,
       deserializeValue: (buffer) =>

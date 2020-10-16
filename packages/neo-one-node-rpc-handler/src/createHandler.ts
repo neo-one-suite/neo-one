@@ -350,7 +350,7 @@ export const createHandler = ({
     [RPC_METHODS.getblockhash]: async (args) => {
       const height = args[0];
       checkHeight(height);
-      const hash = blockchain.getBlockHash(height);
+      const hash = await blockchain.getBlockHash(height);
 
       return hash === undefined ? undefined : JSONHelper.writeUInt256(hash);
     },
@@ -617,8 +617,8 @@ export const createHandler = ({
         throw new JSONRPCError(-32602, 'Invalid params');
       }
 
-      const startTimeBytes = new BN(startTime, 10).toBuffer('le').reverse();
-      const endTimeBytes = new BN(endTime, 10).toBuffer('le').reverse();
+      const startTimeBytes = new BN(startTime).toBuffer();
+      const endTimeBytes = new BN(endTime).toBuffer();
       const mapToTransfers = ({ key, value }: { key: Nep5TransferKey; value: Nep5Transfer }) => ({
         timestamp: key.timestampMS.toNumber(),
         assethash: common.uInt160ToString(key.assetScriptHash),

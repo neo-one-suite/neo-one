@@ -20,7 +20,7 @@ export interface ExecuteScriptResult {
 
 export type VerifyWitnesses = (
   vm: VM,
-  verifiable: Verifiable & SerializableContainer,
+  verifiable: SerializableContainer,
   storage: BlockchainStorage,
   native: NativeContainer,
   gasIn: number,

@@ -19,7 +19,6 @@ import {
   StackItemType,
   StructStackItem,
 } from '../StackItems';
-import { StreamOptions } from '../Storage';
 import { StorageItem } from '../StorageItem';
 import { BinaryReader } from './BinaryReader';
 
@@ -205,7 +204,6 @@ function equals<T>(
 const wildCardFromJSON = <T>(json: WildcardContainerJSON, selector: (input: string) => T) => {
   if (typeof json === 'string') {
     if (json !== '*') {
-      // TODO: more descriptive
       throw new InvalidFormatError();
     }
 

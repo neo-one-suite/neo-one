@@ -16,9 +16,11 @@ import {
   CallFlags,
   ECDsaVerifyPrice,
   getOpCodePrice,
+  Notification,
   Transaction,
   TriggerType,
   utils as coreUtils,
+  Verifiable,
   VM,
 } from '@neo-one/node-core';
 import { BN } from 'bn.js';
@@ -37,20 +39,23 @@ const getOnPersistNativeContractScript = coreUtils.lazy(() => {
   return script.build();
 });
 
-const getApplicationExecuted = (engine: ApplicationEngine, transaction?: Transaction) => ({
-  transaction,
+// tslint:disable-next-line: no-any
+const isTransaction = (value: any): value is Transaction => value?.type === 'Transaction';
+
+const getApplicationExecuted = (engine: ApplicationEngine, container?: Verifiable) => ({
+  transaction: isTransaction(container) ? container : undefined,
   trigger: engine.trigger,
   state: engine.state,
   gasConsumed: engine.gasConsumed,
   stack: engine.resultStack,
-  notifications: engine.notifications,
+  notifications: engine.notifications.map((item) => Notification.fromStackItem(item, container)),
 });
 
-const getCallReceipt = (engine: ApplicationEngine) => ({
+const getCallReceipt = (engine: ApplicationEngine, container?: Verifiable) => ({
   state: engine.state,
   gasConsumed: engine.gasConsumed,
   stack: engine.resultStack,
-  notifications: engine.notifications,
+  notifications: engine.notifications.map((item) => Notification.fromStackItem(item, container)),
 });
 
 export interface TempWalletAccount {
@@ -189,4 +194,5 @@ export const utils = {
   verifyContract,
   getCalculateNetworkFee,
   blockComparator,
+  isTransaction,
 };

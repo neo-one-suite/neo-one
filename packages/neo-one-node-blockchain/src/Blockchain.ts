@@ -1,17 +1,20 @@
-import { common, UInt256, VerifyResultModel } from '@neo-one/client-common';
+import { common, ScriptBuilder, UInt256, VerifyResultModel } from '@neo-one/client-common';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
+  ApplicationExecuted,
   Block,
   Blockchain as BlockchainType,
   BlockchainSettings,
   CallReceipt,
   Change,
+  ChangeSet,
   ConsensusPayload,
   DeserializeWireContext,
   HashIndexState,
   Header,
   Mempool,
   NativeContainer,
+  Nep5Balance,
   RunEngineOptions,
   Signers,
   Storage,
@@ -28,7 +31,7 @@ import PriorityQueue from 'js-priority-queue';
 import { Observable, Subject } from 'rxjs';
 import { map, toArray } from 'rxjs/operators';
 import { BlockVerifyError, ConsensusPayloadVerifyError, GenesisBlockNotRegisteredError } from './errors';
-import { getNep5ChangeSet } from './getNep5ChangeSet';
+import { getNep5UpdateOptions } from './getNep5UpdateOptions';
 import { HeaderIndexCache } from './HeaderIndexCache';
 import { PersistingBlockchain } from './PersistingBlockchain';
 import { utils } from './utils';
@@ -72,7 +75,7 @@ export const recoverHeaderIndex = async (storage: Storage) => {
     if (hashIndex.index >= storedHeaderCount) {
       let hash = hashIndex.hash;
       const finalHash = latestStoredHashes[latestStoredHashes.length - 1];
-      // tslint:disable-next-line: no-loop-statement possible-timing-attack
+      // tslint:disable-next-line: no-loop-statement
       while (!hash.equals(finalHash)) {
         currentHashes = [hash].concat(currentHashes);
         const { previousHash } = await storage.blocks.get({ hashOrIndex: hash });
@@ -490,7 +493,7 @@ export class Blockchain {
           engine.setInstructionPointer(offset);
           engine.execute();
 
-          return utils.getCallReceipt(engine);
+          return utils.getCallReceipt(engine, container);
         },
       );
     });
@@ -585,7 +588,7 @@ export class Blockchain {
     logger.info({ name: 'neo_blockchain_start' }, 'Neo blockchain started.');
   }
 
-  private async updateBlockMetadata(block: Block): Promise<void> {
+  private updateBlockMetadata(block: Block): ChangeSet {
     const newHashIndexState = new HashIndexState({ hash: block.hash, index: block.index });
     const updateBlockHashIndex: Change = {
       type: 'add',
@@ -603,7 +606,71 @@ export class Blockchain {
     this.mutableCurrentBlock = block;
     this.mutableCurrentHeader = block.header;
 
-    return this.storage.commit([updateBlockHashIndex, updateHeaderHashIndex]);
+    return [updateBlockHashIndex, updateHeaderHashIndex];
+  }
+
+  private updateNep5Balances({
+    applicationsExecuted,
+    block,
+  }: {
+    readonly applicationsExecuted: readonly ApplicationExecuted[];
+    readonly block: Block;
+  }) {
+    const { assetKeys, transfersSent, transfersReceived } = getNep5UpdateOptions({
+      applicationsExecuted,
+      block,
+    });
+    const nep5BalancePairs = assetKeys.map((key) => {
+      const script = new ScriptBuilder().emitAppCall(key.assetScriptHash, 'balanceOf', key.userScriptHash).build();
+      const callReceipt = this.runEngineWrapper({ script, gas: 100000000, snapshot: 'main' });
+      const balanceBuffer = callReceipt.stack[0].getInteger().toBuffer();
+
+      return { key, value: new Nep5Balance({ balanceBuffer, lastUpdatedBlock: this.currentBlockIndex }) };
+    });
+
+    const nep5BalanceChangeSet: ChangeSet = nep5BalancePairs.map(({ key, value }) => {
+      if (value.balance.eqn(0)) {
+        return {
+          type: 'delete',
+          change: {
+            type: 'nep5Balance',
+            key,
+          },
+        };
+      }
+
+      return {
+        type: 'add',
+        change: {
+          type: 'nep5Balance',
+          key,
+          value,
+        },
+        subType: 'update',
+      };
+    });
+
+    const nep5TransfersSentChangeSet: ChangeSet = transfersSent.map(({ key, value }) => ({
+      type: 'add',
+      subType: 'add',
+      change: {
+        type: 'nep5TransferSent',
+        key,
+        value,
+      },
+    }));
+
+    const nep5TransfersReceivedChangeSet: ChangeSet = transfersReceived.map(({ key, value }) => ({
+      type: 'add',
+      subType: 'add',
+      change: {
+        type: 'nep5TransferReceived',
+        key,
+        value,
+      },
+    }));
+
+    return nep5BalanceChangeSet.concat(nep5TransfersReceivedChangeSet, nep5TransfersSentChangeSet);
   }
 
   private async persistBlockInternal(block: Block, verify?: boolean): Promise<void> {
@@ -611,31 +678,36 @@ export class Blockchain {
       await this.verifyBlock(block);
     }
 
+    if (block.transactions.length > 0) {
+      const hash =
+        block.transactions[0].sender !== undefined ? common.uInt160ToString(block.transactions[0].sender) : undefined;
+      logger.debug({ name: 'TRY_THIS_TEST_TRANSACTION_HASH', hash });
+    }
     const blockchain = this.createPersistingBlockchain();
-    const currentHeaderCount = this.headerIndexCache.length;
 
+    const currentHeaderCount = this.headerIndexCache.length;
     if (block.index === currentHeaderCount) {
       await this.headerIndexCache.push(block.hash);
     }
 
-    const { changeBatch, applicationsExecuted } = blockchain.persistBlock(block, currentHeaderCount);
-    await this.storage.commitBatch(changeBatch);
+    const { changeBatch: persistBatch, applicationsExecuted } = blockchain.persistBlock(block, currentHeaderCount);
+    await this.storage.commitBatch(persistBatch);
 
-    // This ordering could cause issues. Lookout.
-    const nep5ChangeSet = getNep5ChangeSet({
-      applicationsExecuted,
-      block,
-      settings: this.settings,
-      runEngineWrapper: this.runEngineWrapper,
-    });
-    await this.storage.commit(nep5ChangeSet);
-    await this.updateBlockMetadata(block);
+    const blockMetadataBatch = this.updateBlockMetadata(block);
+    await this.storage.commit(blockMetadataBatch);
+
+    const nep5Updates = this.updateNep5Balances({ applicationsExecuted, block });
+    if (nep5Updates.length > 0) {
+      logger.debug({ name: 'incoming_nep5_updates', nep5Updates });
+    }
+    await this.storage.commit(nep5Updates);
+
+    this.vm.updateSnapshots();
   }
 
   private createPersistingBlockchain(): PersistingBlockchain {
     return new PersistingBlockchain({
       onPersistNativeContractScript: this.onPersistNativeContractScript,
-      storage: this.storage,
       vm: this.vm,
     });
   }
