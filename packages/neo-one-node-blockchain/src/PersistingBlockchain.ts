@@ -1,5 +1,6 @@
 // tslint:disable no-array-mutation no-object-mutation
 import { common, UInt256, VMState } from '@neo-one/client-common';
+import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   // Action,
   // ActionKey,
@@ -30,6 +31,8 @@ import { PersistNativeContractsError } from './errors';
 import { ReadAddStorageCache } from './StorageCache';
 import { utils, utils as blockchainUtils } from './utils';
 
+const logger = createChild(nodeLogger, { service: 'persisting_blockchain' });
+
 interface PersistingBlockchainOptions {
   readonly vm: VM;
   readonly storage: Storage;
@@ -37,7 +40,7 @@ interface PersistingBlockchainOptions {
 }
 
 interface GetHeaderHashListChangesResult {
-  readonly countIncrement: number;
+  readonly storedCount: number;
   readonly changeSet: ChangeSet;
 }
 
@@ -116,23 +119,27 @@ export class PersistingBlockchain {
     headerIndex: readonly UInt256[],
     storedCount: number,
   ): Promise<GetHeaderHashListChangesResult> {
-    let increment = 0;
+    let mutableCount = storedCount;
     // tslint:disable-next-line: no-loop-statement
-    while (headerIndex.length - (storedCount + increment) >= utils.hashListBatchSize) {
-      const index = storedCount + increment;
+    while (headerIndex.length - mutableCount >= utils.hashListBatchSize) {
+      logger.debug({ name: 'adding new headerHashListChange', currentLength: headerIndex.length, mutableCount });
       await this.caches.headerHashList.add(
-        index,
+        mutableCount,
         new HeaderHashList({
-          hashes: headerIndex.slice(index, index + utils.hashListBatchSize),
+          hashes: headerIndex.slice(mutableCount, mutableCount + utils.hashListBatchSize),
         }),
       );
 
-      increment += utils.hashListBatchSize;
+      mutableCount += utils.hashListBatchSize;
     }
 
+    const changeSet = this.caches.headerHashList.getChangeSet();
+    logger.debug({ name: 'headerHashListChange debug', changeSetLength: changeSet.length });
+    this.caches.headerHashList.clearChangeSet();
+
     return {
-      countIncrement: increment,
-      changeSet: this.caches.headerHashList.getChangeSet(),
+      storedCount: mutableCount,
+      changeSet,
     };
   }
 

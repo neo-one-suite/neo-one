@@ -291,6 +291,10 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
     // tslint:disable-next-line no-loop-statement
     while (!this.mutableStopped) {
       try {
+        logger.debug({
+          name: 'neo_network_current_connected_peers',
+          num: Object.values(this.mutableConnectedPeers).length,
+        });
         this.connectToPeers();
         this.checkPeerHealth();
         await new Promise<void>((resolve) => {

@@ -26,29 +26,15 @@ describe('Blockchain storage works', () => {
       protocolSettings: blockchainSettingsToProtocolSettings(blockchainSettings),
     });
 
-    // console.log(dispatcher.test());
+    console.log(dispatcher.test());
 
-    const native = new NativeContainer(blockchainSettings);
-    const blockchain = await Blockchain.create({
-      settings: blockchainSettings,
-      storage,
-      vm: dispatcher,
-      native,
-    });
-
-    await new Promise((resolve, reject) =>
-      db
-        .createReadStream()
-        .on('data', (data: any) => {
-          console.log(`key: ${data.key.toString('hex')}`);
-          console.log(`value: ${data.key.toString('hex')}`);
-        })
-        .on('error', (error) => {
-          reject(error);
-        })
-        .on('close', resolve)
-        .on('end', resolve),
-    );
+    // const native = new NativeContainer(blockchainSettings);
+    // const blockchain = await Blockchain.create({
+    //   settings: blockchainSettings,
+    //   storage,
+    //   vm: dispatcher,
+    //   native,
+    // });
 
     // console.log(blockchain.currentBlockIndex);
 

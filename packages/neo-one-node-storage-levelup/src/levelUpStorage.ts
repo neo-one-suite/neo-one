@@ -157,9 +157,8 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
         }),
     }),
 
-    headerHashList: read.createReadAllStorage({
+    headerHashList: read.createReadStorage({
       db,
-      range: { gte: keys.minHeaderHashListKey, lte: keys.maxHeaderHashListKey },
       serializeKey: keys.createHeaderHashListKey,
       deserializeValue: (buffer) =>
         HeaderHashList.deserializeWire({

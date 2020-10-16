@@ -43,7 +43,7 @@ export interface Blockchain extends BlockchainStorage {
 
   readonly getBlock: (hashOrIndex: UInt256 | number) => Promise<Block | undefined>;
   readonly getHeader: (hashOrIndex: UInt256 | number) => Promise<Header | undefined>;
-  readonly getBlockHash: (index: number) => UInt256 | undefined;
+  readonly getBlockHash: (index: number) => Promise<UInt256 | undefined>;
   readonly getNextBlockHash: (hash: UInt256) => Promise<UInt256 | undefined>;
 
   readonly invokeScript: (script: Buffer, signers?: Signers) => CallReceipt;

@@ -102,7 +102,7 @@ interface ReadGetAllAddUpdateDeleteStorage<Key, Value, Update>
   extends ReadGetAllStorage<Key, Value>,
     AddUpdateDeleteStorage<Key, Value, Update> {}
 
-interface LatestReadStorage<Key, Value> extends ReadStorage<Key, Value> {
+export interface LatestReadStorage<Key, Value> extends ReadStorage<Key, Value> {
   readonly tryGetLatest: () => Promise<Value | undefined>;
 }
 
@@ -146,7 +146,6 @@ export interface BlockchainStorage {
 
 export interface Storage extends BlockchainStorage {
   readonly blocks: ReadAllStorage<BlockKey, TrimmedBlock>;
-  readonly headerHashList: ReadAllStorage<HeaderKey, HeaderHashList>;
   readonly commit: (changeSet: ChangeSet) => Promise<void>;
   // tslint:disable-next-line: readonly-array
   readonly commitBatch: (batch: AbstractBatch[]) => Promise<void>;

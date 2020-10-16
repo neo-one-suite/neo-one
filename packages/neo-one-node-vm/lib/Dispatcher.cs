@@ -15,7 +15,6 @@ namespace NEOONE
         private IStore store;
         private bool init = false;
         private string path;
-
         private enum BaseMethod
         {
             init,
@@ -125,7 +124,7 @@ namespace NEOONE
 
         private dynamic _test()
         {
-            return true;
+            return this._getConfig();
         }
 
         private NEOONE.ReturnHelpers.ProtocolSettingsReturn _getConfig()

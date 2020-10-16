@@ -34,10 +34,10 @@ const getCreateKey = <Key>({
 const getMetadataKey = ({ prefix }: { readonly prefix: Prefix }) => Buffer.from([prefix]);
 
 const serializeHeaderHashListKey = (key: number) => {
-  const writer = new BinaryWriter();
-  writer.writeUInt32LE(key);
+  const buffer = Buffer.alloc(4);
+  buffer.writeUInt32LE(key);
 
-  return writer.toBuffer();
+  return buffer;
 };
 
 /* crude method but it does what we want it to do */
@@ -135,9 +135,6 @@ const contractIDKey = getMetadataKey({
 const minBlockKey = createBlockKey({ hashOrIndex: common.ZERO_UINT256 });
 const maxBlockKey = createBlockKey({ hashOrIndex: common.MAX_UINT256 });
 
-const minHeaderHashListKey = createHeaderHashListKey(0);
-const maxHeaderHashListKey = createHeaderHashListKey(0xffffffff);
-
 const getStorageSearchRange = createGetSearchRange(Prefix.Storage);
 
 const getNep5BalanceSearchRange = createGetSearchRange(Prefix.Nep5Balance);
@@ -162,6 +159,4 @@ export const keys = {
   contractIDKey,
   minBlockKey,
   maxBlockKey,
-  minHeaderHashListKey,
-  maxHeaderHashListKey,
 };
