@@ -54,7 +54,7 @@ export function getNep5UpdateOptions({
       if (!stateItems[0].isNull && !isByteStringStackItem(stateItems[0])) {
         return;
       }
-      if (!stateItems[1].isNull && isByteStringStackItem(stateItems[1])) {
+      if (!stateItems[1].isNull && !isByteStringStackItem(stateItems[1])) {
         return;
       }
       const amountItem = stateItems[2];

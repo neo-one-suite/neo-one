@@ -14,7 +14,7 @@ export class Notification {
     const array = assertArrayStackItem(stackItem).array;
     const scriptHash = common.bufferToUInt160(array[0].getBuffer());
     const eventName = array[1].getString();
-    const state = array.slice(2);
+    const state = assertArrayStackItem(array[2]).array;
 
     return new Notification({
       container,

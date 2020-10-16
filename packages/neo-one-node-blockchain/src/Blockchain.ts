@@ -697,9 +697,6 @@ export class Blockchain {
     await this.storage.commit(blockMetadataBatch);
 
     const nep5Updates = this.updateNep5Balances({ applicationsExecuted, block });
-    if (nep5Updates.length > 0) {
-      logger.debug({ name: 'incoming_nep5_updates', nep5Updates });
-    }
     await this.storage.commit(nep5Updates);
 
     this.vm.updateSnapshots();
