@@ -47,6 +47,10 @@ export interface Blockchain extends BlockchainStorage {
   readonly getNextBlockHash: (hash: UInt256) => Promise<UInt256 | undefined>;
 
   readonly invokeScript: (script: Buffer, signers?: Signers) => CallReceipt;
+  readonly invokeTransaction: <TTransaction extends { readonly script: Buffer }>(
+    transaction: TTransaction,
+    gas: number,
+  ) => CallReceipt;
 
   // readonly updateSettings: (settings: BlockchainSettings) => void;
   readonly stop: () => Promise<void>;

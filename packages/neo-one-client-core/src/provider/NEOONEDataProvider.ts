@@ -1,5 +1,6 @@
 /// <reference types="@reactivex/ix-es2015-cjs" />
 import {
+  Account,
   AddressString,
   Attribute,
   AttributeJSON,
@@ -150,7 +151,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
   }
 
   public async testInvoke(transaction: FeelessTransactionModel): Promise<RawCallReceipt> {
-    const receipt = await this.mutableClient.testInvocation(transaction.serializeWire().toString('hex'));
+    const receipt = await this.mutableClient.testInvocation(transaction.script.toString('hex'));
 
     return convertCallReceipt(receipt);
   }
@@ -270,6 +271,21 @@ export class NEOONEDataProvider implements DeveloperProvider {
       flatten<StorageItem>() as any,
       map<StorageItemJSON, StorageItem>((storageItem) => this.convertStorageItem(storageItem)),
     );
+  }
+
+  public async getAccount(address: AddressString): Promise<Account> {
+    const balances = await this.mutableClient.getNep5Balances(address);
+
+    return {
+      address,
+      balances: balances.balance.reduce<Account['balances']>(
+        (acc, { assethash, amount }) => ({
+          ...acc,
+          [assethash]: new BigNumber(amount),
+        }),
+        {},
+      ),
+    };
   }
 
   private convertStorageItem(storageItem: StorageItemJSON): StorageItem {
@@ -404,9 +420,9 @@ export class NEOONEDataProvider implements DeveloperProvider {
     };
   }
 
-  private convertWildcardContainer<TJSON, T>(
-    container: WildcardContainerJSON<TJSON>,
-    converter: (val: TJSON) => T,
+  private convertWildcardContainer<T>(
+    container: WildcardContainerJSON,
+    converter: (val: string) => T,
   ): WildcardContainer<T> {
     if (container === '*') {
       return '*';

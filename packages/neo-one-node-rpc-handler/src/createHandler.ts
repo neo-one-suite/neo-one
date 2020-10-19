@@ -19,8 +19,9 @@ import {
   Nep5Transfer,
   Nep5TransferKey,
   Node,
-  RelayTransactionResult,
+  notificationToJSON,
   Signers,
+  StackItem,
   stackItemToJSON,
   StorageKey,
   Transaction,
@@ -279,20 +280,22 @@ export const createHandler = ({
     const result = blockchain.invokeScript(script, signers);
 
     try {
-      const stack = result.stack.map((item) => stackItemToJSON(item, undefined));
+      const stack = result.stack.map((item: StackItem) => stackItemToJSON(item, undefined));
 
       return {
         script: script.toString('hex'),
         state: toVMStateJSON(result.state),
         stack,
-        gasConsumed: result.gasConsumed.toString(),
+        gasconsumed: result.gasConsumed,
+        notifications: result.notifications.map(notificationToJSON),
       };
     } catch {
       return {
         script: script.toString('hex'),
         state: toVMStateJSON(result.state),
         stack: 'error: recursive reference',
-        gasConsumed: result.gasConsumed.toString(),
+        gasconsumed: result.gasConsumed,
+        notifications: result.notifications.map(notificationToJSON),
       };
     }
   };
@@ -677,41 +680,38 @@ export const createHandler = ({
     },
 
     // Settings
-    // [RPC_METHODS.updatesettings]: async (args) => {
-    //   const { settings } = blockchain;
-    //   const newSettings = {
-    //     ...settings,
-    //     secondsPerBlock: args[0].secondsPerBlock,
-    //   };
+    [RPC_METHODS.updatesettings]: async (_args) => {
+      throw new JSONRPCError(-101, 'Not implemented');
+      // const { settings } = blockchain;
+      // const newSettings = {
+      //   ...settings,
+      //   secondsPerBlock: args[0].secondsPerBlock,
+      // };
 
-    // TODO: implement this
-    // blockchain.updateSettings(newSettings);
+      // blockchain.updateSettings(newSettings);
 
-    //   return true;
-    // },
-    // [RPC_METHODS.getsettings]: async () => ({
-    //   millisecondsPerBlock: blockchain.settings.millisecondsPerBlock,
-    // }),
+      // return true;
+    },
+    [RPC_METHODS.getsettings]: async () => ({ millisecondsPerBlock: blockchain.settings.millisecondsPerBlock }),
 
     // NEO•ONE
-    // TODO: I think we can get away with not using this but we need to make the change in the provider
-    // [RPC_METHODS.testinvocation]: async (args) => {
-    //   const transaction = Transaction.deserializeWire({
-    //     context: blockchain.deserializeWireContext,
-    //     buffer: JSONHelper.readBuffer(args[0]),
-    //   });
+    [RPC_METHODS.testinvocation]: async (args) => {
+      const script = JSONHelper.readBuffer(args[0]);
 
-    //   try {
-    //     const receipt = blockchain.invokeTransaction(transaction);
+      try {
+        const receipt = blockchain.invokeTransaction({ script }, 1000000);
 
-    //     return {
-    //       result: receipt.result.serializeJSON(blockchain.serializeJSONContext),
-    //       actions: receipt.actions.map((action) => action.serializeJSON(blockchain.serializeJSONContext)),
-    //     };
-    //   } catch {
-    //     throw new JSONRPCError(-103, 'Invalid Transaction');
-    //   }
-    // },
+        return {
+          script,
+          state: toVMStateJSON(receipt.state),
+          stack: receipt.stack.map((item) => stackItemToJSON(item, undefined)),
+          gasconsumed: receipt.gasConsumed,
+          notifications: receipt.notifications.map(notificationToJSON),
+        };
+      } catch {
+        throw new JSONRPCError(-103, 'Invalid Transaction');
+      }
+    },
     [RPC_METHODS.relaytransaction]: async (args): Promise<RelayTransactionResultJSON> => {
       const transaction = Transaction.deserializeWire({
         context: blockchain.deserializeWireContext,
@@ -719,10 +719,8 @@ export const createHandler = ({
       });
 
       try {
-        const [transactionJSON, result] = await Promise.all<TransactionJSON, RelayTransactionResult>([
-          transaction.serializeJSON(),
-          node.relayTransaction(transaction, { forceAdd: true, throwVerifyError: true }),
-        ]);
+        const transactionJSON = transaction.serializeJSON();
+        const result = await node.relayTransaction(transaction, { forceAdd: true, throwVerifyError: true });
 
         const resultJSON = result.verifyResult !== undefined ? toJSONVerifyResult(result.verifyResult) : undefined;
 
@@ -742,6 +740,7 @@ export const createHandler = ({
         //         },
         //       };
 
+        // TODO: client expects more information than this
         return {
           transaction: transactionJSON,
           verifyResult: resultJSON,
@@ -810,7 +809,7 @@ export const createHandler = ({
       return result;
     },
 
-    [RPC_METHODS.getinvocationdata]: async () => {
+    [RPC_METHODS.getinvocationdata]: async (_args) => {
       throw new JSONRPCError(-101, 'Not implemented');
       // const transactionState = await blockchain.transactions.get(JSONHelper.readUInt256(args[0]));
       // // TODO: check serializeJSON() method. Doesn't include `data`
@@ -822,19 +821,35 @@ export const createHandler = ({
 
       // return result.data;
     },
-    // TODO: reimplement this;
-    [RPC_METHODS.getnetworksettings]: async () => ({
-      maxTransactionPerBlock: 512,
-      blockAccounts: [],
-      maxBlockSize: 1024 * 256,
-      maxBlockSystemFee: '',
-      neoVotersCount: 0,
-      neoNextBlockValidators: [],
-      neoCandidates: [],
-      neoCommitteeMembers: [],
-      neoCommitteeAddress: '',
-      neoTotalSupply: 100000000,
-    }),
+    [RPC_METHODS.getnetworksettings]: async () => {
+      const {
+        decrementInterval,
+        generationAmount,
+        privateKeyVersion,
+        standbyValidators,
+        messageMagic,
+        addressVersion,
+        standbyCommittee,
+        committeeMembersCount,
+        validatorsCount,
+        millisecondsPerBlock,
+        memoryPoolMaxTransactions,
+      } = blockchain.settings;
+
+      return {
+        decrementinterval: decrementInterval,
+        generationamount: generationAmount,
+        privatekeyversion: privateKeyVersion,
+        standbydalidators: standbyValidators.map((val) => common.ecPointToString(val)),
+        messagemagic: messageMagic,
+        addressversion: addressVersion,
+        standbycommittee: standbyCommittee.map((val) => common.ecPointToString(val)),
+        committeememberscount: committeeMembersCount,
+        validatorscount: validatorsCount,
+        millisecondsperblock: millisecondsPerBlock,
+        memorypoolmaxtransactions: memoryPoolMaxTransactions,
+      };
+    },
     [RPC_METHODS.runconsensusnow]: async () => {
       if (node.consensus) {
         await node.consensus.runConsensusNow();

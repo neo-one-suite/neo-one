@@ -6,7 +6,7 @@ import {
   Transfer,
   wifToPrivateKey,
 } from '@neo-one/client-common';
-import { Hash256, NEOONEDataProvider } from '@neo-one/client-core';
+import { Hash160, NEOONEDataProvider } from '@neo-one/client-core';
 import { constants } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { getClients } from './getClients';
@@ -84,12 +84,12 @@ export const WALLETS: readonly BootstrapWallet[] = [
 const createWalletTransfers = (to: BootstrapWallet) => [
   {
     to: privateKeyToAddress(wifToPrivateKey(to.wif)),
-    asset: Hash256.NEO,
+    asset: Hash160.NEO,
     amount: to.amount,
   },
   {
     to: privateKeyToAddress(wifToPrivateKey(to.wif)),
-    asset: Hash256.GAS,
+    asset: Hash160.GAS,
     amount: to.amount,
   },
 ];
@@ -123,8 +123,8 @@ export const setupWallets = async (
   ]);
 
   if (
-    (account.balances[Hash256.NEO] as BigNumber | undefined) === undefined ||
-    account.balances[Hash256.NEO].isEqualTo(0)
+    (account.balances[Hash160.NEO] as BigNumber | undefined) === undefined ||
+    account.balances[Hash160.NEO].isEqualTo(0)
   ) {
     const result = await client.transfer(
       WALLETS.reduce<readonly Transfer[]>((acc, wallet) => acc.concat(createWalletTransfers(wallet)), []),

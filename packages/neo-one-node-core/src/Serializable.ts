@@ -5,6 +5,11 @@
 // import { InvocationResult } from './invocationResult';
 // import { StorageChange } from './storageChange';
 import { SerializableWire } from '@neo-one/client-common';
+import { utils } from '@neo-one/utils';
+import { Block } from './Block';
+import { ConsensusPayload } from './payload';
+import { Signers } from './Signers';
+import { Transaction } from './transaction';
 import { BinaryReader } from './utils';
 import { Verifiable } from './Verifiable';
 
@@ -20,6 +25,26 @@ export interface SerializedScriptContainer {
   readonly type: SerializableContainerType;
   readonly buffer: Buffer;
 }
+
+export const deserializeScriptContainer = (
+  item: SerializedScriptContainer,
+  context: DeserializeWireContext,
+): SerializableWire => {
+  const buffer = item.buffer;
+  switch (item.type) {
+    case 'Block':
+      return Block.deserializeWire({ buffer, context });
+    case 'Transaction':
+      return Transaction.deserializeWire({ buffer, context });
+    case 'ConsensusPayload':
+      return ConsensusPayload.deserializeWire({ buffer, context });
+    case 'Signers':
+      return Signers.deserializeWire({ buffer, context });
+    default:
+      utils.assertNever(item.type);
+      throw new Error('For TS');
+  }
+};
 
 export const serializeScriptContainer = (item: SerializableContainer): SerializedScriptContainer => ({
   buffer: item.serializeWire(),

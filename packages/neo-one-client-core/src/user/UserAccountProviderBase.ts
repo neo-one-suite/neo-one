@@ -1,11 +1,11 @@
 import {
+  Account,
   AddressString,
   addressToScriptHash,
   Attribute,
   AttributeModel,
   Block,
   common,
-  crypto,
   FeelessTransactionModel,
   ForwardValue,
   GetOptions,
@@ -39,13 +39,7 @@ import BigNumber from 'bignumber.js';
 import debug from 'debug';
 import { Observable } from 'rxjs';
 import { clientUtils } from '../clientUtils';
-import {
-  InsufficientSystemFeeError,
-  InvokeError,
-  NoAccountError,
-  NothingToClaimError,
-  NotImplementedError,
-} from '../errors';
+import { InsufficientSystemFeeError, InvokeError, NoAccountError, NotImplementedError } from '../errors';
 import { converters } from './converters';
 
 const logger = debug('NEOONE:LocalUserAccountProvider');
@@ -91,16 +85,16 @@ export interface ExecuteInvokeMethodOptions<T extends TransactionReceipt> extend
   readonly invokeMethodOptions: InvokeMethodOptions;
 }
 
-// export interface ExecuteInvokeClaimOptions {
-//   readonly contract: AddressString;
-//   readonly unclaimedAmount: BigNumber;
-//   readonly attributes: readonly Attribute[];
-//   readonly method: string;
-//   readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
-//   readonly paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>;
-//   readonly from: UserAccountID;
-//   readonly sourceMaps?: SourceMaps;
-// }
+export interface ExecuteInvokeClaimOptions {
+  readonly contract: AddressString;
+  readonly unclaimedAmount: BigNumber;
+  readonly attributes: readonly Attribute[];
+  readonly method: string;
+  readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
+  readonly paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>;
+  readonly from: UserAccountID;
+  readonly sourceMaps?: SourceMaps;
+}
 
 export interface Provider {
   readonly networks$: Observable<readonly NetworkType[]>;
@@ -122,6 +116,7 @@ export interface Provider {
   readonly getBlockCount: (network: NetworkType) => Promise<number>;
   readonly getTransaction: (network: NetworkType, hash: Hash256String) => Promise<Transaction>;
   readonly iterBlocks: (network: NetworkType, options?: IterOptions) => AsyncIterable<Block>;
+  readonly getAccount: (network: NetworkType, address: AddressString) => Promise<Account>;
   readonly iterActionsRaw?: (network: NetworkType, options?: IterOptions) => AsyncIterable<RawAction>;
 }
 
@@ -176,6 +171,10 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     return this.provider.getBlockCount(network);
   }
 
+  public async getAccount(network: NetworkType, address: AddressString): Promise<Account> {
+    return this.provider.getAccount(network, address);
+  }
+
   public async transfer(transfers: readonly Transfer[], options?: TransactionOptions): Promise<TransactionResult> {
     const { from, attributes, networkFee } = this.getTransactionOptions(options);
 
@@ -185,9 +184,9 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
   }
 
   public async claim(options?: TransactionOptions): Promise<TransactionResult> {
-    const { from, networkFee } = this.getTransactionOptions(options);
+    const { from, attributes, networkFee } = this.getTransactionOptions(options);
 
-    return this.capture(async () => this.executeClaim(from, networkFee), {
+    return this.capture(async () => this.executeClaim(from, attributes, networkFee), {
       name: 'neo_claim',
     });
   }
@@ -408,41 +407,40 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     });
   }
 
-  public async invokeClaim(
-    contract: AddressString,
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-    options: TransactionOptions = {},
-    sourceMaps: SourceMaps = {},
-  ): Promise<TransactionResult> {
-    // TODO: what to do with networkfee?
-    const { from, attributes, networkFee } = this.getTransactionOptions(options);
+  // public async invokeClaim(
+  //   contract: AddressString,
+  //   method: string,
+  //   params: ReadonlyArray<ScriptBuilderParam | undefined>,
+  //   paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
+  //   options: TransactionOptions = {},
+  //   sourceMaps: SourceMaps = {},
+  // ): Promise<TransactionResult> {
+  //   const { from, attributes, networkFee } = this.getTransactionOptions(options);
 
-    return this.capture(
-      async () => {
-        const unclaimedAmount = await this.provider.getUnclaimed(from.network, contract);
+  //   return this.capture(
+  //     async () => {
+  //       const unclaimedAmount = await this.provider.getUnclaimed(from.network, contract);
 
-        if (unclaimedAmount.lte(new BigNumber(0))) {
-          throw new NothingToClaimError(from);
-        }
+  //       if (unclaimedAmount.lte(new BigNumber(0))) {
+  //         throw new NothingToClaimError(from);
+  //       }
 
-        return this.executeInvokeClaim({
-          contract,
-          unclaimedAmount,
-          attributes,
-          from,
-          method,
-          params,
-          paramsZipped,
-          sourceMaps,
-        });
-      },
-      {
-        name: 'neo_invoke_claim',
-      },
-    );
-  }
+  //       return this.executeInvokeClaim({
+  //         contract,
+  //         unclaimedAmount,
+  //         attributes,
+  //         from,
+  //         method,
+  //         params,
+  //         paramsZipped,
+  //         sourceMaps,
+  //       });
+  //     },
+  //     {
+  //       name: 'neo_invoke_claim',
+  //     },
+  //   );
+  // }
 
   public async call(
     network: NetworkType,
@@ -500,18 +498,20 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
   }
 
   protected getTransactionOptions(options: TransactionOptions = {}): TransactionOptionsFull {
-    const { attributes = [], networkFee = utils.ZERO_BIG_NUMBER, systemFee = utils.ZERO_BIG_NUMBER, from } = options;
+    const {
+      attributes = [],
+      networkFee = utils.ZERO_BIG_NUMBER,
+      systemFee = utils.ZERO_BIG_NUMBER,
+      from: fromIn,
+    } = options;
+    let from = fromIn;
 
-    let accounts: readonly AddressString[] = [];
     if (from === undefined) {
       const fromAccount = this.getCurrentUserAccount();
       if (fromAccount === undefined) {
-        accounts = this.getUserAccounts().map((account) =>
-          common.uInt160ToString(
-            crypto.addressToScriptHash({ addressVersion: common.NEO_ADDRESS_VERSION, address: account.id.address }),
-          ),
-        );
+        throw new NoAccountError();
       }
+      from = fromAccount.id;
     }
 
     return {
@@ -686,7 +686,11 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     networkFee: BigNumber,
   ): Promise<TransactionResult>;
 
-  protected abstract async executeClaim(from: UserAccountID, networkFee: BigNumber): Promise<TransactionResult>;
+  protected abstract async executeClaim(
+    from: UserAccountID,
+    attributes: readonly Attribute[],
+    networkFee: BigNumber,
+  ): Promise<TransactionResult>;
 
   protected async invokeRaw<T extends TransactionReceipt>({
     invokeMethodOptionsOrScript,

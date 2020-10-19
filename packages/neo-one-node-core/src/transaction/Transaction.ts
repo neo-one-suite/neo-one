@@ -134,7 +134,7 @@ export class Transaction
     const { reader } = options;
     const count = reader.readVarUIntLE(new BN(maxCount)).toNumber();
     if (count === 0) {
-      throw new InvalidFormatError(`expected signer count > 0, found: ${count}`);
+      throw new InvalidFormatError(`Expected signer count > 0, found: ${count}`);
     }
 
     const signerSet = new Set<UInt160>();

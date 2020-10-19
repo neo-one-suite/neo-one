@@ -1,4 +1,5 @@
 import {
+  Account,
   AddressString,
   Block,
   Contract,

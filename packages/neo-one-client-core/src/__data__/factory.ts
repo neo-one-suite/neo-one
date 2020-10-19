@@ -73,12 +73,11 @@ import {
   VoidContractParameterJSON,
   Witness,
   WitnessJSON,
-  WitnessModel,
 } from '@neo-one/client-common';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
 import { ContractEventDescriptor, ContractMethodDescriptor } from '../../../neo-one-node-core/src/manifest';
-import { Hash256 } from '../Hash256';
+import { Hash160 } from '../Hash160';
 import * as nep5 from '../nep5';
 import { LockedWallet, UnlockedWallet } from '../user';
 import { data } from './data';
@@ -681,7 +680,7 @@ const createOtherWallet = (options: Partial<UnlockedWallet> = {}): UnlockedWalle
 const createTransfer = (options: Partial<Transfer> = {}): Transfer => ({
   to: keys[0].address,
   amount: data.bigNumbers.a,
-  asset: Hash256.NEO,
+  asset: Hash160.NEO,
   ...options,
 });
 

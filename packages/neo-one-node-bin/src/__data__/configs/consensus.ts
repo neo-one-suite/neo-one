@@ -7,10 +7,10 @@ export const consensus = (rpcPort: number, path: string) => ({
   path,
   blockchain: serializeSettings(
     createMain({
-      address,
+      // address,
       standbyValidators: [standbyValidator],
       privateNet: true,
-      secondsPerBlock: 5,
+      millisecondsPerBlock: 5000,
     }),
   ),
   rpc: {

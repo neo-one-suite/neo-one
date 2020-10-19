@@ -1,7 +1,7 @@
 import { ABIParameter, ABIReturn } from '@neo-one/client-common';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
-import { Hash256 } from '../Hash256';
+import { Hash160 } from '../Hash160';
 import { keys } from './keys';
 
 const hash256s = {
@@ -344,7 +344,7 @@ const transfer = {
   a: {
     to: keys[0].address,
     amount: bigNumbers.a,
-    asset: Hash256.NEO,
+    asset: Hash160.NEO,
   },
 };
 
