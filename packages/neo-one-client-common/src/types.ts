@@ -5,7 +5,7 @@ import { BN } from 'bn.js';
 import { Observable } from 'rxjs';
 import { RawSourceMap } from 'source-map';
 import { ECPoint, UInt160, UInt160Hex, UInt256 } from './common';
-import { AttributeTypeModel, Wildcard } from './models';
+import { AttributeTypeModel, VMState, Wildcard } from './models';
 
 /**
  * Base58 encoded string that represents a NEO address.
@@ -62,7 +62,9 @@ export type NetworkType = 'main' | 'test' | string;
  *
  * @see Attribute
  */
-export interface AttributeBase {}
+export interface AttributeBase {
+  readonly type: AttributeTypeModel;
+}
 /**
  * `Attribute` whose transaction is "high priority".
  */
@@ -179,14 +181,18 @@ export interface Transaction {
   readonly witnesses: readonly Witness[];
 }
 
+// For Neo node returns
+export interface VerboseTransaction extends Transaction {
+  readonly blockHash: UInt256;
+  readonly confirmations: number;
+  readonly blockTime: BigNumber;
+  readonly state: VMState;
+}
+
 /**
  * `Transaction` that has been confirmed on the blockchain. Includes all of the same properties as a `Transaction` as well as the `TransactionReceipt` of the confirmation.
  */
 export interface ConfirmedTransaction extends Transaction {
-  /**
-   * Additional raw data that is typically processed by an `ABI` for the client APIs.
-   */
-  readonly invocationData: RawInvocationData;
   /**
    * 'Receipt' of the confirmed transaction on the blockchain. This contains properties like the block the `Transaction` was included in.
    */
@@ -237,16 +243,11 @@ export interface Header {
    * Size in bytes of the `Block`.
    */
   readonly size: number;
-  /**
-   * TODO: is this custom to NEO•ONE? Keep or no?
-   * Number of confirmations of the `Block`.
-   */
-  // readonly confirmations: number;
-  /**
-   * TODO: is this custom to NEO•ONE? Keep or no?
-   * The hash of the next `Block`.
-   */
-  // readonly nextBlockHash?: string;
+}
+
+export interface HeaderVerbose extends Header {
+  readonly confirmations: number;
+  readonly nextblockhash: Hash256String;
 }
 
 /**
