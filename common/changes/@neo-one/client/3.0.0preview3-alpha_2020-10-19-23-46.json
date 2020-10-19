@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "3.0.0preview3-alpha release bump",
+      "type": "none",
+      "packageName": "@neo-one/client"
+    }
+  ],
+  "packageName": "@neo-one/client",
+  "email": "danwbyrne@gmail.com"
+}

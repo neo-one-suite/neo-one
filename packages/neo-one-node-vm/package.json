@@ -6,6 +6,7 @@
   "scripts": {
     "build": "gulp",
     "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "install": "dotnet build ./lib",
     "lint:staged": "lint-staged --relative",
     "pack": "gulp pack",
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"

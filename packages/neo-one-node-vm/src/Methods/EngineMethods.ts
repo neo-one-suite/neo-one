@@ -1,6 +1,6 @@
 import { VMState } from '@neo-one/client-common';
 import { CallFlags, SerializedScriptContainer, SnapshotName, TriggerType } from '@neo-one/node-core';
-import { NotificationReturn, StackItemReturn } from '../converters';
+import { StackItemReturn } from '../converters';
 import { DefaultMethods, DispatchMethod } from '../types';
 
 interface CreateEngineArgs {
@@ -19,7 +19,7 @@ export interface EngineMethods extends DefaultMethods {
   readonly getgasconsumed: DispatchMethod<number>;
   readonly getvmstate: DispatchMethod<keyof typeof VMState>;
   readonly getresultstack: DispatchMethod<readonly StackItemReturn[]>;
-  readonly getnotifications: DispatchMethod<readonly NotificationReturn[]>;
+  readonly getnotifications: DispatchMethod<readonly StackItemReturn[]>;
   // methods
   readonly execute: DispatchMethod<keyof typeof VMState>;
   readonly setinstructionpointer: DispatchMethod<boolean, { readonly position: number }>;

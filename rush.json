@@ -40,21 +40,21 @@
       "packageName": "@neo-one/cli",
       "projectFolder": "packages/neo-one-cli",
       "reviewCategory": "production",
-      "shouldPublish": true,
+      "shouldPublish": false,
       "versionPolicyName": "CoreReleasePolicy"
     },
     {
       "packageName": "@neo-one/cli-common",
       "projectFolder": "packages/neo-one-cli-common",
       "reviewCategory": "production",
-      "shouldPublish": true,
+      "shouldPublish": false,
       "versionPolicyName": "CoreReleasePolicy"
     },
     {
       "packageName": "@neo-one/cli-common-node",
       "projectFolder": "packages/neo-one-cli-common-node",
       "reviewCategory": "production",
-      "shouldPublish": true,
+      "shouldPublish": false,
       "versionPolicyName": "CoreReleasePolicy"
     },
     {
@@ -110,7 +110,7 @@
       "packageName": "@neo-one/developer-tools",
       "projectFolder": "packages/neo-one-developer-tools",
       "reviewCategory": "production",
-      "shouldPublish": true,
+      "shouldPublish": false,
       "versionPolicyName": "CoreReleasePolicy"
     },
     {
@@ -267,7 +267,7 @@
       "packageName": "@neo-one/node-storage-cache",
       "projectFolder": "packages/neo-one-node-storage-cache",
       "reviewCategory": "production",
-      "shouldPublish": true,
+      "shouldPublish": false,
       "versionPolicyName": "NodeReleasePolicy"
     },
     {
@@ -321,42 +321,42 @@
       "packageName": "@neo-one/smart-contract",
       "projectFolder": "packages/neo-one-smart-contract",
       "reviewCategory": "production",
-      "shouldPublish": true,
+      "shouldPublish": false,
       "versionPolicyName": "CoreReleasePolicy"
     },
     {
       "packageName": "@neo-one/smart-contract-codegen",
       "projectFolder": "packages/neo-one-smart-contract-codegen",
       "reviewCategory": "production",
-      "shouldPublish": true,
+      "shouldPublish": false,
       "versionPolicyName": "CoreReleasePolicy"
     },
     {
       "packageName": "@neo-one/smart-contract-compiler",
       "projectFolder": "packages/neo-one-smart-contract-compiler",
       "reviewCategory": "production",
-      "shouldPublish": true,
+      "shouldPublish": false,
       "versionPolicyName": "CoreReleasePolicy"
     },
     {
       "packageName": "@neo-one/smart-contract-compiler-node",
       "projectFolder": "packages/neo-one-smart-contract-compiler-node",
       "reviewCategory": "production",
-      "shouldPublish": true,
+      "shouldPublish": false,
       "versionPolicyName": "CoreReleasePolicy"
     },
     {
       "packageName": "@neo-one/smart-contract-lib",
       "projectFolder": "packages/neo-one-smart-contract-lib",
       "reviewCategory": "production",
-      "shouldPublish": true,
+      "shouldPublish": false,
       "versionPolicyName": "CoreReleasePolicy"
     },
     {
       "packageName": "@neo-one/smart-contract-test",
       "projectFolder": "packages/neo-one-smart-contract-test",
       "reviewCategory": "production",
-      "shouldPublish": true,
+      "shouldPublish": false,
       "versionPolicyName": "CoreReleasePolicy"
     },
     {
@@ -368,21 +368,21 @@
       "packageName": "@neo-one/smart-contract-test-common",
       "projectFolder": "packages/neo-one-smart-contract-test-common",
       "reviewCategory": "production",
-      "shouldPublish": true,
+      "shouldPublish": false,
       "versionPolicyName": "CoreReleasePolicy"
     },
     {
       "packageName": "@neo-one/smart-contract-typescript-plugin",
       "projectFolder": "packages/neo-one-smart-contract-typescript-plugin",
       "reviewCategory": "production",
-      "shouldPublish": true,
+      "shouldPublish": false,
       "versionPolicyName": "CoreReleasePolicy"
     },
     {
       "packageName": "@neo-one/suite",
       "projectFolder": "packages/neo-one-suite",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@neo-one/ts-utils",

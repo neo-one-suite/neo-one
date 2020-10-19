@@ -1,10 +1,11 @@
 
 # Ignore everything by default
 **
-    
+
 # Use negative patterns to bring back the specific things we want to publish
 !/bin/**
 !/dist/**
+!/lib/**
 
 # Ignore certain files in the above folder
 /dist/**/*.map

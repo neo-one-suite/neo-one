@@ -2,6 +2,10 @@
 
 This branch is under heavy development during our migration to neo3 protocols. Please see the [master-2.x](https://github.com/neo-one-suite/neo-one/tree/master-2.x) branch for currently published source code.
 
+Currently we support syncing a NEO•ONE node and retrieving information from it.
+We have a node deployed publicly at `staging.neotracker.io/rpc` which can be used for demonstrating the current capabilities.
+For a more in-depth view of currently supported features visit our demo repository at: https://github.com/neo-one-suite/neo-one-3.0-alpha-demo
+
 # NEO•ONE
 
 [![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=shield)](#contributors)

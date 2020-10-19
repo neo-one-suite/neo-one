@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "3.0.0preview3-alpha release bump",
+      "type": "none",
+      "packageName": "@neo-one/node-storage-levelup"
+    }
+  ],
+  "packageName": "@neo-one/node-storage-levelup",
+  "email": "danwbyrne@gmail.com"
+}

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "3.0.0preview3-alpha release bump",
+      "type": "none",
+      "packageName": "@neo-one/node-vm"
+    }
+  ],
+  "packageName": "@neo-one/node-vm",
+  "email": "danwbyrne@gmail.com"
+}
