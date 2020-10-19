@@ -55,7 +55,7 @@ export class HeaderIndexCache {
 
   private async getHeaderHashIndex(index: number): Promise<UInt256 | undefined> {
     const hashListHashIndex = index % 2000;
-    if (index - this.mutableStorageCount > 0) {
+    if (index - this.mutableStorageCount >= 0) {
       return this.getHeaderHashIndexFromCurrent(hashListHashIndex);
     }
 

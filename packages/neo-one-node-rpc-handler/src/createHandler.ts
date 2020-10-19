@@ -7,9 +7,12 @@ import {
   toJSONVerifyResult,
   toVMStateJSON,
   TransactionJSON,
+  TransactionReceiptJSON,
+  VerboseTransactionJSON,
 } from '@neo-one/client-common';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
+  Block,
   Blockchain,
   getEndpointConfig,
   NativeContainer,
@@ -21,7 +24,6 @@ import {
   stackItemToJSON,
   StorageKey,
   Transaction,
-  TransactionData,
   TransactionState,
 } from '@neo-one/node-core';
 import { Labels } from '@neo-one/utils';
@@ -251,13 +253,6 @@ const createJSONRPCHandler = (handlers: Handlers) => {
   return async (request: unknown) => handleRequestSafe({ [Labels.RPC_TYPE]: 'jsonrpc' }, request);
 };
 
-const getTransactionReceipt = (value: TransactionData) => ({
-  blockIndex: value.startHeight,
-  blockHash: JSONHelper.writeUInt256(value.blockHash),
-  transactionIndex: value.index,
-  globalIndex: JSONHelper.writeUInt64(value.globalIndex),
-});
-
 // tslint:disable-next-line no-any
 export type RPCHandler = (request: unknown) => Promise<any>;
 
@@ -302,6 +297,16 @@ export const createHandler = ({
     }
   };
 
+  const getTransactionReceiptJSON = (block: Block, value: TransactionState): TransactionReceiptJSON => ({
+    blockIndex: value.blockIndex,
+    blockHash: JSONHelper.writeUInt256(block.hash),
+    blockTime: JSONHelper.writeUInt64(block.timestamp),
+    globalIndex: JSONHelper.writeUInt64(new BN(-1)),
+    transactionIndex: block.transactions.findIndex((tx) => value.transaction.hash.equals(tx.hash)),
+    transactionHash: JSONHelper.writeUInt256(value.transaction.hash),
+    confirmations: blockchain.currentBlockIndex - block.index + 1,
+  });
+
   const handlers: Handlers = {
     // Blockchain
     [RPC_METHODS.getbestblockhash]: async () => JSONHelper.writeUInt256(blockchain.currentBlock.hash),
@@ -320,8 +325,7 @@ export const createHandler = ({
         watchTimeoutMS = args[2];
       }
 
-      const trimmedBlock = await blockchain.blocks.tryGet({ hashOrIndex });
-      let block = await trimmedBlock?.getBlock(blockchain.transactions);
+      let block = await blockchain.getBlock(hashOrIndex);
       if (block === undefined) {
         if (watchTimeoutMS === undefined) {
           throw new JSONRPCError(-100, 'Unknown block');
@@ -391,7 +395,7 @@ export const createHandler = ({
       height: blockchain.currentBlockIndex,
       verified: Object.values(node.memPool).map((transaction) => JSONHelper.writeUInt256(transaction.hash)),
     }),
-    [RPC_METHODS.getrawtransaction]: async (args) => {
+    [RPC_METHODS.getrawtransaction]: async (args): Promise<TransactionJSON | VerboseTransactionJSON | string> => {
       const hash = JSONHelper.readUInt256(args[0]);
       const verbose = args.length >= 2 && !!args[1];
 
@@ -410,11 +414,10 @@ export const createHandler = ({
         if (state !== undefined) {
           const header = await blockchain.getHeader(state.blockIndex);
           if (header === undefined) {
-            // TODO: implement better error;
             throw new Error('If you ever see this error something has gone terribly wrong');
           }
 
-          return tx.serializeJSONWithInvocationData({
+          return tx.serializeJSONWithVerboseData({
             blockhash: JSONHelper.writeUInt256(header.hash),
             confirmations: blockchain.currentBlockIndex - header.index + 1,
             blocktime: JSONHelper.writeUInt64LE(header.timestamp),
@@ -764,10 +767,8 @@ export const createHandler = ({
         .toPromise();
     },
 
-    [RPC_METHODS.gettransactionreceipt]: async (args) => {
-      const transactionData = await blockchain.transactionData.tryGet({
-        hash: JSONHelper.readUInt256(args[0]),
-      });
+    [RPC_METHODS.gettransactionreceipt]: async (args): Promise<TransactionReceiptJSON | undefined> => {
+      const state = await blockchain.transactions.tryGet(JSONHelper.readUInt256(args[0]));
 
       let watchTimeoutMS;
       if (args[1] !== undefined && typeof args[1] === 'number') {
@@ -776,7 +777,7 @@ export const createHandler = ({
       }
 
       let result;
-      if (transactionData === undefined) {
+      if (state === undefined) {
         if (watchTimeoutMS === undefined) {
           throw new JSONRPCError(-100, 'Unknown transaction');
         }
@@ -784,12 +785,10 @@ export const createHandler = ({
         try {
           result = await blockchain.block$
             .pipe(
-              switchMap(async () => {
-                const data = await blockchain.transactionData.tryGet({
-                  hash: JSONHelper.readUInt256(args[0]),
-                });
+              switchMap(async (block) => {
+                const data = await blockchain.transactions.tryGet(JSONHelper.readUInt256(args[0]));
 
-                return data === undefined ? undefined : getTransactionReceipt(data);
+                return data === undefined ? undefined : getTransactionReceiptJSON(block, data);
               }),
               filter((receipt) => receipt !== undefined),
               take(1),
@@ -800,7 +799,12 @@ export const createHandler = ({
           throw new JSONRPCError(-100, 'Unknown transaction');
         }
       } else {
-        result = getTransactionReceipt(transactionData);
+        const block = await blockchain.getBlock(state.blockIndex);
+        if (block === undefined) {
+          throw new Error('For TS');
+        }
+
+        result = getTransactionReceiptJSON(block, state);
       }
 
       return result;
@@ -818,25 +822,19 @@ export const createHandler = ({
 
       // return result.data;
     },
-    [RPC_METHODS.getnetworksettings]: async () => {
-      const settings = blockchain.settings;
-      // TODO: change blockchain.settings to be set from NativeContracts
-      // Update returned values. Don't have to return all the below values
-      // Unique to NEO•ONE
-
-      return {
-        maxTransactionPerBlock: 512,
-        blockAccounts: [],
-        maxBlockSize: 1024 * 256,
-        maxBlockSystemFee: '',
-        neoVotersCount: 0,
-        neoNextBlockValidators: [],
-        neoCandidates: [],
-        neoCommitteeMembers: [],
-        neoCommitteeAddress: '',
-        neoTotalSupply: 100000000,
-      };
-    },
+    // TODO: reimplement this;
+    [RPC_METHODS.getnetworksettings]: async () => ({
+      maxTransactionPerBlock: 512,
+      blockAccounts: [],
+      maxBlockSize: 1024 * 256,
+      maxBlockSystemFee: '',
+      neoVotersCount: 0,
+      neoNextBlockValidators: [],
+      neoCandidates: [],
+      neoCommitteeMembers: [],
+      neoCommitteeAddress: '',
+      neoTotalSupply: 100000000,
+    }),
     [RPC_METHODS.runconsensusnow]: async () => {
       if (node.consensus) {
         await node.consensus.runConsensusNow();

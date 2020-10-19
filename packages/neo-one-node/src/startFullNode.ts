@@ -8,7 +8,7 @@ import { dumpChain, loadChain } from '@neo-one/node-offline';
 import { Node, NodeOptions } from '@neo-one/node-protocol';
 import { storage as levelupStorage } from '@neo-one/node-storage-levelup';
 import { blockchainSettingsToProtocolSettings, Dispatcher } from '@neo-one/node-vm';
-import { composeDisposables, Disposable, noopDisposable } from '@neo-one/utils';
+import { composeDisposable, Disposable, noopDisposable } from '@neo-one/utils';
 import { AbstractLevelDOWN } from 'abstract-leveldown';
 import fs from 'fs-extra';
 import LevelUp from 'levelup';
@@ -60,7 +60,7 @@ export const startFullNode = async ({
     }
 
     const rocks = customLeveldown === undefined ? RocksDB(dataPath) : customLeveldown;
-    disposable = composeDisposables(disposable, async () => {
+    disposable = composeDisposable(disposable, async () => {
       await new Promise((resolve, reject) => {
         rocks.close((err) => {
           if (err) {
@@ -77,9 +77,7 @@ export const startFullNode = async ({
       context: { messageMagic: blockchainSettings.messageMagic },
     });
 
-    disposable = composeDisposables(disposable, async () => {
-      await storage.close();
-    });
+    disposable = composeDisposable(async () => storage.close(), disposable);
 
     const native = new NativeContainer(blockchainSettings);
 
@@ -88,6 +86,8 @@ export const startFullNode = async ({
       protocolSettings: blockchainSettingsToProtocolSettings(blockchainSettings),
     });
 
+    disposable = composeDisposable(async () => vm.dispose(), disposable);
+
     const blockchain = await Blockchain.create({
       settings: blockchainSettings,
       storage,
@@ -95,9 +95,7 @@ export const startFullNode = async ({
       vm,
     });
 
-    disposable = composeDisposables(disposable, async () => {
-      await blockchain.stop();
-    });
+    disposable = composeDisposable(async () => blockchain.stop(), disposable);
 
     if (chainFile !== undefined) {
       await loadChain({
@@ -124,7 +122,7 @@ export const startFullNode = async ({
         }),
     });
     const nodeDisposable = await node.start();
-    disposable = composeDisposables(disposable, nodeDisposable);
+    disposable = composeDisposable(nodeDisposable, disposable);
 
     const rpcDisposable = await setupRPCServer({
       blockchain,
@@ -132,7 +130,7 @@ export const startFullNode = async ({
       options: rpcOptions,
       native,
     });
-    disposable = composeDisposables(disposable, rpcDisposable);
+    disposable = composeDisposable(rpcDisposable, disposable);
 
     return disposable;
   } catch (err) {

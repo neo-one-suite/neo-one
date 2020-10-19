@@ -107,12 +107,11 @@ export const recoverHeaderIndex = async (storage: Storage) => {
 export class Blockchain {
   public static async create({ settings, storage, native, vm }: CreateBlockchainOptions): Promise<BlockchainType> {
     const headerIndexCache = await recoverHeaderIndex(storage);
-    logger.debug({ name: 'header_index_length', length: headerIndexCache.length });
     if (headerIndexCache.length > 0) {
       const currentHeaderIndex = await headerIndexCache.get(headerIndexCache.length - 1);
       const currentBlockTrimmed = await storage.blocks.tryGet({ hashOrIndex: currentHeaderIndex });
       if (currentBlockTrimmed === undefined) {
-        throw new Error('testing');
+        throw new Error('For TS, this should never happen');
       }
 
       const currentBlock = await currentBlockTrimmed.getBlock(storage.transactions);
@@ -678,11 +677,6 @@ export class Blockchain {
       await this.verifyBlock(block);
     }
 
-    if (block.transactions.length > 0) {
-      const hash =
-        block.transactions[0].sender !== undefined ? common.uInt160ToString(block.transactions[0].sender) : undefined;
-      logger.debug({ name: 'TRY_THIS_TEST_TRANSACTION_HASH', hash });
-    }
     const blockchain = this.createPersistingBlockchain();
 
     const currentHeaderCount = this.headerIndexCache.length;

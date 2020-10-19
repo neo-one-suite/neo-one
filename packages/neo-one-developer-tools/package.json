@@ -5,7 +5,7 @@
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
   "scripts": {
-    "build": "gulp",
+    "build": "",
     "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
     "lint:staged": "lint-staged --relative",
     "pack": "gulp pack",

@@ -4,7 +4,8 @@
   "description": "NEO•ONE developer tools.",
   "license": "MIT",
   "scripts": {
-    "build": "node ./node_modules/@neo-one/build-tools-web/dist/compile --bundle tools",
+    "build": "",
+    "build-real": "node ./node_modules/@neo-one/build-tools-web/dist/compile --bundle tools",
     "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
     "lint:staged": "lint-staged --relative",
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"

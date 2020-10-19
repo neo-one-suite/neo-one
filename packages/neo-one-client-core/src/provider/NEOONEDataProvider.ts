@@ -59,7 +59,7 @@ import {
   TransactionReceipt,
   TransactionReceiptJSON,
   TransactionWithInvocationDataJSON,
-  utils,
+  VerboseTransactionJSON,
   VerifyTransactionResult,
   VerifyTransactionResultJSON,
   WildcardContainer,
@@ -342,27 +342,15 @@ export class NEOONEDataProvider implements DeveloperProvider {
     };
   }
 
-  private convertConfirmedTransaction(transaction: TransactionWithInvocationDataJSON): ConfirmedTransaction {
+  private convertConfirmedTransaction(transaction: ConfirmedTransactionJSON): ConfirmedTransaction {
     if (transaction.data === undefined) {
       /* istanbul ignore next */
       throw new Error('Unexpected undefined data');
     }
-    if (transaction.invocationData === undefined) {
-      throw new MissingTransactionDataError(transaction.hash);
-    }
-
-    const invocationData = this.convertInvocationData(
-      transaction.invocationData,
-      transaction.data.blockHash,
-      transaction.data.blockIndex,
-      transaction.hash,
-      transaction.data.transactionIndex,
-    );
 
     return {
       ...this.convertTransaction(transaction),
-      invocationData,
-      receipt: this.convertTransactionReceipt(transaction.data),
+      receipt: this.convertTransactionReceipt(transaction.receipt),
     };
   }
 
@@ -391,11 +379,11 @@ export class NEOONEDataProvider implements DeveloperProvider {
         storage: manifest.features.storage,
         payable: manifest.features.payable,
       },
-      supportedStandards: manifest.supportedStandards,
+      supportedStandards: manifest.supportedstandards,
       abi: this.convertContractABI(manifest.abi),
       permissions: manifest.permissions.map(this.convertContractPermission),
       trusts: this.convertWildcardContainer(manifest.trusts, common.stringToUInt160),
-      safeMethods: manifest.safeMethods,
+      safeMethods: manifest.safemethods,
       extra: manifest.extra,
       hasStorage: manifest.features.storage,
       payable: manifest.features.payable,
@@ -463,7 +451,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return {
       name: method.name,
       parameters: method.parameters.map(this.convertContractParameterDefinition),
-      returnType: this.convertContractParameterType(method.returnType),
+      returnType: this.convertContractParameterType(method.returntype),
       offset: method.offset,
     };
   }

@@ -266,11 +266,10 @@ export interface TransactionJSON {
   readonly signers: readonly SignerJSON[];
   readonly script: string;
   readonly witnesses: readonly WitnessJSON[];
-  // TODO: what, if any, transaction data are we including?
-  readonly data?: TransactionReceiptJSON;
+  readonly receipt?: TransactionReceiptJSON;
 }
 
-// TODO: temporary using this instead of TransactionWithInvocationDataJSON
+// Just for Neo returns, don't think we need it for anything
 export interface VerboseTransactionJSON extends TransactionJSON {
   readonly blockhash: UInt256Hex;
   readonly confirmations: number;
@@ -278,9 +277,7 @@ export interface VerboseTransactionJSON extends TransactionJSON {
   readonly vmstate: VMStateJSON;
 }
 
-// TODO: not going to use this right now because still copying C# code
 export interface TransactionWithInvocationDataJSON extends TransactionJSON {
-  // TODO: this may be off slightly. Not sure where script and gas belong. They may belong in TransactionJSON
   readonly script: string;
   readonly gas: string;
   readonly invocationData?: InvocationDataJSON | undefined;
@@ -289,15 +286,15 @@ export interface TransactionWithInvocationDataJSON extends TransactionJSON {
 export interface TransactionReceiptJSON {
   readonly blockIndex: number;
   readonly blockHash: string;
-  readonly transactionIndex: number;
   readonly globalIndex: string;
-  readonly blockTime: number;
+  readonly transactionIndex: number;
+  readonly blockTime: string;
   readonly confirmations: number;
   readonly transactionHash: string;
 }
 
 export type Wildcard = '*';
-export type WildcardContainerJSON = readonly string[] | Wildcard;
+export type WildcardContainerJSON<TJSON = string> = readonly TJSON[] | Wildcard;
 
 export interface ContractMethodDescriptorJSON {
   readonly name: string;
@@ -371,11 +368,10 @@ export interface BlockBaseJSON {
   readonly time: string;
   readonly index: number;
   readonly nextconsensus: string;
+  readonly nextblockhash?: string;
   readonly witnesses: readonly WitnessJSON[];
   readonly hash: string;
   readonly size: number;
-  // TODO: confirmations: number;
-  // TODO: nextblockhash?: string;
 }
 
 export interface ConsensusDataJSON {
@@ -423,7 +419,6 @@ export interface VerifyTransactionResultJSON {
 }
 
 export interface RelayTransactionResultJSON {
-  // TODO: reimplement transactionJSONWithInvocationData
   readonly transaction: TransactionJSON;
   // TODO: reimplement the longform verify transaction result
   readonly verifyResult?: VerifyResultJSON;

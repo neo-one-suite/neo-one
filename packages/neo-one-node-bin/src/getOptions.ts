@@ -15,7 +15,7 @@ const DEFAULT_OPTIONS = {
             host: 'localhost',
           },
   },
-  blockchain: serializeSettings(createMain()),
+  blockchain: serializeSettings(createTest()),
 };
 
 export const getOptions = (): FullNodeCreateOptions['options'] => {

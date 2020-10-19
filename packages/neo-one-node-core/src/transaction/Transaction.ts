@@ -281,7 +281,7 @@ export class Transaction
     };
   }
 
-  public serializeJSONWithInvocationData(data: VerboseData): VerboseTransactionJSON {
+  public serializeJSONWithVerboseData(data: VerboseData): VerboseTransactionJSON {
     const base = this.serializeJSON();
 
     return {
