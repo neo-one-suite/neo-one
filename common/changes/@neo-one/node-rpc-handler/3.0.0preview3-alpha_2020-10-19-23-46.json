@@ -2,7 +2,7 @@
   "changes": [
     {
       "comment": "3.0.0preview3-alpha release bump",
-      "type": "none",
+      "type": "major",
       "packageName": "@neo-one/node-rpc-handler"
     }
   ],
