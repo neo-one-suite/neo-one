@@ -177,7 +177,7 @@ export const loadChain = async ({
 
       pending += 1;
       blockchain
-        .persistBlock({ block, unsafe: true })
+        .persistBlock({ block, verify: false })
         .then(() => {
           pending -= 1;
           if (pending < 500 && paused) {
@@ -232,7 +232,7 @@ const writeOut = async (blockchain: Blockchain, out: Writable, height: number): 
   // tslint:disable-next-line no-loop-statement
   for (const chunk of _.chunk(_.range(0, height), 1000)) {
     // eslint-disable-next-line
-    const blocks = await Promise.all(chunk.map(async (index) => blockchain.block.get({ hashOrIndex: index })));
+    const blocks = await Promise.all(chunk.map(async (index) => blockchain.blocks.get({ hashOrIndex: index })));
 
     // tslint:disable-next-line no-loop-statement
     for (const block of blocks) {

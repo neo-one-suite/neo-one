@@ -1,5 +1,4 @@
 import {
-  AddressString,
   addressToScriptHash,
   Attribute,
   common,
@@ -7,11 +6,9 @@ import {
   GetOptions,
   IterOptions,
   NetworkType,
-  Param,
   RawAction,
   RelayTransactionResult,
   ScriptBuilder,
-  ScriptBuilderParam,
   SourceMaps,
   Transaction,
   TransactionModel,
@@ -29,8 +26,8 @@ import { processActionsAndMessage } from '@neo-one/client-switch';
 import { utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { Observable } from 'rxjs';
-import { InvokeError, NothingToClaimError, NothingToTransferError, UnknownAccountError } from '../errors';
-import { Hash256 } from '../Hash256';
+import { InvokeError, UnknownAccountError } from '../errors';
+import { Hash160 } from '../Hash160';
 import {
   ExecuteInvokeMethodOptions,
   ExecuteInvokeScriptOptions,
@@ -254,8 +251,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
   //   readonly from: UserAccountID;
   //   readonly sourceMaps?: SourceMaps;
   // }): Promise<TransactionResult> {
-  //   const builder = new ScriptBuilder();
-  //   builder.emitSysCall()
+  //   const builder = new ScriptBuilder()
   //     .emitSysCall('System.Contract.Call', common.GAS_CONTRACT_SCRIPT_HASH, 'transfer', [
   //       addressToScriptHash(contract),
   //       common.GAS_CONTRACT_SCRIPT_HASH,
@@ -280,6 +276,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
   //   });
   // }
 
+  // TODO: probably want to make sure an "executeTransfer" function is able to transfer any asset
+  // since they're all just contract invocations now
   protected async executeTransfer(
     transfers: readonly Transfer[],
     from: UserAccountID,
@@ -290,7 +288,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     transfers.forEach((transfer) => {
       sb.emitSysCall(
         'System.Contract.Call',
-        transfer.asset === Hash256.NEO ? common.NEO_CONTRACT_SCRIPT_HASH : common.GAS_CONTRACT_SCRIPT_HASH,
+        transfer.asset === Hash160.NEO ? common.nativeHashes.NEO : common.nativeHashes.GAS,
         'transfer',
         [addressToScriptHash(from.address), addressToScriptHash(transfer.to), transfer.amount.toString()],
       );
@@ -314,13 +312,18 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     });
   }
 
-  protected async executeClaim(from: UserAccountID, networkFee: BigNumber): Promise<TransactionResult> {
+  protected async executeClaim(
+    from: UserAccountID,
+    attributes: readonly Attribute[],
+    networkFee: BigNumber,
+  ): Promise<TransactionResult> {
     const toAccount = this.getUserAccount(from);
+    const unclaimedAmount = await this.provider.getUnclaimed(from.network, from.address);
     const toHash = crypto.toScriptHash(crypto.createSignatureRedeemScript(common.stringToECPoint(toAccount.publicKey)));
     const script = new ScriptBuilder()
-      .emitSysCall('System.Contract.Call', common.GAS_CONTRACT_SCRIPT_HASH, 'transfer', [
+      .emitSysCall('System.Contract.Call', common.nativeHashes.GAS, 'transfer', [
         addressToScriptHash(from.address),
-        common.GAS_CONTRACT_SCRIPT_HASH,
+        common.nativeHashes.GAS,
         unclaimedAmount.toString(),
       ])
       .build();

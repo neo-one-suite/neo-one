@@ -9,6 +9,8 @@ import {
   GetOptions,
   Hash256String,
   InvocationDataJSON,
+  Nep5BalancesJSON,
+  Nep5TransfersJSON,
   NetworkSettingsJSON,
   Peer,
   PrivateNetworkSettings,
@@ -38,6 +40,24 @@ export class JSONRPCClient {
         method: 'getblock',
         params: [hashOrIndex, 1],
         watchTimeoutMS: timeoutMS,
+      }),
+    );
+  }
+
+  public async getNep5Balances(address: AddressString): Promise<Nep5BalancesJSON> {
+    return this.withInstance(async (provider) =>
+      provider.request({
+        method: 'getnep5balances',
+        params: [addressToScriptHash(address)],
+      }),
+    );
+  }
+
+  public async getNep5Transfers(address: AddressString): Promise<Nep5TransfersJSON> {
+    return this.withInstance(async (provider) =>
+      provider.request({
+        method: 'getnep5transfers',
+        params: [addressToScriptHash(address)],
       }),
     );
   }

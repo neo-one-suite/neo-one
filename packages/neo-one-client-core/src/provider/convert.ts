@@ -1,14 +1,19 @@
 import {
   ActionJSON,
   CallReceiptJSON,
+  common,
   ContractParameter,
   ContractParameterJSON,
   InvocationResultJSON,
   JSONHelper,
+  NewRawNotification,
+  NotificationJSON,
   RawAction,
   RawCallReceipt,
   RawInvocationResult,
+  RawStackItem,
   scriptHashToAddress,
+  StackItemJSON,
 } from '@neo-one/client-common';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
@@ -16,17 +21,46 @@ import { BN } from 'bn.js';
 
 export function convertCallReceipt(receipt: CallReceiptJSON): RawCallReceipt {
   return {
-    result: convertInvocationResult(receipt.result),
-    actions: receipt.actions.map((action, idx) =>
-      convertAction(
-        '0x​​​​​0000000000000000000000000000000000000000000000000000000000000000​​​​​',
-        0,
-        '0x​​​​​0000000000000000000000000000000000000000000000000000000000000000​​​​​',
-        0,
-        idx,
-        action,
-      ),
-    ),
+    script: JSONHelper.readBuffer(receipt.script),
+    state: receipt.state,
+    gasConsumed: receipt.gasconsumed,
+    stack: typeof receipt.stack === 'string' ? receipt.stack : receipt.stack.map(convertStackItem),
+    notifications: receipt.notifications.map(convertNotifications),
+  };
+}
+
+export function convertStackItem(item: StackItemJSON): RawStackItem {
+  switch (item.type) {
+    case 'Any':
+      return { type: 'Any', value: undefined };
+    case 'Boolean':
+      return { type: 'Boolean', value: item.value };
+    case 'Pointer':
+      return { type: 'Pointer', value: item.value };
+    case 'Integer':
+      return { type: 'Integer', value: new BigNumber(item.value) }; // TODO: BigNumber or BN?
+    case 'Buffer':
+      return { type: 'Buffer', value: Buffer.from(item.value, 'hex') };
+    case 'ByteString':
+      return { type: 'ByteString', value: Buffer.from(item.value, 'hex') };
+    case 'Array':
+      return { type: 'Array', value: item.value.map(convertStackItem) };
+    case 'Map':
+      return {
+        type: 'Map',
+        value: item.value.map(({ key, value }) => [convertStackItem(key), convertStackItem(value)]),
+      };
+    default:
+      // utils.assertNever(item.type);
+      throw new Error('Problem converting stack item');
+  }
+}
+
+export function convertNotifications(notification: NotificationJSON): NewRawNotification {
+  return {
+    scriptHash: common.stringToUInt160(notification.scripthash),
+    eventName: notification.eventname,
+    state: notification.state.map(convertStackItem),
   };
 }
 

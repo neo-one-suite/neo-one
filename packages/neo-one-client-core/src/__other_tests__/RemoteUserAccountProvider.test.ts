@@ -5,7 +5,7 @@ import { map, take } from 'rxjs/operators';
 // tslint:disable-next-line no-implicit-dependencies
 import { MessageChannel } from 'worker_threads';
 import { data, factory, keys } from '../__data__';
-import { Hash256 } from '../Hash256';
+import { Hash160 } from '../Hash160';
 import { connectRemoteUserAccountProvider, RemoteUserAccountProvider } from '../user';
 
 describe('RemoteUserAccountProvider', () => {
@@ -218,7 +218,7 @@ describe('RemoteUserAccountProvider', () => {
     transfer.mockImplementation(async () => transactionResult);
 
     const result = await remoteUserAccountProvider.transfer(
-      [{ amount: data.bigNumbers.a, asset: Hash256.NEO, to: keys[0].address }],
+      [{ amount: data.bigNumbers.a, asset: Hash160.NEO, to: keys[0].address }],
       {
         from: unlockedWallet1.userAccount.id,
       },
@@ -255,8 +255,8 @@ describe('RemoteUserAccountProvider', () => {
       allParamsZipped,
       true,
       {
-        sendFrom: [{ amount: data.bigNumbers.a, asset: Hash256.NEO, to: keys[0].address }],
-        sendTo: [{ amount: data.bigNumbers.a, asset: Hash256.NEO }],
+        sendFrom: [{ amount: data.bigNumbers.a, asset: Hash160.NEO, to: keys[0].address }],
+        sendTo: [{ amount: data.bigNumbers.a, asset: Hash160.NEO }],
       },
       sourceMap,
     );
@@ -280,7 +280,7 @@ describe('RemoteUserAccountProvider', () => {
       allParamsZipped,
       {
         amount: data.bigNumbers.a,
-        asset: Hash256.NEO,
+        asset: Hash160.NEO,
         to: keys[0].address,
       },
       transactionOptions,
@@ -304,7 +304,7 @@ describe('RemoteUserAccountProvider', () => {
       'deploy',
       allScriptBuilderParams,
       allParamsZipped,
-      Hash256.NEO,
+      Hash160.NEO,
       transactionOptions,
     );
 
@@ -324,7 +324,7 @@ describe('RemoteUserAccountProvider', () => {
       'deploy',
       allScriptBuilderParams,
       allParamsZipped,
-      Hash256.NEO,
+      Hash160.NEO,
       transactionOptions,
       sourceMap,
     );

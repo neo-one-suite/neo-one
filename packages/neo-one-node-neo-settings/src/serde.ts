@@ -1,32 +1,40 @@
 import { common } from '@neo-one/client-common';
 import { Block, Settings } from '@neo-one/node-core';
-import _ from 'lodash';
 
 export const serializeSettings = (settings: Settings) => {
   const {
     genesisBlock,
     decrementInterval,
     generationAmount,
-    messageMagic,
-    addressVersion,
     privateKeyVersion,
     standbyValidators,
+    messageMagic,
+    addressVersion,
+    standbyCommittee,
+    committeeMembersCount,
+    validatorsCount,
     millisecondsPerBlock,
     memoryPoolMaxTransactions,
-    standbyCommittee,
   } = settings;
 
   return {
     genesisBlock: genesisBlock.serializeWire().toString('hex'),
     decrementInterval,
     generationAmount,
-    messageMagic,
-    addressVersion,
+    // fees: _.fromPairs(
+    //   Object.entries(fees).map(([key, fee]) => [key, fee === undefined ? JSON.stringify(undefined) : fee.toString(10)]),
+    // ),
     privateKeyVersion,
     standbyValidators: standbyValidators.map((validator) => common.ecPointToString(validator)),
+    standbyCommittee: standbyCommittee.map((validator) => common.ecPointToString(validator)),
+    committeeMembersCount,
+    validatorsCount,
+    // registerValidatorFee: registerValidatorFee.toString(10),
+    messageMagic,
+    addressVersion,
+    // vm,
     millisecondsPerBlock,
     memoryPoolMaxTransactions,
-    standbyCommittee: standbyCommittee.map((validator) => common.ecPointToString(validator)),
   };
 };
 
@@ -36,15 +44,15 @@ export const deserializeSettings = (settings: any): Settings => {
     genesisBlock,
     decrementInterval,
     generationAmount,
-    messageMagic,
-    addressVersion,
     privateKeyVersion,
     standbyValidators,
+    messageMagic,
+    addressVersion,
+    standbyCommittee,
+    committeeMembersCount,
+    validatorsCount,
     millisecondsPerBlock,
     memoryPoolMaxTransactions,
-    standbyCommittee,
-    validatorsCount,
-    committeeMembersCount,
   } = settings;
 
   const context = { messageMagic };
@@ -53,14 +61,19 @@ export const deserializeSettings = (settings: any): Settings => {
     genesisBlock: Block.deserializeWire({ context, buffer: Buffer.from(genesisBlock, 'hex') }),
     decrementInterval,
     generationAmount,
+    // fees: _.fromPairs(
+    //   Object.entries(fees).map(([key, fee]) => [key, fee === undefined ? undefined : new BN(fee as string, 10)]),
+    // ),
+    // registerValidatorFee: new BN(registerValidatorFee, 10),
     messageMagic,
     addressVersion,
     privateKeyVersion,
     standbyValidators: standbyValidators.map((validator: string) => common.stringToECPoint(validator)),
-    millisecondsPerBlock,
-    memoryPoolMaxTransactions,
     standbyCommittee: standbyCommittee.map((validator: string) => common.stringToECPoint(validator)),
     committeeMembersCount,
     validatorsCount,
+    // vm,
+    millisecondsPerBlock,
+    memoryPoolMaxTransactions,
   };
 };

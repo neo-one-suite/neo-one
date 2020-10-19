@@ -1,4 +1,4 @@
-import { JSONArray, JSONObject } from '@neo-one/utils';
+import { JSONObject } from '@neo-one/utils';
 import { UInt256Hex } from '../common';
 import { ContractParameterTypeModel } from './ContractParameterTypeModel';
 import { StorageFlagsModel } from './StorageFlagsModel';
@@ -214,11 +214,13 @@ export interface UnclaimedGASJSON {
   readonly address: string;
 }
 
+// TODO: not sure if we need this
 export interface StateItemJSON {
   readonly type: string;
   readonly value: string;
 }
 
+// TODO: not sure if we need this
 export interface NeoNotificationJSON {
   readonly contract: string;
   readonly state: {
@@ -227,10 +229,68 @@ export interface NeoNotificationJSON {
   };
 }
 
-export interface StackItemJSON {
-  readonly type: string;
+export interface StackItemJSONBase {
+  readonly type: StackItemJSON['type'];
+  // readonly value:
+  //   | string
+  //   | number
+  //   | boolean
+  //   | readonly StackItemJSON[]
+  //   | undefined
+  //   | ReadonlyArray<{ readonly key: PrimitiveStackItemJSON; readonly value: StackItemJSON }>;
+}
+
+export interface AnyStackItemJSON extends StackItemJSONBase {
+  readonly type: 'Any';
+  readonly value: undefined;
+}
+
+export interface PointerStackItemJSON extends StackItemJSONBase {
+  readonly type: 'Pointer';
+  readonly value: number;
+}
+
+export interface BooleanStackItemJSON extends StackItemJSONBase {
+  readonly type: 'Boolean';
+  readonly value: boolean;
+}
+
+export interface IntegerStackItemJSON extends StackItemJSONBase {
+  readonly type: 'Integer';
   readonly value: string;
 }
+
+export interface ByteStringStackItemJSON extends StackItemJSONBase {
+  readonly type: 'ByteString';
+  readonly value: string;
+}
+
+export interface BufferStackItemJSON extends StackItemJSONBase {
+  readonly type: 'Buffer';
+  readonly value: string;
+}
+
+export interface ArrayStackItemJSON extends StackItemJSONBase {
+  readonly type: 'Array';
+  readonly value: readonly StackItemJSON[];
+}
+
+export interface MapStackItemJSON extends StackItemJSONBase {
+  readonly type: 'Map';
+  readonly value: ReadonlyArray<{ readonly key: PrimitiveStackItemJSON; readonly value: StackItemJSON }>;
+}
+
+export type PrimitiveStackItemJSON = BooleanStackItemJSON | IntegerStackItemJSON | ByteStringStackItemJSON;
+
+export type StackItemJSON =
+  | AnyStackItemJSON
+  | PointerStackItemJSON
+  | PrimitiveStackItemJSON
+  | BufferStackItemJSON
+  | ArrayStackItemJSON
+  // | StructStackItemJSON
+  | MapStackItemJSON;
+// | InteropInterfaceStackItemJSON;
 
 // TODO: copy pasted from node-core. We might want to put this here instead
 export enum TriggerType {
@@ -361,6 +421,33 @@ export interface ContractJSON {
   readonly payable: boolean;
 }
 
+export interface Nep5TransfersJSON {
+  readonly address: string;
+  readonly received: readonly Nep5TransferJSON[];
+  readonly sent: readonly Nep5TransferJSON[];
+}
+
+export interface Nep5BalancesJSON {
+  readonly address: string;
+  readonly balance: readonly Nep5BalanceJSON[];
+}
+
+export interface Nep5BalanceJSON {
+  readonly assethash: string;
+  readonly amount: string;
+  readonly lastupdatedblock: number;
+}
+
+export interface Nep5TransferJSON {
+  readonly timestamp: number;
+  readonly assethash: string;
+  readonly transferaddress: string;
+  readonly amount: string;
+  readonly blockindex: number;
+  readonly transfernotifyindex: number;
+  readonly txhash: string;
+}
+
 export interface BlockBaseJSON {
   readonly version: number;
   readonly previousblockhash: string;
@@ -400,11 +487,19 @@ export interface NetworkSettingsJSON {
 //   readonly actions: readonly ActionJSON[];
 // }
 
+export interface NotificationJSON {
+  // readonly scriptcontainer: SerializedScriptContainerJSON;
+  readonly scripthash: string;
+  readonly eventname: string;
+  readonly state: readonly StackItemJSON[];
+}
+
 export interface CallReceiptJSON {
   readonly script: string;
   readonly state: keyof typeof VMState;
-  readonly gasConsumed: string;
-  readonly stack: JSONArray | string;
+  readonly gasconsumed: number;
+  readonly stack: readonly StackItemJSON[] | string;
+  readonly notifications: readonly NotificationJSON[];
 }
 
 export interface VerifyScriptResultJSON {

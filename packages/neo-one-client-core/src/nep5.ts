@@ -47,6 +47,7 @@ const decimalsFunction: ContractMethodDescriptorClient = {
   constant: true,
   parameters: [],
   returnType: { type: 'Integer', decimals: 0 },
+  offset: 0,
 };
 
 const blankScript = new ScriptBuilder().build();
@@ -61,12 +62,14 @@ export const abi = (decimals: number): ContractABIClient => ({
       constant: true,
       parameters: [],
       returnType: { type: 'String' },
+      offset: 0,
     },
     {
       name: 'symbol',
       constant: true,
       parameters: [],
       returnType: { type: 'String' },
+      offset: 0,
     },
     decimalsFunction,
     {
@@ -74,6 +77,7 @@ export const abi = (decimals: number): ContractABIClient => ({
       constant: true,
       parameters: [],
       returnType: { type: 'Integer', decimals },
+      offset: 0,
     },
     {
       name: 'transfer',
@@ -93,6 +97,7 @@ export const abi = (decimals: number): ContractABIClient => ({
         },
       ],
       returnType: { type: 'Boolean' },
+      offset: 0,
     },
     {
       name: 'balanceOf',
@@ -104,6 +109,7 @@ export const abi = (decimals: number): ContractABIClient => ({
         },
       ],
       returnType: { type: 'Integer', decimals },
+      offset: 0,
     },
   ],
   events: [

@@ -6,8 +6,14 @@ import {
   toWitnessScope,
   WitnessScopeModel,
 } from '@neo-one/client-common';
-import { DeserializeWireBaseOptions, SerializableContainer, SerializableContainerType } from './Serializable';
+import {
+  DeserializeWireBaseOptions,
+  DeserializeWireOptions,
+  SerializableContainer,
+  SerializableContainerType,
+} from './Serializable';
 import { Signer } from './Signer';
+import { BinaryReader } from './utils';
 import { Witness } from './Witness';
 
 export interface SignersAdd {
@@ -21,6 +27,13 @@ export class Signers implements SerializableContainer {
 
     return new this({
       signers,
+    });
+  }
+
+  public static deserializeWire(options: DeserializeWireOptions): Signers {
+    return this.deserializeWireBase({
+      context: options.context,
+      reader: new BinaryReader(options.buffer),
     });
   }
 

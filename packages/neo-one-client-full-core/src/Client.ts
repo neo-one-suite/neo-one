@@ -1,5 +1,5 @@
 import {
-  ContractManifest,
+  ContractManifestClient,
   NetworkType,
   Param,
   SourceMaps,
@@ -30,7 +30,7 @@ export class Client<TUserAccountProviders extends UserAccountProviders = any> ex
 
   public async publishAndDeploy(
     contract: ContractRegister,
-    manifest: ContractManifest,
+    manifest: ContractManifestClient,
     params: readonly Param[] = [],
     optionsIn?: TransactionOptions,
     sourceMaps: SourceMaps = {},

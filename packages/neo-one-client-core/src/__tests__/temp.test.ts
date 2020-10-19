@@ -1,10 +1,9 @@
-import { common } from '@neo-one/client-common';
-import BigNumber from 'bignumber.js';
+import { common, crypto } from '@neo-one/client-common';
 import { Client } from '../Client';
 import { NEOONEProvider } from '../provider';
 import { LocalKeyStore, LocalMemoryStore, LocalUserAccountProvider } from '../user';
 
-describe('quick testing', () => {
+describe('Client Tests', () => {
   const createUserAccountProvider = async () => {
     const keystore = new LocalKeyStore(new LocalMemoryStore());
     await keystore.addUserAccount({
@@ -24,7 +23,7 @@ describe('quick testing', () => {
       provider: new NEOONEProvider([
         {
           network: 'testnet',
-          rpcURL: '127.0.0.1:8080/rpc',
+          rpcURL: 'http://127.0.0.1:8080/rpc',
         },
       ]),
     });
@@ -36,16 +35,29 @@ describe('quick testing', () => {
     return new Client({ local: accountProvider });
   };
 
-  test('start', async () => {
-    const client = await setupClient();
+  let client: Client;
+  beforeEach(async () => {
+    client = await setupClient();
+  });
+
+  test('__call', async () => {
     const account = client.getCurrentUserAccount();
     if (account === undefined) {
       throw new Error('for ts');
     }
 
-    const result = await client.__call('test', common.uInt160ToString(common.nativeHashes.GAS), 'balanceOf', [
-      account.id.address,
-    ]);
+    const result = await client.__call(
+      'testnet',
+      crypto.scriptHashToAddress({ addressVersion: common.NEO_ADDRESS_VERSION, scriptHash: common.nativeHashes.GAS }),
+      'balanceOf',
+      [account.id.address],
+    );
+
+    console.log(result);
+  });
+
+  test('getAccount', async () => {
+    const result = await client.getAccount({ network: 'testnet', address: 'NSuX7PdXJLwUB7zboGor3X2C2eHswdM3t9' });
 
     console.log(result);
   });

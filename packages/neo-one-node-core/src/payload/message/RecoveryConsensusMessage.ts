@@ -1,6 +1,7 @@
 import { BinaryWriter, common, createSerializeWire, crypto, UInt256 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import _ from 'lodash';
+import { ConsensusContext } from '../../ConsensusContext';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from '../../Serializable';
 import { BinaryReader } from '../../utils';
 import { Witness } from '../../Witness';
@@ -128,6 +129,7 @@ export class RecoveryConsensusMessage extends ConsensusMessageBase {
           consensusMessage: new ChangeViewConsensusMessage({
             viewNumber: item.originalViewNumber,
             timestamp: item.timestamp,
+            reason,
           }),
           witness: new Witness({
             invocation: item.invocationScript,

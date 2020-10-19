@@ -1,5 +1,5 @@
 import { RawAction, smartContractConverters as converters } from '@neo-one/client-common';
-import { deserializeStackItem, StackItem } from '@neo-one/node-vm';
+// import { BinaryReader, deserializeStackItem, StackItem } from '@neo-one/node-core';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import { SourceMaps } from '../common';
@@ -56,7 +56,7 @@ const inspect = (value: any, wrapString = false): any => {
 
 // tslint:disable-next-line no-any
 const extractValueFromStackItem = (stackItem: StackItem): any => {
-  const type = stackItem.asArray()[0].asBigIntegerUnsafe().toNumber();
+  const type = stackItem.getArray()[0].getInteger().toNumber();
 
   switch (type) {
     case 1:
@@ -65,35 +65,35 @@ const extractValueFromStackItem = (stackItem: StackItem): any => {
       // tslint:disable-next-line no-null-keyword
       return null;
     case 3:
-      return stackItem.asArray()[1].asBoolean();
+      return stackItem.getArray()[1].getBoolean();
     case 4:
-      return stackItem.asArray()[1].asString();
+      return stackItem.getArray()[1].getString();
     case 5:
-      return `Symbol(${stackItem.asArray()[1].asString()})`;
+      return `Symbol(${stackItem.getArray()[1].getString()})`;
     case 6:
-      return stackItem.asArray()[1].asBigIntegerUnsafe().toString(10);
+      return stackItem.getArray()[1].getInteger().toString(10);
     case 7:
       return _.fromPairs(
         utils.zip(
-          stackItem.asArray()[1].asArray()[0].asArray().map(extractValueFromStackItem),
-          stackItem.asArray()[1].asArray()[1].asArray().map(extractValueFromStackItem),
+          stackItem.getArray()[1].getArray()[0].getArray().map(extractValueFromStackItem),
+          stackItem.getArray()[1].getArray()[1].getArray().map(extractValueFromStackItem),
         ),
       );
     case 8:
-      return stackItem.asArray()[1].asArray().map(extractValueFromStackItem);
+      return stackItem.getArray()[1].getArray().map(extractValueFromStackItem);
     case 9:
-      return stackItem.asArray()[1].asBuffer().toString('hex');
+      return stackItem.getArray()[1].getBuffer().toString('hex');
     case 10:
       // tslint:disable-next-line no-any
       return new Map<any, any>(
         stackItem
-          .asArray()[1]
-          .asArray()
+          .getArray()[1]
+          .getArray()
           // tslint:disable-next-line no-any
-          .map<any>((value) => value.asArray().map(extractValueFromStackItem)),
+          .map<any>((value: any) => value.getArray().map(extractValueFromStackItem)),
       );
     case 11:
-      return new Set(stackItem.asArray()[1].asArray().map(extractValueFromStackItem));
+      return new Set(stackItem.getArray()[1].getArray().map(extractValueFromStackItem));
     default:
       return `<unknown type ${type}>`;
   }
@@ -106,7 +106,7 @@ const extractMessageFromStackItem = (stackItem: StackItem): string => {
 };
 
 const extractMessage = (value: Buffer): string => {
-  const stackItems = deserializeStackItem(value).asArray()[1].asArray();
+  const stackItems = deserializeStackItem(new BinaryReader(value), 16, 34).getArray()[1].getArray();
 
   const messages = stackItems.map(extractMessageFromStackItem);
 

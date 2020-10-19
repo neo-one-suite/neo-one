@@ -1,4 +1,5 @@
 import {
+  Account,
   AddressString,
   Block,
   FeelessTransactionModel,
@@ -103,6 +104,10 @@ export class NEOONEProvider implements Provider {
 
   public read(network: NetworkType): NEOONEDataProvider {
     return this.getProvider(network);
+  }
+
+  public async getAccount(network: NetworkType, address: AddressString): Promise<Account> {
+    return this.getProvider(network).getAccount(address);
   }
 
   public iterActionsRaw(network: NetworkType, options?: IterOptions): AsyncIterable<RawAction> {

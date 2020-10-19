@@ -1,5 +1,4 @@
-import { InvalidFormatError, JSONHelper } from '@neo-one/client-common';
-import { JSONObject } from '@neo-one/utils';
+import { InvalidFormatError, JSONHelper, PrimitiveStackItemJSON, StackItemJSON } from '@neo-one/client-common';
 import { InvalidPrimitiveStackItemError, InvalidStackItemError, InvalidStackItemTypeError } from '../errors';
 import { ArrayStackItem } from './ArrayStackItem';
 import { BooleanStackItem } from './BooleanStackItem';
@@ -133,7 +132,7 @@ export const assertPrimitiveStackItem = (item: any): PrimitiveStackItem => {
   throw new InvalidPrimitiveStackItemError();
 };
 
-export const stackItemToJSON = (item: StackItem, context?: Set<StackItem>): JSONObject => {
+export const stackItemToJSON = (item: StackItem, context?: Set<StackItem>): StackItemJSON => {
   const type = StackItemType[item.type];
   switch (item.type) {
     case StackItemType.Array:
@@ -144,27 +143,27 @@ export const stackItemToJSON = (item: StackItem, context?: Set<StackItem>): JSON
       }
       arrayContext.add(array);
 
-      return { type, value: array.array.map((subItem) => stackItemToJSON(subItem, arrayContext)) };
+      return { type: 'Array', value: array.array.map((subItem) => stackItemToJSON(subItem, arrayContext)) };
 
     case StackItemType.Boolean:
       const booleanItem = assertBooleanStackItem(item);
 
-      return { type, value: booleanItem.getBoolean() };
+      return { type: 'Boolean', value: booleanItem.getBoolean() };
 
     case StackItemType.Buffer:
       const buffer = assertBufferStackItem(item);
 
-      return { type, value: JSONHelper.writeBuffer(buffer.getBuffer()) };
+      return { type: 'Buffer', value: JSONHelper.writeBuffer(buffer.getBuffer()) };
 
     case StackItemType.ByteString:
       const byteString = assertByteStringStackItem(item);
 
-      return { type, value: JSONHelper.writeBuffer(byteString.getBuffer()) };
+      return { type: 'ByteString', value: JSONHelper.writeBuffer(byteString.getBuffer()) };
 
     case StackItemType.Integer:
       const integer = assertIntegerStackItem(item);
 
-      return { type, value: integer.getInteger().toString() };
+      return { type: 'Integer', value: integer.getInteger().toString() };
 
     case StackItemType.Map:
       const map = assertMapStackItem(item);
@@ -175,9 +174,9 @@ export const stackItemToJSON = (item: StackItem, context?: Set<StackItem>): JSON
       mapContext.add(map);
 
       return {
-        type,
+        type: 'Map',
         value: Array.from(map.dictionary.entries()).map(([key, value]) => ({
-          key: stackItemToJSON(key, mapContext),
+          key: stackItemToJSON(key, mapContext) as PrimitiveStackItemJSON,
           value: stackItemToJSON(value, mapContext),
         })),
       };
@@ -185,7 +184,7 @@ export const stackItemToJSON = (item: StackItem, context?: Set<StackItem>): JSON
     case StackItemType.Pointer:
       const pointer = assertPointerStackItem(item);
 
-      return { type, value: pointer.position };
+      return { type: 'Pointer', value: pointer.position };
 
     default:
       throw new InvalidFormatError(`didn't expect stack item of type: ${type} on return`);

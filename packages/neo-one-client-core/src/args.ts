@@ -575,6 +575,7 @@ const assertContractMethodDescriptorClient = (name: string, value?: unknown): Co
     claim: assertProperty(value, 'ContractMethodDescriptorClient', 'claim', assertNullableBoolean),
     refundAssets: assertProperty(value, 'ContractMethodDescriptorClient', 'refundAssets', assertNullableBoolean),
     completeSend: assertProperty(value, 'ContractMethodDescriptorClient', 'completeSend', assertNullableBoolean),
+    offset: assertProperty(value, 'ContractMethodDescriptorClient', 'offset', assertNumber),
   };
 };
 
@@ -589,7 +590,7 @@ const assertContractMethodDescriptor = (name: string, value?: unknown): Contract
       assertContractParameter('ContractMethodDescriptor.parameters', parameter),
     ),
     returnType: assertProperty(value, 'ContractMethodDescriptor', 'returnType', assertContractParameterType),
-    offset: assertProperty(value, 'ContractMethodDescriptor', 'offset', assertNullableNumber),
+    offset: assertProperty(value, 'ContractMethodDescriptor', 'offset', assertNumber),
   };
 };
 

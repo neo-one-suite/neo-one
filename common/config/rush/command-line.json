@@ -334,62 +334,85 @@
       "longName": "--express",
       "shortName": "-e",
       "description": "flag to enable Cypress' express test",
-      "associatedCommands": ["test-cypress"]
+      "associatedCommands": [
+        "test-cypress"
+      ]
     },
     {
       "parameterKind": "flag",
       "longName": "--local",
       "shortName": "-l",
       "description": "flag to enable a shorter wait time for building the website when running Cypress",
-      "associatedCommands": ["test-cypress"]
+      "associatedCommands": [
+        "test-cypress"
+      ]
     },
     {
       "parameterKind": "string",
       "longName": "--browser",
       "argumentName": "BROWSER",
       "description": "specify the browser for Cypress to use",
-      "associatedCommands": ["cypress-run"]
+      "associatedCommands": [
+        "cypress-run"
+      ]
     },
     {
       "parameterKind": "string",
       "longName": "--spec",
       "argumentName": "SPEC",
       "description": "specify the tests that Cypress should run",
-      "associatedCommands": ["cypress-run"]
+      "associatedCommands": [
+        "cypress-run"
+      ]
     },
     {
       "parameterKind": "flag",
       "longName": "--coverage",
       "shortName": "-c",
       "description": "flag to enable coverage collection for jest",
-      "associatedCommands": ["test", "test-ci"]
+      "associatedCommands": [
+        "test",
+        "test-ci"
+      ]
     },
     {
       "parameterKind": "flag",
       "longName": "--update-snapshot",
       "shortName": "-u",
       "description": "update snapshot tests",
-      "associatedCommands": ["test", "e2e"]
+      "associatedCommands": [
+        "test",
+        "e2e"
+      ]
     },
     {
       "parameterKind": "flag",
       "longName": "--debug",
       "shortName": "-d",
       "description": "enables logging/debug mode for associated command",
-      "associatedCommands": ["clean"]
+      "associatedCommands": [
+        "clean"
+      ]
     },
     {
       "parameterKind": "flag",
       "longName": "--full",
       "shortName": "-f",
       "description": "enables cleaning of dist/* and rush/* directories",
-      "associatedCommands": ["clean"]
+      "associatedCommands": [
+        "clean"
+      ]
     },
     {
       "parameterKind": "flag",
       "longName": "--detect-open-handles",
       "description": "pass through of jest's detectOpenHandle flag",
-      "associatedCommands": ["test", "test-ci", "e2e", "e2e-ci"]
+      "associatedCommands": [
+        "test",
+        "test-ci",
+        "e2e",
+        "e2e-ci"
+      ]
     },
     {
       "parameterKind": "string",
@@ -397,7 +420,13 @@
       "shortName": "-t",
       "argumentName": "PATTERN",
       "description": "jest pattern matching parameter",
-      "associatedCommands": ["test", "test-ci", "e2e", "e2e-ci", "e2e-ci:coverage"]
+      "associatedCommands": [
+        "test",
+        "test-ci",
+        "e2e",
+        "e2e-ci",
+        "e2e-ci:coverage"
+      ]
     },
     {
       "parameterKind": "string",
@@ -405,14 +434,19 @@
       "shortName": "-w",
       "argumentName": "PATTERN",
       "description": "jest maximum concurrent worker flag",
-      "associatedCommands": ["e2e"]
+      "associatedCommands": [
+        "e2e"
+      ]
     },
     {
       "parameterKind": "choice",
       "longName": "--format",
       "shortName": "-b",
       "description": "specify an output build format (main, esm, browserify)",
-      "associatedCommands": ["build", "rebuild"],
+      "associatedCommands": [
+        "build",
+        "rebuild"
+      ],
       "alternatives": [
         {
           "name": "main",
@@ -433,7 +467,9 @@
       "longName": "--flags",
       "shortName": "-F",
       "description": "add a code coverage flag",
-      "associatedCommands": ["upload-coverage"],
+      "associatedCommands": [
+        "upload-coverage"
+      ],
       "alternatives": [
         {
           "name": "unit",
