@@ -79,7 +79,7 @@ export class JSONRPCClient {
     );
   }
 
-  public async getMemPool(): Promise<readonly string[]> {
+  public async getMemPool(): Promise<{ readonly height: number; readonly verified: readonly string[] }> {
     return this.withInstance(async (provider) => provider.request({ method: 'getrawmempool' }));
   }
 
@@ -188,7 +188,7 @@ export class JSONRPCClient {
     );
   }
 
-  public async getBlockHash(index: number): Promise<readonly string[]> {
+  public async getBlockHash(index: number): Promise<string> {
     return this.withInstance(async (provider) =>
       provider.request({
         method: 'getblockhash',

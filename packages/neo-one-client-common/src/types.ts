@@ -140,7 +140,7 @@ export interface Transaction {
    */
   readonly nonce: number;
   /**
-   * Hash160 of the transaction sender.
+   * `Hash160` of the transaction sender.
    */
   readonly sender?: AddressString;
   /**
@@ -622,7 +622,7 @@ export interface PrivateNetworkSettings {
   /**
    * Time until the next block starts to be produced.
    */
-  readonly secondsPerBlock: number;
+  readonly millisecondsPerBlock: number;
 }
 
 /**

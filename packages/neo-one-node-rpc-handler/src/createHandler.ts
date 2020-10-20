@@ -551,7 +551,7 @@ export const createHandler = ({
       );
 
       return {
-        unclaimed,
+        unclaimed: unclaimed.toString(),
         address: JSONHelper.writeUInt160(address),
       };
     },
