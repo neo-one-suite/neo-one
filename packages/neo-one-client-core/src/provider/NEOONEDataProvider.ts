@@ -187,7 +187,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return this.convertContract(contract);
   }
 
-  public async getMemPool(): Promise<readonly Hash256String[]> {
+  public async getMemPool(): Promise<{ readonly height: number; readonly verified: readonly Hash256String[] }> {
     return this.mutableClient.getMemPool();
   }
 

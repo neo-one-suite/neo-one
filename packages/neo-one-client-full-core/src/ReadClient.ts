@@ -49,7 +49,7 @@ export class ReadClient<TDataProvider extends DataProvider = DataProvider> {
     return this.dataProvider.getContract(clientArgs.assertAddress('address', address));
   }
 
-  public async getMemPool(): Promise<readonly Hash256String[]> {
+  public async getMemPool(): Promise<{ readonly height: number; readonly verified: readonly Hash256String[] }> {
     return this.dataProvider.getMemPool();
   }
 

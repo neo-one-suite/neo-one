@@ -58,7 +58,7 @@ export interface DataProvider {
   readonly getBestBlockHash: () => Promise<Hash256String>;
   readonly getBlockCount: () => Promise<number>;
   readonly getContract: (address: AddressString) => Promise<Contract>;
-  readonly getMemPool: () => Promise<readonly Hash256String[]>;
+  readonly getMemPool: () => Promise<{ readonly height: number; readonly verified: readonly Hash256String[] }>;
   readonly getTransaction: (hash: Hash256String) => Promise<Transaction>;
   readonly getConnectedPeers: () => Promise<readonly Peer[]>;
 }

@@ -121,8 +121,9 @@ export interface RawInvocationResultErrorJSON {
 
 export interface RawInvocationResultSuccessJSON {
   readonly state: 'HALT';
-  readonly gas_consumed: string;
+  readonly gasconsumed: string;
   readonly stack: readonly ContractParameterJSON[];
+  readonly notifications: readonly NotificationJSON[];
 }
 
 export type RawInvocationResultJSON = RawInvocationResultSuccessJSON | RawInvocationResultErrorJSON;
@@ -327,6 +328,10 @@ export interface TransactionJSON {
   readonly script: string;
   readonly witnesses: readonly WitnessJSON[];
   readonly receipt?: TransactionReceiptJSON;
+  readonly blockhash: string;
+  readonly confirmations: number;
+  readonly blocktime: string;
+  readonly vmstate: string;
 }
 
 // Just for Neo returns, don't think we need it for anything
