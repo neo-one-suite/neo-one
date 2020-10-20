@@ -39,7 +39,7 @@ class ContainerPlaceholder {
 const isContainerPlaceholder = (item: any): item is ContainerPlaceholder => item.isContainerPlaceHolder === true;
 
 // tslint:disable: no-array-mutation no-loop-statement increment-decrement
-const deserialize = (reader: BinaryReader, maxArraySize: number, maxItemSize: number): StackItem => {
+export const deserializeStackItem = (reader: BinaryReader, maxArraySize: number, maxItemSize: number): StackItem => {
   const deserialized: Array<StackItem | ContainerPlaceholder> = [];
   let undeserialized = 1;
   while (undeserialized-- > 0) {
