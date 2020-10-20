@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/developer-tools",
-  "version": "2.7.0",
+  "version": "3.0.0-preview3",
   "description": "NEO•ONE developer tools.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -13,7 +13,7 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-core": "^2.7.0",
+    "@neo-one/client-core": "3.0.0-preview3",
     "resize-observer-polyfill": "^1.5.0",
     "tslib": "^1.10.0"
   },

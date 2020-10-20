@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-neo-settings",
-  "version": "2.7.0",
+  "version": "3.0.0-preview3",
   "description": "NEO•ONE standard MainNet and TestNet blockchain settings.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -13,9 +13,9 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-common": "^2.7.0",
-    "@neo-one/node-core": "^2.7.0",
-    "@neo-one/utils": "^2.6.1",
+    "@neo-one/client-common": "3.0.0-preview3",
+    "@neo-one/node-core": "3.0.0-preview3",
+    "@neo-one/utils": "3.0.0-preview3",
     "@types/bn.js": "^4.11.5",
     "@types/lodash": "^4.14.138",
     "bn.js": "^5.0.0",

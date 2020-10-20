@@ -13,8 +13,8 @@
   "dependencies": {
     "@neo-one/http": "^2.7.0",
     "@neo-one/logger": "^2.6.1",
-    "@neo-one/utils": "^2.6.1",
-    "@neo-one/utils-node": "^2.6.1",
+    "@neo-one/utils": "3.0.0-preview3",
+    "@neo-one/utils-node": "2.6.2-preview3",
     "core-js": "^3.2.1",
     "cross-fetch": "^3.0.4",
     "detective": "^5.2.0",
