@@ -4,6 +4,7 @@ import _ from 'lodash';
 import {
   ArrayStackItem,
   assertPrimitiveStackItem,
+  assertStackItem,
   assertStackItemType,
   BooleanStackItem,
   BufferStackItem,
@@ -38,7 +39,7 @@ class ContainerPlaceholder {
 const isContainerPlaceholder = (item: any): item is ContainerPlaceholder => item.isContainerPlaceHolder === true;
 
 // tslint:disable: no-array-mutation no-loop-statement increment-decrement
-export const deserializeStackItem = (reader: BinaryReader, maxArraySize: number, maxItemSize: number): StackItem => {
+const deserialize = (reader: BinaryReader, maxArraySize: number, maxItemSize: number): StackItem => {
   const deserialized: Array<StackItem | ContainerPlaceholder> = [];
   let undeserialized = 1;
   while (undeserialized-- > 0) {
@@ -66,20 +67,15 @@ export const deserializeStackItem = (reader: BinaryReader, maxArraySize: number,
         break;
 
       case StackItemType.Array:
-        const arrayCount = reader.readVarUIntLE(maxArraySize).toNumber();
-        deserialized.push(new ContainerPlaceholder({ type, elementCount: arrayCount }));
-        undeserialized += arrayCount;
-        break;
-
       case StackItemType.Struct:
         const structCount = reader.readVarUIntLE(maxArraySize).toNumber();
-        deserialized.push(new ContainerPlaceholder({ type, elementCount: structCount }));
+        deserialized.unshift(new ContainerPlaceholder({ type, elementCount: structCount }));
         undeserialized += structCount;
         break;
 
       case StackItemType.Map:
         const mapCount = reader.readVarUIntLE(maxArraySize).toNumber();
-        deserialized.push(new ContainerPlaceholder({ type, elementCount: mapCount }));
+        deserialized.unshift(new ContainerPlaceholder({ type, elementCount: mapCount }));
         undeserialized += mapCount * 2;
         break;
 
@@ -88,9 +84,9 @@ export const deserializeStackItem = (reader: BinaryReader, maxArraySize: number,
     }
   }
 
-  let stackTemp: StackItem[] = [];
+  let stackTemp: Array<StackItem | ContainerPlaceholder> = [];
   while (deserialized.length > 0) {
-    const item = deserialized.pop();
+    const item = deserialized.shift();
     if (item === undefined) {
       throw new Error('Unexpected undefined since deserialized.length > 0');
     }
@@ -98,21 +94,21 @@ export const deserializeStackItem = (reader: BinaryReader, maxArraySize: number,
     if (isContainerPlaceholder(item)) {
       switch (item.type) {
         case StackItemType.Array:
-          const arrayElements = stackTemp.slice(0, item.elementCount);
+          const arrayElements = stackTemp.slice(0, item.elementCount).map(assertStackItem);
           stackTemp = stackTemp.slice(item.elementCount);
-          stackTemp.push(new ArrayStackItem(arrayElements));
+          stackTemp.unshift(new ArrayStackItem(arrayElements));
           break;
 
         case StackItemType.Struct:
-          const structElements = stackTemp.slice(0, item.elementCount);
+          const structElements = stackTemp.slice(0, item.elementCount).map(assertStackItem);
           stackTemp = stackTemp.slice(item.elementCount);
-          stackTemp.push(new StructStackItem(structElements));
+          stackTemp.unshift(new StructStackItem(structElements));
           break;
 
         case StackItemType.Map:
-          const mapElements = stackTemp.slice(0, item.elementCount * 2);
+          const mapElements = stackTemp.slice(0, item.elementCount * 2).map(assertStackItem);
           stackTemp = stackTemp.slice(item.elementCount * 2);
-          stackTemp.push(
+          stackTemp.unshift(
             new MapStackItem(
               _.range(0, item.elementCount * 2, 2).reduce((acc, idx) => {
                 const key = assertPrimitiveStackItem(mapElements[idx]);
@@ -128,10 +124,10 @@ export const deserializeStackItem = (reader: BinaryReader, maxArraySize: number,
           throw new InvalidFormatError(`Invalid ContainerPlaceholder type, found: ${item.type}`);
       }
     } else {
-      stackTemp.push(item);
+      stackTemp.unshift(item);
     }
   }
 
-  return stackTemp[0];
+  return assertStackItem(stackTemp[0]);
 };
 // tslint:enable: no-array-mutation no-loop-statement increment-decrement

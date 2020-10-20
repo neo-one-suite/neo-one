@@ -535,7 +535,10 @@ export const createHandler = ({
     },
     [RPC_METHODS.getunclaimedgas]: async (args) => {
       const address = args[0];
-      const scriptHash = crypto.addressToScriptHash(address);
+      if (typeof address !== 'string') {
+        throw new JSONRPCError(-100, 'Invalid argument at position 0');
+      }
+      const scriptHash = crypto.addressToScriptHash({ address, addressVersion: common.NEO_ADDRESS_VERSION });
       const isValidAddress = common.isUInt160(scriptHash);
       if (!isValidAddress) {
         throw new JSONRPCError(-100, 'Invalid address');
@@ -543,7 +546,7 @@ export const createHandler = ({
 
       const unclaimed = await native.NEO.unclaimedGas(
         { storages: blockchain.storages },
-        address,
+        scriptHash,
         blockchain.currentBlockIndex + 1,
       );
 

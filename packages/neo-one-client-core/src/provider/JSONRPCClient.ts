@@ -17,9 +17,9 @@ import {
   RawInvocationResultJSON,
   RelayTransactionResultJSON,
   StorageItemJSON,
-  TransactionJSON,
   TransactionReceiptJSON,
   UnclaimedGASJSON,
+  VerboseTransactionJSON,
   VersionJSON,
 } from '@neo-one/client-common';
 import { RelayTransactionError } from '../errors';
@@ -83,7 +83,7 @@ export class JSONRPCClient {
     return this.withInstance(async (provider) => provider.request({ method: 'getrawmempool' }));
   }
 
-  public async getTransaction(hash: Hash256String): Promise<TransactionJSON> {
+  public async getTransaction(hash: Hash256String): Promise<VerboseTransactionJSON> {
     return this.withInstance(async (provider) =>
       provider.request({
         method: 'getrawtransaction',
