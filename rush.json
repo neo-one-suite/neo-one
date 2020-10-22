@@ -5,15 +5,19 @@
   "nodeSupportedVersionRange": ">=10.13.0 <=12.18.4",
   "ensureConsistentVersions": true,
   "suppressNodeLtsWarning": true,
-
   "approvedPackagesPolicy": {
-    "reviewCategories": ["production", "tools", "web"],
-    "ignoredNpmScopes": ["@types"]
+    "reviewCategories": [
+      "production",
+      "tools",
+      "web"
+    ],
+    "ignoredNpmScopes": [
+      "@types"
+    ]
   },
   "repository": {
     "url": "https://github.com/neo-one-suite/neo-one.git"
   },
-
   "eventHooks": {
     "preRushInstall": [],
     "postRushInstall": [],
@@ -377,12 +381,6 @@
       "reviewCategory": "production",
       "shouldPublish": false,
       "versionPolicyName": "CoreReleasePolicy"
-    },
-    {
-      "packageName": "@neo-one/suite",
-      "projectFolder": "packages/neo-one-suite",
-      "reviewCategory": "production",
-      "shouldPublish": false
     },
     {
       "packageName": "@neo-one/ts-utils",

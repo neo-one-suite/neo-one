@@ -31,15 +31,7 @@ This page describes how to setup NEO•ONE using `yarn` or `npm`.
 
 **Once you have a project setup**, the next step is to add NEO•ONE to it. NEO•ONE is organized into multiple individual packages. Use as much or as little as you like. Each package may be installed using either [yarn](https://yarnpkg.com/) (`yarn add <package name>`) or [npm](https://www.npmjs.com/) (`npm install <package name>`). Each package has the form `@neo-one/<name>`, for example, `@neo-one/client`.
 
-Not sure which packages to use from NEO•ONE? Go ahead and install everything using
-
-```bash
-yarn add @neo-one/suite
-```
-
-and then follow the [main guide](/docs/hello-world) or the [tutorial](/tutorial). By the end of it you'll know which features of NEO•ONE you're using and which packages to keep.
-
-If you are already comfortable with neo-one packages, install everything individually with yarn by running:
+Install all the neo-one packages with yarn by running:
 
 ```bash
 yarn add @neo-one/client @neo-one/cli @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
@@ -50,6 +42,8 @@ Install everything individually with npm by running:
 ```bash
 npm install @neo-one/client @neo-one/cli @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
 ```
+
+and then follow the [main guide](/docs/hello-world) or the [tutorial](/tutorial). By the end of it you'll know which features of NEO•ONE you're using and which packages to keep.
 
 Know what you want to use from NEO•ONE? Read on to see which packages to install for specific functionality.
 

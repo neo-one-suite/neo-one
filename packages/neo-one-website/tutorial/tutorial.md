@@ -62,20 +62,10 @@ Here's how to setup your local development environment:
 3. Install NEO•ONE using either [yarn](https://yarnpkg.com/)
 
 ```bash
-yarn add @neo-one/suite
+yarn add @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
 ```
 
 or [npm](https://www.npmjs.com/)
-
-```bash
-npm install @neo-one/suite
-```
-
-alternatively, install the individual packages `@neo-one/suite` wraps for you:
-
-```bash
-yarn add @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
-```
 
 ```bash
 npm install @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
