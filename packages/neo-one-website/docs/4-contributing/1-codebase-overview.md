@@ -255,12 +255,6 @@ Provides the interface for controlling a private development network.
 
 Creates the developer tools iframe for controlling a private network.
 
-### neo-one-suite
-
-A simple user-friendly package that downloads `@neo-one/cli`, `@neo-one/client`, `@neo-one/smart-contract`,
-`@neo-one/smart-contract-lib`, `@neo-one/smart-contract-test`, `@neo-one/smart-contract-typescript-plugin`
-for easy startup.
-
 ### neo-one-ts-utils
 
 Primarily exports TypeScript compiler API helper functions for use in build tools, the compiler, and more.

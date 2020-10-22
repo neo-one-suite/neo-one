@@ -75,6 +75,6 @@ export class BlockCounter implements OnInit {
 
 ### Important Notes
 
-- For the smoothest experience using NEO•ONE with Angular 6+, you should use the browserified version of NEO•ONE. This version of NEO•ONE replaces Node.js builtin modules with their browser compatible shims. To use this version, you simply need to import any NEO•ONE client modules with the `-browserify` suffix. So, `@neo-one/client` is imported as `@neo-one/client-browserify`. If you're importing `@neo-one/suite`, then import the browserified version with `@neo-one/suite-browserify`.
+- For the smoothest experience using NEO•ONE with Angular 6+, you should use the browserified version of NEO•ONE. This version of NEO•ONE replaces Node.js builtin modules with their browser compatible shims. To use this version, you simply need to import any NEO•ONE client modules with the `-browserify` suffix. So, `@neo-one/client` is imported as `@neo-one/client-browserify`.
 - `allowSyntheticDefaultImports` must be set to `true` in the top level `tsconfig.json`.
 - `(window as any).global = window;` must be added in the `polyfill.ts` file.
