@@ -141,7 +141,7 @@ const parsePrimitiveStackItem = (item: PrimitiveStackItemReturn): PrimitiveStack
       return new ByteStringStackItem(item.value);
 
     case 'Integer':
-      return new IntegerStackItem(new BN(item.value));
+      return new IntegerStackItem(new BN(item.value, 'le'));
 
     default:
       throw new Error(`invalid stack item when parsing, found type ${item}`);

@@ -1,4 +1,4 @@
-import { BinaryWriter, common, InvalidFormatError, UInt160, UInt256 } from '@neo-one/client-common';
+import { common, InvalidFormatError, UInt160, UInt256 } from '@neo-one/client-common';
 import { BlockKey, Nep5BalanceKey, Nep5TransferKey, StorageKey, StreamOptions } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 
@@ -76,7 +76,6 @@ const createGetSearchRange = (prefix: Prefix) => {
 const createBlockKey = getCreateKey<BlockKey>({
   serializeKey: ({ hashOrIndex }) => {
     if (typeof hashOrIndex === 'number') {
-      // TODO: implement getting a block by its index
       throw new Error();
     }
 

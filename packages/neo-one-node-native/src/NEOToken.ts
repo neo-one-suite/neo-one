@@ -97,7 +97,7 @@ export class NEOToken extends NEP5NativeContract {
 
   private async getCommitteeMembers(storage: NativeContractStorageContext): Promise<readonly ECPoint[]> {
     const item = await storage.storages.get(this.createStorageKey(this.prefixes.votersCount).toStorageKey());
-    const votersCount = new BN(item.value).toNumber();
+    const votersCount = new BN(item.value, 'le').toNumber();
     const voterTurnout = votersCount / this.totalAmount.toNumber();
     if (voterTurnout < this.effectiveVoterTurnout) {
       return this.settings.standbyCommittee;
@@ -123,10 +123,10 @@ export class NEOToken extends NEP5NativeContract {
     }
 
     let amount = new BN(0);
-    let ustart = start / this.settings.decrementInterval;
+    let ustart = Math.floor(start / this.settings.decrementInterval);
     if (ustart < this.settings.generationAmount.length) {
       let istart = start % this.settings.decrementInterval;
-      let uend = end / this.settings.decrementInterval;
+      let uend = Math.floor(end / this.settings.decrementInterval);
       let iend = end % this.settings.decrementInterval;
       if (uend >= this.settings.generationAmount.length) {
         uend = this.settings.generationAmount.length;

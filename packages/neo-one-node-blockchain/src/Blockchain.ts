@@ -619,9 +619,10 @@ export class Blockchain {
       applicationsExecuted,
       block,
     });
+
     const nep5BalancePairs = assetKeys.map((key) => {
       const script = new ScriptBuilder().emitAppCall(key.assetScriptHash, 'balanceOf', key.userScriptHash).build();
-      const callReceipt = this.runEngineWrapper({ script, gas: 100000000, snapshot: 'main' });
+      const callReceipt = this.runEngineWrapper({ script, gas: 1, snapshot: 'main' });
       const balanceBuffer = callReceipt.stack[0].getInteger().toBuffer();
 
       return { key, value: new Nep5Balance({ balanceBuffer, lastUpdatedBlock: this.currentBlockIndex }) };

@@ -38,6 +38,6 @@ export class ByteStringStackItem extends PrimitiveStackItemBase {
       throw new InvalidIntegerStackItemError(this.size);
     }
 
-    return new BN(this.getBuffer());
+    return new BN(this.getBuffer(), 'le');
   }
 }
