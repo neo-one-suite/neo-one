@@ -219,10 +219,16 @@ const FIVE_THOUSAND_FIXED8 = fixed8FromDecimal(5000);
 const TEN_THOUSAND_FIXED8 = fixed8FromDecimal(10000);
 const ONE_HUNDRED_MILLION_FIXED8 = fixed8FromDecimal(100000000);
 
+const nativeScriptHashes = {
+  GAS: '0x668e0c1f9d7b70a99dd9e06eadd4c784d641afbc',
+  NEO: '0xde5f57d430d3dece511cf975a8d37848cb9e0525',
+  Policy: '0xce06595079cd69583126dbfd1d2e25cca74cffe9',
+};
+
 const nativeHashes = {
-  GAS: hexToUInt160('0x668e0c1f9d7b70a99dd9e06eadd4c784d641afbc'),
-  NEO: hexToUInt160('0xde5f57d430d3dece511cf975a8d37848cb9e0525'),
-  Policy: hexToUInt160('0xce06595079cd69583126dbfd1d2e25cca74cffe9'),
+  GAS: hexToUInt160(nativeScriptHashes.GAS),
+  NEO: hexToUInt160(nativeScriptHashes.NEO),
+  Policy: hexToUInt160(nativeScriptHashes.Policy),
 };
 
 export const common = {
@@ -296,5 +302,6 @@ export const common = {
   fixedToDecimal,
   reverse,
   isWildcard,
+  nativeScriptHashes,
   nativeHashes,
 };

@@ -114,12 +114,15 @@ export interface TransactionResultSuccessJSON {
 export type InvocationResultJSON = TransactionResultSuccessJSON | TransactionResultErrorJSON;
 
 export interface RawInvocationResultErrorJSON {
+  readonly script: string;
   readonly state: 'FAULT';
-  readonly gas_consumed: string;
-  readonly stack: readonly ContractParameterJSON[];
+  readonly gasconsumed: string;
+  readonly stack: string;
+  readonly notifications: readonly NotificationJSON[];
 }
 
 export interface RawInvocationResultSuccessJSON {
+  readonly script: string;
   readonly state: 'HALT';
   readonly gasconsumed: string;
   readonly stack: readonly ContractParameterJSON[];
@@ -464,6 +467,7 @@ export interface BlockBaseJSON {
   readonly witnesses: readonly WitnessJSON[];
   readonly hash: string;
   readonly size: number;
+  readonly confirmations: number;
 }
 
 export interface ConsensusDataJSON {
@@ -484,7 +488,17 @@ export interface TrimmedBlockJSON extends BlockBaseJSON {
 }
 
 export interface NetworkSettingsJSON {
-  readonly issueGASFee: string;
+  readonly decrementinternal: number;
+  readonly generationamount: readonly number[];
+  readonly privatekeyversion: number;
+  readonly standbyvalidators: readonly string[];
+  readonly messagemagic: number;
+  readonly addressversion: number;
+  readonly standbycommittee: readonly string[];
+  readonly committeememberscount: number;
+  readonly validatorscount: number;
+  readonly millisecondsperblock: number;
+  readonly memorypoolmaxtransactions: number;
 }
 
 // export interface CallReceiptJSON {
