@@ -27,7 +27,7 @@ import {
   Transaction,
   TransactionState,
 } from '@neo-one/node-core';
-import { Labels } from '@neo-one/utils';
+import { Labels, utils } from '@neo-one/utils';
 import { BN } from 'bn.js';
 import { filter, map, switchMap, take, timeout, toArray } from 'rxjs/operators';
 
@@ -134,6 +134,16 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   UNKNOWN: 'UNKNOWN',
   INVALID: 'INVALID',
 };
+
+const mapToTransfers = ({ key, value }: { readonly key: Nep5TransferKey; readonly value: Nep5Transfer }) => ({
+  timestamp: key.timestampMS.toNumber(),
+  assethash: common.uInt160ToString(key.assetScriptHash),
+  transferaddress: common.uInt160ToString(value.userScriptHash),
+  amount: value.amount.toString(),
+  blockindex: value.blockIndex,
+  transfernotifyindex: key.blockTransferNotificationIndex,
+  txhash: common.uInt256ToString(value.txHash),
+});
 
 const createJSONRPCHandler = (handlers: Handlers) => {
   // tslint:disable-next-line no-any
@@ -538,7 +548,7 @@ export const createHandler = ({
       if (typeof address !== 'string') {
         throw new JSONRPCError(-100, 'Invalid argument at position 0');
       }
-      const scriptHash = crypto.addressToScriptHash({ address, addressVersion: common.NEO_ADDRESS_VERSION });
+      const scriptHash = crypto.addressToScriptHash({ address, addressVersion: blockchain.settings.addressVersion });
       const isValidAddress = common.isUInt160(scriptHash);
       if (!isValidAddress) {
         throw new JSONRPCError(-100, 'Invalid address');
@@ -626,23 +636,18 @@ export const createHandler = ({
         throw new JSONRPCError(-32602, 'Invalid params');
       }
 
-      const startTimeBytes = new BN(startTime).toBuffer();
-      const endTimeBytes = new BN(endTime).toBuffer();
-      const mapToTransfers = ({ key, value }: { key: Nep5TransferKey; value: Nep5Transfer }) => ({
-        timestamp: key.timestampMS.toNumber(),
-        assethash: common.uInt160ToString(key.assetScriptHash),
-        transferaddress: common.uInt160ToString(value.userScriptHash),
-        amount: value.amount.toString(),
-        blockindex: value.blockIndex,
-        transfernotifyindex: key.blockXferNotificationIndex,
-        txhash: common.uInt256ToString(value.txHash),
-      });
+      const startTimeBytes = new BN(startTime, 'le').toBuffer();
+      const endTimeBytes = new BN(endTime, 'le').toBuffer();
+
+      const gte = Buffer.concat([scriptHash, startTimeBytes]);
+      const lte = Buffer.concat([scriptHash, endTimeBytes]);
+
       const sentPromise = blockchain.nep5TransfersSent
-        .find$(startTimeBytes, endTimeBytes)
+        .find$(gte, lte)
         .pipe(take(1000), map(mapToTransfers), toArray())
         .toPromise();
       const receivedPromise = blockchain.nep5TransfersSent
-        .find$(startTimeBytes, endTimeBytes)
+        .find$(gte, lte)
         .pipe(take(1000), map(mapToTransfers), toArray())
         .toPromise();
 
@@ -657,27 +662,24 @@ export const createHandler = ({
     [RPC_METHODS.getnep5balances]: async (args) => {
       const scriptHash = JSONHelper.readUInt160(args[0]);
       const address = crypto.scriptHashToAddress({ addressVersion: blockchain.settings.addressVersion, scriptHash });
-      const nep5Balances = await blockchain.nep5Balances
-        .find$(scriptHash)
-        .pipe(
-          map(async ({ key, value }) => {
-            const assetStillExists = await blockchain.contracts.tryGet(key.assetScriptHash);
-            if (!assetStillExists) {
-              return undefined;
-            }
+      const storedBalances = await blockchain.nep5Balances.find$(scriptHash).pipe(toArray()).toPromise();
+      const validBalances = await Promise.all(
+        storedBalances.map(async ({ key, value }) => {
+          const assetStillExists = await blockchain.contracts.tryGet(key.assetScriptHash);
+          if (!assetStillExists) {
+            return undefined;
+          }
 
-            return {
-              assethash: common.uInt160ToString(key.assetScriptHash),
-              amount: value.balance.toString(),
-              lastupdatedblock: value.lastUpdatedBlock,
-            };
-          }),
-          toArray(),
-        )
-        .toPromise();
+          return {
+            assethash: common.uInt160ToString(key.assetScriptHash),
+            amount: value.balance.toString(),
+            lastupdatedblock: value.lastUpdatedBlock,
+          };
+        }),
+      );
 
       return {
-        balance: nep5Balances,
+        balance: validBalances.filter(utils.notNull),
         address,
       };
     },

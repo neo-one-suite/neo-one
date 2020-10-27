@@ -54,7 +54,7 @@ export const deserializeStackItem = (reader: BinaryReader, maxArraySize: number,
         break;
 
       case StackItemType.Integer:
-        deserialized.unshift(new IntegerStackItem(new BN(reader.readVarBytesLE(IntegerStackItem.maxSize))));
+        deserialized.unshift(new IntegerStackItem(new BN(reader.readVarBytesLE(IntegerStackItem.maxSize), 'le')));
         break;
 
       case StackItemType.ByteString:

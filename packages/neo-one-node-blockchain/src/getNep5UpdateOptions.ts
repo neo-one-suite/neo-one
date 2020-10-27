@@ -80,7 +80,7 @@ export function getNep5UpdateOptions({
         const fromKey = new Nep5BalanceKey({ userScriptHash: from, assetScriptHash: scriptHash });
         const fromKeyString = fromKey.serializeWire().toString('hex');
         // No need to check address balance for every single transfer. Just need to check new balances for
-        // addresses that we know have transfered assets
+        // addresses that we know have transferred assets
 
         // mutableNep5BalancesChangedKeys will be used to run scripts to check storage for new balance of each address
         // whose balance we know has changed based on the transfers we know happened
@@ -110,7 +110,7 @@ export function getNep5UpdateOptions({
               userScriptHash: from,
               timestampMS: block.timestamp,
               assetScriptHash: scriptHash,
-              blockXferNotificationIndex: transferIndex,
+              blockTransferNotificationIndex: transferIndex,
             }),
             value: new Nep5Transfer({
               userScriptHash: to,
@@ -127,7 +127,7 @@ export function getNep5UpdateOptions({
               userScriptHash: to,
               timestampMS: block.timestamp,
               assetScriptHash: scriptHash,
-              blockXferNotificationIndex: transferIndex,
+              blockTransferNotificationIndex: transferIndex,
             }),
             value: new Nep5Transfer({
               userScriptHash: from,

@@ -190,7 +190,12 @@ export class Node implements INode {
     const peer = this.mutableBestPeer;
     const previousBlock = this.blockchain.previousBlock;
     const block = previousBlock === undefined ? this.blockchain.currentBlock : previousBlock;
-    if (peer !== undefined && block.index < this.mutableBlockIndex[peer.endpoint]) {
+    if (peer === undefined) {
+      return;
+    }
+
+    const peerIndex = this.mutableBlockIndex[peer.endpoint];
+    if (block.index < peerIndex) {
       if (this.mutableGetBlocksRequestsCount > GET_BLOCKS_CLOSE_COUNT) {
         this.mutableBestPeer = this.findBestPeer(peer);
         this.network.blacklistAndClose(peer);
@@ -202,6 +207,8 @@ export class Node implements INode {
           this.mutableGetBlocksRequestsCount = 1;
           this.mutableGetBlocksRequestsIndex = block.index;
         }
+
+        const requestAmount = Math.min(peerIndex - block.index, this.mutableGetBlocksRequestsCount * 50);
         this.mutableGetBlocksRequestTime = Date.now();
         this.sendMessage(
           peer,
@@ -209,7 +216,7 @@ export class Node implements INode {
             command: Command.GetBlocks,
             payload: new GetBlocksPayload({
               hashStart: block.hash,
-              count: this.mutableGetBlocksRequestsCount * 50,
+              count: requestAmount,
             }),
           }),
         );

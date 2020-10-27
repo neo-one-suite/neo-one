@@ -7,7 +7,7 @@ export interface Nep5TransferKeyAdd {
   readonly userScriptHash: UInt160;
   readonly timestampMS: BN;
   readonly assetScriptHash: UInt160;
-  readonly blockXferNotificationIndex: number;
+  readonly blockTransferNotificationIndex: number;
 }
 
 export class Nep5TransferKey extends Nep5TransferKeyModel {
@@ -16,13 +16,13 @@ export class Nep5TransferKey extends Nep5TransferKeyModel {
     const userScriptHash = reader.readUInt160();
     const timestampMS = reader.readUInt64LE();
     const assetScriptHash = reader.readUInt160();
-    const blockXferNotificationIndex = reader.readUInt16LE();
+    const blockTransferNotificationIndex = reader.readUInt16LE();
 
     return new this({
       userScriptHash,
       timestampMS,
       assetScriptHash,
-      blockXferNotificationIndex,
+      blockTransferNotificationIndex,
     });
   }
 
@@ -47,7 +47,7 @@ export class Nep5TransferKey extends Nep5TransferKeyModel {
       userScriptHash: this.userScriptHash,
       timestampMS: this.timestampMS,
       assetScriptHash: this.assetScriptHash,
-      blockXferNotificationIndex: this.blockXferNotificationIndex,
+      blockTransferNotificationIndex: this.blockTransferNotificationIndex,
     });
   }
 }

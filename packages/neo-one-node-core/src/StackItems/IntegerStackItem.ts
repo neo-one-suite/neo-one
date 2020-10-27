@@ -13,7 +13,7 @@ export class IntegerStackItem extends PrimitiveStackItemBase {
   public constructor(value: BN) {
     const size = value.eqn(0) ? 0 : value.byteLength();
     super({
-      memory: value.eqn(0) ? Buffer.from([]) : value.toBuffer(),
+      memory: value.eqn(0) ? Buffer.from([]) : value.toBuffer('le'),
       type: StackItemType.Integer,
       isNull: false,
       size,

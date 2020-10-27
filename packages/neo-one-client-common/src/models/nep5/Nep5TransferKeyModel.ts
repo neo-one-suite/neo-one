@@ -7,32 +7,32 @@ export interface Nep5TransferKeyModelAdd {
   readonly userScriptHash: UInt160;
   readonly timestampMS: BN;
   readonly assetScriptHash: UInt160;
-  readonly blockXferNotificationIndex: number;
+  readonly blockTransferNotificationIndex: number;
 }
 
 export class Nep5TransferKeyModel implements SerializableWire {
   public readonly userScriptHash: UInt160;
   public readonly timestampMS: BN;
   public readonly assetScriptHash: UInt160;
-  public readonly blockXferNotificationIndex: number;
+  public readonly blockTransferNotificationIndex: number;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   public constructor({
     userScriptHash,
     timestampMS,
     assetScriptHash,
-    blockXferNotificationIndex,
+    blockTransferNotificationIndex,
   }: Nep5TransferKeyModelAdd) {
     this.userScriptHash = userScriptHash;
     this.timestampMS = timestampMS;
     this.assetScriptHash = assetScriptHash;
-    this.blockXferNotificationIndex = blockXferNotificationIndex;
+    this.blockTransferNotificationIndex = blockTransferNotificationIndex;
   }
 
   public serializeWireBase(writer: BinaryWriter): void {
-    writer.writeVarBytesLE(this.userScriptHash);
+    writer.writeUInt160(this.userScriptHash);
     writer.writeUInt64LE(this.timestampMS);
-    writer.writeVarBytesLE(this.assetScriptHash);
-    writer.writeUInt32LE(this.blockXferNotificationIndex);
+    writer.writeUInt160(this.assetScriptHash);
+    writer.writeUInt32LE(this.blockTransferNotificationIndex);
   }
 }

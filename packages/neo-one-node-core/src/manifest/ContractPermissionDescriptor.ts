@@ -11,7 +11,7 @@ export class ContractPermissionDescriptor extends ContractPermissionDescriptorMo
     if (jsonString.length === 66) {
       return new ContractPermissionDescriptor({ hashOrGroup: JSONHelper.readECPoint(jsonString) });
     }
-    if (jsonString === '*') {
+    if (jsonString === '"*"') {
       return new ContractPermissionDescriptor();
     }
 

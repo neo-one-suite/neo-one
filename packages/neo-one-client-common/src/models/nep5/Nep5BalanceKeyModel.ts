@@ -18,7 +18,7 @@ export class Nep5BalanceKeyModel implements SerializableWire {
   }
 
   public serializeWireBase(writer: BinaryWriter): void {
-    writer.writeVarBytesLE(this.userScriptHash);
-    writer.writeVarBytesLE(this.assetScriptHash);
+    writer.writeUInt160(this.userScriptHash);
+    writer.writeUInt160(this.assetScriptHash);
   }
 }
