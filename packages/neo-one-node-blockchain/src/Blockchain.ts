@@ -8,6 +8,7 @@ import {
   CallReceipt,
   Change,
   ChangeSet,
+  ConsensusData,
   ConsensusPayload,
   DeserializeWireContext,
   HashIndexState,
@@ -27,6 +28,7 @@ import {
   Witness,
 } from '@neo-one/node-core';
 import { Labels } from '@neo-one/utils';
+import { BN } from 'bn.js';
 import PriorityQueue from 'js-priority-queue';
 import { Observable, Subject } from 'rxjs';
 import { map, toArray } from 'rxjs/operators';
@@ -708,7 +710,6 @@ export class Blockchain {
     return new Block({
       version: 0,
       previousHash: this.currentBlock.hash,
-      merkleRoot: common.ZERO_UINT256,
       timestamp: this.currentBlock.timestamp.addn(this.settings.millisecondsPerBlock),
       index: this.currentBlockIndex + 1,
       nextConsensus: this.currentBlock.nextConsensus,
@@ -716,6 +717,7 @@ export class Blockchain {
         invocation: Buffer.from([]),
         verification: Buffer.from([]),
       }),
+      consensusData: new ConsensusData({ primaryIndex: 0, nonce: new BN(0) }),
       transactions: [],
     });
   }

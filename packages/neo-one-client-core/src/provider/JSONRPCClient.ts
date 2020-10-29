@@ -4,10 +4,10 @@ import {
   ApplicationLogDataJSON,
   BlockJSON,
   BufferString,
-  CallReceiptJSON,
   ContractJSON,
   GetOptions,
   Hash256String,
+  HeaderJSON,
   InvocationDataJSON,
   Nep5BalancesJSON,
   Nep5TransfersJSON,
@@ -19,6 +19,7 @@ import {
   StorageItemJSON,
   TransactionReceiptJSON,
   UnclaimedGASJSON,
+  ValidatorJSON,
   VerboseTransactionJSON,
   VersionJSON,
 } from '@neo-one/client-common';
@@ -53,11 +54,15 @@ export class JSONRPCClient {
     );
   }
 
-  public async getNep5Transfers(address: AddressString): Promise<Nep5TransfersJSON> {
+  public async getNep5Transfers(
+    address: AddressString,
+    startTime?: number,
+    endTime?: number,
+  ): Promise<Nep5TransfersJSON> {
     return this.withInstance(async (provider) =>
       provider.request({
         method: 'getnep5transfers',
-        params: [addressToScriptHash(address)],
+        params: [addressToScriptHash(address), startTime, endTime],
       }),
     );
   }
@@ -158,15 +163,6 @@ export class JSONRPCClient {
     );
   }
 
-  public async testInvocation(value: BufferString): Promise<CallReceiptJSON> {
-    return this.withInstance(async (provider) =>
-      provider.request({
-        method: 'testinvocation',
-        params: [value],
-      }),
-    );
-  }
-
   public async getTransactionReceipt(hash: Hash256String, options: GetOptions = {}): Promise<TransactionReceiptJSON> {
     const { timeoutMS } = options;
 
@@ -195,6 +191,23 @@ export class JSONRPCClient {
         params: [index],
       }),
     );
+  }
+
+  public async getBlockHeader(hashOrIndex: Hash256String | number): Promise<HeaderJSON> {
+    return this.withInstance(async (provider) =>
+      provider.request({
+        method: 'getblockheader',
+        params: [hashOrIndex, 1],
+      }),
+    );
+  }
+
+  public async getValidators(): Promise<readonly ValidatorJSON[]> {
+    return this.withInstance(async (provider) => provider.request({ method: 'getvalidators' }));
+  }
+
+  public async validateAddress(address: string): Promise<{ readonly address: string; readonly isvalid: boolean }> {
+    return this.withInstance(async (provider) => provider.request({ method: 'validateaddress', params: [address] }));
   }
 
   public async getConnectionCount(): Promise<number> {

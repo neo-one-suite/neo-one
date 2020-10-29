@@ -119,7 +119,6 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   getsettings: 'getsettings',
 
   // NEO•ONE
-  testinvocation: 'testinvocation',
   relaytransaction: 'relaytransaction',
   getallstorage: 'getallstorage',
   gettransactionreceipt: 'gettransactionreceipt',
@@ -444,17 +443,12 @@ export const createHandler = ({
       return JSONHelper.writeBuffer(tx.serializeWire());
     },
     [RPC_METHODS.getstorage]: async (args) => {
-      let id = 0;
-      try {
-        const hash = JSONHelper.readUInt160(args[0]);
-        const state = await blockchain.contracts.tryGet(hash);
-        if (state === undefined) {
-          return undefined;
-        }
-        id = state.id;
-      } catch {
-        /* do nothing */
+      const hash = JSONHelper.readUInt160(args[0]);
+      const state = await blockchain.contracts.tryGet(hash);
+      if (state === undefined) {
+        return undefined;
       }
+      const id = state.id;
 
       const key = JSONHelper.readBuffer(args[1]);
       const item = await blockchain.storages.tryGet(new StorageKey({ id, key }));
@@ -525,17 +519,8 @@ export const createHandler = ({
     },
 
     // SmartContract
-    // TODO: we didn't use invokefunction in the past, whether or not that will still be the case is up in the air
     [RPC_METHODS.invokefunction]: async (_args) => {
       throw new JSONRPCError(-101, 'Not implemented');
-      // const scriptHash = JSONHelper.readUInt160(args[0]);
-      // const operation = args[1];
-      // const params = args.length >= 3 ? args[2].map((arg) => ContractParameter.fromJSON(arg)) : [];
-      // const signers = args.length >= 4 ? signersFromJSON(args[3]) : undefined;
-      // const builder = new ScriptBuilder();
-      // const script = builder.emitAppCall(scriptHash, operation, params).build();
-
-      // return getInvokeResult(script, signers);
     },
     [RPC_METHODS.invokescript]: async (args) => {
       const script = JSONHelper.readBuffer(args[0]);
@@ -584,7 +569,6 @@ export const createHandler = ({
       throw new JSONRPCError(-101, 'Not implemented');
     },
     [RPC_METHODS.getapplicationlog]: async () => {
-      // TODO: this looks very similar to our "getinvocationdata"
       throw new JSONRPCError(-101, 'Not implemented');
     },
 
@@ -700,23 +684,6 @@ export const createHandler = ({
     [RPC_METHODS.getsettings]: async () => ({ millisecondsPerBlock: blockchain.settings.millisecondsPerBlock }),
 
     // NEO•ONE
-    [RPC_METHODS.testinvocation]: async (args) => {
-      const script = JSONHelper.readBuffer(args[0]);
-
-      try {
-        const receipt = blockchain.invokeTransaction({ script }, 1000000);
-
-        return {
-          script,
-          state: toVMStateJSON(receipt.state),
-          stack: receipt.stack.map((item) => stackItemToJSON(item, undefined)),
-          gasconsumed: receipt.gasConsumed,
-          notifications: receipt.notifications.map(notificationToJSON),
-        };
-      } catch {
-        throw new JSONRPCError(-103, 'Invalid Transaction');
-      }
-    },
     [RPC_METHODS.relaytransaction]: async (args): Promise<RelayTransactionResultJSON> => {
       const transaction = Transaction.deserializeWire({
         context: blockchain.deserializeWireContext,
@@ -760,11 +727,11 @@ export const createHandler = ({
       if (contract === undefined) {
         return [];
       }
-      // const items = await blockchain.storages.find$(contract.id).pipe(toArray()).toPromise();
 
       return blockchain.storages
         .find$(Buffer.from([contract.id]))
         .pipe(
+          take(1000),
           map(({ key, value }) => value.serializeJSON(key)),
           toArray(),
         )

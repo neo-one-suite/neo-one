@@ -1,4 +1,4 @@
-import { common } from '@neo-one/client-common';
+import { common, scriptHashToAddress } from '@neo-one/client-common';
 
 /**
  * Common `AddressString`s.
@@ -7,9 +7,13 @@ export const Hash160 = {
   /**
    * `AddressString` of the native NEO conract.
    */
-  NEO: common.uInt160ToString(common.nativeHashes.NEO),
+  NEO: scriptHashToAddress(common.nativeScriptHashes.NEO),
   /**
    * `AddressString` of the native GAS conract.
    */
-  GAS: common.uInt160ToString(common.nativeHashes.GAS),
+  GAS: scriptHashToAddress(common.nativeScriptHashes.GAS),
+  /**
+   * `AddressString` of the native Policy conract.
+   */
+  Policy: scriptHashToAddress(common.nativeScriptHashes.Policy),
 };
