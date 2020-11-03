@@ -4,6 +4,7 @@ import {
   crypto,
   JSONHelper,
   RelayTransactionResultJSON,
+  scriptHashToAddress,
   toJSONVerifyResult,
   toVMStateJSON,
   TransactionJSON,
@@ -137,12 +138,20 @@ const RPC_METHODS: { readonly [key: string]: string } = {
 const mapToTransfers = ({ key, value }: { readonly key: Nep5TransferKey; readonly value: Nep5Transfer }) => ({
   timestamp: key.timestampMS.toNumber(),
   assethash: common.uInt160ToString(key.assetScriptHash),
-  transferaddress: common.uInt160ToString(value.userScriptHash),
+  transferaddress: scriptHashToAddress(common.uInt160ToString(value.userScriptHash)),
   amount: value.amount.toString(),
   blockindex: value.blockIndex,
   transfernotifyindex: key.blockTransferNotificationIndex,
   txhash: common.uInt256ToString(value.txHash),
 });
+
+const getScriptHashFromParam = (param: string, addressVersion: number) => {
+  if (param.length < 40) {
+    return crypto.addressToScriptHash({ addressVersion, address: param });
+  }
+
+  return JSONHelper.readUInt160(param);
+};
 
 const createJSONRPCHandler = (handlers: Handlers) => {
   // tslint:disable-next-line no-any
@@ -451,7 +460,8 @@ export const createHandler = ({
       const id = state.id;
 
       const key = JSONHelper.readBuffer(args[1]);
-      const item = await blockchain.storages.tryGet(new StorageKey({ id, key }));
+      const storageKey = new StorageKey({ id, key });
+      const item = await blockchain.storages.tryGet(storageKey);
 
       if (item === undefined) {
         return undefined;
@@ -609,8 +619,9 @@ export const createHandler = ({
 
     // Nep5
     [RPC_METHODS.getnep5transfers]: async (args) => {
-      const scriptHash = JSONHelper.readUInt160(args[0]);
-      const address = crypto.scriptHashToAddress({ addressVersion: blockchain.settings.addressVersion, scriptHash });
+      const addressVersion = blockchain.settings.addressVersion;
+      const scriptHash = getScriptHashFromParam(args[0], addressVersion);
+      const address = crypto.scriptHashToAddress({ addressVersion, scriptHash });
 
       const SEVEN_DAYS_IN_MS = 7 * 24 * 60 * 60 * 1000;
       const startTime = args[1] === undefined ? Date.now() - SEVEN_DAYS_IN_MS : args[1];
@@ -630,7 +641,7 @@ export const createHandler = ({
         .find$(gte, lte)
         .pipe(take(1000), map(mapToTransfers), toArray())
         .toPromise();
-      const receivedPromise = blockchain.nep5TransfersSent
+      const receivedPromise = blockchain.nep5TransfersReceived
         .find$(gte, lte)
         .pipe(take(1000), map(mapToTransfers), toArray())
         .toPromise();
@@ -644,8 +655,9 @@ export const createHandler = ({
       };
     },
     [RPC_METHODS.getnep5balances]: async (args) => {
-      const scriptHash = JSONHelper.readUInt160(args[0]);
-      const address = crypto.scriptHashToAddress({ addressVersion: blockchain.settings.addressVersion, scriptHash });
+      const addressVersion = blockchain.settings.addressVersion;
+      const scriptHash = getScriptHashFromParam(args[0], addressVersion);
+      const address = crypto.scriptHashToAddress({ addressVersion, scriptHash });
       const storedBalances = await blockchain.nep5Balances.find$(scriptHash).pipe(toArray()).toPromise();
       const validBalances = await Promise.all(
         storedBalances.map(async ({ key, value }) => {
@@ -723,13 +735,19 @@ export const createHandler = ({
     },
     [RPC_METHODS.getallstorage]: async (args) => {
       const hash = JSONHelper.readUInt160(args[0]);
+      const { NEO, GAS, Policy } = common.nativeHashes;
+      if (hash.equals(NEO) || hash.equals(GAS) || hash.equals(Policy)) {
+        throw new Error("Can't get all storage for native contracts.");
+      }
       const contract = await blockchain.contracts.tryGet(hash);
       if (contract === undefined) {
         return [];
       }
+      const buffer = Buffer.alloc(4);
+      buffer.writeInt32LE(contract.id);
 
       return blockchain.storages
-        .find$(Buffer.from([contract.id]))
+        .find$(buffer)
         .pipe(
           take(1000),
           map(({ key, value }) => value.serializeJSON(key)),
