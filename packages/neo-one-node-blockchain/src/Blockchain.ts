@@ -1,7 +1,8 @@
-import { common, ScriptBuilder, UInt256, VerifyResultModel } from '@neo-one/client-common';
+import { common, ScriptBuilder, TriggerType, UInt256, VerifyResultModel } from '@neo-one/client-common';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   ApplicationExecuted,
+  ApplicationLog,
   Block,
   Blockchain as BlockchainType,
   BlockchainSettings,
@@ -16,12 +17,12 @@ import {
   Mempool,
   NativeContainer,
   Nep5Balance,
+  Notification,
   RunEngineOptions,
   Signers,
   Storage,
   Transaction,
   TransactionVerificationContext,
-  TriggerType,
   VerifyConsensusPayloadOptions,
   VerifyOptions,
   VM,
@@ -241,6 +242,10 @@ export class Blockchain {
 
   public get nep5TransfersSent() {
     return this.storage.nep5TransfersSent;
+  }
+
+  public get applicationLogs() {
+    return this.storage.applicationLogs;
   }
 
   public get transactions() {
@@ -675,6 +680,42 @@ export class Blockchain {
     return nep5BalanceChangeSet.concat(nep5TransfersReceivedChangeSet, nep5TransfersSentChangeSet);
   }
 
+  private updateApplicationLogs({
+    applicationsExecuted,
+    block,
+  }: {
+    readonly applicationsExecuted: readonly ApplicationExecuted[];
+    readonly block: Block;
+  }): ChangeSet {
+    return applicationsExecuted.map(
+      ({ transaction, trigger, state: vmState, gasConsumed, stack, notifications: notificationsIn }) => {
+        const notifications = notificationsIn.map(
+          ({ scriptHash, eventName, state }) =>
+            new Notification({
+              scriptHash,
+              eventName,
+              state,
+            }),
+        );
+
+        const value = new ApplicationLog({
+          txid: transaction?.hash,
+          trigger,
+          vmState,
+          gasConsumed,
+          stack,
+          notifications,
+        });
+
+        return {
+          type: 'add',
+          subType: 'add',
+          change: { type: 'applicationLog', key: transaction?.hash ?? block.hash, value },
+        };
+      },
+    );
+  }
+
   private async persistBlockInternal(block: Block, verify?: boolean): Promise<void> {
     if (verify) {
       await this.verifyBlock(block);
@@ -695,6 +736,9 @@ export class Blockchain {
 
     const nep5Updates = this.updateNep5Balances({ applicationsExecuted, block });
     await this.storage.commit(nep5Updates);
+
+    const applicationLogUpdates = this.updateApplicationLogs({ applicationsExecuted, block });
+    await this.storage.commit(applicationLogUpdates);
 
     this.vm.updateSnapshots();
   }

@@ -1,5 +1,5 @@
-import { common, ScriptBuilder } from '@neo-one/client-common';
-import { Block, ConsensusData, TriggerType, Witness } from '@neo-one/node-core';
+import { common, ScriptBuilder, TriggerType } from '@neo-one/client-common';
+import { Block, ConsensusData, Witness } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import { ApplicationEngine } from '../ApplicationEngine';

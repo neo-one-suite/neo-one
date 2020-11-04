@@ -39,6 +39,15 @@ const convertAddChange = (change: AddChange): readonly PutBatch[] => {
         },
       ];
 
+    case 'applicationLog':
+      return [
+        {
+          type: 'put',
+          key: keys.createApplicationLogKey(change.key),
+          value: change.value.serializeWire(),
+        },
+      ];
+
     case 'block':
       return [
         {

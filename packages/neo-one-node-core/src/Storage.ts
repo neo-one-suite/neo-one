@@ -1,4 +1,6 @@
+import { ApplicationLogJSON } from '@neo-one/client-common';
 import { Observable } from 'rxjs';
+import { ApplicationLog } from './ApplicationLog';
 import { ContractIDState } from './ContractIDState';
 import { ContractKey, ContractState } from './ContractState';
 import { HashIndexState } from './HashIndexState';
@@ -109,7 +111,8 @@ export type AddChange =
   | { readonly type: 'contractID'; readonly value: ContractIDState }
   | { readonly type: 'nep5Balance'; readonly key: Nep5BalanceKey; readonly value: Nep5Balance }
   | { readonly type: 'nep5TransferSent'; readonly key: Nep5TransferKey; readonly value: Nep5Transfer }
-  | { readonly type: 'nep5TransferReceived'; readonly key: Nep5TransferKey; readonly value: Nep5Transfer };
+  | { readonly type: 'nep5TransferReceived'; readonly key: Nep5TransferKey; readonly value: Nep5Transfer }
+  | { readonly type: 'applicationLog'; readonly key: TransactionKey; readonly value: ApplicationLog };
 
 export type DeleteChange =
   | { readonly type: 'contract'; readonly key: ContractKey }
@@ -127,6 +130,7 @@ export interface BlockchainStorage {
   readonly nep5Balances: ReadAllFindStorage<Nep5BalanceKey, Nep5Balance>;
   readonly nep5TransfersSent: ReadFindStorage<Nep5TransferKey, Nep5Transfer>;
   readonly nep5TransfersReceived: ReadFindStorage<Nep5TransferKey, Nep5Transfer>;
+  readonly applicationLogs: ReadStorage<TransactionKey, ApplicationLogJSON>;
   readonly transactions: ReadStorage<TransactionKey, TransactionState>;
   readonly contracts: ReadStorage<ContractKey, ContractState>;
   readonly storages: ReadFindStorage<StorageKey, StorageItem>;

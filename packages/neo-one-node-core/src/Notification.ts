@@ -1,5 +1,5 @@
-import { common, UInt160 } from '@neo-one/client-common';
-import { assertArrayStackItem, StackItem } from './StackItems';
+import { common, NotificationJSON, UInt160 } from '@neo-one/client-common';
+import { assertArrayStackItem, StackItem, stackItemToJSON } from './StackItems';
 import { Verifiable } from './Verifiable';
 
 export interface NotificationAdd {
@@ -34,5 +34,20 @@ export class Notification {
     this.scriptHash = scriptHash;
     this.eventName = eventName;
     this.state = state;
+  }
+
+  public serializeJSON(): NotificationJSON {
+    let state;
+    try {
+      state = this.state.map((s) => stackItemToJSON(s, undefined));
+    } catch {
+      state = 'error: recursive reference';
+    }
+
+    return {
+      scripthash: common.uInt160ToString(this.scriptHash),
+      eventname: this.eventName,
+      state,
+    };
   }
 }

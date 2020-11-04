@@ -1,6 +1,5 @@
 import { common, ScriptBuilder, TransactionModel } from '@neo-one/client-common';
 import BN from 'bn.js';
-import { Hash160 } from '../../Hash160';
 import { JSONRPCClient, JSONRPCHTTPProvider } from '../../provider';
 
 describe('JSONRPCClient Tests', () => {
@@ -274,12 +273,25 @@ describe('JSONRPCClient Tests', () => {
     expect(notifications).toEqual([]);
   });
 
-  // TODO: implement getapplicationlog
-  // JSON client method
-  // JSON return type
-  // RPC method
-  // storage, etc.
-  // test('getApplicationLog', async () => {
-  //   const log = await client.getApplicationLog();
-  // });
+  test('getApplicationLog', async () => {
+    const { gasconsumed, notifications, stack, trigger, txid, vmstate } = await client.getApplicationLog(
+      transactionHash,
+    );
+
+    expect(gasconsumed).toEqual('0');
+    expect(stack).toEqual([]);
+    expect(trigger).toEqual('Application');
+    expect(vmstate).toEqual('HALT');
+    expect(txid).toEqual(transactionHash);
+    expect(notifications.length).toEqual(2);
+    expect(notifications[0]).toEqual({
+      eventname: 'Transfer',
+      scripthash: '0xde5f57d430d3dece511cf975a8d37848cb9e0525',
+      state: [
+        { type: 'Any' },
+        { type: 'ByteString', value: '4KPFXK1yAo+1kBdIsZonviH2VAQ=' },
+        { type: 'Integer', value: '100000000' },
+      ],
+    });
+  });
 });

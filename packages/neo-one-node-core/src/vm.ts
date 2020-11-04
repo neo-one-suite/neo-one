@@ -1,16 +1,10 @@
-import { UInt256, VMState } from '@neo-one/client-common';
+import { TriggerType, UInt256, VMState } from '@neo-one/client-common';
 import { Block } from './Block';
 import { CallFlags } from './CallFlags';
 import { Notification } from './Notification';
 import { SerializableContainer } from './Serializable';
 import { StackItem } from './StackItems';
 import { Transaction } from './transaction';
-
-export enum TriggerType {
-  Verification = 0x00,
-  System = 0x01,
-  Application = 0x10,
-}
 
 export interface CallReceipt {
   readonly state: VMState;

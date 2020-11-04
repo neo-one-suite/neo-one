@@ -23,10 +23,9 @@ export class Header extends BlockBase implements SerializableWire, SerializableJ
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Header {
     const { reader } = options;
     const blockBase = super.deserializeWireBase(options);
-    if (reader.readUInt8() !== 0) {
-      throw new InvalidFormatError(
-        `Expected Header BinaryReader readUInt8(0) to be 0. Received: ${reader.readUInt8()}`,
-      );
+    const uint8 = reader.readUInt8();
+    if (uint8 !== 0) {
+      throw new InvalidFormatError(`Expected Header BinaryReader readUInt8() to be 0. Received: ${uint8}`);
     }
 
     return new this({

@@ -3,6 +3,7 @@ import { UInt256Hex } from '../common';
 import { ContractParameterTypeModel } from './ContractParameterTypeModel';
 import { StorageFlagsModel } from './StorageFlagsModel';
 import { AttributeTypeModel } from './transaction/attribute/AttributeTypeModel';
+import { TriggerType, TriggerTypeJSON } from './trigger';
 import { VerifyResultModel } from './VerifyResultModel';
 import { VMState, VMStateJSON } from './vm';
 import { WitnessScopeModel } from './WitnessScopeModel';
@@ -218,21 +219,6 @@ export interface UnclaimedGASJSON {
   readonly address: string;
 }
 
-// TODO: not sure if we need this
-export interface StateItemJSON {
-  readonly type: string;
-  readonly value: string;
-}
-
-// TODO: not sure if we need this
-export interface NeoNotificationJSON {
-  readonly contract: string;
-  readonly state: {
-    readonly type: string;
-    readonly value: readonly StateItemJSON[];
-  };
-}
-
 export interface StackItemJSONBase {
   readonly type: StackItemJSON['type'];
   // readonly value:
@@ -293,15 +279,8 @@ export type StackItemJSON =
   | BufferStackItemJSON
   | ArrayStackItemJSON
   // | StructStackItemJSON
+  // | InteropInterfaceStackItemJSON
   | MapStackItemJSON;
-// | InteropInterfaceStackItemJSON;
-
-// TODO: copy pasted from node-core. We might want to put this here instead
-export enum TriggerType {
-  Verification = 0x00,
-  System = 0x01,
-  Application = 0x10,
-}
 
 export interface ExecutionResultJSON {
   readonly trigger: keyof typeof TriggerType;
@@ -312,9 +291,13 @@ export interface ExecutionResultJSON {
   readonly notifications: readonly NotificationActionJSON[];
 }
 
-export interface ApplicationLogDataJSON {
-  readonly txid: string;
-  readonly executions: readonly ExecutionResultJSON[];
+export interface ApplicationLogJSON {
+  readonly txid?: string;
+  readonly trigger: TriggerTypeJSON;
+  readonly vmstate: VMStateJSON;
+  readonly gasconsumed: string;
+  readonly stack: readonly StackItemJSON[] | string;
+  readonly notifications: readonly NotificationJSON[];
 }
 
 export interface TransactionJSON {
@@ -331,10 +314,6 @@ export interface TransactionJSON {
   readonly script: string;
   readonly witnesses: readonly WitnessJSON[];
   readonly receipt?: TransactionReceiptJSON;
-  readonly blockhash: string;
-  readonly confirmations: number;
-  readonly blocktime: string;
-  readonly vmstate: string;
 }
 
 // Just for Neo returns, don't think we need it for anything
@@ -467,7 +446,7 @@ export interface BlockBaseJSON {
   readonly witnesses: readonly WitnessJSON[];
   readonly hash: string;
   readonly size: number;
-  readonly confirmations: number;
+  readonly confirmations?: number;
 }
 
 export interface ConsensusDataJSON {
@@ -507,10 +486,9 @@ export interface NetworkSettingsJSON {
 // }
 
 export interface NotificationJSON {
-  // readonly scriptcontainer: SerializedScriptContainerJSON;
   readonly scripthash: string;
   readonly eventname: string;
-  readonly state: readonly StackItemJSON[];
+  readonly state: readonly StackItemJSON[] | string;
 }
 
 export interface CallReceiptJSON {
