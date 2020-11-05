@@ -303,7 +303,7 @@ export const createHandler = ({
         script: script.toString('hex'),
         state: toVMStateJSON(result.state),
         stack,
-        gasconsumed: result.gasConsumed,
+        gasconsumed: common.fixed8FromDecimal(result.gasConsumed.toString()).toString(),
         notifications: result.notifications.map((n) => n.serializeJSON()),
       };
     } catch {
@@ -311,7 +311,7 @@ export const createHandler = ({
         script: script.toString('hex'),
         state: toVMStateJSON(result.state),
         stack: 'error: recursive reference',
-        gasconsumed: result.gasConsumed,
+        gasconsumed: common.fixed8FromDecimal(result.gasConsumed.toString()).toString(),
         notifications: result.notifications.map((n) => n.serializeJSON()),
       };
     }

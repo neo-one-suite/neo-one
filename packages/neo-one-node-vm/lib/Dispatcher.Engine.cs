@@ -159,7 +159,7 @@ namespace NEOONE
         private bool _setInstructionPointer(int initialPosition)
         {
             this.isEngineInitialized();
-            this.engine.LoadClonedContext(initialPosition);
+            this.engine.CurrentContext.InstructionPointer = initialPosition;
 
             return true;
         }
