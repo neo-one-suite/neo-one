@@ -1,6 +1,6 @@
 // tslint:disable no-array-mutation no-object-mutation
-import { common, VMState } from '@neo-one/client-common';
-import { ApplicationExecuted, Block, SnapshotHandler, Transaction, TriggerType, VM } from '@neo-one/node-core';
+import { common, TriggerType, VMState } from '@neo-one/client-common';
+import { ApplicationExecuted, Block, SnapshotHandler, Transaction, VM } from '@neo-one/node-core';
 import { PersistNativeContractsError } from './errors';
 import { utils as blockchainUtils } from './utils';
 

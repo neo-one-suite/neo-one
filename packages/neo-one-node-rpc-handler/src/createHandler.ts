@@ -20,7 +20,6 @@ import {
   Nep5Transfer,
   Nep5TransferKey,
   Node,
-  notificationToJSON,
   Signers,
   StackItem,
   stackItemToJSON,
@@ -305,7 +304,7 @@ export const createHandler = ({
         state: toVMStateJSON(result.state),
         stack,
         gasconsumed: result.gasConsumed,
-        notifications: result.notifications.map(notificationToJSON),
+        notifications: result.notifications.map((n) => n.serializeJSON()),
       };
     } catch {
       return {
@@ -313,7 +312,7 @@ export const createHandler = ({
         state: toVMStateJSON(result.state),
         stack: 'error: recursive reference',
         gasconsumed: result.gasConsumed,
-        notifications: result.notifications.map(notificationToJSON),
+        notifications: result.notifications.map((n) => n.serializeJSON()),
       };
     }
   };
@@ -366,7 +365,11 @@ export const createHandler = ({
       }
 
       if (args[1] === true || args[1] === 1) {
-        return block.serializeJSON(blockchain.serializeJSONContext);
+        const confirmations = blockchain.currentBlockIndex - block.index + 1;
+        const hash = await blockchain.getNextBlockHash(block.hash);
+        const nextblockhash = hash ? JSONHelper.writeUInt256(hash) : undefined;
+
+        return block.serializeJSONVerbose(blockchain.serializeJSONContext, { confirmations, nextblockhash });
       }
 
       return block.serializeWire().toString('hex');
@@ -578,8 +581,23 @@ export const createHandler = ({
     [RPC_METHODS.listplugins]: async () => {
       throw new JSONRPCError(-101, 'Not implemented');
     },
-    [RPC_METHODS.getapplicationlog]: async () => {
-      throw new JSONRPCError(-101, 'Not implemented');
+    [RPC_METHODS.getapplicationlog]: async (args) => {
+      const hash = common.stringToUInt256(args[0]);
+      const value = await blockchain.applicationLogs.tryGet(hash);
+      if (value === undefined) {
+        throw new JSONRPCError(-100, 'Unknown transaction');
+      }
+
+      const { txid, trigger, vmstate, gasconsumed, stack, notifications } = value;
+
+      return {
+        txid,
+        trigger,
+        vmstate,
+        gasconsumed,
+        stack,
+        notifications,
+      };
     },
 
     // Wallet

@@ -1,7 +1,7 @@
 import {
   AddressString,
   addressToScriptHash,
-  ApplicationLogDataJSON,
+  ApplicationLogJSON,
   BlockJSON,
   BufferString,
   ContractJSON,
@@ -222,7 +222,7 @@ export class JSONRPCClient {
     return this.withInstance(async (provider) => provider.request({ method: 'getversion' }));
   }
 
-  public async getApplicationLog(hash: Hash256String): Promise<ApplicationLogDataJSON> {
+  public async getApplicationLog(hash: Hash256String): Promise<ApplicationLogJSON> {
     return this.withInstance(async (provider) =>
       provider.request({
         method: 'getapplicationlog',

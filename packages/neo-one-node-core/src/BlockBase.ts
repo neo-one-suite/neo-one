@@ -204,9 +204,18 @@ export abstract class BlockBase implements EquatableKey, SerializableContainer, 
         addressVersion: context.addressVersion,
         scriptHash: this.nextConsensus,
       }),
-
       witnesses: [this.witness.serializeJSON()],
-      // confirmations: [] TODO: this is a property we used to use, do we still need?
+    };
+  }
+
+  public serializeJSONVerbose(
+    context: SerializeJSONContext,
+    verbose: { readonly confirmations: number; readonly nextblockhash?: UInt256Hex },
+  ): BlockBaseJSON {
+    return {
+      ...this.serializeJSON(context),
+      confirmations: verbose.confirmations,
+      nextblockhash: verbose.nextblockhash,
     };
   }
 

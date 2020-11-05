@@ -1,4 +1,5 @@
 import {
+  ApplicationLog,
   BinaryReader,
   BlockKey,
   ContractIDState,
@@ -120,6 +121,12 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
           buffer,
         }),
       deserializeKey: (buffer) => Nep5TransferKey.deserializeWire({ context, buffer }),
+    }),
+
+    applicationLogs: read.createReadStorage({
+      db,
+      serializeKey: keys.createApplicationLogKey,
+      deserializeValue: (buffer) => ApplicationLog.deserializeWire({ context, buffer }),
     }),
 
     transactions: read.createReadStorage({

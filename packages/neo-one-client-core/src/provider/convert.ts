@@ -29,6 +29,7 @@ export function convertCallReceipt(receipt: CallReceiptJSON): RawCallReceipt {
   };
 }
 
+// TODO: this almost definitely needs to be looked at and redone
 export function convertStackItem(item: StackItemJSON): RawStackItem {
   switch (item.type) {
     case 'Any':

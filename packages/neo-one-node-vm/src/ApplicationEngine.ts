@@ -1,11 +1,5 @@
-import { common, VMState } from '@neo-one/client-common';
-import {
-  CallFlags,
-  SerializableContainer,
-  serializeScriptContainer,
-  SnapshotName,
-  TriggerType,
-} from '@neo-one/node-core';
+import { common, TriggerType, VMState } from '@neo-one/client-common';
+import { CallFlags, SerializableContainer, serializeScriptContainer, SnapshotName } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import { parseStackItems } from './converters';

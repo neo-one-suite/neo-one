@@ -133,7 +133,6 @@ export const assertPrimitiveStackItem = (item: any): PrimitiveStackItem => {
 };
 
 export const stackItemToJSON = (item: StackItem, context?: Set<StackItem>): StackItemJSON => {
-  const type = StackItemType[item.type];
   switch (item.type) {
     case StackItemType.Array:
       const array = assertArrayStackItem(item);
@@ -153,12 +152,12 @@ export const stackItemToJSON = (item: StackItem, context?: Set<StackItem>): Stac
     case StackItemType.Buffer:
       const buffer = assertBufferStackItem(item);
 
-      return { type: 'Buffer', value: JSONHelper.writeBuffer(buffer.getBuffer()) };
+      return { type: 'Buffer', value: JSONHelper.writeBase64Buffer(buffer.getBuffer()) };
 
     case StackItemType.ByteString:
       const byteString = assertByteStringStackItem(item);
 
-      return { type: 'ByteString', value: JSONHelper.writeBuffer(byteString.getBuffer()) };
+      return { type: 'ByteString', value: JSONHelper.writeBase64Buffer(byteString.getBuffer()) };
 
     case StackItemType.Integer:
       const integer = assertIntegerStackItem(item);
@@ -187,6 +186,6 @@ export const stackItemToJSON = (item: StackItem, context?: Set<StackItem>): Stac
       return { type: 'Pointer', value: pointer.position };
 
     default:
-      throw new InvalidFormatError(`didn't expect stack item of type: ${type} on return`);
+      return { type: 'Any', value: undefined };
   }
 };

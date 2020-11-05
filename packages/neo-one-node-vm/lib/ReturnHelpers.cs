@@ -1,10 +1,8 @@
 using System;
 using System.Linq;
 using Neo.IO;
-using Neo.SmartContract;
 using Neo.VM.Types;
 using Neo;
-using Neo.Network.P2P.Payloads;
 
 namespace NEOONE
 {

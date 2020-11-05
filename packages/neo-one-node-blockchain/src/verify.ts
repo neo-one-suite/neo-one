@@ -1,4 +1,4 @@
-import { common, UInt160, VMState } from '@neo-one/client-common';
+import { common, TriggerType, UInt160, VMState } from '@neo-one/client-common';
 import {
   BlockchainStorage,
   CallFlags,
@@ -6,7 +6,6 @@ import {
   ExecuteScriptResult,
   NativeContainer,
   SerializableContainer,
-  TriggerType,
   Verifiable,
   VM,
 } from '@neo-one/node-core';

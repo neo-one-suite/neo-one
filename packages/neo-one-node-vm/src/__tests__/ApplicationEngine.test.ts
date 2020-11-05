@@ -1,4 +1,4 @@
-import { TriggerType } from '@neo-one/node-core';
+import { TriggerType } from '@neo-one/client-common';
 import { ApplicationEngine } from '../ApplicationEngine';
 import { Dispatcher } from '../Dispatcher';
 

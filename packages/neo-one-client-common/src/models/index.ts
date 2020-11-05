@@ -9,3 +9,4 @@ export * from './transaction';
 export * from './nep5';
 export * from './types';
 export * from './vm';
+export * from './trigger';

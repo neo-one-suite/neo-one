@@ -1,5 +1,5 @@
-import { VMState } from '@neo-one/client-common';
-import { CallFlags, SerializedScriptContainer, SnapshotName, TriggerType } from '@neo-one/node-core';
+import { TriggerType, VMState } from '@neo-one/client-common';
+import { CallFlags, SerializedScriptContainer, SnapshotName } from '@neo-one/node-core';
 import { StackItemReturn } from '../converters';
 import { DefaultMethods, DispatchMethod } from '../types';
 

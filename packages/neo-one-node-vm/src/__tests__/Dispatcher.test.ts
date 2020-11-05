@@ -1,5 +1,4 @@
-import { ScriptBuilder, VMState } from '@neo-one/client-common';
-import { TriggerType } from '@neo-one/node-core';
+import { ScriptBuilder, TriggerType, VMState } from '@neo-one/client-common';
 import { ApplicationEngine } from '../ApplicationEngine';
 import { Dispatcher } from '../Dispatcher';
 import { blockchainSettingsToProtocolSettings } from '../utils';

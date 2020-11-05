@@ -6,6 +6,7 @@ import {
   IOHelper,
   Op,
   ScriptBuilder,
+  TriggerType,
   UInt160,
   VMState,
 } from '@neo-one/client-common';
@@ -18,7 +19,6 @@ import {
   getOpCodePrice,
   Notification,
   Transaction,
-  TriggerType,
   utils as coreUtils,
   Verifiable,
   VM,

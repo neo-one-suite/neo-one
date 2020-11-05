@@ -14,6 +14,7 @@ export enum Prefix {
   Nep5Balance = 0xf8,
   Nep5TransferSent = 0xf9,
   Nep5TransferReceived = 0xfa,
+  ApplicationLog = 0xfb, // Custom internal prefix. Can be changed.
 
   // NEO•ONE prefix, watch out for future collisions with https://github.com/neo-project/neo/blob/master/src/neo/Persistence/Prefixes.cs
   Settings = 0xdd,
@@ -145,11 +146,17 @@ const getNep5BalanceSearchRange = createGetSearchRange(Prefix.Nep5Balance);
 const getNep5TransferReceivedSearchRange = createGetSearchRange(Prefix.Nep5TransferReceived);
 const getNep5TransferSentSearchRange = createGetSearchRange(Prefix.Nep5TransferSent);
 
+const createApplicationLogKey = getCreateKey<UInt256>({
+  serializeKey: (key) => key,
+  prefix: Prefix.Transaction,
+});
+
 export const keys = {
   createBlockKey,
   createNep5BalanceKey,
   createNep5TransferSentKey,
   createNep5TransferReceivedKey,
+  createApplicationLogKey,
   createTransactionKey,
   createContractKey,
   createStorageKey,

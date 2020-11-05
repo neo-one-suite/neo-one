@@ -310,7 +310,6 @@ export const getSysCallHash = (sysCall: SysCallName) => {
   return maybeHash;
 };
 
-// TODO: probably good to drop the implementation in node-core and just use this one
 export enum VMState {
   NONE = 0x00,
   HALT = 0x01,
