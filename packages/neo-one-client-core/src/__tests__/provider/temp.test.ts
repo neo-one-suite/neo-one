@@ -187,18 +187,6 @@ describe('JSONRPCClient Tests', () => {
     expect(memorypoolmaxtransactions).toBeDefined();
   });
 
-  // TODO: run test
-  // test('getAllStorage', async () => {
-  //   const storages = await client.getAllStorage(Hash160.NEO);
-
-  //   expect(storages.length).toEqual(10);
-  //   expect(storages[0]).toEqual({
-  //     isConstant: false,
-  //     key: 'feffffff0b',
-  //     value: '7ee57ed872ab0a',
-  //   });
-  // });
-
   test('getNep5Balances', async () => {
     const balances = await client.getNep5Balances(address);
 
@@ -212,7 +200,6 @@ describe('JSONRPCClient Tests', () => {
     ]);
   });
 
-  // TODO: why are transfers and received equivalent?
   test('getNep5Transfers', async () => {
     const transfers = await client.getNep5Transfers(addressWithTransfers, 1468595301000, 1603753592250);
 
@@ -240,13 +227,12 @@ describe('JSONRPCClient Tests', () => {
     });
   });
 
-  // test('relayTransaction', async () => {
-  //   const receipt = await client.relayTransaction();
-
-  //   // TODO: test
-  // expect(receipt.transaction).toBeDefined();
-  // expect(receipt.verifyResult).toBeDefined();
-  // });
+  // TODO: run test/ debug
+  test('relayTransaction', async () => {
+    const receipt = await client.relayTransaction(Buffer.from([]).toString());
+    expect(receipt.transaction).toBeDefined();
+    expect(receipt.verifyResult).toBeDefined();
+  });
 
   // TODO: run test/ debug
   test('sendRawTransaction', async () => {
@@ -260,16 +246,14 @@ describe('JSONRPCClient Tests', () => {
     expect(receipt).toEqual(true);
   });
 
-  // TODO: run test
   test('testInvokeRaw', async () => {
-    const { script, state, stack, gasconsumed, notifications } = await client.testInvokeRaw(
-      new ScriptBuilder().emitOp('PUSH0').build().toString('hex'),
-    );
+    const input = new ScriptBuilder().emitOp('PUSH0').build().toString('hex');
+    const { script, state, stack, gasconsumed, notifications } = await client.testInvokeRaw(input);
 
-    expect(script).toEqual('');
+    expect(script).toEqual('10');
     expect(state).toEqual('HALT');
-    expect(stack).toEqual([]);
-    expect(gasconsumed).toEqual('0');
+    expect(stack).toEqual([{ type: 'Integer', value: '0' }]);
+    expect(gasconsumed).toEqual('30');
     expect(notifications).toEqual([]);
   });
 

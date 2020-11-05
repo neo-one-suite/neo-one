@@ -494,7 +494,7 @@ export interface NotificationJSON {
 export interface CallReceiptJSON {
   readonly script: string;
   readonly state: keyof typeof VMState;
-  readonly gasconsumed: number;
+  readonly gasconsumed: string;
   readonly stack: readonly StackItemJSON[] | string;
   readonly notifications: readonly NotificationJSON[];
 }
