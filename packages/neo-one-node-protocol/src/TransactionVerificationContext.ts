@@ -45,7 +45,7 @@ export class TransactionVerificationContext {
     const maybeFee = this.mutableSenderFee[key];
     if (maybeFee === undefined) {
       // TODO: implement error;
-      throw new Error('transaction not present in verification context to remove');
+      throw new Error('Transaction not present in verification context to remove');
     }
 
     const newFee = maybeFee.sub(tx.systemFee).sub(tx.networkFee);

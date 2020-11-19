@@ -290,7 +290,7 @@ export class Node implements INode {
 
     this.mutableMemPool = {};
     this.transactionVerificationContext = new TransactionVerificationContext({
-      getGasBalance: native.GAS.balanceOf,
+      getGasBalance: native.GAS.balanceOf.bind(native.GAS),
     });
     this.mutableKnownBlockHashes = createScalingBloomFilter();
     this.tempKnownBlockHashes = new Set();

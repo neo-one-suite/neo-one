@@ -10,6 +10,7 @@ const addFees = (tx: FeelessTransactionModel, fees: TransactionFeesAdd): Transac
     witnesses: tx.witnesses,
     nonce: tx.nonce,
     validUntilBlock: tx.validUntilBlock,
+    messageMagic: tx.messageMagic,
     systemFee: fees.systemFee,
     networkFee: fees.networkFee,
   });

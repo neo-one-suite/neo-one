@@ -5,11 +5,12 @@ import {
   JSONHelper,
   RelayTransactionResultJSON,
   scriptHashToAddress,
-  toJSONVerifyResult,
+  toVerifyResultJSON,
   toVMStateJSON,
   TransactionJSON,
   TransactionReceiptJSON,
   VerboseTransactionJSON,
+  VerifyResultModel,
 } from '@neo-one/client-common';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
@@ -444,7 +445,7 @@ export const createHandler = ({
           return tx.serializeJSONWithVerboseData({
             blockhash: JSONHelper.writeUInt256(header.hash),
             confirmations: blockchain.currentBlockIndex - header.index + 1,
-            blocktime: JSONHelper.writeUInt64LE(header.timestamp),
+            blocktime: header.timestamp.toNumber(),
             vmstate: toVMStateJSON(state.state),
           });
         }
@@ -479,7 +480,7 @@ export const createHandler = ({
       ]);
 
       return candidates.map((candidate) => ({
-        publicKey: JSONHelper.writeECPoint(candidate.publicKey),
+        publickey: JSONHelper.writeECPoint(candidate.publicKey),
         votes: candidate.votes.toString(),
         active: validators.some((validator) => validator.compare(candidate.publicKey) === 0),
       }));
@@ -520,11 +521,17 @@ export const createHandler = ({
       });
 
       try {
-        await node.relayTransaction(transaction, { throwVerifyError: true, forceAdd: true });
+        const { verifyResult } = await node.relayTransaction(transaction, { throwVerifyError: true, forceAdd: true });
+        if (verifyResult !== VerifyResultModel.Succeed) {
+          throw new JSONRPCError(
+            -500,
+            verifyResult === undefined ? 'Unknown verify result' : toVerifyResultJSON(verifyResult),
+          );
+        }
 
-        return true;
-      } catch {
-        return false;
+        return { hash: transaction.hash };
+      } catch (error) {
+        throw new JSONRPCError(-500, error.message);
       }
     },
     [RPC_METHODS.submitblock]: async () => {
@@ -724,7 +731,7 @@ export const createHandler = ({
         const transactionJSON = transaction.serializeJSON();
         const result = await node.relayTransaction(transaction, { forceAdd: true, throwVerifyError: true });
 
-        const resultJSON = result.verifyResult !== undefined ? toJSONVerifyResult(result.verifyResult) : undefined;
+        const resultJSON = result.verifyResult !== undefined ? toVerifyResultJSON(result.verifyResult) : undefined;
 
         // const resultJSON =
         //   result.verifyResult === undefined
@@ -848,7 +855,7 @@ export const createHandler = ({
         decrementinterval: decrementInterval,
         generationamount: generationAmount,
         privatekeyversion: privateKeyVersion,
-        standbydalidators: standbyValidators.map((val) => common.ecPointToString(val)),
+        standbyvalidators: standbyValidators.map((val) => common.ecPointToString(val)),
         messagemagic: messageMagic,
         addressversion: addressVersion,
         standbycommittee: standbyCommittee.map((val) => common.ecPointToString(val)),

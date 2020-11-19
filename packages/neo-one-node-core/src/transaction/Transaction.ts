@@ -36,7 +36,7 @@ export type TransactionAddUnsigned = Omit<TransactionModelAdd<Attribute, Witness
 export interface VerboseData {
   readonly blockhash: string;
   readonly confirmations: number;
-  readonly blocktime: string;
+  readonly blocktime: number;
   readonly vmstate: VMStateJSON;
 }
 
@@ -77,6 +77,7 @@ export class Transaction
       attributes,
       script,
       witnesses,
+      messageMagic: options.context.messageMagic,
     });
   }
 
@@ -120,6 +121,7 @@ export class Transaction
       signers,
       attributes,
       script,
+      messageMagic: options.context.messageMagic,
     };
   }
 
@@ -201,7 +203,7 @@ export class Transaction
 
     const maxBlockSysFee = await native.Policy.getMaxBlockSystemFee(storage);
     const sysFee = this.systemFee;
-    if (sysFee.gtn(maxBlockSysFee)) {
+    if (sysFee.gt(new BN(maxBlockSysFee))) {
       return VerifyResultModel.PolicyFail;
     }
 
@@ -271,8 +273,8 @@ export class Transaction
       version: this.version,
       nonce: this.nonce,
       sender: this.sender ? scriptHashToAddress(common.uInt160ToString(this.sender)) : undefined,
-      sysfee: JSONHelper.writeUInt64LE(this.systemFee),
-      netfee: JSONHelper.writeUInt64LE(this.networkFee),
+      sysfee: JSONHelper.writeUInt64(this.systemFee),
+      netfee: JSONHelper.writeUInt64(this.networkFee),
       validuntilblock: this.validUntilBlock,
       signers: this.signers.map((signer) => signer.serializeJSON()),
       attributes: this.attributes.map((attr) => attr.serializeJSON()),

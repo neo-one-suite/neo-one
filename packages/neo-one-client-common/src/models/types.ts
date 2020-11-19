@@ -320,7 +320,7 @@ export interface TransactionJSON {
 export interface VerboseTransactionJSON extends TransactionJSON {
   readonly blockhash: UInt256Hex;
   readonly confirmations: number;
-  readonly blocktime: string;
+  readonly blocktime: number;
   readonly vmstate: VMStateJSON;
 }
 
@@ -366,12 +366,7 @@ export interface ContractGroupJSON {
   readonly signature: string;
 }
 
-export interface ContractPermissionDescriptorJSON {
-  readonly hashOrGroup: string;
-  readonly isHash: boolean;
-  readonly isGroup: boolean;
-  readonly isWildcard: boolean;
-}
+export type ContractPermissionDescriptorJSON = string;
 
 export interface ContractPermissionJSON {
   readonly contract: ContractPermissionDescriptorJSON;
@@ -379,9 +374,6 @@ export interface ContractPermissionJSON {
 }
 
 export interface ContractManifestJSON {
-  readonly hash: string;
-  // TODO: only hash is included in old `ContractJSON` definition. Remove hashHex?
-  readonly hashHex: string;
   readonly abi: ContractABIJSON;
   readonly groups: readonly ContractGroupJSON[];
   readonly permissions: readonly ContractPermissionJSON[];
@@ -402,10 +394,9 @@ export interface ContractParameterDefinitionJSON {
 
 export interface ContractJSON {
   readonly id: number;
+  readonly hash: string;
   readonly script: string;
   readonly manifest: ContractManifestJSON;
-  readonly hasStorage: boolean;
-  readonly payable: boolean;
 }
 
 export interface Nep5TransfersJSON {
@@ -439,7 +430,7 @@ export interface BlockBaseJSON {
   readonly version: number;
   readonly previousblockhash: string;
   readonly merkleroot: string;
-  readonly time: string;
+  readonly time: number;
   readonly index: number;
   readonly nextconsensus: string;
   readonly nextblockhash?: string;
@@ -467,7 +458,7 @@ export interface TrimmedBlockJSON extends BlockBaseJSON {
 }
 
 export interface NetworkSettingsJSON {
-  readonly decrementinternal: number;
+  readonly decrementinterval: number;
   readonly generationamount: readonly number[];
   readonly privatekeyversion: number;
   readonly standbyvalidators: readonly string[];
@@ -516,9 +507,13 @@ export interface RelayTransactionResultJSON {
   readonly verifyResult?: VerifyResultJSON;
 }
 
+export interface SendRawTransactionResultJSON {
+  readonly hash: string;
+}
+
 export interface ValidatorJSON {
   readonly active: boolean;
-  readonly publicKey: string;
+  readonly publickey: string;
   readonly votes: string;
 }
 

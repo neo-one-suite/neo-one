@@ -28,6 +28,7 @@ export interface BlockAdd extends Omit<BlockBaseAdd, 'merkleRoot'> {
   readonly merkleRoot?: UInt256;
   readonly consensusData?: ConsensusData;
   readonly transactions: readonly Transaction[];
+  readonly messageMagic: number;
 }
 
 // export interface BlockVerifyOptions {
@@ -102,6 +103,7 @@ export class Block extends BlockBase implements SerializableContainer, Serializa
       nextConsensus: blockBase.nextConsensus,
       witness: blockBase.witness,
       transactions,
+      messageMagic: options.context.messageMagic,
     });
   }
 
@@ -128,6 +130,7 @@ export class Block extends BlockBase implements SerializableContainer, Serializa
         index: this.index,
         nextConsensus: this.nextConsensus,
         witness: this.witness,
+        messageMagic: this.messageMagic,
       }),
   );
 
@@ -145,6 +148,7 @@ export class Block extends BlockBase implements SerializableContainer, Serializa
     witness,
     hash,
     transactions,
+    messageMagic,
     merkleRoot = MerkleTree.computeRoot(getCombinedModels(transactions, consensusData).map((model) => model.hash)),
   }: BlockAdd) {
     super({
@@ -156,6 +160,7 @@ export class Block extends BlockBase implements SerializableContainer, Serializa
       nextConsensus,
       witness,
       hash,
+      messageMagic,
     });
 
     this.transactions = transactions;
@@ -185,6 +190,7 @@ export class Block extends BlockBase implements SerializableContainer, Serializa
       index: this.index,
       consensusData: this.consensusData,
       nextConsensus: this.nextConsensus,
+      messageMagic: this.messageMagic,
       transactions,
       witness,
     });
@@ -218,6 +224,7 @@ export class Block extends BlockBase implements SerializableContainer, Serializa
       witness: this.witness,
       hashes: this.allHashes,
       consensusData: this.consensusData,
+      messageMagic: this.messageMagic,
     });
   }
 }

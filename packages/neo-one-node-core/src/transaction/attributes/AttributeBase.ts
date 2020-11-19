@@ -6,7 +6,7 @@ import {
   IOHelper,
   toJSONAttributeType,
 } from '@neo-one/client-common';
-import { DeserializeWireBaseOptions, SerializableJSON, SerializeJSONContext } from '../../Serializable';
+import { DeserializeWireBaseOptions, SerializableJSON } from '../../Serializable';
 import { VerifyOptions } from '../../Verifiable';
 import { Transaction } from '../Transaction';
 

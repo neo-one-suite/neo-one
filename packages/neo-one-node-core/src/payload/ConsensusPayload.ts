@@ -44,6 +44,7 @@ export class ConsensusPayload extends UnsignedConsensusPayload implements Serial
       validatorIndex,
       data,
       witness,
+      magic: options.context.messageMagic,
     });
   }
 

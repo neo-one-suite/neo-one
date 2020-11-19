@@ -85,10 +85,6 @@ export class ContractManifestModel<
 
   public serializeJSON(): ContractManifestJSON {
     return {
-      // TODO: not sure if hash and hashHex should be returned here
-      // we serialize hash but not hashHex in old `Contract.ts`
-      hash: JSONHelper.writeUInt160(this.hash),
-      hashHex: this.hashHex,
       groups: this.groups.map((group) => group.serializeJSON()),
       features: {
         storage: this.hasStorage,

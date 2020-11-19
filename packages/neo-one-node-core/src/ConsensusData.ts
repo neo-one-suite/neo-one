@@ -1,4 +1,4 @@
-import { BinaryWriter, ConsensusDataJSON, crypto, IOHelper, UInt256 } from '@neo-one/client-common';
+import { BinaryWriter, ConsensusDataJSON, crypto, IOHelper, JSONHelper, UInt256 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { DEFAULT_VALIDATORS_COUNT } from './constants';
 import {
@@ -56,7 +56,7 @@ export class ConsensusData implements SerializableWire, SerializableJSON<Consens
   public serializeJSON() {
     return {
       primary: this.primaryIndex,
-      nonce: this.nonce.toString(16),
+      nonce: JSONHelper.writeUInt64LE(this.nonce),
     };
   }
 }

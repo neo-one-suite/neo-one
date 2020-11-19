@@ -45,6 +45,7 @@ export class TransactionModel<
     hash,
     systemFee,
     networkFee,
+    messageMagic,
   }: TransactionModelAdd<TAttribute, TWitness, TSigner>) {
     super({
       version,
@@ -55,6 +56,7 @@ export class TransactionModel<
       validUntilBlock,
       script,
       hash,
+      messageMagic,
     });
 
     this.systemFee = systemFee;
@@ -75,6 +77,7 @@ export class TransactionModel<
       networkFee: this.networkFee,
       nonce: this.nonce,
       validUntilBlock: this.validUntilBlock,
+      messageMagic: this.messageMagic,
     });
   }
 
@@ -93,6 +96,7 @@ export class TransactionModel<
       networkFee: this.networkFee,
       nonce: options.nonce,
       validUntilBlock: options.validUntilBlock,
+      messageMagic: this.messageMagic,
     });
   }
 

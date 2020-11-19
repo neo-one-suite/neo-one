@@ -31,7 +31,7 @@ export const assertVerifyResult = (value: number): VerifyResultModel => {
   return value;
 };
 
-export const toJSONVerifyResult = (reason: VerifyResultModel): VerifyResultJSON =>
+export const toVerifyResultJSON = (reason: VerifyResultModel): VerifyResultJSON =>
   assertVerifyResultJSON(VerifyResultModel[reason]);
 
 export const isVerifyResultJSON = (reason: string): reason is VerifyResultJSON =>

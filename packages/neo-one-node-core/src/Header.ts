@@ -36,6 +36,7 @@ export class Header extends BlockBase implements SerializableWire, SerializableJ
       index: blockBase.index,
       nextConsensus: blockBase.nextConsensus,
       witness: blockBase.witness,
+      messageMagic: options.context.messageMagic,
     });
   }
 
@@ -59,6 +60,7 @@ export class Header extends BlockBase implements SerializableWire, SerializableJ
       nextConsensus: this.nextConsensus,
       witness: this.witness,
       hashes: [],
+      messageMagic: this.messageMagic,
     });
   }
 
