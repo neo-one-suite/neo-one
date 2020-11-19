@@ -1,216 +1,197 @@
-import { common, crypto, PrivateKey, UInt160 } from '@neo-one/client-common';
-import {
-  Block,
-  MinerTransaction,
-  Node,
-  Output,
-  PrepareRequestConsensusMessage,
-  Transaction,
-  utils,
-} from '@neo-one/node-core';
-import { utils as commonUtils } from '@neo-one/utils';
-import BigNumber from 'bignumber.js';
-import { BN } from 'bn.js';
-import _ from 'lodash';
-import {
-  checkExpectedView,
-  checkSignatures,
-  incrementExpectedView,
-  initializeConsensusInitial,
-  signAndRelay,
-  signAndRelayChangeView,
-} from './common';
+import { Block, ChangeViewReason, ConsensusContext, Node } from '@neo-one/node-core';
+import { checkCommits } from './checkPayload';
+import { requestChangeView, sendPrepareRequest } from './common';
 import { InternalOptions } from './Consensus';
-import { ConsensusContext } from './ConsensusContext';
-import { Context, RequestSentContext, SignatureSentContext } from './context';
+import { makeRecovery } from './makePayload';
+import { TimerContext } from './TimerContext';
 import { Result } from './types';
 
-const createMinerTransaction = async ({
-  node,
-  feeAddress,
-  transactions,
-  nonce,
-}: {
-  readonly node: Node;
-  readonly feeAddress: UInt160;
-  readonly transactions: readonly Transaction[];
-  readonly nonce: BN;
-}) => {
-  const networkFee = await Block.calculateNetworkFee(node.blockchain.feeContext, transactions);
-
-  const outputs = networkFee.isZero()
-    ? []
-    : [
-        new Output({
-          asset: node.blockchain.settings.utilityToken.hash,
-          value: networkFee,
-          address: feeAddress,
-        }),
-      ];
-
-  return new MinerTransaction({
-    nonce: nonce.mod(utils.UINT_MAX.addn(1)).toNumber(),
-    outputs,
-  });
-};
-
-const requestChangeView = ({
+export const runConsensus = async ({
   context: contextIn,
   node,
-  privateKey,
-  consensusContext,
+  options: { privateKey, privateNet },
+  timerContext,
 }: {
-  readonly context: Context;
-  readonly node: Node;
-  readonly privateKey: PrivateKey;
-  readonly consensusContext: ConsensusContext;
-}): Result<Context> => {
-  let context = contextIn;
-
-  context = context.cloneExpectedView({
-    expectedView: incrementExpectedView(context),
-  });
-
-  signAndRelayChangeView({ context, node, privateKey });
-
-  const viewNumber = context.expectedView[context.myIndex];
-  if (checkExpectedView({ context, viewNumber })) {
-    return initializeConsensusInitial({
-      blockchain: node.blockchain,
-      context,
-      viewNumber,
-      consensusContext,
-    });
-  }
-
-  const { secondsPerBlock } = node.blockchain.settings;
-
-  return {
-    context,
-    // tslint:disable-next-line no-bitwise
-    timerSeconds: secondsPerBlock << (viewNumber + 1),
-  };
-};
-
-export const runConsensus = async ({
-  context,
-  node,
-  options: { privateKey, feeAddress, privateNet },
-  consensusContext,
-}: {
-  readonly context: Context;
+  readonly context: ConsensusContext;
   readonly node: Node;
   readonly options: InternalOptions;
-  readonly consensusContext: ConsensusContext;
-}): Promise<Result<Context>> => {
-  if (context.type === 'primary' && !(context instanceof RequestSentContext)) {
-    let requestSentContext: RequestSentContext;
-    if (context instanceof SignatureSentContext) {
-      requestSentContext = context.cloneRequestSent();
-    } else {
-      const nonce = utils.randomUInt64();
-      let mutableTransactions = Object.values(node.memPool);
-      const minerTransaction = await createMinerTransaction({
-        node,
-        feeAddress,
-        transactions: mutableTransactions,
-        nonce,
-      });
-
-      if (mutableTransactions.length >= node.blockchain.settings.maxTransactionsPerBlock) {
-        const mutableNetworkFees = await Promise.all(
-          mutableTransactions.map<Promise<[Transaction, BigNumber]>>(async (transaction) => {
-            const networkFee = await transaction.getNetworkFee(node.blockchain.feeContext);
-
-            return [transaction, new BigNumber(networkFee.toString(10))];
-          }),
-        );
-
-        mutableNetworkFees.sort(([first, a], [second, b]) => b.div(second.size).comparedTo(a.div(first.size)));
-        mutableTransactions = _.take(mutableNetworkFees, node.blockchain.settings.maxTransactionsPerBlock - 1)
-          // tslint:disable-next-line no-unused
-          .map(([transaction, _unused]) => transaction);
-      }
-      mutableTransactions.unshift(minerTransaction);
-      const [previousHeader, validators] = await Promise.all([
-        node.blockchain.header.get({ hashOrIndex: context.previousHash }),
-        node.blockchain.getValidators(mutableTransactions),
-      ]);
-
-      const newContext = new RequestSentContext({
-        viewNumber: context.viewNumber,
-        myIndex: context.myIndex,
-        primaryIndex: context.primaryIndex,
-        expectedView: context.expectedView,
-        validators: context.validators,
-        blockReceivedTimeSeconds: context.blockReceivedTimeSeconds,
-        transactions: mutableTransactions.reduce<{ [key: string]: Transaction }>(
-          (acc, transaction) => ({
-            ...acc,
-            [transaction.hashHex]: transaction,
-          }),
-          {},
-        ),
-        signatures: [],
-        header: {
-          type: 'new',
-          previousHash: context.previousHash,
-          transactionHashes: mutableTransactions.map((transaction) => transaction.hashHex),
-
-          blockIndex: context.blockIndex,
-          nonce,
-          timestamp: Math.max(consensusContext.nowSeconds(), previousHeader.timestamp + 1),
-
-          nextConsensus: crypto.getConsensusAddress(validators),
-        },
-      });
-
-      const mutableSignatures = [];
-      mutableSignatures[newContext.myIndex] = crypto.sign({
-        message: newContext.header.message,
-        privateKey,
-      });
-
-      requestSentContext = newContext.cloneSignatures({ signatures: mutableSignatures });
-    }
-
-    if (privateNet) {
-      return checkSignatures({ node, context: requestSentContext });
-    }
-
-    signAndRelay({
-      context: requestSentContext,
+  readonly timerContext: TimerContext;
+}): Promise<Result> => {
+  let context = contextIn;
+  if (privateNet) {
+    const { context: privateNetContext } = await sendPrepareRequest({
       node,
       privateKey,
-      consensusMessage: new PrepareRequestConsensusMessage({
-        viewNumber: requestSentContext.viewNumber,
-        nonce: requestSentContext.header.consensusData,
-        nextConsensus: requestSentContext.header.nextConsensus,
-        transactionHashes: requestSentContext.transactionHashes.map((hash) => common.hexToUInt256(hash)),
-        minerTransaction: commonUtils.nullthrows(
-          requestSentContext.transactions[requestSentContext.transactionHashes[0]],
-        ) as MinerTransaction,
-        signature: commonUtils.nullthrows(requestSentContext.signatures[requestSentContext.myIndex]),
-      }),
+      context,
     });
 
-    const { secondsPerBlock } = node.blockchain.settings;
-
-    return {
-      context: requestSentContext,
-      // tslint:disable-next-line no-bitwise
-      timerSeconds: secondsPerBlock << (requestSentContext.viewNumber + 1),
-    };
+    return { context: privateNetContext, timerMS: node.blockchain.settings.millisecondsPerBlock };
+  }
+  if (context.watchOnly || context.blockSent) {
+    return { context };
   }
 
-  if (context instanceof RequestSentContext || context.type === 'backup') {
-    return requestChangeView({
-      context,
+  if (context.isPrimary && !context.requestSentOrReceived) {
+    const { context: sendPrepareRequestContext } = await sendPrepareRequest({
       node,
       privateKey,
-      consensusContext,
+      context,
     });
+
+    context = sendPrepareRequestContext;
+  } else if ((context.isPrimary && context.requestSentOrReceived) || context.isBackup) {
+    if (context.commitSent) {
+      const recoveryPayload = await makeRecovery({ node, context, privateKey });
+      node.relayConsensusPayload(recoveryPayload);
+    } else {
+      let block: Block | undefined;
+      try {
+        block = context.blockBuilder.getBlock();
+      } catch {
+        // do nothing;
+      }
+
+      const reason =
+        block !== undefined && (context.transactionHashes?.length ?? 0) > Object.values(context.transactions).length
+          ? ChangeViewReason.TxNotFound
+          : ChangeViewReason.Timeout;
+
+      const { context: requestChangeViewContext } = await requestChangeView({
+        node,
+        context,
+        timerContext,
+        privateKey,
+        reason,
+        isRecovering: false,
+      });
+
+      context = requestChangeViewContext;
+    }
   }
 
   return { context };
 };
+
+// export const runConsensusOld = async ({
+//   context,
+//   node,
+//   options: { privateKey, privateNet },
+//   timerContext,
+// }: {
+//   readonly context: ConsensusContext;
+//   readonly node: Node;
+//   readonly options: InternalOptions;
+//   readonly timerContext: TimerContext;
+// }): Promise<Result> => {
+//   if (context.type === 'primary' && !(context instanceof RequestSentContext)) {
+//     let requestSentContext: RequestSentContext;
+//     if (context instanceof SignatureSentContext) {
+//       requestSentContext = context.cloneRequestSent();
+//     } else {
+//       const newNonce = utils.randomUInt64();
+//       let mutableTransactions = Object.values(node.memPool);
+
+//       if (mutableTransactions.length >= node.blockchain.settings.memoryPoolMaxTransactions) {
+//         const mutableNetworkFees = await Promise.all(
+//           mutableTransactions.map<Promise<[Transaction, BigNumber]>>(async (transaction) => {
+//             const networkFee = await transaction.getNetworkFee(node.blockchain.feeContext);
+
+//             return [transaction, new BigNumber(networkFee.toString(10))];
+//           }),
+//         );
+
+//         mutableNetworkFees.sort(([first, a], [second, b]) => b.div(second.size).comparedTo(a.div(first.size)));
+//         mutableTransactions = _.take(mutableNetworkFees, node.blockchain.settings.memoryPoolMaxTransactions - 1)
+//           // tslint:disable-next-line no-unused
+//           .map(([transaction, _unused]) => transaction);
+//       }
+//       const [previousHeader, validators] = await Promise.all([
+//         node.blockchain.getHeader(context.previousHash),
+//         node.blockchain.getValidators(),
+//       ]);
+
+//       if (previousHeader === undefined) {
+//         // TODO: real error or implementy `getHeader` and `tryGetHeader` separately.
+//         throw new Error('we expect previousHeader to be defined always');
+//       }
+
+//       const newContext = new RequestSentContext({
+//         viewNumber: context.viewNumber,
+//         myIndex: context.myIndex,
+//         primaryIndex: context.primaryIndex,
+//         expectedView: context.expectedView,
+//         validators: context.validators,
+//         blockReceivedTimeMS: context.blockReceivedTimeMS,
+//         verificationContext: context.verificationContext,
+//         transactions: mutableTransactions.reduce<{ [key: string]: Transaction }>(
+//           (acc, transaction) => ({
+//             ...acc,
+//             [transaction.hashHex]: transaction,
+//           }),
+//           {},
+//         ),
+//         signatures: [],
+//         header: {
+//           type: 'new',
+//           previousHash: context.previousHash,
+//           transactionHashes: mutableTransactions.map((transaction) => transaction.hashHex),
+
+//           blockIndex: context.blockIndex,
+//           nonce: newNonce,
+//           timestamp: Math.max(timerContext.nowMilliseconds(), previousHeader.timestamp.toNumber() + 1),
+
+//           nextConsensus: crypto.getConsensusAddress(validators),
+//         },
+//       });
+
+//       const mutableSignatures = [];
+//       mutableSignatures[newContext.myIndex] = crypto.sign({
+//         message: newContext.header.message,
+//         privateKey,
+//       });
+
+//       requestSentContext = newContext.cloneSignatures({ signatures: mutableSignatures });
+//     }
+
+//     if (privateNet) {
+//       return checkSignatures({ node, context: requestSentContext });
+//     }
+
+//     const nonce = requestSentContext.header.consensusData?.nonce;
+//     if (nonce === undefined) {
+//       // TODO: real error
+//       throw new Error('we expect nonce to be defined');
+//     }
+
+//     signAndRelay({
+//       context: requestSentContext,
+//       node,
+//       privateKey,
+//       consensusMessage: new PrepareRequestConsensusMessage({
+//         viewNumber: requestSentContext.viewNumber,
+//         nonce,
+//         transactionHashes: requestSentContext.transactionHashes.map((hash) => common.hexToUInt256(hash)),
+//         // signature: commonUtils.nullthrows(requestSentContext.signatures[requestSentContext.myIndex]),
+//       }),
+//     });
+
+//     const { millisecondsPerBlock } = node.blockchain.settings;
+
+//     return {
+//       context: requestSentContext,
+//       // tslint:disable-next-line no-bitwise
+//       timerSeconds: secondsPerBlock << (requestSentContext.viewNumber + 1),
+//     };
+//   }
+
+//   if (context instanceof RequestSentContext || context.type === 'backup') {
+//     return requestChangeView({
+//       context,
+//       node,
+//       privateKey,
+//       timerContext,
+//     });
+//   }
+
+//   return { context };
+// };

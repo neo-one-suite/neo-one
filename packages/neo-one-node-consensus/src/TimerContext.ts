@@ -1,6 +1,6 @@
 import { utils } from '@neo-one/utils';
 
-export class ConsensusContext {
+export class TimerContext {
   private mutableFastForwardSeconds: number;
 
   public constructor() {
@@ -9,6 +9,10 @@ export class ConsensusContext {
 
   public nowSeconds(): number {
     return utils.nowSeconds() + this.mutableFastForwardSeconds;
+  }
+
+  public nowMilliseconds(): number {
+    return Date.now() + this.mutableFastForwardSeconds * 1000;
   }
 
   public fastForwardOffset(seconds: number) {

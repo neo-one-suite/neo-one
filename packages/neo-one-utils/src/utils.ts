@@ -10,6 +10,21 @@ function nullthrows<T>(value: T | null | undefined): T {
   return value;
 }
 
+function numCompAscending(a: number, b: number): -1 | 0 | 1 {
+  if (a < b) {
+    return -1;
+  }
+  if (b < a) {
+    return 1;
+  }
+
+  return 0;
+}
+
+function numCompDescending(a: number, b: number) {
+  return numCompAscending(a, b) * -1;
+}
+
 function assertNever(_value: never): void {
   // do nothing
 }
@@ -35,6 +50,8 @@ function zip<T>(...arrays: Array<ArrayLike<T> | null | undefined>): T[][] {
 export const utils = {
   nowSeconds,
   nullthrows,
+  numCompAscending,
+  numCompDescending,
   assertNever,
   notNull,
   isPromise,

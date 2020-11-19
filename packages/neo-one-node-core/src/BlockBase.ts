@@ -2,8 +2,8 @@ import {
   BinaryWriter,
   BlockBaseJSON,
   common,
-  createGetHashData,
   crypto,
+  getHashData,
   InvalidFormatError,
   IOHelper,
   JSONHelper,
@@ -38,6 +38,27 @@ export interface BlockBaseAdd {
   readonly witness?: Witness;
   readonly hash?: UInt256;
 }
+
+export const getBlockScriptHashesForVerifying = async (
+  block: {
+    readonly previousHash: UInt256;
+    readonly witness?: Witness;
+  },
+  storage: BlockchainStorage,
+) => {
+  if (block.previousHash === common.ZERO_UINT256) {
+    return [block.witness?.scriptHash];
+  }
+
+  const prevBlock = await storage.blocks.tryGet({ hashOrIndex: block.previousHash });
+  const prevHeader = prevBlock?.header;
+  if (prevHeader === undefined) {
+    // TODO: implement this as a makeError InvalidStorageHeaderFetch
+    throw new Error(`previous header hash ${block.previousHash} did not return a valid Header from storage`);
+  }
+
+  return [prevHeader.nextConsensus];
+};
 
 export abstract class BlockBase implements EquatableKey, SerializableContainer, Verifiable {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): BlockBaseAdd {
@@ -116,7 +137,7 @@ export abstract class BlockBase implements EquatableKey, SerializableContainer, 
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase);
   private readonly hashInternal: () => UInt256;
   private readonly hashHexInternal = utils.lazy(() => common.uInt256ToHex(this.hash));
-  private readonly messageInternal = utils.lazy(() => createGetHashData(this.serializeUnsigned, this.messageMagic)());
+  private readonly messageInternal = utils.lazy(() => getHashData(this.serializeUnsigned(), this.messageMagic));
   private readonly witnessInternal: Witness | undefined;
   private readonly sizeInternal = utils.lazy(
     () =>

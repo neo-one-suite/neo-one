@@ -1,8 +1,7 @@
 import { PrivateKey } from '@neo-one/client-common';
-import { Node, Transaction } from '@neo-one/node-core';
+import { ConsensusContext, Node, Transaction } from '@neo-one/node-core';
 import { addTransaction } from './common';
-import { ConsensusContext } from './ConsensusContext';
-import { Context, RequestReceivedContext } from './context';
+import { TimerContext } from './TimerContext';
 import { Result } from './types';
 
 export const handleTransactionReceived = async ({
@@ -10,16 +9,20 @@ export const handleTransactionReceived = async ({
   node,
   privateKey,
   transaction,
-  consensusContext,
+  timerContext,
 }: {
-  readonly context: Context;
+  readonly context: ConsensusContext;
   readonly node: Node;
   readonly privateKey: PrivateKey;
   readonly transaction: Transaction;
-  readonly consensusContext: ConsensusContext;
-}): Promise<Result<Context>> => {
+  readonly timerContext: TimerContext;
+}): Promise<Result> => {
   if (
-    !(context instanceof RequestReceivedContext) ||
+    !context.isBackup ||
+    context.notAcceptingPayloadsDueToViewChanging ||
+    !context.requestSentOrReceived ||
+    context.responseSent ||
+    context.blockSent ||
     context.transactions[transaction.hashHex] !== undefined ||
     !context.transactionHashesSet.has(transaction.hashHex)
   ) {
@@ -32,6 +35,7 @@ export const handleTransactionReceived = async ({
     privateKey,
     transaction,
     verify: true,
-    consensusContext,
+    timerContext,
+    isRecovering: false,
   });
 };

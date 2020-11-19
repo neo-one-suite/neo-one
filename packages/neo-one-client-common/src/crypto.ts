@@ -621,12 +621,15 @@ const isMultiSigContract = (script: Buffer) => {
 };
 // tslint:enable
 
-type MultiSigResult = { readonly result: true; readonly m: number; readonly n: number } | { readonly result: false };
+type MultiSigResult =
+  | { readonly result: true; readonly m: number; readonly n: number; readonly points: readonly ECPoint[] }
+  | { readonly result: false };
 // tslint:disable
 const isMultiSigContractWithResult = (script: Buffer): MultiSigResult => {
   let m = 0;
   let n = 0;
   let i = 0;
+  let points = [];
   if (script.length < 43) return { result: false };
   if (script[i] > Op.PUSH16) return { result: false };
   if (script[i] < Op.PUSH1 && script[i] !== 1 && script[i] !== 2) return { result: false };
@@ -652,7 +655,8 @@ const isMultiSigContractWithResult = (script: Buffer): MultiSigResult => {
   while (script[i] == Op.PUSHDATA1) {
     if (script.length <= i + 35) return { result: false };
     if (script[++i] !== 33) return { result: false };
-    // points?.push(script.slice(i + 1, i + 1 + 33)); // TODO: add "points" List from C#
+    // TODO: this will take some work to verify but look at what the C# calls
+    points.push(common.bufferToECPoint(script.slice(i + 1, i + 1 + 33)));
 
     i += 34;
     ++n;
@@ -680,7 +684,7 @@ const isMultiSigContractWithResult = (script: Buffer): MultiSigResult => {
   if (script[i++] !== Op.SYSCALL) return { result: false };
   if (script.length !== i + 4) return { result: false };
   if (script.slice(i) !== checkMultiSigUint) return { result: false };
-  return { result: true, m, n };
+  return { result: true, m, n, points };
 };
 // tslint:enable
 

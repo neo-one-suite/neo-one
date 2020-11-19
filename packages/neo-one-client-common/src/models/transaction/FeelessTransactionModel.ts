@@ -4,7 +4,7 @@ import { BinaryWriter } from '../../BinaryWriter';
 import { common, ECPoint, InvalidFormatError, PrivateKey, UInt160, UInt256, UInt256Hex } from '../../common';
 import { crypto } from '../../crypto';
 import { utils } from '../../utils';
-import { createGetHashData, createSerializeWire, SerializableWire, SerializeWire } from '../Serializable';
+import { createSerializeWire, getHashData, SerializableWire, SerializeWire } from '../Serializable';
 import { SignerModel } from '../SignerModel';
 import { WitnessModel } from '../WitnessModel';
 import { AttributeModel } from './attribute';
@@ -66,7 +66,7 @@ export class FeelessTransactionModel<
   public readonly serializeUnsigned: SerializeWire = createSerializeWire(this.serializeUnsignedBase.bind(this));
   private readonly hashInternal: () => UInt256;
   private readonly hashHexInternal = utils.lazy(() => common.uInt256ToHex(this.hash));
-  private readonly messageInternal = utils.lazy(() => createGetHashData(this.serializeUnsigned, this.messageMagic)());
+  private readonly messageInternal = utils.lazy(() => getHashData(this.serializeUnsigned(), this.messageMagic));
 
   public constructor({
     version,

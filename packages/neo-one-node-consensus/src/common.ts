@@ -1,325 +1,231 @@
-import { common, crypto, ECPoint, PrivateKey } from '@neo-one/client-common';
+import { ECPoint, PrivateKey, VerifyResultModel } from '@neo-one/client-common';
 import {
   Blockchain,
   ChangeViewConsensusMessage,
-  ConsensusMessage,
-  ConsensusPayload,
+  ChangeViewReason,
+  ConsensusContext,
   Node,
-  PrepareResponseConsensusMessage,
   Transaction,
-  UnsignedConsensusPayload,
-  Witness,
+  TransactionVerificationContext,
 } from '@neo-one/node-core';
-import { utils as commonUtils } from '@neo-one/utils';
 import _ from 'lodash';
-import { ConsensusContext } from './ConsensusContext';
-import {
-  BlockSentContext,
-  cloneBlockSent,
-  cloneInitial,
-  Context,
-  HeaderContext,
-  InitialContext,
-  RequestReceivedContext,
-  SignatureSentContext,
-  Type,
-  ViewChangingContext,
-} from './context';
+import { checkPreparations, checkPrepareResponse } from './checkPayload';
+import { getInitialContext, reset } from './context';
+import { makeChangeView, makePrepareRequest, makeRecoveryRequest } from './makePayload';
+import { TimerContext } from './TimerContext';
 import { Result } from './types';
 
-export const signAndRelay = ({
+export const sendPrepareRequest = async ({
   node,
   privateKey,
-  context,
-  consensusMessage,
+  context: contextIn,
 }: {
   readonly node: Node;
   readonly privateKey: PrivateKey;
-  readonly context: Context;
-  readonly consensusMessage: ConsensusMessage;
-}) => {
-  const payload = ConsensusPayload.sign(
-    new UnsignedConsensusPayload({
-      version: context.version,
-      previousHash: context.previousHash,
-      blockIndex: context.blockIndex,
-      validatorIndex: context.myIndex,
-      consensusMessage,
-    }),
-
-    privateKey,
-  );
+  readonly context: ConsensusContext;
+}): Promise<Result> => {
+  let context = contextIn;
+  const { context: prepareRequestContext, payload } = await makePrepareRequest({ node, privateKey, context });
+  context = prepareRequestContext;
 
   node.relayConsensusPayload(payload);
-};
 
-export const getInitialContextAdd = ({
-  blockchain,
-  publicKey,
-  validators,
-  blockReceivedTimeSeconds,
-}: {
-  readonly blockchain: Blockchain;
-  readonly publicKey: ECPoint;
-  readonly validators: readonly ECPoint[];
-  readonly blockReceivedTimeSeconds?: number;
-}) => {
-  const blockIndex = blockchain.currentBlock.index + 1;
-  const primaryIndex = blockIndex % validators.length;
-  const myIndex = _.findIndex(validators, (validator) => common.ecPointEqual(validator, publicKey));
-
-  return {
-    type: primaryIndex === myIndex ? 'primary' : 'backup',
-    previousHash: blockchain.currentBlock.hash,
-    blockIndex,
-    viewNumber: 0,
-    myIndex,
-    primaryIndex,
-    expectedView: _.range(0, validators.length).map(() => 0),
-    validators,
-    blockReceivedTimeSeconds,
-  };
-};
-
-function initializeConsensusCommon<TContext extends InitialContext | SignatureSentContext>({
-  context,
-  blockchain,
-  consensusContext,
-}: {
-  readonly context: TContext;
-  readonly blockchain: Blockchain;
-  readonly consensusContext: ConsensusContext;
-}): Result<TContext> {
-  if (context.myIndex < 0) {
-    return { context };
+  if (context.validators.length === 1) {
+    const { context: checkPreparationContext } = await checkPreparations(context, node, privateKey);
+    context = checkPreparationContext;
   }
 
-  if (context.type === 'primary') {
-    return {
-      context,
-      timerSeconds: Math.max(
-        0,
-        blockchain.settings.secondsPerBlock - (consensusContext.nowSeconds() - context.blockReceivedTimeSeconds),
-      ),
-    };
-  }
-
-  const { secondsPerBlock } = blockchain.settings;
-
-  return {
-    context,
-    // tslint:disable-next-line no-bitwise
-    timerSeconds: secondsPerBlock << (context.viewNumber + 1),
-  };
-}
-
-export const initializeNewConsensus = async ({
-  blockchain,
-  publicKey,
-  consensusContext,
-}: {
-  readonly blockchain: Blockchain;
-  readonly publicKey: ECPoint;
-  readonly consensusContext: ConsensusContext;
-}): Promise<Result<InitialContext>> => {
-  const validators = await blockchain.getValidators([]);
-  const blockReceivedTimeSeconds = blockchain.currentBlock.timestamp;
-  const blockIndex = blockchain.currentBlock.index + 1;
-  const primaryIndex = blockIndex % validators.length;
-  const myIndex = _.findIndex(validators, (validator) => common.ecPointEqual(validator, publicKey));
-
-  const context = new InitialContext({
-    type: primaryIndex === myIndex ? 'primary' : 'backup',
-    previousHash: blockchain.currentBlock.hash,
-    blockIndex,
-    viewNumber: 0,
-    myIndex,
-    primaryIndex,
-    expectedView: _.range(0, validators.length).map(() => 0),
-    validators,
-    blockReceivedTimeSeconds,
-  });
-
-  return initializeConsensusCommon({ context, blockchain, consensusContext });
-};
-
-const getPrimaryIndexType = ({
-  context,
-  viewNumber,
-}: {
-  readonly context: Context;
-  readonly viewNumber: number;
-}): {
-  readonly type: Type;
-  readonly primaryIndex: number;
-} => {
-  let primaryIndex = (context.blockIndex - viewNumber) % context.validators.length;
-  if (primaryIndex < 0) {
-    primaryIndex += context.validators.length;
-  }
-
-  return {
-    type: primaryIndex === context.myIndex ? 'primary' : 'backup',
-    primaryIndex,
-  };
-};
-
-export const initializeConsensus = ({
-  node,
-  context: contextIn,
-  viewNumber,
-  consensusContext,
-}: {
-  readonly node: Node;
-  readonly context: Context;
-  readonly viewNumber: number;
-  readonly consensusContext: ConsensusContext;
-}): Result<InitialContext | SignatureSentContext> => {
-  if (viewNumber <= 0) {
-    throw new Error('Programming error');
-  }
-  const { blockchain } = node;
-  let context = contextIn;
-  let primaryIndex = (context.blockIndex - viewNumber) % context.validators.length;
-  if (primaryIndex < 0) {
-    primaryIndex += context.validators.length;
-  }
-  const type = primaryIndex === context.myIndex ? 'primary' : 'backup';
-  context =
-    type === 'primary' && context instanceof SignatureSentContext
-      ? context.clone({ type, primaryIndex, viewNumber })
-      : cloneInitial(context, { type, primaryIndex, viewNumber });
-
-  return initializeConsensusCommon({ blockchain, context, consensusContext });
-};
-
-export async function checkSignatures<TContext extends HeaderContext>({
-  node,
-  context,
-}: {
-  readonly node: Node;
-  readonly context: TContext;
-}): Promise<Result<TContext | BlockSentContext>> {
-  const signaturesLength = context.signatures.filter((p) => p !== undefined).length;
-
-  if (
-    signaturesLength >= context.M &&
-    context.transactionHashes.every((hash) => context.transactions[hash] !== undefined)
-  ) {
-    const mutablePublicKeyToSignature: { [key: string]: Buffer } = {};
-    // tslint:disable-next-line no-loop-statement
-    for (let i = 0, j = 0; i < context.validators.length && j < context.M; i += 1) {
-      const validator = context.validators[i];
-      const signature = context.signatures[i];
-      if (signature !== undefined) {
-        mutablePublicKeyToSignature[common.ecPointToHex(validator)] = signature;
-        j += 1;
-      }
-    }
-    const script = crypto.createMultiSignatureWitness(
-      context.M,
-      context.validators,
-      mutablePublicKeyToSignature,
-      Witness,
-    );
-
-    const block = context.header.clone({
-      transactions: context.transactionHashes.map((hash) => context.transactions[hash]).filter(commonUtils.notNull),
-      script,
-    });
-
-    await node.relayBlock(block);
-
-    return { context: cloneBlockSent(context) };
-  }
+  // TODO: it seems to me anything we would send the node here it already knows about
+  // since our mempool isn't as disjointed like C# land.
+  // if ((context.transactionHashes ?? 0) > 0) {
+  //   node.sendInv(/*...*/);
+  // }
 
   return { context };
-}
+};
 
-export const signAndRelayChangeView = ({
+export const requestRecovery = async ({
   node,
   privateKey,
   context,
 }: {
   readonly node: Node;
   readonly privateKey: PrivateKey;
-  readonly context: Context;
+  readonly context: ConsensusContext;
 }) => {
-  signAndRelay({
-    node,
-    privateKey,
-    context,
-    consensusMessage: new ChangeViewConsensusMessage({
-      viewNumber: context.viewNumber,
-      newViewNumber: context.expectedView[context.myIndex],
-    }),
-  });
+  if (context.blockBuilder.index === node.blockchain.currentHeaderIndex + 1) {
+    const payload = await makeRecoveryRequest({ node, context, privateKey });
+    node.relayConsensusPayload(payload);
+  }
 };
 
 export const checkExpectedView = ({
   context,
   viewNumber,
 }: {
-  readonly context: Context;
+  readonly context: ConsensusContext;
   readonly viewNumber: number;
-}) => context.viewNumber !== viewNumber && context.expectedView.filter((p) => p === viewNumber).length >= context.M;
+}) =>
+  context.viewNumber < viewNumber ||
+  context.changeViewPayloads.filter(
+    (p) => p !== undefined && p.getDeserializedMessage<ChangeViewConsensusMessage>().newViewNumber >= viewNumber,
+  ).length >= context.M;
 
-export const initializeConsensusInitial = ({
-  blockchain,
-  context,
-  viewNumber,
-  consensusContext,
-}: {
-  readonly blockchain: Blockchain;
-  readonly context: Context;
-  readonly viewNumber: number;
-  readonly consensusContext: ConsensusContext;
-}): Result<InitialContext> => {
-  const { primaryIndex, type } = getPrimaryIndexType({ context, viewNumber });
-
-  return initializeConsensusCommon({
-    blockchain,
-    context: cloneInitial(context, { type, primaryIndex, viewNumber }),
-    consensusContext,
-  });
-};
-
-export const incrementExpectedView = (context: Context): readonly number[] => {
-  const mutableExpectedView = [...context.expectedView];
-  mutableExpectedView[context.myIndex] += 1;
-
-  return mutableExpectedView;
-};
-
-const requestChangeViewBackup = ({
-  context: contextIn,
+export const requestChangeView = async ({
   node,
+  context: contextIn,
+  timerContext,
   privateKey,
-  consensusContext,
+  reason,
+  isRecovering,
 }: {
-  readonly context: RequestReceivedContext;
   readonly node: Node;
+  readonly context: ConsensusContext;
+  readonly timerContext: TimerContext;
   readonly privateKey: PrivateKey;
-  readonly consensusContext: ConsensusContext;
-}): Result<InitialContext | ViewChangingContext> => {
-  const context = contextIn.cloneViewChanging({
-    expectedView: incrementExpectedView(contextIn),
+  readonly reason: ChangeViewReason;
+  readonly isRecovering: boolean;
+}): Promise<Result> => {
+  let context = contextIn;
+  if (context.watchOnly) {
+    return { context };
+  }
+
+  const expectedView = context.viewNumber + 1;
+  if (context.countCommitted + context.countFailed > context.F) {
+    await requestRecovery({ node, privateKey, context });
+
+    return { context };
+  }
+
+  const { context: changeViewContext, payload } = await makeChangeView({
+    node,
+    context,
+    privateKey,
+    reason,
   });
 
-  signAndRelayChangeView({ context, node, privateKey });
+  context = changeViewContext;
 
-  const viewNumber = context.expectedView[context.myIndex];
-  if (checkExpectedView({ context, viewNumber })) {
-    return initializeConsensusInitial({
+  node.relayConsensusPayload(payload);
+
+  if (checkExpectedView({ context, viewNumber: expectedView }) && !context.watchOnly) {
+    const message = context.changeViewPayloads[context.myIndex]?.getDeserializedMessage<ChangeViewConsensusMessage>();
+    if (message === undefined || message.newViewNumber < expectedView) {
+      const { context: moreChangeViewContext, payload: changeViewPayload } = await makeChangeView({
+        node,
+        privateKey,
+        context,
+        reason: ChangeViewReason.ChangeAgreement,
+      });
+      context = moreChangeViewContext;
+      node.relayConsensusPayload(changeViewPayload);
+    }
+
+    return initializeConsensus({
       blockchain: node.blockchain,
+      privateKey,
       context,
-      viewNumber,
-      consensusContext,
+      viewNumber: expectedView,
+      timerContext,
+      isRecovering,
     });
   }
 
   return { context };
 };
+
+export async function initializeConsensus({
+  blockchain,
+  privateKey,
+  context: contextIn,
+  timerContext,
+  viewNumber,
+  isRecovering,
+}: {
+  readonly blockchain: Blockchain;
+  readonly privateKey: PrivateKey;
+  readonly context: ConsensusContext;
+  readonly timerContext: TimerContext;
+  readonly viewNumber: number;
+  readonly isRecovering: boolean;
+}): Promise<Result> {
+  const { context } = await reset({
+    blockchain,
+    privateKey,
+    context: contextIn,
+    viewNumber,
+  });
+
+  if (context.watchOnly) {
+    return { context };
+  }
+
+  return initializeConsensusCommon({
+    context,
+    blockchain,
+    timerContext,
+    isRecovering,
+  });
+}
+
+function initializeConsensusCommon({
+  context,
+  blockchain,
+  timerContext,
+  isRecovering,
+}: {
+  readonly context: ConsensusContext;
+  readonly blockchain: Blockchain;
+  readonly timerContext: TimerContext;
+  readonly isRecovering: boolean;
+}): Result {
+  const { millisecondsPerBlock } = blockchain.settings;
+
+  if (context.isPrimary && !isRecovering) {
+    return {
+      context,
+      timerMS: Math.max(0, millisecondsPerBlock - (timerContext.nowMilliseconds() - context.blockReceivedTimeMS)),
+    };
+  }
+
+  return {
+    context,
+    // tslint:disable-next-line no-bitwise
+    timerMS: millisecondsPerBlock << (context.viewNumber + 1),
+  };
+}
+
+export async function initializeNewConsensus({
+  blockchain,
+  publicKey,
+  privateKey,
+  timerContext,
+  verificationContext,
+}: {
+  readonly blockchain: Blockchain;
+  readonly publicKey: ECPoint;
+  readonly privateKey: PrivateKey;
+  readonly timerContext: TimerContext;
+  readonly verificationContext: TransactionVerificationContext;
+}) {
+  const validators = await blockchain.getValidators();
+  const initialContext = getInitialContext({
+    blockchain,
+    publicKey,
+    validators,
+    verificationContext,
+  });
+
+  return initializeConsensus({
+    blockchain,
+    privateKey,
+    context: initialContext,
+    timerContext,
+    viewNumber: initialContext.viewNumber,
+    isRecovering: false,
+  });
+}
 
 export const addTransaction = async ({
   context: contextIn,
@@ -327,36 +233,45 @@ export const addTransaction = async ({
   privateKey,
   transaction,
   verify,
-  consensusContext,
+  timerContext,
+  isRecovering,
 }: {
-  readonly context: RequestReceivedContext;
+  readonly context: ConsensusContext;
   readonly node: Node;
   readonly privateKey: PrivateKey;
   readonly transaction: Transaction;
   readonly verify: boolean;
-  readonly consensusContext: ConsensusContext;
-}): Promise<
-  Result<RequestReceivedContext | InitialContext | ViewChangingContext | SignatureSentContext | BlockSentContext>
-> => {
+  readonly timerContext: TimerContext;
+  readonly isRecovering: boolean;
+}): Promise<Result> => {
   let context = contextIn;
   const { blockchain } = node;
-  const tx = await blockchain.transaction.tryGet({ hash: transaction.hash });
+  const tx = await blockchain.transactions.tryGet(transaction.hash);
   if (tx !== undefined) {
     return { context };
   }
   if (verify) {
-    let verified = true;
-    try {
-      const { verifications } = await blockchain.verifyTransaction({
-        transaction,
-        memPool: Object.values(context.transactions).filter(commonUtils.notNull),
+    const result = await blockchain.verifyTransaction(transaction, context.transactions, context.verificationContext);
+
+    if (result === VerifyResultModel.PolicyFail) {
+      return requestChangeView({
+        context,
+        node,
+        privateKey,
+        timerContext,
+        reason: ChangeViewReason.TxRejectedByPolicy,
+        isRecovering,
       });
-      verified = verifications.every(({ failureMessage }) => failureMessage === undefined);
-    } catch {
-      verified = false;
     }
-    if (!verified) {
-      return { context };
+    if (result !== VerifyResultModel.Succeed) {
+      return requestChangeView({
+        context,
+        node,
+        privateKey,
+        timerContext,
+        reason: ChangeViewReason.TxInvalid,
+        isRecovering,
+      });
     }
   }
 
@@ -367,39 +282,13 @@ export const addTransaction = async ({
     },
   });
 
-  const transactionsLength = Object.values(context.transactions).length;
-  if (context.transactionHashes.length === transactionsLength) {
-    const validators = await blockchain.getValidators(Object.values(context.transactions).filter(commonUtils.notNull));
+  context.verificationContext.addTransaction(transaction);
 
-    const consensusAddress = crypto.getConsensusAddress(validators);
-    if (common.uInt160Equal(consensusAddress, context.header.nextConsensus)) {
-      const mutableSignatures = [...context.signatures];
-      mutableSignatures[context.myIndex] = crypto.sign({
-        message: context.header.message,
-        privateKey,
-      });
-
-      const newContext = context.cloneSignatureSent({ signatures: mutableSignatures });
-      signAndRelay({
-        node,
-        context: newContext,
-        privateKey,
-        consensusMessage: new PrepareResponseConsensusMessage({
-          viewNumber: newContext.viewNumber,
-          signature: commonUtils.nullthrows(mutableSignatures[newContext.myIndex]),
-        }),
-      });
-
-      return checkSignatures({ node, context: newContext });
-    }
-
-    return requestChangeViewBackup({
-      context,
-      node,
-      privateKey,
-      consensusContext,
-    });
-  }
-
-  return { context };
+  return checkPrepareResponse({
+    context,
+    node,
+    privateKey,
+    timerContext,
+    isRecovering,
+  });
 };

@@ -145,12 +145,13 @@ const mapToTransfers = ({ key, value }: { readonly key: Nep5TransferKey; readonl
   txhash: common.uInt256ToString(value.txHash),
 });
 
-const getScriptHashFromParam = (param: string, addressVersion: number) => {
+const getScriptHashAndAddress = (param: string, addressVersion: number) => {
   if (param.length < 40) {
-    return crypto.addressToScriptHash({ addressVersion, address: param });
+    return { address: param, scriptHash: crypto.addressToScriptHash({ addressVersion, address: param }) };
   }
+  const scriptHash = JSONHelper.readUInt160(param);
 
-  return JSONHelper.readUInt160(param);
+  return { scriptHash, address: crypto.scriptHashToAddress({ addressVersion, scriptHash }) };
 };
 
 const createJSONRPCHandler = (handlers: Handlers) => {
@@ -645,8 +646,7 @@ export const createHandler = ({
     // Nep5
     [RPC_METHODS.getnep5transfers]: async (args) => {
       const addressVersion = blockchain.settings.addressVersion;
-      const scriptHash = getScriptHashFromParam(args[0], addressVersion);
-      const address = crypto.scriptHashToAddress({ addressVersion, scriptHash });
+      const { address, scriptHash } = getScriptHashAndAddress(args[0], addressVersion);
 
       const SEVEN_DAYS_IN_MS = 7 * 24 * 60 * 60 * 1000;
       const startTime = args[1] === undefined ? Date.now() - SEVEN_DAYS_IN_MS : args[1];
@@ -681,8 +681,7 @@ export const createHandler = ({
     },
     [RPC_METHODS.getnep5balances]: async (args) => {
       const addressVersion = blockchain.settings.addressVersion;
-      const scriptHash = getScriptHashFromParam(args[0], addressVersion);
-      const address = crypto.scriptHashToAddress({ addressVersion, scriptHash });
+      const { address, scriptHash } = getScriptHashAndAddress(args[0], addressVersion);
       const storedBalances = await blockchain.nep5Balances.find$(scriptHash).pipe(toArray()).toPromise();
       const validBalances = await Promise.all(
         storedBalances.map(async ({ key, value }) => {

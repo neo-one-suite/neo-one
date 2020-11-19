@@ -1,4 +1,12 @@
-import { common, ScriptBuilder, TriggerType, UInt256, VerifyResultModel } from '@neo-one/client-common';
+import {
+  common,
+  crypto,
+  ECPoint,
+  ScriptBuilder,
+  TriggerType,
+  UInt256,
+  VerifyResultModel,
+} from '@neo-one/client-common';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   ApplicationExecuted,
@@ -276,6 +284,10 @@ export class Blockchain {
     return this.storage.contractID;
   }
 
+  public get consensusState() {
+    return this.storage.consensusState;
+  }
+
   public get serializeJSONContext() {
     return {
       addressVersion: this.settings.addressVersion,
@@ -412,6 +424,26 @@ export class Blockchain {
     }
 
     return this.getBlockHash(header.index + 1);
+  }
+
+  public async getValidators(): Promise<readonly ECPoint[]> {
+    return this.native.NEO.getValidators(this.storage);
+  }
+
+  public async getNextBlockValidators(): Promise<readonly ECPoint[]> {
+    return this.native.NEO.getNextBlockValidators(this.storage);
+  }
+
+  public async getMaxBlockSize(): Promise<number> {
+    return this.native.Policy.getMaxBlockSize(this.storage);
+  }
+
+  public async getMaxBlockSystemFee(): Promise<BN> {
+    return this.native.Policy.getMaxBlockSystemFee(this.storage);
+  }
+
+  public async getMaxTransactionsPerBlock(): Promise<number> {
+    return this.native.Policy.getMaxTransactionsPerBlock(this.storage);
   }
 
   public async persistBlock({
@@ -630,7 +662,7 @@ export class Blockchain {
 
     const nep5BalancePairs = assetKeys.map((key) => {
       const script = new ScriptBuilder().emitAppCall(key.assetScriptHash, 'balanceOf', key.userScriptHash).build();
-      const callReceipt = this.runEngineWrapper({ script, gas: 1, snapshot: 'main' });
+      const callReceipt = this.invokeScript(script);
       const balanceBuffer = callReceipt.stack[0].getInteger().toBuffer();
 
       return { key, value: new Nep5Balance({ balanceBuffer, lastUpdatedBlock: this.currentBlockIndex }) };

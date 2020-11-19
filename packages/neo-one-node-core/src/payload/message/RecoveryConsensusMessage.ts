@@ -1,7 +1,7 @@
 import { BinaryWriter, common, createSerializeWire, crypto, UInt256 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import _ from 'lodash';
-import { ConsensusContext } from '../../ConsensusContext';
+import { ConsensusContext } from '../../consensus/ConsensusContext';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from '../../Serializable';
 import { BinaryReader } from '../../utils';
 import { Witness } from '../../Witness';
@@ -14,6 +14,7 @@ import { CommitConsensusMessage } from './CommitConsensusMessage';
 import { ConsensusMessageBase, ConsensusMessageBaseAdd } from './ConsensusMessageBase';
 import { ConsensusMessageType } from './ConsensusMessageType';
 import { PrepareRequestConsensusMessage } from './PrepareRequestConsensusMessage';
+import { PrepareResponseConsensusMessage } from './PrepareResponseConsensusMessage';
 
 export interface RecoveryConsensusMessageAdd extends ConsensusMessageBaseAdd {
   readonly prepareRequestMessage?: PrepareRequestConsensusMessage;
@@ -154,6 +155,57 @@ export class RecoveryConsensusMessage extends ConsensusMessageBase {
           witness: new Witness({
             invocation: item.invocationScript,
             verification: crypto.createSignatureRedeemScript(context.validators[item.validatorIndex]),
+          }),
+        }),
+    );
+  }
+
+  public getPrepareRequestPayload(context: ConsensusContext, payload: ConsensusPayload): ConsensusPayload | undefined {
+    if (this.prepareRequestMessage === undefined) {
+      return undefined;
+    }
+
+    const index = context.blockBuilder.getConsensusData().primaryIndex;
+    const maybePreparationMessage = this.preparationMessages[index];
+    // tslint:disable-next-line: strict-type-predicates
+    if (maybePreparationMessage === undefined) {
+      return undefined;
+    }
+
+    return new ConsensusPayload({
+      version: payload.version,
+      previousHash: payload.previousHash,
+      blockIndex: payload.blockIndex,
+      validatorIndex: index,
+      consensusMessage: this.prepareRequestMessage,
+      witness: new Witness({
+        invocation: maybePreparationMessage.invocationScript,
+        verification: crypto.createSignatureRedeemScript(context.validators[index]),
+      }),
+    });
+  }
+
+  public getPrepareResponsePayloads(context: ConsensusContext, payload: ConsensusPayload): readonly ConsensusPayload[] {
+    const index = context.blockBuilder.getConsensusData().primaryIndex;
+    const preparationHash = this.preparationHash ?? context.preparationPayloads[index]?.hash;
+    if (preparationHash === undefined) {
+      return [];
+    }
+
+    return Object.values(this.preparationMessages).map(
+      (item) =>
+        new ConsensusPayload({
+          version: payload.version,
+          previousHash: payload.previousHash,
+          blockIndex: payload.blockIndex,
+          validatorIndex: item.validatorIndex,
+          consensusMessage: new PrepareResponseConsensusMessage({
+            viewNumber: this.viewNumber,
+            preparationHash,
+          }),
+          witness: new Witness({
+            invocation: item.invocationScript,
+            verification: crypto.createSignatureRedeemScript(context.validators[index]),
           }),
         }),
     );

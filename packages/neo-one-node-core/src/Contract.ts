@@ -15,10 +15,6 @@ export interface ContractAdd {
   readonly scriptHash?: UInt160;
   readonly address?: string;
 }
-
-/* I implemented this but then didn't need it since I can just use the underlying crypto function I need.
- * It might come up later so we will keep it around for now. TODO: revist
- **/
 export class Contract {
   public static createMultiSigContract(m: number, publicKeys: readonly ECPoint[]): Contract {
     return new Contract({
