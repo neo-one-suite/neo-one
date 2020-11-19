@@ -18,14 +18,7 @@ export interface SerializableJSON<TJSON> {
   readonly serializeJSON: () => TJSON;
 }
 
-/** TODO: revist how the `magic` gets in here. Previously it was passed only as a `DeserializeContext` option
- * but now its needed for getting the hash of certain models. Really this is something that should get passed in
- * from `Blockchain` or `Settings`
- */
-
-// mainnet: 5195086
-// testnet: 1951352142
-export const createGetHashData = (serializeWire: () => Buffer, magic = 1951352142) => () => {
+export const createGetHashData = (serializeWire: () => Buffer, magic: number) => () => {
   const writer = new BinaryWriter();
   writer.writeUInt32LE(magic);
   writer.writeBytes(serializeWire());

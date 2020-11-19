@@ -175,7 +175,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
       async () => {
         const signature = await this.keystore.sign({
           account: from,
-          message: transactionUnsigned.serializeUnsigned().toString('hex'),
+          message: transactionUnsigned.message.toString('hex'),
         });
 
         const userAccount = this.getUserAccount(from);

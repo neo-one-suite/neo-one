@@ -34,6 +34,7 @@ export interface BlockBaseAdd {
   readonly timestamp: BN;
   readonly index: number;
   readonly nextConsensus: UInt160;
+  readonly messageMagic: number;
   readonly witness?: Witness;
   readonly hash?: UInt256;
 }
@@ -58,6 +59,7 @@ export abstract class BlockBase implements EquatableKey, SerializableContainer, 
       index,
       nextConsensus,
       witness: witnesses[0],
+      messageMagic: options.context.messageMagic,
     };
   }
   public static deserializeWireBaseUnsigned(options: DeserializeWireBaseOptions): BlockBaseAdd {
@@ -77,6 +79,7 @@ export abstract class BlockBase implements EquatableKey, SerializableContainer, 
       timestamp,
       index,
       nextConsensus,
+      messageMagic: options.context.messageMagic,
     };
   }
 
@@ -87,6 +90,7 @@ export abstract class BlockBase implements EquatableKey, SerializableContainer, 
   public readonly timestamp: BN;
   public readonly index: number;
   public readonly nextConsensus: UInt160;
+  public readonly messageMagic: number;
   public readonly getScriptHashesForVerifying = utils.lazyAsync(
     async (context: { readonly storage: BlockchainStorage }) => {
       if (this.previousHash === common.ZERO_UINT256) {
@@ -112,7 +116,7 @@ export abstract class BlockBase implements EquatableKey, SerializableContainer, 
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase);
   private readonly hashInternal: () => UInt256;
   private readonly hashHexInternal = utils.lazy(() => common.uInt256ToHex(this.hash));
-  private readonly messageInternal = utils.lazy(() => createGetHashData(this.serializeUnsigned)());
+  private readonly messageInternal = utils.lazy(() => createGetHashData(this.serializeUnsigned, this.messageMagic)());
   private readonly witnessInternal: Witness | undefined;
   private readonly sizeInternal = utils.lazy(
     () =>
@@ -136,6 +140,7 @@ export abstract class BlockBase implements EquatableKey, SerializableContainer, 
     nextConsensus,
     witness,
     hash,
+    messageMagic,
   }: BlockBaseAdd) {
     this.version = version;
     this.previousHash = previousHash;
@@ -144,6 +149,7 @@ export abstract class BlockBase implements EquatableKey, SerializableContainer, 
     this.index = index;
     this.nextConsensus = nextConsensus;
     this.witnessInternal = witness;
+    this.messageMagic = messageMagic;
     const hashIn = hash;
     this.hashInternal = hashIn === undefined ? utils.lazy(() => crypto.hash256(this.message)) : () => hashIn;
   }
@@ -198,7 +204,7 @@ export abstract class BlockBase implements EquatableKey, SerializableContainer, 
       size: this.size,
       previousblockhash: JSONHelper.writeUInt256(this.previousHash),
       merkleroot: JSONHelper.writeUInt256(this.merkleRoot),
-      time: JSONHelper.writeUInt64(this.timestamp),
+      time: this.timestamp.toNumber(),
       index: this.index,
       nextconsensus: crypto.scriptHashToAddress({
         addressVersion: context.addressVersion,

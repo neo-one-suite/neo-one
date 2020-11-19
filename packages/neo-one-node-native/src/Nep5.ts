@@ -11,6 +11,7 @@ export interface NEP5NativeContractAdd extends NativeContractAdd {
 export abstract class NEP5NativeContract extends NativeContract {
   public readonly symbol: string;
   public readonly decimals: number;
+  public readonly factor: BN;
 
   protected readonly totalSupplyPrefix = Buffer.from([11]);
   protected readonly accountPrefix = Buffer.from([20]);
@@ -19,6 +20,7 @@ export abstract class NEP5NativeContract extends NativeContract {
     super(options);
     this.symbol = options.symbol;
     this.decimals = options.decimals;
+    this.factor = new BN(10 ** this.decimals);
   }
 
   public async totalSupply({ storages }: NativeContractStorageContext): Promise<BN> {

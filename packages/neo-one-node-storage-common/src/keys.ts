@@ -148,7 +148,7 @@ const getNep5TransferSentSearchRange = createGetSearchRange(Prefix.Nep5TransferS
 
 const createApplicationLogKey = getCreateKey<UInt256>({
   serializeKey: (key) => key,
-  prefix: Prefix.Transaction,
+  prefix: Prefix.ApplicationLog,
 });
 
 export const keys = {

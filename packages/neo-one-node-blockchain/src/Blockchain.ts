@@ -279,6 +279,7 @@ export class Blockchain {
   public get serializeJSONContext() {
     return {
       addressVersion: this.settings.addressVersion,
+      messageMagic: this.settings.messageMagic,
     };
   }
 
@@ -710,7 +711,11 @@ export class Blockchain {
         return {
           type: 'add',
           subType: 'add',
-          change: { type: 'applicationLog', key: transaction?.hash ?? block.hash, value },
+          change: {
+            type: 'applicationLog',
+            key: transaction?.hash ?? block.hash,
+            value,
+          },
         };
       },
     );
@@ -763,6 +768,7 @@ export class Blockchain {
       }),
       consensusData: new ConsensusData({ primaryIndex: 0, nonce: new BN(0) }),
       transactions: [],
+      messageMagic: this.settings.messageMagic,
     });
   }
 }

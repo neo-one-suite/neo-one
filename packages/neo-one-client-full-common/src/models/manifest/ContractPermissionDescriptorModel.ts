@@ -32,27 +32,12 @@ export class ContractPermissionDescriptorModel implements SerializableJSON<Contr
 
   public serializeJSON(): ContractPermissionDescriptorJSON {
     if (this.isGroup) {
-      return {
-        hashOrGroup: common.ecPointToString(this.hashOrGroup as ECPoint),
-        isHash: false,
-        isGroup: true,
-        isWildcard: false,
-      };
+      return common.ecPointToString(this.hashOrGroup as ECPoint);
     }
     if (this.isHash) {
-      return {
-        hashOrGroup: common.uInt160ToString(this.hashOrGroup as UInt160),
-        isHash: true,
-        isGroup: false,
-        isWildcard: false,
-      };
+      return common.uInt160ToString(this.hashOrGroup as UInt160);
     }
 
-    return {
-      hashOrGroup: this.hashOrGroup as Wildcard,
-      isHash: false,
-      isGroup: false,
-      isWildcard: true,
-    };
+    return this.hashOrGroup as Wildcard;
   }
 }

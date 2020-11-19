@@ -16,6 +16,7 @@ import {
   PrivateNetworkSettings,
   RawInvocationResultJSON,
   RelayTransactionResultJSON,
+  SendRawTransactionResultJSON,
   StorageItemJSON,
   TransactionReceiptJSON,
   UnclaimedGASJSON,
@@ -127,7 +128,7 @@ export class JSONRPCClient {
     );
   }
 
-  public async sendRawTransaction(value: BufferString): Promise<boolean> {
+  public async sendRawTransaction(value: BufferString): Promise<SendRawTransactionResultJSON> {
     return this.withInstance(async (provider) =>
       provider
         .request({

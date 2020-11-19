@@ -12,6 +12,7 @@ import { AttributeModel } from './attribute';
 export interface TransactionConsensusOptions {
   readonly nonce: number;
   readonly validUntilBlock: number;
+  readonly messageMagic: number;
 }
 
 export interface TransactionFeesAdd {
@@ -26,12 +27,13 @@ export interface FeelessTransactionModelAdd<
 > {
   readonly version?: number;
   readonly nonce?: number;
-  readonly validUntilBlock?: number;
+  readonly validUntilBlock: number;
   readonly attributes?: readonly TAttribute[];
   readonly signers?: readonly TSigner[];
   readonly script: Buffer;
   readonly witnesses?: readonly TWitness[];
   readonly hash?: UInt256;
+  readonly messageMagic: number;
 }
 
 export const MAX_TRANSACTION_ATTRIBUTES = 16;
@@ -58,12 +60,13 @@ export class FeelessTransactionModel<
   public readonly attributes: readonly TAttribute[];
   public readonly script: Buffer;
   public readonly witnesses: readonly TWitness[];
+  public readonly messageMagic: number;
 
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   public readonly serializeUnsigned: SerializeWire = createSerializeWire(this.serializeUnsignedBase.bind(this));
   private readonly hashInternal: () => UInt256;
   private readonly hashHexInternal = utils.lazy(() => common.uInt256ToHex(this.hash));
-  private readonly messageInternal = utils.lazy(() => createGetHashData(this.serializeUnsigned)());
+  private readonly messageInternal = utils.lazy(() => createGetHashData(this.serializeUnsigned, this.messageMagic)());
 
   public constructor({
     version,
@@ -71,9 +74,10 @@ export class FeelessTransactionModel<
     attributes = [],
     witnesses = [],
     signers = [],
-    validUntilBlock = 0,
+    validUntilBlock,
     script,
     hash,
+    messageMagic,
   }: FeelessTransactionModelAdd<TAttribute, TWitness, TSigner>) {
     this.version = version === undefined ? DEFAULT_VERSION : version;
     this.nonce = nonce;
@@ -83,6 +87,7 @@ export class FeelessTransactionModel<
     this.signers = signers;
     this.validUntilBlock = validUntilBlock;
     this.script = script;
+    this.messageMagic = messageMagic;
     const hashIn = hash;
     this.hashInternal = hashIn === undefined ? utils.lazy(() => crypto.hash256(this.message)) : () => hashIn;
 
@@ -117,6 +122,7 @@ export class FeelessTransactionModel<
       witnesses: this.witnesses,
       nonce: options.nonce,
       validUntilBlock: options.validUntilBlock,
+      messageMagic: this.messageMagic,
     });
   }
 

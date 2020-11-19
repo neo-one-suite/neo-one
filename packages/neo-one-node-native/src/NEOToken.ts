@@ -145,6 +145,9 @@ export class NEOToken extends NEP5NativeContract {
       amount = amount.addn((iend - istart) * this.settings.generationAmount[ustart]);
     }
 
-    return common.fixedFromDecimal(amount.mul(value), GASToken.decimals).div(this.totalAmount);
+    return common
+      .fixedFromDecimal(amount.mul(value), GASToken.decimals)
+      .mul(new BN(10 ** GASToken.decimals))
+      .div(this.totalAmount);
   }
 }

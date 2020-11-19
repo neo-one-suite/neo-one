@@ -11,7 +11,7 @@ export interface UnsignedConsensusPayloadAdd {
   readonly data?: Buffer;
   readonly getConsensusMessage?: () => ConsensusMessage;
   readonly consensusMessage?: ConsensusMessage;
-  readonly magic?: number;
+  readonly magic: number;
 }
 
 export class UnsignedConsensusPayload implements SerializableWire {
@@ -56,7 +56,7 @@ export class UnsignedConsensusPayload implements SerializableWire {
   public readonly previousHash: UInt256;
   public readonly blockIndex: number;
   public readonly validatorIndex: number;
-  public readonly magic: number | undefined;
+  public readonly magic: number;
 
   public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly consensusMessageInternal: (() => ConsensusMessage) | undefined;
@@ -86,8 +86,8 @@ export class UnsignedConsensusPayload implements SerializableWire {
 
   public get consensusMessage() {
     if (this.consensusMessageInternal === undefined) {
-      // TODO: Implement an error here;
-      throw new Error('need a way to get consensusMessage');
+      // TODO: Implement an error here
+      throw new Error('Need a way to get consensusMessage');
     }
 
     return this.consensusMessageInternal();

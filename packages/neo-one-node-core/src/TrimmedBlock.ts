@@ -46,6 +46,7 @@ export class TrimmedBlock extends BlockBase implements SerializableWire {
       witness,
       hashes,
       consensusData,
+      messageMagic: options.context.messageMagic,
     });
   }
 
@@ -76,6 +77,7 @@ export class TrimmedBlock extends BlockBase implements SerializableWire {
         index: this.index,
         nextConsensus: this.nextConsensus,
         witness: this.witness,
+        messageMagic: this.messageMagic,
       }),
   );
 
@@ -90,6 +92,7 @@ export class TrimmedBlock extends BlockBase implements SerializableWire {
     hash,
     consensusData,
     hashes,
+    messageMagic,
   }: TrimmedBlockAdd) {
     super({
       version,
@@ -100,6 +103,7 @@ export class TrimmedBlock extends BlockBase implements SerializableWire {
       nextConsensus,
       witness,
       hash,
+      messageMagic,
     });
     this.consensusData = consensusData;
     this.hashes = hashes;
@@ -127,6 +131,7 @@ export class TrimmedBlock extends BlockBase implements SerializableWire {
           return state.transaction;
         }),
       ),
+      messageMagic: this.messageMagic,
     });
   }
 
@@ -142,6 +147,7 @@ export class TrimmedBlock extends BlockBase implements SerializableWire {
       witness: this.witness,
       hashes: this.hashes,
       consensusData: this.consensusData,
+      messageMagic: this.messageMagic,
       ...options,
     });
   }
