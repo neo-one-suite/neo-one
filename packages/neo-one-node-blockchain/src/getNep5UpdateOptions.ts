@@ -92,7 +92,7 @@ export function getNep5UpdateOptions({
 
       if (toBytes !== undefined) {
         to = common.bufferToUInt160(toBytes);
-        const toKey = new Nep5BalanceKey({ userScriptHash: from, assetScriptHash: scriptHash });
+        const toKey = new Nep5BalanceKey({ userScriptHash: to, assetScriptHash: scriptHash });
         const toKeyString = toKey.serializeWire().toString('hex');
         if (!nep5BalancesChanged.has(toKeyString)) {
           nep5BalancesChanged.add(toKeyString);
