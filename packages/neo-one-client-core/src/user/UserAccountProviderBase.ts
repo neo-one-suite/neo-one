@@ -12,10 +12,12 @@ import {
   Hash256String,
   InvokeSendUnsafeReceiveTransactionOptions,
   IterOptions,
+  NetworkSettings,
   NetworkType,
   Param,
   ParamJSON,
   RawAction,
+  RawApplicationLogData,
   RawCallReceipt,
   RawInvocationData,
   RawInvokeReceipt,
@@ -105,7 +107,7 @@ export interface Provider {
     hash: Hash256String,
     options?: GetOptions,
   ) => Promise<TransactionReceipt>;
-  readonly getInvocationData: (network: NetworkType, hash: Hash256String) => Promise<RawInvocationData>;
+  readonly getApplicationLogData: (network: NetworkType, hash: Hash256String) => Promise<RawApplicationLogData>;
   readonly testInvoke: (network: NetworkType, transaction: FeelessTransactionModel) => Promise<RawCallReceipt>;
   readonly call: (
     network: NetworkType,
@@ -113,11 +115,11 @@ export interface Provider {
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
   ) => Promise<RawCallReceipt>;
+  readonly getNetworkSettings: (network: NetworkType) => Promise<NetworkSettings>;
   readonly getBlockCount: (network: NetworkType) => Promise<number>;
   readonly getTransaction: (network: NetworkType, hash: Hash256String) => Promise<Transaction>;
   readonly iterBlocks: (network: NetworkType, options?: IterOptions) => AsyncIterable<Block>;
   readonly getAccount: (network: NetworkType, address: AddressString) => Promise<Account>;
-  readonly iterActionsRaw?: (network: NetworkType, options?: IterOptions) => AsyncIterable<RawAction>;
 }
 
 interface TransactionOptionsFull {
@@ -471,16 +473,20 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     readonly gas: BigNumber;
     readonly attributes: ReadonlyArray<Attribute>;
   }> {
-    const testTransaction = new TransactionModel({
-      systemFee: common.TEN_THOUSAND_FIXED8,
+    const [count, { messageMagic }] = await Promise.all([
+      this.provider.getBlockCount(from.network),
+      this.provider.getNetworkSettings(from.network),
+    ]);
+    const testTransaction = new FeelessTransactionModel({
       attributes: this.convertAttributes(attributes),
-      networkFee: common.TEN_THOUSAND_FIXED8,
       script,
       witnesses,
+      messageMagic,
+      validUntilBlock: count + 240,
     });
 
     const callReceipt = await this.provider.testInvoke(from.network, testTransaction);
-    if (callReceipt.result.state === 'FAULT') {
+    if (callReceipt === 'FAULT') {
       const message = await processActionsAndMessage({
         actions: callReceipt.actions,
         message: callReceipt.result.message,

@@ -5,7 +5,16 @@ import { BN } from 'bn.js';
 import { Observable } from 'rxjs';
 import { RawSourceMap } from 'source-map';
 import { ECPoint, UInt160, UInt160Hex, UInt256 } from './common';
-import { AttributeTypeModel, VMState, Wildcard } from './models';
+import {
+  AttributeTypeModel,
+  NotificationJSON,
+  StackItemJSON,
+  TriggerTypeJSON,
+  VerifyResultModel,
+  VMState,
+  VMStateJSON,
+  Wildcard,
+} from './models';
 
 /**
  * Base58 encoded string that represents a NEO address.
@@ -123,7 +132,7 @@ export interface Signer {
   /**
    * Array of contract groups that this address can verify.
    */
-  readonly allowedGroups?: readonly ECPoint[];
+  readonly allowedGroups?: readonly PublicKeyString[];
 }
 
 /**
@@ -196,7 +205,7 @@ export interface ConfirmedTransaction extends Transaction {
   /**
    * 'Receipt' of the confirmed transaction on the blockchain. This contains properties like the block the `Transaction` was included in.
    */
-  readonly receipt: TransactionReceipt;
+  readonly receipt?: TransactionReceipt;
 }
 
 /**
@@ -290,7 +299,7 @@ export interface TransactionReceipt {
   /**
    * `Block` time of the `Transaction` for this receipt.
    */
-  readonly blockTime: number;
+  readonly blockTime: string;
   /**
    * Transaction index of the `Transaction` within the `Block` for this receipt.
    */
@@ -1398,7 +1407,7 @@ export interface ContractABIClient {
   /**
    * Script hash of the contract.
    */
-  readonly hash: UInt160;
+  readonly hash: UInt160Hex;
   /**
    * TODO: describe
    * Specification of the smart contract methods.
@@ -1420,7 +1429,7 @@ export interface ContractABI {
   /**
    * Script hash of the contract.
    */
-  readonly hash: UInt160;
+  readonly hash: UInt160Hex;
   /**
    * Specification of the smart contract methods.
    */
@@ -1439,9 +1448,8 @@ export interface ContractABI {
 export interface ContractGroup {
   /**
    * The public key identifying the group.
-   * TODO: should this be some sort of string? Like ECPointString?
    */
-  readonly publicKey: ECPoint;
+  readonly publicKey: PublicKeyString;
   /**
    * Signature of the contract hash.
    */
@@ -1477,21 +1485,7 @@ export type WildcardContainer<T> = readonly T[] | Wildcard;
  * If it specifies a contract hash, then that contract will be invoked. If it specifies the public key of a group,
  * then any contract in that group will be invoked. If it specifies a wildcard, then any contract will be invoked.
  */
-export interface ContractPermissionDescriptor {
-  readonly hashOrGroup: UInt160 | ECPoint | Wildcard;
-  /**
-   * True if the permission is for a `UInt160`.
-   */
-  readonly isHash: boolean;
-  /**
-   * True if the permission is for an `ECPoint`, representing a `ContractGroup`.
-   */
-  readonly isGroup: boolean;
-  /**
-   * True if the permission is a wildcard (*), meaning any group or address can call this `Contract`.
-   */
-  readonly isWildcard: boolean;
-}
+export type ContractPermissionDescriptor = UInt160Hex | PublicKeyString | Wildcard;
 
 /**
  * Describes which contracts may be invoked and which methods are called.
@@ -1517,13 +1511,7 @@ export interface ContractManifestClient {
   /**
    * The `Contract`'s hash.
    */
-  readonly hash: UInt160;
-  /**
-   * The `Contract`'s hash as a hex string.
-   * TODO: we didn't include hashHex in the old `Contract` type definition
-   * Not sure if it belongs in this type here
-   */
-  readonly hashHex: UInt160Hex;
+  readonly hash: UInt160Hex;
   /**
    * Set of mutually trusted contracts.
    */
@@ -1552,7 +1540,7 @@ export interface ContractManifestClient {
   /**
    * The trusts field is an array containing a set of contract hashes or group of public keys.
    */
-  readonly trusts: WildcardContainer<UInt160>;
+  readonly trusts: WildcardContainer<UInt160Hex>;
   /**
    * The safeMethods field is an array containing a set of safe methods.
    */
@@ -1577,16 +1565,6 @@ export interface ContractManifestClient {
  */
 export interface ContractManifest {
   /**
-   * The `Contract`'s hash.
-   */
-  readonly hash: UInt160;
-  /**
-   * The `Contract`'s hash as a hex string.
-   * TODO: we didn't include hashHex in the old `Contract` type definition
-   * Not sure if it belongs in this type here
-   */
-  readonly hashHex: UInt160Hex;
-  /**
    * Set of mutually trusted contracts.
    */
   readonly groups: readonly ContractGroup[];
@@ -1594,7 +1572,13 @@ export interface ContractManifest {
    * The features field describes what features are available for the contract.
    */
   readonly features: {
+    /**
+     * True if the `Contract` modified blockchain storage.
+     */
     readonly storage: boolean;
+    /**
+     * True if the `Contract` can receive assets.
+     */
     readonly payable: boolean;
   };
   /**
@@ -1613,7 +1597,7 @@ export interface ContractManifest {
   /**
    * The trusts field is an array containing a set of contract hashes or group of public keys.
    */
-  readonly trusts: WildcardContainer<UInt160>;
+  readonly trusts: WildcardContainer<UInt160Hex>;
   /**
    * The safeMethods field is an array containing a set of safe methods.
    */
@@ -1627,7 +1611,7 @@ export interface ContractManifest {
    */
   readonly hasStorage: boolean;
   /**
-   * True if the `Contract` can receive native assets.
+   * True if the `Contract` can receive assets.
    */
   readonly payable: boolean;
 }
@@ -1749,17 +1733,13 @@ export interface Contract {
    */
   readonly script: BufferString;
   /**
+   * The `Contract`'s script hash.
+   */
+  readonly hash: UInt160Hex;
+  /**
    * The `Contract`'s manifest.
    */
   readonly manifest: ContractManifest;
-  /**
-   * True if the `Contract` modified blockchain storage.
-   */
-  readonly hasStorage: boolean;
-  /**
-   * True if the `Contract` can receive native assets.
-   */
-  readonly payable: boolean;
 }
 
 /* BEGIN LOW-LEVEL API */
@@ -2209,7 +2189,7 @@ export type RawStorageChange = RawStorageChangeAdd | RawStorageChangeModify | Ra
 export interface RawCallReceipt {
   readonly state: keyof typeof VMState;
   readonly script: Buffer;
-  readonly gasConsumed: number;
+  readonly gasConsumed: BigNumber;
   readonly stack: readonly RawStackItem[] | string;
   readonly notifications: readonly NewRawNotification[];
 }
@@ -2219,17 +2199,58 @@ export interface RawCallReceipt {
  *
  * Low-level API for advanced usage only.
  */
-export interface RawStackItem {
-  readonly type: string;
-  readonly value:
-    | boolean
-    | Buffer
-    | string
-    | undefined
-    | BigNumber
-    | number
-    | Map<RawStackItem, RawStackItem>
-    | ReadonlyArray<RawStackItem>;
+export type RawStackItem =
+  | RawAnyStackItem
+  | RawPointerStackItem
+  | RawPrimitiveStackItem
+  | RawBufferStackItem
+  | RawArrayStackItem
+  | RawMapStackItem;
+
+export type RawPrimitiveStackItem = RawBooleanStackItem | RawIntegerStackItem | RawByteStringStackItem;
+
+export interface RawStackItemBase {
+  readonly type: RawStackItem['type'];
+}
+
+export interface RawAnyStackItem extends RawStackItemBase {
+  readonly type: 'Any';
+  readonly value: undefined;
+}
+
+export interface RawPointerStackItem extends RawStackItemBase {
+  readonly type: 'Pointer';
+  readonly value: number;
+}
+
+export interface RawBooleanStackItem extends RawStackItemBase {
+  readonly type: 'Boolean';
+  readonly value: boolean;
+}
+
+export interface RawIntegerStackItem extends RawStackItemBase {
+  readonly type: 'Integer';
+  readonly value: BigNumber;
+}
+
+export interface RawByteStringStackItem extends RawStackItemBase {
+  readonly type: 'ByteString';
+  readonly value: Buffer;
+}
+
+export interface RawBufferStackItem extends RawStackItemBase {
+  readonly type: 'Buffer';
+  readonly value: Buffer;
+}
+
+export interface RawArrayStackItem extends RawStackItemBase {
+  readonly type: 'Array';
+  readonly value: readonly RawStackItem[];
+}
+
+export interface RawMapStackItem extends RawStackItemBase {
+  readonly type: 'Map';
+  readonly value: ReadonlyArray<readonly [RawStackItem, RawStackItem]>;
 }
 
 /**
@@ -2240,8 +2261,7 @@ export interface RawStackItem {
 export interface NewRawNotification {
   readonly scriptHash: UInt160;
   readonly eventName: string;
-  readonly state: readonly RawStackItem[];
-  // readonly scriptContainer: any;
+  readonly state: readonly RawStackItem[] | string;
 }
 
 /**
@@ -2325,7 +2345,7 @@ export interface RelayTransactionResult {
   /**
    * Verification result.
    */
-  readonly verifyResult?: VerifyTransactionResult;
+  readonly verifyResult?: VerifyResultModel;
 }
 
 /**
@@ -2358,6 +2378,36 @@ export interface RawInvocationData {
   readonly storageChanges: readonly RawStorageChange[];
 }
 
+/**
+ * Additional raw data that is typically used for the client APIs.
+ */
+export interface RawApplicationLogData {
+  /**
+   * The `Transaction`'s ID.
+   */
+  readonly txId?: string;
+  /**
+   * The `Transaction`'s trigger type.
+   */
+  readonly trigger: TriggerTypeJSON;
+  /**
+   * The `Transaction` script's resultant VM state.
+   */
+  readonly vmState: VMStateJSON;
+  /**
+   * The GAS consumed by the `Transaction`'s script execution.
+   */
+  readonly gasConsumed: BigNumber;
+  /**
+   * The resulting stack from `Transaction`'s script execution or the error that resulted.
+   */
+  readonly stack: string | readonly RawStackItem[];
+  /**
+   * The `Notification`s that came from the `Transaction`'s script execution.
+   */
+  readonly notifications: readonly NewRawNotification[];
+}
+
 export interface ParamJSONArray extends ReadonlyArray<ParamJSON> {}
 /**
  * JSON format of `Param`s that are added as an `Attribute` tag.
@@ -2376,7 +2426,17 @@ export type ParamJSON =
  * Constant settings used to initialize the client APIs.
  */
 export interface NetworkSettings {
-  readonly issueGASFee: BigNumber;
+  readonly decrementInterval: number;
+  readonly generationAmount: readonly number[];
+  readonly privateKeyVersion: number;
+  readonly standbyvalidators: readonly string[];
+  readonly messageMagic: number;
+  readonly addressVersion: number;
+  readonly standbyCommittee: readonly string[];
+  readonly committeeMemberscount: number;
+  readonly validatorsCount: number;
+  readonly millisecondsPerBlock: number;
+  readonly memoryPoolMaxTransactions: number;
 }
 
 /**

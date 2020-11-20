@@ -2,11 +2,11 @@
 import {
   Account,
   AddressString,
+  ApplicationLogJSON,
   Attribute,
   AttributeJSON,
   Block,
   BlockJSON,
-  common,
   ConfirmedTransaction,
   Contract,
   ContractABI,
@@ -25,14 +25,11 @@ import {
   ContractParameterType,
   ContractParameterTypeJSON,
   ContractPermission,
-  ContractPermissionDescriptor,
-  ContractPermissionDescriptorJSON,
   ContractPermissionJSON,
   DeveloperProvider,
   FeelessTransactionModel,
   GetOptions,
   Hash256String,
-  InvocationDataJSON,
   IterOptions,
   JSONHelper,
   NetworkSettings,
@@ -40,44 +37,35 @@ import {
   NetworkType,
   Peer,
   PrivateNetworkSettings,
-  RawAction,
+  RawApplicationLogData,
   RawCallReceipt,
-  RawInvocationData,
-  RawStorageChange,
   RelayTransactionResult,
   RelayTransactionResultJSON,
   ScriptBuilderParam,
   scriptHashToAddress,
   Signer,
   SignerJSON,
-  StorageChangeJSON,
   StorageItem,
   StorageItemJSON,
   toAttributeType,
+  toVerifyResult,
   Transaction,
   TransactionJSON,
   TransactionModel,
   TransactionReceipt,
   TransactionReceiptJSON,
-  TransactionWithInvocationDataJSON,
-  VerboseTransactionJSON,
-  VerifyTransactionResult,
-  VerifyTransactionResultJSON,
-  WildcardContainer,
-  WildcardContainerJSON,
+  VerifyResultJSON,
+  VerifyResultModel,
 } from '@neo-one/client-common';
 import { utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
-import { flatMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatmap';
 import { flatten } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatten';
 import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
 import BigNumber from 'bignumber.js';
 import debug from 'debug';
-import _ from 'lodash';
 import { AsyncBlockIterator } from '../AsyncBlockIterator';
 import { clientUtils } from '../clientUtils';
-import { MissingTransactionDataError } from '../errors';
-import { convertAction, convertCallReceipt, convertInvocationResult } from './convert';
+import { convertCallReceipt, convertNotification, convertStackItem } from './convert';
 import { JSONRPCClient } from './JSONRPCClient';
 import { JSONRPCHTTPProvider } from './JSONRPCHTTPProvider';
 import { JSONRPCProvider, JSONRPCProviderManager } from './JSONRPCProvider';
@@ -131,27 +119,14 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return { ...result, globalIndex: new BigNumber(result.globalIndex) };
   }
 
-  public async getInvocationData(hash: Hash256String): Promise<RawInvocationData> {
-    const [invocationData, transaction] = await Promise.all([
-      this.mutableClient.getInvocationData(hash),
-      this.mutableClient.getTransaction(hash),
-    ]);
+  public async getApplicationLogData(hash: Hash256String): Promise<RawApplicationLogData> {
+    const applicationLogData = await this.mutableClient.getApplicationLog(hash);
 
-    if (transaction.data === undefined) {
-      throw new MissingTransactionDataError(hash);
-    }
-
-    return this.convertInvocationData(
-      invocationData,
-      transaction.data.blockHash,
-      transaction.data.blockIndex,
-      hash,
-      transaction.data.transactionIndex,
-    );
+    return this.convertApplicationLogData(applicationLogData);
   }
 
   public async testInvoke(transaction: FeelessTransactionModel): Promise<RawCallReceipt> {
-    const receipt = await this.mutableClient.testInvocation(transaction.script.toString('hex'));
+    const receipt = await this.mutableClient.testInvokeRaw(transaction.script.toString('hex'));
 
     return convertCallReceipt(receipt);
   }
@@ -207,27 +182,25 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return this.convertNetworkSettings(settings);
   }
 
-  public iterActionsRaw(options: IterOptions = {}): AsyncIterable<RawAction> {
-    return AsyncIterableX.from(this.iterBlocks(options)).pipe<RawAction>(
-      flatMap(async (block) => {
-        const actions = _.flatten(block.transactions.map((transaction) => [...transaction?.invocationData?.actions]));
-
-        return AsyncIterableX.of(...actions);
-      }),
-    );
-  }
-
   public async call(
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    validUntilBlock?: number,
   ): Promise<RawCallReceipt> {
+    const countPromise = validUntilBlock ? Promise.resolve(0) : this.mutableClient.getBlockCount();
+    const [count, { messagemagic: messageMagic }] = await Promise.all([
+      countPromise,
+      this.mutableClient.getNetworkSettings(),
+    ]);
     const testTransaction = new FeelessTransactionModel({
       script: clientUtils.getInvokeMethodScript({
         address: contract,
         method,
         params,
       }),
+      validUntilBlock: validUntilBlock ? validUntilBlock : count + 240,
+      messageMagic,
     });
 
     return this.testInvoke(testTransaction);
@@ -296,7 +269,6 @@ export class NEOONEDataProvider implements DeveloperProvider {
     };
   }
 
-  // TODO: implement this;
   private convertBlock(block: BlockJSON): Block {
     return {
       version: block.version,
@@ -354,19 +326,14 @@ export class NEOONEDataProvider implements DeveloperProvider {
       account: scriptHashToAddress(signer.account),
       scopes: signer.scopes,
       allowedContracts: signer.allowedcontracts?.map(scriptHashToAddress),
-      allowedGroups: signer.allowedgroups?.map((group) => common.stringToECPoint(group)), // TODO: check
+      allowedGroups: signer.allowedgroups,
     };
   }
 
-  private convertConfirmedTransaction(transaction: ConfirmedTransactionJSON): ConfirmedTransaction {
-    if (transaction.data === undefined) {
-      /* istanbul ignore next */
-      throw new Error('Unexpected undefined data');
-    }
-
+  private convertConfirmedTransaction(transaction: TransactionJSON): ConfirmedTransaction {
     return {
       ...this.convertTransaction(transaction),
-      receipt: this.convertTransactionReceipt(transaction.receipt),
+      receipt: transaction.receipt ? this.convertTransactionReceipt(transaction.receipt) : undefined,
     };
   }
 
@@ -380,16 +347,13 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return {
       id: contract.id,
       script: contract.script,
+      hash: contract.hash,
       manifest: this.convertContractManifest(contract.manifest),
-      hasStorage: contract.hasStorage,
-      payable: contract.payable,
     };
   }
 
   private convertContractManifest(manifest: ContractManifestJSON): ContractManifest {
     return {
-      hash: common.stringToUInt160(manifest.hash),
-      hashHex: common.uInt160ToHex(common.stringToUInt160(manifest.hashHex)),
       groups: manifest.groups.map(this.convertContractGroup),
       features: {
         storage: manifest.features.storage,
@@ -398,7 +362,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
       supportedStandards: manifest.supportedstandards,
       abi: this.convertContractABI(manifest.abi),
       permissions: manifest.permissions.map(this.convertContractPermission),
-      trusts: this.convertWildcardContainer(manifest.trusts, common.stringToUInt160),
+      trusts: manifest.trusts,
       safeMethods: manifest.safemethods,
       extra: manifest.extra,
       hasStorage: manifest.features.storage,
@@ -408,49 +372,21 @@ export class NEOONEDataProvider implements DeveloperProvider {
 
   private convertContractGroup(group: ContractGroupJSON): ContractGroup {
     return {
-      publicKey: common.stringToECPoint(group.publicKey), // TODO: check this
+      publicKey: group.publicKey,
       signature: group.signature,
     };
   }
 
   private convertContractPermission(permission: ContractPermissionJSON): ContractPermission {
     return {
-      contract: this.convertContractPermissionDescriptor(permission.contract),
-      methods: this.convertWildcardContainer(permission.methods, (str) => str),
-    };
-  }
-
-  private convertWildcardContainer<T>(
-    container: WildcardContainerJSON,
-    converter: (val: string) => T,
-  ): WildcardContainer<T> {
-    if (container === '*') {
-      return '*';
-    }
-
-    return container.map(converter);
-  }
-
-  private convertContractPermissionDescriptor(
-    descriptor: ContractPermissionDescriptorJSON,
-  ): ContractPermissionDescriptor {
-    const hashOrGroup = descriptor.isWildcard
-      ? '*'
-      : descriptor.isGroup
-      ? common.stringToECPoint(descriptor.hashOrGroup)
-      : common.stringToUInt160(descriptor.hashOrGroup);
-
-    return {
-      hashOrGroup,
-      isHash: descriptor.isHash,
-      isGroup: descriptor.isGroup,
-      isWildcard: descriptor.isWildcard,
+      contract: permission.contract,
+      methods: permission.methods,
     };
   }
 
   private convertContractABI(abi: ContractABIJSON): ContractABI {
     return {
-      hash: common.stringToUInt160(abi.hash),
+      hash: abi.hash,
       methods: abi.methods.map(this.convertContractMethodDescriptor),
       events: abi.events.map(this.convertContractEventDescriptor),
     };
@@ -514,86 +450,43 @@ export class NEOONEDataProvider implements DeveloperProvider {
     }
   }
 
-  private convertInvocationData(
-    data: InvocationDataJSON,
-    blockHash: string,
-    blockIndex: number,
-    transactionHash: string,
-    transactionIndex: number,
-  ): RawInvocationData {
+  private convertApplicationLogData(data: ApplicationLogJSON): RawApplicationLogData {
     return {
-      result: convertInvocationResult(data.result),
-      contracts: data.contracts.map((contract) => this.convertContract(contract)),
-      deletedContractAddresses: data.deletedContractHashes.map(scriptHashToAddress),
-      migratedContractAddresses: data.migratedContractHashes.map<readonly [AddressString, AddressString]>(
-        ([hash0, hash1]) => [scriptHashToAddress(hash0), scriptHashToAddress(hash1)],
-      ),
-      actions: data.actions.map((action, idx) =>
-        convertAction(blockHash, blockIndex, transactionHash, transactionIndex, idx, action),
-      ),
-      storageChanges: data.storageChanges.map((storageChange) => this.convertStorageChange(storageChange)),
-    };
-  }
-
-  private convertStorageChange(storageChange: StorageChangeJSON): RawStorageChange {
-    if (storageChange.type === 'Add') {
-      return {
-        type: 'Add',
-        address: scriptHashToAddress(storageChange.hash),
-        key: storageChange.key,
-        value: storageChange.value,
-      };
-    }
-
-    if (storageChange.type === 'Modify') {
-      return {
-        type: 'Modify',
-        address: scriptHashToAddress(storageChange.hash),
-        key: storageChange.key,
-        value: storageChange.value,
-      };
-    }
-
-    return {
-      type: 'Delete',
-      address: scriptHashToAddress(storageChange.hash),
-      key: storageChange.key,
+      txId: data?.txid,
+      trigger: data.trigger,
+      vmState: data.vmstate,
+      gasConsumed: new BigNumber(data.gasconsumed),
+      stack: typeof data.stack === 'string' ? data.stack : data.stack.map(convertStackItem),
+      notifications: data.notifications.map(convertNotification),
     };
   }
 
   private convertNetworkSettings(settings: NetworkSettingsJSON): NetworkSettings {
     return {
-      issueGASFee: new BigNumber(settings.issueGASFee),
+      decrementInterval: settings.decrementinterval,
+      generationAmount: settings.generationamount,
+      privateKeyVersion: settings.privatekeyversion,
+      standbyvalidators: settings.standbyvalidators,
+      messageMagic: settings.messagemagic,
+      addressVersion: settings.addressversion,
+      standbyCommittee: settings.standbycommittee,
+      committeeMemberscount: settings.committeememberscount,
+      validatorsCount: settings.validatorscount,
+      millisecondsPerBlock: settings.millisecondsperblock,
+      memoryPoolMaxTransactions: settings.memorypoolmaxtransactions,
     };
   }
 
   private convertRelayTransactionResult(result: RelayTransactionResultJSON): RelayTransactionResult {
     const transaction = this.convertTransaction(result.transaction);
-    const verifyResult =
-      result.verifyResult === undefined ? undefined : this.convertVerifyResult(transaction.hash, result.verifyResult);
+    const verifyResult = result.verifyResult === undefined ? undefined : this.convertVerifyResult(result.verifyResult);
 
     return { transaction, verifyResult };
   }
 
   /* istanbul ignore next */
-  private convertVerifyResult(transactionHash: string, result: VerifyTransactionResultJSON): VerifyTransactionResult {
-    return {
-      verifications: result.verifications.map((verification) => ({
-        failureMessage: verification.failureMessage,
-        witness: verification.witness,
-        address: scriptHashToAddress(verification.hash),
-        actions: verification.actions.map((action, idx) =>
-          convertAction(
-            common.uInt256ToString(common.bufferToUInt256(Buffer.alloc(32, 0))),
-            -1,
-            transactionHash,
-            -1,
-            idx,
-            action,
-          ),
-        ),
-      })),
-    };
+  private convertVerifyResult(result: VerifyResultJSON): VerifyResultModel {
+    return toVerifyResult(result);
   }
 
   private async capture<T>(func: () => Promise<T>, title: string): Promise<T> {

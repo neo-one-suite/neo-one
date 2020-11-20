@@ -23,13 +23,12 @@ export function convertCallReceipt(receipt: CallReceiptJSON): RawCallReceipt {
   return {
     script: JSONHelper.readBuffer(receipt.script),
     state: receipt.state,
-    gasConsumed: receipt.gasconsumed,
+    gasConsumed: new BigNumber(receipt.gasconsumed),
     stack: typeof receipt.stack === 'string' ? receipt.stack : receipt.stack.map(convertStackItem),
-    notifications: receipt.notifications.map(convertNotifications),
+    notifications: receipt.notifications.map(convertNotification),
   };
 }
 
-// TODO: this almost definitely needs to be looked at and redone
 export function convertStackItem(item: StackItemJSON): RawStackItem {
   switch (item.type) {
     case 'Any':
@@ -39,7 +38,7 @@ export function convertStackItem(item: StackItemJSON): RawStackItem {
     case 'Pointer':
       return { type: 'Pointer', value: item.value };
     case 'Integer':
-      return { type: 'Integer', value: new BigNumber(item.value) }; // TODO: BigNumber or BN?
+      return { type: 'Integer', value: new BigNumber(item.value) };
     case 'Buffer':
       return { type: 'Buffer', value: Buffer.from(item.value, 'hex') };
     case 'ByteString':
@@ -49,19 +48,22 @@ export function convertStackItem(item: StackItemJSON): RawStackItem {
     case 'Map':
       return {
         type: 'Map',
-        value: item.value.map(({ key, value }) => [convertStackItem(key), convertStackItem(value)]),
+        value: item.value.map<readonly [RawStackItem, RawStackItem]>(({ key, value }) => [
+          convertStackItem(key),
+          convertStackItem(value),
+        ]),
       };
     default:
-      // utils.assertNever(item.type);
+      utils.assertNever(item);
       throw new Error('Problem converting stack item');
   }
 }
 
-export function convertNotifications(notification: NotificationJSON): NewRawNotification {
+export function convertNotification(notification: NotificationJSON): NewRawNotification {
   return {
     scriptHash: common.stringToUInt160(notification.scripthash),
     eventName: notification.eventname,
-    state: notification.state.map(convertStackItem),
+    state: typeof notification.state === 'string' ? notification.state : notification.state.map(convertStackItem),
   };
 }
 

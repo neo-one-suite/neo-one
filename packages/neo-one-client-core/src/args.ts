@@ -23,7 +23,6 @@ import {
   ContractParameter,
   ContractPermission,
   ContractPermissionDescriptor,
-  ECPoint,
   ForwardValue,
   Hash256String,
   InvokeSendUnsafeReceiveTransactionOptions,
@@ -41,7 +40,7 @@ import {
   toAttributeType,
   TransactionOptions,
   Transfer,
-  UInt160,
+  UInt160Hex,
   UpdateAccountNameOptions,
   UserAccountID,
   wifToPrivateKey,
@@ -138,6 +137,16 @@ export const assertPublicKey = (name: string, publicKey?: unknown): PublicKeyStr
     return common.ecPointToString(common.stringToECPoint(value));
   } catch {
     throw new InvalidArgumentError('PublicKey', name, value);
+  }
+};
+
+const assertUInt160Hex = (name: string, value?: unknown): UInt160Hex => {
+  const valueIn = assertString(name, value);
+
+  try {
+    return common.uInt160ToString(common.stringToUInt160(valueIn));
+  } catch {
+    throw new InvalidArgumentError('UInt160Hex', name, value);
   }
 };
 
@@ -629,7 +638,7 @@ export const assertContractABIClient = (name: string, value?: unknown): Contract
   }
 
   return {
-    hash: assertProperty(value, 'ContractABI', 'hash', assertUInt160),
+    hash: assertProperty(value, 'ContractABI', 'hash', assertUInt160Hex),
     methods: assertProperty(value, 'ContractABI', 'methods', assertArray).map((method) =>
       assertContractMethodDescriptorClient('ContractABI.methods', method),
     ),
@@ -645,7 +654,7 @@ export const assertContractABI = (name: string, value?: unknown): ContractABI =>
   }
 
   return {
-    hash: assertProperty(value, 'ContractABI', 'hash', assertUInt160),
+    hash: assertProperty(value, 'ContractABI', 'hash', assertUInt160Hex),
     methods: assertProperty(value, 'ContractABI', 'methods', assertArray).map((method) =>
       assertContractMethodDescriptor('ContractABI.methods', method),
     ),
@@ -733,39 +742,25 @@ export const assertNullableJSON = (name: string, value?: unknown): JSONObject =>
   return value;
 };
 
-const assertUInt160 = (name: string, value?: unknown): UInt160 => {
-  const valueIn = assertString(name, value);
-
-  return common.stringToUInt160(valueIn);
-};
-
-// TODO: should this assert some sort of string? Like an ECPointString?
-const assertECPoint = (name: string, value?: unknown): ECPoint => {
-  const valueIn = assertString(name, value);
-
-  return common.stringToECPoint(valueIn);
-};
-
-// TODO: check logic here
-const assertHashOrGroup = (name: string, value?: unknown): ECPoint | UInt160 | Wildcard => {
+const assertHashOrGroup = (name: string, value?: unknown): PublicKeyString | UInt160Hex | Wildcard => {
   const valueIn = assertString(name, value);
   if (valueIn === '*') {
     return '*';
   }
 
   try {
-    return assertUInt160(valueIn);
+    return assertUInt160Hex(name, valueIn);
   } catch {
     // do nothing
   }
 
   try {
-    return assertECPoint(valueIn);
+    return assertPublicKey(name, valueIn);
   } catch {
     // do nothing
   }
 
-  return '*';
+  throw new InvalidArgumentError('HashOrGroup', name, value);
 };
 
 export const assertContractManifestClient = (name: string, value?: unknown): ContractManifestClient => {
@@ -774,8 +769,7 @@ export const assertContractManifestClient = (name: string, value?: unknown): Con
   }
 
   return {
-    hash: assertProperty(value, 'ContractManifest', 'hash', assertUInt160),
-    hashHex: assertProperty(value, 'ContractManifest', 'hashHex', assertString),
+    hash: assertProperty(value, 'ContractManifest', 'hash', assertUInt160Hex),
     groups: assertProperty(value, 'ContractManifest', 'groups', assertArray).map((group) =>
       assertContractGroup('ContractManifest.groups', group),
     ),
@@ -790,7 +784,7 @@ export const assertContractManifestClient = (name: string, value?: unknown): Con
     permissions: assertProperty(value, 'ContractManifest', 'permissions', assertArray).map((permission) =>
       assertContractPermission('ContractManifest.permissions', permission),
     ),
-    trusts: assertWildcardContainerProperty(value, 'ContractManifest', 'trusts', assertUInt160),
+    trusts: assertWildcardContainerProperty(value, 'ContractManifest', 'trusts', assertUInt160Hex),
     safeMethods: assertWildcardContainerProperty(value, 'ContractManifest', 'safeMethods', assertString),
     extra: assertProperty(value, 'ContractManifest', 'extra', assertNullableJSON),
     hasStorage: assertProperty(value, 'ContractManifest', 'hasStorage', assertBoolean),
@@ -804,8 +798,7 @@ export const assertContractManifest = (name: string, value?: unknown): ContractM
   }
 
   return {
-    hash: assertProperty(value, 'ContractManifest', 'hash', assertUInt160),
-    hashHex: assertProperty(value, 'ContractManifest', 'hashHex', assertString),
+    hash: assertProperty(value, 'ContractManifest', 'hash', assertUInt160Hex),
     groups: assertProperty(value, 'ContractManifest', 'groups', assertArray).map((group) =>
       assertContractGroup('ContractManifest.groups', group),
     ),
@@ -820,7 +813,7 @@ export const assertContractManifest = (name: string, value?: unknown): ContractM
     permissions: assertProperty(value, 'ContractManifest', 'permissions', assertArray).map((permission) =>
       assertContractPermission('ContractManifest.permissions', permission),
     ),
-    trusts: assertWildcardContainerProperty(value, 'ContractManifest', 'trusts', assertUInt160),
+    trusts: assertWildcardContainerProperty(value, 'ContractManifest', 'trusts', assertUInt160Hex),
     safeMethods: assertWildcardContainerProperty(value, 'ContractManifest', 'safeMethods', assertString),
     extra: assertProperty(value, 'ContractManifest', 'extra', assertNullableJSON),
     hasStorage: assertProperty(value, 'ContractManifest', 'hasStorage', assertBoolean),
@@ -858,7 +851,7 @@ const assertContractGroup = (name: string, value?: unknown): ContractGroup => {
   }
 
   return {
-    publicKey: assertProperty(value, 'ContractGroup', 'publicKey', assertECPoint),
+    publicKey: assertProperty(value, 'ContractGroup', 'publicKey', assertPublicKey),
     signature: assertProperty(value, 'ContractGroup', 'signature', assertBuffer),
   };
 };

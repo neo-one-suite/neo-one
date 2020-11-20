@@ -1,4 +1,4 @@
-import { ABI } from '@neo-one/client';
+import { ContractABI } from '@neo-one/client';
 import { common, crypto } from '@neo-one/client-common';
 
 const jmpABI = {
@@ -69,13 +69,13 @@ const convertABIMetadata = (metadata: NEOONEContractMetadata) => ({
   'is-payable': metadata.payable,
 });
 
-const convertABI = (abi: ABI, metadata: NEOONEContractMetadata, script: Buffer) => ({
+const convertABI = (abi: ContractABI, metadata: NEOONEContractMetadata, script: Buffer) => ({
   hash: common.uInt160ToHex(crypto.toScriptHash(script)),
   entrypoint: '@Jmp',
   functions: [
     jmpABI,
     dispatcherABI,
-    ...abi.functions.map((func) => ({
+    ...abi.methods.map((func) => ({
       name: func.name,
       parameters: func.parameters
         ? func.parameters.map(({ name, type }) => ({
@@ -83,19 +83,17 @@ const convertABI = (abi: ABI, metadata: NEOONEContractMetadata, script: Buffer) 
             type,
           }))
         : [],
-      returntype: func.returnType.type,
+      returntype: func.returnType,
     })),
   ],
-  events: abi.events
-    ? abi.events.map((event) => ({
-        name: event.name,
-        parameters: event.parameters.map(({ name, type }) => ({
-          name,
-          type,
-        })),
-        returntype: 'Void',
-      }))
-    : [],
+  events: abi.events.map((event) => ({
+    name: event.name,
+    parameters: event.parameters.map(({ name, type }) => ({
+      name,
+      type,
+    })),
+    returntype: 'Void',
+  })),
   metadata: convertABIMetadata(metadata),
 });
 

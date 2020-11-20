@@ -3,6 +3,7 @@ import {
   crypto,
   privateKeyToAddress,
   privateKeyToScriptHash,
+  publicKeyToAddress,
   ScriptBuilder,
   scriptHashToAddress,
   SignerModel,
