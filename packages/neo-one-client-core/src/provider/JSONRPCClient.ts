@@ -4,6 +4,7 @@ import {
   ApplicationLogJSON,
   BlockJSON,
   BufferString,
+  CallReceiptJSON,
   ContractJSON,
   GetOptions,
   Hash256String,
@@ -14,7 +15,6 @@ import {
   NetworkSettingsJSON,
   Peer,
   PrivateNetworkSettings,
-  RawInvocationResultJSON,
   RelayTransactionResultJSON,
   SendRawTransactionResultJSON,
   StorageItemJSON,
@@ -101,7 +101,7 @@ export class JSONRPCClient {
   public async testInvokeRaw(
     script: BufferString,
     verifications: readonly BufferString[] = [],
-  ): Promise<RawInvocationResultJSON> {
+  ): Promise<CallReceiptJSON> {
     return this.withInstance(async (provider) =>
       provider.request({
         method: 'invokescript',

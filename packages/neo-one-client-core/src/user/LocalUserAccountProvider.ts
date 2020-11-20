@@ -372,7 +372,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
         from,
         transaction: invokeTransaction,
         onConfirm: async ({ transaction, receipt }) => {
-          const data = await this.provider.getInvocationData(from.network, transaction.hash);
+          const data = await this.provider.getApplicationLogData(from.network, transaction.hash);
 
           return onConfirm({ transaction, receipt, data });
         },

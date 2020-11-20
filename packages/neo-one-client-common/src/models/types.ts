@@ -221,13 +221,6 @@ export interface UnclaimedGASJSON {
 
 export interface StackItemJSONBase {
   readonly type: StackItemJSON['type'];
-  // readonly value:
-  //   | string
-  //   | number
-  //   | boolean
-  //   | readonly StackItemJSON[]
-  //   | undefined
-  //   | ReadonlyArray<{ readonly key: PrimitiveStackItemJSON; readonly value: StackItemJSON }>;
 }
 
 export interface AnyStackItemJSON extends StackItemJSONBase {
@@ -278,8 +271,6 @@ export type StackItemJSON =
   | PrimitiveStackItemJSON
   | BufferStackItemJSON
   | ArrayStackItemJSON
-  // | StructStackItemJSON
-  // | InteropInterfaceStackItemJSON
   | MapStackItemJSON;
 
 export interface ExecutionResultJSON {
@@ -327,7 +318,6 @@ export interface VerboseTransactionJSON extends TransactionJSON {
 export interface TransactionWithInvocationDataJSON extends TransactionJSON {
   readonly script: string;
   readonly gas: string;
-  readonly invocationData?: InvocationDataJSON | undefined;
 }
 
 export interface TransactionReceiptJSON {

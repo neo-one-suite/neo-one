@@ -8,9 +8,8 @@ import {
   IterOptions,
   NetworkSettings,
   NetworkType,
-  RawAction,
+  RawApplicationLogData,
   RawCallReceipt,
-  RawInvocationData,
   RelayTransactionResult,
   ScriptBuilderParam,
   Transaction,
@@ -73,8 +72,8 @@ export class NEOONEProvider implements Provider {
     return this.getProvider(network).getTransactionReceipt(hash, options);
   }
 
-  public async getInvocationData(network: NetworkType, hash: Hash256String): Promise<RawInvocationData> {
-    return this.getProvider(network).getInvocationData(hash);
+  public async getApplicationLogData(network: NetworkType, hash: Hash256String): Promise<RawApplicationLogData> {
+    return this.getProvider(network).getApplicationLogData(hash);
   }
 
   public async testInvoke(network: NetworkType, transaction: FeelessTransactionModel): Promise<RawCallReceipt> {
@@ -108,10 +107,6 @@ export class NEOONEProvider implements Provider {
 
   public async getAccount(network: NetworkType, address: AddressString): Promise<Account> {
     return this.getProvider(network).getAccount(address);
-  }
-
-  public iterActionsRaw(network: NetworkType, options?: IterOptions): AsyncIterable<RawAction> {
-    return this.getProvider(network).iterActionsRaw(options);
   }
 
   public iterBlocks(network: NetworkType, options: IterOptions = {}): AsyncIterable<Block> {

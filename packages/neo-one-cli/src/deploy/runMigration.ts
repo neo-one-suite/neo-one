@@ -125,7 +125,7 @@ export const runMigration = async (
           const params = await Promise.all(action.params);
           const result = await client.publishAndDeploy(
             contract.contract,
-            contract.abi,
+            contract.manifest,
             params,
             {
               ...(action.options === undefined ? {} : action.options),
@@ -144,7 +144,7 @@ export const runMigration = async (
           contracts = {
             ...contracts,
             [action.contract]: client.smartContract({
-              abi: contract.abi,
+              manifest: contract.manifest,
               networks: {
                 [network]: {
                   address: receipt.result.value.address,

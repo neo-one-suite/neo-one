@@ -50,12 +50,12 @@ const decimalsFunction: ContractMethodDescriptorClient = {
   offset: 0,
 };
 
+// TODO: check that the script/hash can/should be blank here. also check offsets
 const blankScript = new ScriptBuilder().build();
 const blankHash = crypto.toScriptHash(blankScript);
 
 export const abi = (decimals: number): ContractABIClient => ({
-  // TODO: check
-  hash: blankHash,
+  hash: common.uInt160ToString(blankHash),
   methods: [
     {
       name: 'name',
@@ -136,9 +136,9 @@ export const abi = (decimals: number): ContractABIClient => ({
   ],
 });
 
+// TODO: check that the script/hash can/should be blank here
 export const manifest = (decimals: number): ContractManifestClient => ({
-  hash: blankHash, // TODO: check
-  hashHex: common.uInt160ToHex(blankHash), // TODO: check
+  hash: common.uInt160ToString(blankHash),
   groups: [],
   features: {
     storage: true,
