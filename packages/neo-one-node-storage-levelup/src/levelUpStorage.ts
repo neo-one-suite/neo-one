@@ -1,3 +1,4 @@
+import { common } from '@neo-one/client-common';
 import {
   ApplicationLog,
   BinaryReader,

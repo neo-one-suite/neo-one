@@ -131,10 +131,37 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return convertCallReceipt(receipt);
   }
 
+  public async testTransaction(transaction: TransactionModel): Promise<RawCallReceipt> {
+    const receipt = await this.mutableClient.testTransaction(transaction.serializeWire().toString('hex'));
+
+    return convertCallReceipt(receipt);
+  }
+
   public async getBlock(hashOrIndex: Hash256String | number, options?: GetOptions): Promise<Block> {
     const block = await this.mutableClient.getBlock(hashOrIndex, options);
 
     return this.convertBlock(block);
+  }
+
+  public async getFeePerByte(): Promise<BigNumber> {
+    const feePerByte = await this.mutableClient.getFeePerByte();
+
+    return new BigNumber(feePerByte);
+  }
+
+  public async getVerificationCost(
+    hash: AddressString,
+    transaction: TransactionModel,
+  ): Promise<{
+    readonly fee: BigNumber;
+    readonly size: number;
+  }> {
+    const result = await this.mutableClient.getVerificationCost(hash, transaction.serializeWire().toString('hex'));
+
+    return {
+      fee: new BigNumber(result.fee),
+      size: result.size,
+    };
   }
 
   public iterBlocks(options: IterOptions = {}): AsyncIterable<Block> {
@@ -296,7 +323,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return {
       version: transaction.version,
       nonce: transaction.nonce,
-      sender: transaction.sender ? scriptHashToAddress(transaction.sender) : undefined,
+      sender: transaction.sender ? transaction.sender : undefined,
       hash: transaction.hash,
       size: transaction.size,
       validUntilBlock: transaction.validuntilblock,

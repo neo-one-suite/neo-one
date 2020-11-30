@@ -1,6 +1,6 @@
 // tslint:disable no-any
 import { FullNodeCreateOptions } from '@neo-one/node';
-import { createMain, createTest, deserializeSettings, serializeSettings } from '@neo-one/node-neo-settings';
+import { createMain, createPriv, createTest, deserializeSettings, serializeSettings } from '@neo-one/node-neo-settings';
 import envPaths from 'env-paths';
 import rc from 'rc';
 
@@ -25,7 +25,9 @@ export const getOptions = (): FullNodeCreateOptions['options'] => {
   if ((typeof blockchain as any) === 'string') {
     options = {
       ...options,
-      blockchain: serializeSettings((blockchain as any) === 'test' ? createTest() : createMain()) as any,
+      blockchain: serializeSettings(
+        (blockchain as any) === 'test' ? createTest() : (blockchain as any) === 'priv' ? createPriv() : createMain(),
+      ) as any,
     };
   }
 

@@ -191,6 +191,7 @@ export class Consensus {
               result = await handleTransactionReceived({
                 context,
                 node: this.node,
+                privateNet: this.options.privateNet,
                 privateKey: options.privateKey,
                 transaction: event.transaction,
                 timerContext: this.mutableTimerContext,

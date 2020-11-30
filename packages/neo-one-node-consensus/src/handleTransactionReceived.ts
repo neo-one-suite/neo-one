@@ -8,15 +8,34 @@ export const handleTransactionReceived = async ({
   context,
   node,
   privateKey,
+  privateNet,
   transaction,
   timerContext,
 }: {
   readonly context: ConsensusContext;
   readonly node: Node;
   readonly privateKey: PrivateKey;
+  readonly privateNet: boolean;
   readonly transaction: Transaction;
   readonly timerContext: TimerContext;
 }): Promise<Result> => {
+  // TODO: temporary workaround for private net development.
+  if (privateNet) {
+    if (context.blockSent) {
+      return { context };
+    }
+
+    return addTransaction({
+      context,
+      node,
+      privateKey,
+      transaction,
+      verify: true,
+      timerContext,
+      isRecovering: false,
+    });
+  }
+
   if (
     !context.isBackup ||
     context.notAcceptingPayloadsDueToViewChanging ||

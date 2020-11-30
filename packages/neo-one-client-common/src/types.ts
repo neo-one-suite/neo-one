@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { RawSourceMap } from 'source-map';
 import { ECPoint, UInt160, UInt160Hex, UInt256 } from './common';
 import {
+  AccountContract,
   AttributeTypeModel,
   NotificationJSON,
   StackItemJSON,
@@ -460,6 +461,10 @@ export interface UserAccount {
    * The public key for the address.
    */
   readonly publicKey: PublicKeyString;
+  /**
+   * The signature redemption contract of the account.
+   */
+  readonly contract: AccountContract;
 }
 
 /**
@@ -595,14 +600,14 @@ export interface UserAccountProvider {
    *
    * Otherwise, parameters are the same as `invoke`.
    */
-  // readonly invokeClaim: (
-  //   contract: AddressString,
-  //   method: string,
-  //   params: ReadonlyArray<ScriptBuilderParam | undefined>,
-  //   paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-  //   options?: TransactionOptions,
-  //   sourceMaps?: SourceMaps,
-  // ) => Promise<TransactionResult>;
+  readonly invokeClaim: (
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
+    options?: TransactionOptions,
+    sourceMaps?: SourceMaps,
+  ) => Promise<TransactionResult>;
   /**
    * Invokes the constant `method` on `contract` with `params` on `network`.
    */
@@ -846,7 +851,7 @@ export interface TransactionOptions {
   /**
    * An optional network fee to include with the transaction.
    */
-  networkFee?: BigNumber;
+  maxNetworkFee?: BigNumber;
   /**
    * A maximum system fee to include with the transaction. Note that this is a maximum, the client APIs will automatically calculate and add a system fee to the transaction up to the value specified here.
    *
@@ -854,7 +859,13 @@ export interface TransactionOptions {
    *
    * A `systemFee` of `-1`, i.e. `new BigNumber(-1)` indicates no limit on the fee. This is typically used only during development.
    */
-  systemFee?: BigNumber;
+  maxSystemFee?: BigNumber;
+  /**
+   * The maximum number of blocks from the current block this transaction should stay valid until. Defaults to `TransactionModel.maxValidBlockIncrement - 1`.
+   *
+   * Useful for when there is high traffic on the network and automatic re-sending of transactions takes place but you want more control.
+   */
+  validBlockCount?: number;
   // tslint:enable readonly-keyword
 }
 

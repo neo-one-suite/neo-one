@@ -9,6 +9,7 @@ import {
   toVMStateJSON,
   TransactionJSON,
   TransactionReceiptJSON,
+  utils as commonUtils,
   VerboseTransactionJSON,
   VerifyResultModel,
 } from '@neo-one/client-common';
@@ -16,11 +17,13 @@ import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   Block,
   Blockchain,
+  CallReceipt,
   getEndpointConfig,
   NativeContainer,
   Nep5Transfer,
   Nep5TransferKey,
   Node,
+  Signer,
   Signers,
   StackItem,
   stackItemToJSON,
@@ -92,6 +95,7 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   invokefunction: 'invokefunction',
   invokescript: 'invokescript',
   getunclaimedgas: 'getunclaimedgas',
+  testtransaction: 'testtransaction',
 
   // Utilities
   listplugins: 'listplugins',
@@ -120,6 +124,8 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   getsettings: 'getsettings',
 
   // NEO•ONE
+  getfeeperbyte: 'getfeeperbyte',
+  getverificationcost: 'getverificationcost',
   relaytransaction: 'relaytransaction',
   getallstorage: 'getallstorage',
   gettransactionreceipt: 'gettransactionreceipt',
@@ -295,26 +301,25 @@ export const createHandler = ({
     }
   };
 
-  const getInvokeResult = (script: Buffer, signers?: Signers): CallReceiptJSON => {
-    const result = blockchain.invokeScript(script, signers);
+  const getInvokeResult = (script: Buffer, receipt: CallReceipt): CallReceiptJSON => {
+    const { stack: stackIn, state, notifications, gasConsumed } = receipt;
 
     try {
-      const stack = result.stack.map((item: StackItem) => stackItemToJSON(item, undefined));
-
+      const stack = stackIn.map((item: StackItem) => stackItemToJSON(item, undefined));
       return {
         script: script.toString('hex'),
-        state: toVMStateJSON(result.state),
+        state: toVMStateJSON(state),
         stack,
-        gasconsumed: common.fixed8FromDecimal(result.gasConsumed.toString()).toString(),
-        notifications: result.notifications.map((n) => n.serializeJSON()),
+        gasconsumed: gasConsumed.toString(),
+        notifications: notifications.map((n) => n.serializeJSON()),
       };
     } catch {
       return {
         script: script.toString('hex'),
-        state: toVMStateJSON(result.state),
+        state: toVMStateJSON(state),
         stack: 'error: recursive reference',
-        gasconsumed: common.fixed8FromDecimal(result.gasConsumed.toString()).toString(),
-        notifications: result.notifications.map((n) => n.serializeJSON()),
+        gasconsumed: gasConsumed.toString(),
+        notifications: notifications.map((n) => n.serializeJSON()),
       };
     }
   };
@@ -546,8 +551,19 @@ export const createHandler = ({
     [RPC_METHODS.invokescript]: async (args) => {
       const script = JSONHelper.readBuffer(args[0]);
       const signers = args[1] !== undefined ? Signers.fromJSON(args[1]) : undefined;
+      const result = blockchain.invokeScript(script, signers);
 
-      return getInvokeResult(script, signers);
+      return getInvokeResult(script, result);
+    },
+    [RPC_METHODS.testtransaction]: async (args) => {
+      const transaction = Transaction.deserializeWire({
+        context: blockchain.deserializeWireContext,
+        buffer: JSONHelper.readBuffer(args[0]),
+      });
+
+      const result = blockchain.testTransaction(transaction);
+
+      return getInvokeResult(transaction.script, result);
     },
     [RPC_METHODS.getunclaimedgas]: async (args) => {
       const address = args[0];
@@ -863,6 +879,20 @@ export const createHandler = ({
         millisecondsperblock: millisecondsPerBlock,
         memorypoolmaxtransactions: memoryPoolMaxTransactions,
       };
+    },
+    [RPC_METHODS.getfeeperbyte]: async () => {
+      const feePerByte = await blockchain.getFeePerByte();
+
+      return feePerByte.toString();
+    },
+    [RPC_METHODS.getverificationcost]: async (args) => {
+      const hash = JSONHelper.readUInt160(args[0]);
+      const transaction = Transaction.deserializeWire({
+        context: blockchain.deserializeWireContext,
+        buffer: JSONHelper.readBuffer(args[1]),
+      });
+
+      return blockchain.getVerificationCost(hash, transaction);
     },
     [RPC_METHODS.runconsensusnow]: async () => {
       if (node.consensus) {

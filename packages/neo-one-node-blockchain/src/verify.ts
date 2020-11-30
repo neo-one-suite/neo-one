@@ -9,9 +9,10 @@ import {
   Verifiable,
   VM,
 } from '@neo-one/node-core';
+import { BN } from 'bn.js';
 import { ContractMethodError, ContractStateFetchError, WitnessVerifyError } from './errors';
 
-const maxVerificationGas = 0.5;
+const maxVerificationGas = common.fixed8FromDecimal('0.5');
 
 interface ApplicationEngineVerifyOptions {
   readonly verification: Buffer;
@@ -58,12 +59,12 @@ export const verifyWithApplicationEngine = (
   verifiable: Verifiable & SerializableContainer,
   verification: Buffer,
   index: number,
-  gas: number,
+  gas: BN,
   offset: number,
   init?: ContractMethodDescriptor,
 ): ExecuteScriptResult =>
   vm.withApplicationEngine(
-    { trigger: TriggerType.Verification, container: verifiable, snapshot: 'clone', gas, testMode: true },
+    { trigger: TriggerType.Verification, container: verifiable, snapshot: 'clone', gas, testMode: false },
     (engine) => {
       engine.loadScript(verification, CallFlags.None);
       engine.setInstructionPointer(offset);
@@ -82,7 +83,7 @@ export const verifyWithApplicationEngine = (
         return { result: false, gas };
       }
 
-      return { result: true, gas: gas - engine.gasConsumed };
+      return { result: true, gas: gas.sub(engine.gasConsumed) };
     },
   );
 
@@ -92,7 +93,7 @@ export const tryVerifyHash = async (
   index: number,
   storage: BlockchainStorage,
   verifiable: Verifiable & SerializableContainer,
-  gas: number,
+  gas: BN,
 ): Promise<ExecuteScriptResult> => {
   const { verification: verificationScript, scriptHash } = verifiable.witnesses[index];
   try {
@@ -114,13 +115,13 @@ export const verifyWitnesses = async (
   verifiable: Verifiable & SerializableContainer,
   storage: BlockchainStorage,
   native: NativeContainer,
-  gasIn: number,
+  gasIn: BN,
 ): Promise<boolean> => {
-  if (gasIn < 0) {
+  if (gasIn.ltn(0)) {
     return false;
   }
 
-  const gas = gasIn > maxVerificationGas ? maxVerificationGas : gasIn;
+  const gas = gasIn.gt(maxVerificationGas) ? maxVerificationGas : gasIn;
 
   let hashes: readonly UInt160[];
   try {

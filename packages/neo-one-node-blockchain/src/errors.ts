@@ -36,3 +36,8 @@ export const ContractMethodError = makeErrorWithCode(
   'GET_CONTRACT_METHOD_FAILED',
   (method: string, hash: string) => `failed to fetch method ${method} from contract manifest at hash: ${hash}.`,
 );
+export const RecoverBlockchainError = makeErrorWithCode(
+  'BLOCKCHAIN_RECOVERY_FAILED',
+  (index: number) =>
+    `headerIndex storage returned ${index} blocks, however we failed to find the latest block in storage.`,
+);

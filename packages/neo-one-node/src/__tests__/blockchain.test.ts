@@ -1,6 +1,6 @@
 import { common, crypto, JSONHelper } from '@neo-one/client-common';
 import { Blockchain } from '@neo-one/node-blockchain';
-import { Nep5BalanceKey, StorageKey, StreamOptions, utils } from '@neo-one/node-core';
+import { Nep5BalanceKey, StorageKey, StreamOptions, TrimmedBlock, utils } from '@neo-one/node-core';
 import { KeyBuilder, NativeContainer, NEOAccountState } from '@neo-one/node-native';
 import { test as createTest } from '@neo-one/node-neo-settings';
 import { storage as levelupStorage } from '@neo-one/node-storage-levelup';
@@ -16,7 +16,13 @@ const rawReadStreamPromise = async (db: any, options: { readonly gte: Buffer; re
   new Promise((resolve, reject) => {
     db.createReadStream(options)
       .on('data', (data: any) => {
-        console.log(data.key.toString('hex'));
+        console.log(data.key);
+        console.log(
+          TrimmedBlock.deserializeWire({
+            context: { messageMagic: 7630401, validatorsCount: 1 },
+            buffer: data.value,
+          }).serializeJSON({ addressVersion: common.NEO_ADDRESS_VERSION }),
+        );
       })
       .on('error', reject)
       .on('close', resolve)
@@ -24,20 +30,22 @@ const rawReadStreamPromise = async (db: any, options: { readonly gte: Buffer; re
   });
 
 describe('Blockchain storage works', () => {
-  test('Blockchain can persist and retrieve blocks', async () => {
+  test.only('Blockchain can persist and retrieve blocks', async () => {
     // const blockchainSettings = createTest();
     const levelDBPath = '/Users/danielbyrne/Desktop/consensus-node-data';
     const db = LevelUp(RocksDB(levelDBPath));
 
     const storage = levelupStorage({
       db,
-      context: { messageMagic: 7630401 },
+      context: { messageMagic: 7630401, validatorsCount: 1 },
     });
 
-    const allStorage = await storage.nep5Balances.all$.pipe(toArray()).toPromise();
-    console.log(allStorage);
+    await rawReadStreamPromise(db, { gte: Buffer.from([0x01]), lte: Buffer.from([0x02]) });
 
-    await rawReadStreamPromise(db, { gte: Buffer.from([0x00]), lte: Buffer.from([0xff]) });
+    // const blocks = await storage.blocks.all$.pipe(toArray()).toPromise();
+
+    // blocks.forEach((block) => console.log(block.hashHex));
+    // await rawReadStreamPromise(db, { gte: Buffer.from([0x00]), lte: Buffer.from([0xff]) });
     // const dispatcher = new Dispatcher({
     //   levelDBPath,
     //   protocolSettings: blockchainSettingsToProtocolSettings(blockchainSettings),
@@ -61,7 +69,7 @@ describe('Blockchain storage works', () => {
     // const lte = Buffer.concat([scriptHash, new BN(Date.now(), 'le').toBuffer()]);
   });
 
-  test.only('', () => {
+  test('', () => {
     const validators = [
       '023e9b32ea89b94d066e649b124fd50e396ee91369e8e2a6ae1b11c170d022256d',
       '03009b7540e10f2562e5fd8fac9eaec25166a58b26e412348ff5a86927bfac22a2',
@@ -80,7 +88,7 @@ describe('Blockchain storage works', () => {
     );
     console.log(common.uInt160ToHex(testHash));
     console.log(common.uInt160ToHex(anotherHash));
-    console.log(crypto.scriptHashToAddress({ addressVersion: 23, scriptHash: testHash }));
-    console.log(crypto.scriptHashToAddress({ addressVersion: 23, scriptHash: anotherHash }));
+    console.log(crypto.scriptHashToAddress({ addressVersion: common.NEO_ADDRESS_VERSION, scriptHash: testHash }));
+    console.log(crypto.scriptHashToAddress({ addressVersion: common.NEO_ADDRESS_VERSION, scriptHash: anotherHash }));
   });
 });

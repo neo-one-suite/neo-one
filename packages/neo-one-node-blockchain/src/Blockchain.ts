@@ -1,9 +1,9 @@
 import {
   common,
-  crypto,
   ECPoint,
   ScriptBuilder,
   TriggerType,
+  UInt160,
   UInt256,
   VerifyResultModel,
 } from '@neo-one/client-common';
@@ -41,7 +41,12 @@ import { BN } from 'bn.js';
 import PriorityQueue from 'js-priority-queue';
 import { Observable, Subject } from 'rxjs';
 import { map, toArray } from 'rxjs/operators';
-import { BlockVerifyError, ConsensusPayloadVerifyError, GenesisBlockNotRegisteredError } from './errors';
+import {
+  BlockVerifyError,
+  ConsensusPayloadVerifyError,
+  GenesisBlockNotRegisteredError,
+  RecoverBlockchainError,
+} from './errors';
 import { getNep5UpdateOptions } from './getNep5UpdateOptions';
 import { HeaderIndexCache } from './HeaderIndexCache';
 import { PersistingBlockchain } from './PersistingBlockchain';
@@ -114,15 +119,14 @@ export const recoverHeaderIndex = async (storage: Storage) => {
     initCurrentHeaderHashes: sortedTrimmedBlocks.map((block) => block.hash),
   });
 };
-
 export class Blockchain {
   public static async create({ settings, storage, native, vm }: CreateBlockchainOptions): Promise<BlockchainType> {
     const headerIndexCache = await recoverHeaderIndex(storage);
     if (headerIndexCache.length > 0) {
-      const currentHeaderIndex = await headerIndexCache.get(headerIndexCache.length - 1);
-      const currentBlockTrimmed = await storage.blocks.tryGet({ hashOrIndex: currentHeaderIndex });
+      const currentHeaderHash = await headerIndexCache.get(headerIndexCache.length - 1);
+      const currentBlockTrimmed = await storage.blocks.tryGet({ hashOrIndex: currentHeaderHash });
       if (currentBlockTrimmed === undefined) {
-        throw new Error('For TS, this should never happen');
+        throw new RecoverBlockchainError(headerIndexCache.length);
       }
 
       const currentBlock = await currentBlockTrimmed.getBlock(storage.transactions);
@@ -184,6 +188,7 @@ export class Blockchain {
       options.onPersistNativeContractScript ?? utils.getOnPersistNativeContractScript();
     this.deserializeWireContext = {
       messageMagic: this.settings.messageMagic,
+      validatorsCount: this.settings.validatorsCount,
     };
     this.mutableCurrentBlock = options.currentBlock;
     this.start();
@@ -446,6 +451,10 @@ export class Blockchain {
     return this.native.Policy.getMaxTransactionsPerBlock(this.storage);
   }
 
+  public async getFeePerByte(): Promise<BN> {
+    return this.native.Policy.getFeePerByte(this.storage);
+  }
+
   public async persistBlock({
     block,
     verify = false,
@@ -473,18 +482,37 @@ export class Blockchain {
     });
   }
 
+  public async getVerificationCost(contractHash: UInt160, transaction: Transaction) {
+    const contract = await this.contracts.tryGet(contractHash);
+    if (contract === undefined) {
+      return { fee: utils.ZERO, size: 0 };
+    }
+
+    return utils.verifyContract(contract, this.vm, transaction);
+  }
+
+  public testTransaction(transaction: Transaction): CallReceipt {
+    return this.runEngineWrapper({
+      script: transaction.script,
+      snapshot: 'clone',
+      container: transaction,
+      gas: common.ONE_HUNDRED_FIXED8,
+      testMode: true,
+    });
+  }
+
   public invokeScript(script: Buffer, signers?: Signers): CallReceipt {
     return this.runEngineWrapper({
       script,
       snapshot: 'main',
       container: signers,
-      gas: 10,
+      gas: common.TEN_FIXED8,
     });
   }
 
   public invokeTransaction<TTransaction extends { readonly script: Buffer }>(
     transaction: TTransaction,
-    gas: number,
+    gas: BN,
   ): CallReceipt {
     return this.vm.withApplicationEngine(
       {
@@ -509,7 +537,7 @@ export class Blockchain {
     persistingBlock,
     offset = 0,
     testMode = false,
-    gas = 0,
+    gas = new BN(0),
   }: RunEngineOptions): CallReceipt {
     return this.vm.withSnapshots(({ main, clone }) => {
       const handler = snapshot === 'main' ? main : clone;

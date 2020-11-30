@@ -13,6 +13,7 @@ export const MAX_TRANSACTION_PER_BLOCK = 500;
 interface Options {
   readonly privateNet?: boolean;
   readonly consensusAddress: UInt160;
+  readonly messageMagic: number;
 }
 
 // const ONE_HUNDRED_MILLION = clientCommon.fixed8FromDecimal(100000000);
@@ -65,7 +66,7 @@ const getDeployWitness = () =>
     verification: Buffer.from([Op.PUSH1]),
   });
 
-const getDeployNativeContracts = () => {
+const getDeployNativeContracts = (messageMagic: number) => {
   const scriptBuilder = new ScriptBuilder();
   scriptBuilder.emitSysCall('Neo.Native.Deploy');
   const script = scriptBuilder.build();
@@ -83,15 +84,18 @@ const getDeployNativeContracts = () => {
     ],
     attributes: [],
     witnesses: [getDeployWitness()],
+    validUntilBlock: 0,
+    messageMagic,
   });
 };
 
 interface GetGenesisBlockOptions {
   readonly consensusAddress: UInt160;
+  readonly messageMagic: number;
   readonly privateNet?: boolean;
 }
 
-const getGenesisBlock = ({ consensusAddress, privateNet }: GetGenesisBlockOptions) =>
+const getGenesisBlock = ({ consensusAddress, messageMagic }: GetGenesisBlockOptions) =>
   new Block({
     previousHash: clientCommon.ZERO_UINT256,
     timestamp: new BN(Date.UTC(2016, 6, 15, 15, 8, 21)),
@@ -102,13 +106,15 @@ const getGenesisBlock = ({ consensusAddress, privateNet }: GetGenesisBlockOption
       primaryIndex: 0,
       nonce: new BN(2083236893),
     }),
-    transactions: [getDeployNativeContracts()],
+    transactions: [getDeployNativeContracts(messageMagic)],
+    messageMagic,
   });
 
-export const common = ({ privateNet, consensusAddress }: Options) => ({
+export const common = ({ privateNet, consensusAddress, messageMagic }: Options) => ({
   genesisBlock: getGenesisBlock({
     consensusAddress,
     privateNet,
+    messageMagic,
   }),
   decrementInterval: DECREMENT_INTERVAL,
   generationAmount: privateNet ? GENERATION_AMOUNT_PRIVATE : GENERATION_AMOUNT,

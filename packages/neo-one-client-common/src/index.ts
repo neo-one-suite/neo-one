@@ -8,6 +8,7 @@ export * from './IOHelper';
 export * from './JSONHelper';
 export * from './models';
 export * from './paramUtils';
+export * from './prices';
 export * from './BaseScriptBuilder';
 export * from './ScriptBuilder';
 export * from './types';

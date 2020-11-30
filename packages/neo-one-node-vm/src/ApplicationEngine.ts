@@ -1,4 +1,4 @@
-import { common, TriggerType, VMState } from '@neo-one/client-common';
+import { TriggerType, VMState } from '@neo-one/client-common';
 import { CallFlags, SerializableContainer, serializeScriptContainer, SnapshotName } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
@@ -10,7 +10,7 @@ export interface CreateOptions {
   readonly trigger: TriggerType;
   readonly container?: SerializableContainer;
   readonly snapshot?: SnapshotName;
-  readonly gas: number;
+  readonly gas: BN;
   readonly testMode: boolean;
 }
 
@@ -34,15 +34,15 @@ export class ApplicationEngine {
   }
 
   public get gasConsumed() {
-    return common
-      .fixed8ToDecimal(
-        new BN(
-          this.dispatch({
-            method: 'getgasconsumed',
-          }),
-        ),
-      )
-      .toNumber();
+    try {
+      return new BN(
+        this.dispatch({
+          method: 'getgasconsumed',
+        }),
+      );
+    } catch {
+      return new BN(-1);
+    }
   }
 
   public get state() {
@@ -77,7 +77,7 @@ export class ApplicationEngine {
       args: {
         trigger,
         container: container ? serializeScriptContainer(container) : undefined,
-        gas: common.fixed8FromDecimal(gas.toString()).toString(),
+        gas: gas.toString(),
         snapshot,
         testMode,
       },

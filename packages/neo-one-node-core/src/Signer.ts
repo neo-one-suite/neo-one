@@ -1,21 +1,16 @@
 import {
   assertWitnessScope,
+  hasCustomContracts,
+  hasCustomGroups,
   InvalidFormatError,
-  IOHelper,
   JSONHelper,
   SignerJSON,
   SignerModel,
-  toJSONWitnessScope,
+  toWitnessScope,
   witnessScopeHasFlag,
   WitnessScopeModel,
 } from '@neo-one/client-common';
 import { DeserializeWireBaseOptions, SerializableJSON } from './Serializable';
-import { utils } from './utils';
-
-const hasCustomContracts = (scopes: WitnessScopeModel) =>
-  witnessScopeHasFlag(scopes, WitnessScopeModel.CustomContracts);
-const hasCustomGroups = (scopes: WitnessScopeModel) => witnessScopeHasFlag(scopes, WitnessScopeModel.CustomGroups);
-
 export class Signer extends SignerModel implements SerializableJSON<SignerJSON> {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Signer {
     const { reader } = options;
@@ -35,32 +30,12 @@ export class Signer extends SignerModel implements SerializableJSON<SignerJSON> 
     });
   }
 
-  private readonly sizeInternal = utils.lazy(
-    () =>
-      IOHelper.sizeOfUInt160 +
-      IOHelper.sizeOfUInt8 +
-      (hasCustomContracts(this.scopes)
-        ? IOHelper.sizeOfArray(this.allowedContracts, () => IOHelper.sizeOfUInt160)
-        : 0) +
-      (hasCustomGroups(this.scopes)
-        ? IOHelper.sizeOfArray(this.allowedGroups, (ecPoint) => IOHelper.sizeOfECPoint(ecPoint))
-        : 0),
-  );
-
-  public get size() {
-    return this.sizeInternal();
-  }
-
-  public serializeJSON(): SignerJSON {
-    return {
-      account: JSONHelper.writeUInt160(this.account),
-      scopes: toJSONWitnessScope(this.scopes),
-      allowedcontracts: hasCustomContracts(this.scopes)
-        ? this.allowedContracts.map((contract) => JSONHelper.writeUInt160(contract))
-        : undefined,
-      allowedgroups: hasCustomGroups(this.scopes)
-        ? this.allowedGroups.map((group) => JSONHelper.writeECPoint(group))
-        : undefined,
-    };
+  public static fromJSON(json: SignerJSON): Signer {
+    return new Signer({
+      account: JSONHelper.readUInt160(json.account),
+      scopes: toWitnessScope(json.scopes),
+      allowedContracts: json.allowedcontracts ? json.allowedcontracts.map(JSONHelper.readUInt160) : undefined,
+      allowedGroups: json.allowedgroups ? json.allowedgroups.map(JSONHelper.readECPoint) : undefined,
+    });
   }
 }

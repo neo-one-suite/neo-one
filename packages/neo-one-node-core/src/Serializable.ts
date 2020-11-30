@@ -53,6 +53,7 @@ export const serializeScriptContainer = (item: SerializableContainer): Serialize
 
 export interface DeserializeWireContext {
   readonly messageMagic: number;
+  readonly validatorsCount: number;
 }
 
 export interface DeserializeWireBaseOptions {

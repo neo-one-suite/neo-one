@@ -221,7 +221,7 @@ export const makePrepareRequest = async ({
   }
 
   const timestamp = BN.max(new BN(Date.now()), previousHeader.timestamp.addn(1));
-  context = context.clone({ blockOptions: { timestamp } });
+  context = context.clone({ blockOptions: { timestamp, consensusData: { nonce: new BN(nonce) } } });
 
   const preparationPayload = await makeSignedPayload({
     node,

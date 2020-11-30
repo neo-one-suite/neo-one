@@ -128,7 +128,7 @@ describe('RPC Call sendrawtransaction', () => {
         standbyValidators: ['0248be3c070df745a60f3b8b494efcc6caf90244d803a9a72fe95d9bae2120ec70'].map((p) =>
           common.stringToECPoint(p),
         ),
-        addressVersion: 23,
+        addressVersion: common.NEO_ADDRESS_VERSION,
         messageMagic: 7630401,
       },
     };

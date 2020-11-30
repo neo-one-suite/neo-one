@@ -1,8 +1,8 @@
 // tslint:disable no-array-mutation no-object-mutation
-import { common, TriggerType, VMState } from '@neo-one/client-common';
+import { TriggerType, VMState } from '@neo-one/client-common';
 import { ApplicationExecuted, Block, SnapshotHandler, Transaction, VM } from '@neo-one/node-core';
 import { PersistNativeContractsError } from './errors';
-import { utils as blockchainUtils } from './utils';
+import { utils, utils as blockchainUtils } from './utils';
 
 interface PersistingBlockchainOptions {
   readonly vm: VM;
@@ -36,7 +36,7 @@ export class PersistingBlockchain {
           {
             trigger: TriggerType.System,
             snapshot: 'main',
-            gas: 0,
+            gas: utils.ZERO,
             testMode: true,
           },
           (engine) => {
@@ -88,7 +88,7 @@ export class PersistingBlockchain {
         trigger: TriggerType.Application,
         container: transaction,
         snapshot: 'clone',
-        gas: common.fixed8ToDecimal(transaction.systemFee).toNumber(),
+        gas: transaction.systemFee,
         testMode: false,
       },
       (engine) => {

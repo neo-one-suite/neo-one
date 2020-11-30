@@ -61,6 +61,11 @@ export const InsufficientSystemFeeError = makeErrorWithCode(
   (total: BigNumber, expected: BigNumber) =>
     `Found ${total.toString()} allowed system fee, required: ${expected.toString()}.`,
 );
+export const InsufficientNetworkFeeError = makeErrorWithCode(
+  'INSUFFICIENT_NETWORK_FEE',
+  (total: BigNumber, expected: BigNumber) =>
+    `Found ${total.toString()} allowed network fee, required: ${expected.toString()}.`,
+);
 export const FundsInUseError = makeErrorWithCode(
   'FUNDS_IN_USE',
   (total: BigNumber, expected: BigNumber, numInputs: number) =>

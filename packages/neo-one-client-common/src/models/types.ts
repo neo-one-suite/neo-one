@@ -1,5 +1,6 @@
 import { JSONObject } from '@neo-one/utils';
 import { UInt256Hex } from '../common';
+import { UserAccount } from '../types';
 import { ContractParameterTypeModel } from './ContractParameterTypeModel';
 import { StorageFlagsModel } from './StorageFlagsModel';
 import { AttributeTypeModel } from './transaction/attribute/AttributeTypeModel';
@@ -291,6 +292,13 @@ export interface ApplicationLogJSON {
   readonly notifications: readonly NotificationJSON[];
 }
 
+export interface AccountContractJSON {
+  readonly script: string;
+  readonly parameterlist: readonly ContractParameterTypeJSON[];
+  readonly scripthash: string;
+  readonly address: string;
+}
+
 export interface TransactionJSON {
   readonly hash: string;
   readonly size: number;
@@ -518,4 +526,13 @@ export interface VersionJSON {
   readonly wsport: number;
   readonly nonce: number;
   readonly useragent: string;
+}
+
+export interface VerificationCostJSON {
+  readonly fee: string;
+  readonly size: number;
+}
+
+export interface UserAccountJSON extends Omit<UserAccount, 'contract'> {
+  readonly contract: AccountContractJSON;
 }

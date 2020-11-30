@@ -7,7 +7,6 @@ export * from './ContractParametersContext';
 export * from './manifest';
 export * from './ContractIDState';
 export * from './ContractState';
-export * from './Contract';
 export * from './constants';
 export * from './crypto';
 export * from './Equatable';

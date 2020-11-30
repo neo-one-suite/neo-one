@@ -1,4 +1,5 @@
 import { UInt160 } from '@neo-one/client-common';
+import { BN } from 'bn.js';
 import { NativeContainer } from './Native';
 import { SerializableContainer } from './Serializable';
 import { BlockchainStorage } from './Storage';
@@ -14,7 +15,7 @@ export interface Verifiable {
 }
 
 export interface ExecuteScriptResult {
-  readonly gas: number;
+  readonly gas: BN;
   readonly result: boolean;
 }
 
@@ -23,7 +24,7 @@ export type VerifyWitnesses = (
   verifiable: SerializableContainer,
   storage: BlockchainStorage,
   native: NativeContainer,
-  gasIn: number,
+  gasIn: BN,
 ) => Promise<boolean>;
 
 export interface VerifyOptions {

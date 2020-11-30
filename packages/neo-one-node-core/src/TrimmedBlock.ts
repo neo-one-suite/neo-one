@@ -33,7 +33,7 @@ export class TrimmedBlock extends BlockBase implements SerializableWire {
       options,
     );
 
-    const hashes = reader.readArray(reader.readUInt256.bind(reader), Block.MaxContentsPerBlock);
+    const hashes = reader.readArray(() => reader.readUInt256(), Block.MaxContentsPerBlock);
     const consensusData = hashes.length > 0 ? ConsensusData.deserializeWireBase(options) : undefined;
 
     return new TrimmedBlock({

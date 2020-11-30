@@ -610,29 +610,29 @@ export class Client<
   /**
    * @internal
    */
-  // public async __invokeClaim(
-  //   contract: AddressString,
-  //   method: string,
-  //   params: ReadonlyArray<ScriptBuilderParam | undefined>,
-  //   paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-  //   optionsIn?: TransactionOptions,
-  //   sourceMaps: SourceMaps = {},
-  // ): Promise<TransactionResult> {
-  //   args.assertAddress('contract', contract);
-  //   args.assertString('method', method);
-  //   args.assertArray('params', params).forEach((param) => args.assertNullableScriptBuilderParam('params.param', param));
-  //   paramsZipped.forEach(([tupleString, tupleParam]) => [
-  //     args.assertString('tupleString', tupleString),
-  //     args.assertNullableParam('tupleParam', tupleParam),
-  //   ]);
-  //   const options = args.assertTransactionOptions('options', optionsIn);
-  //   args.assertSourceMaps('sourceMaps', sourceMaps);
-  //   await this.applyBeforeRelayHook(options);
+  public async __invokeClaim(
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
+    optionsIn?: TransactionOptions,
+    sourceMaps: SourceMaps = {},
+  ): Promise<TransactionResult> {
+    args.assertAddress('contract', contract);
+    args.assertString('method', method);
+    args.assertArray('params', params).forEach((param) => args.assertNullableScriptBuilderParam('params.param', param));
+    paramsZipped.forEach(([tupleString, tupleParam]) => [
+      args.assertString('tupleString', tupleString),
+      args.assertNullableParam('tupleParam', tupleParam),
+    ]);
+    const options = args.assertTransactionOptions('options', optionsIn);
+    args.assertSourceMaps('sourceMaps', sourceMaps);
+    await this.applyBeforeRelayHook(options);
 
-  //   return this.addTransactionHooks(
-  //     this.getProvider(options).invokeClaim(contract, method, params, paramsZipped, options, sourceMaps),
-  //   );
-  // }
+    return this.addTransactionHooks(
+      this.getProvider(options).invokeClaim(contract, method, params, paramsZipped, options, sourceMaps),
+    );
+  }
 
   /**
    * @internal
