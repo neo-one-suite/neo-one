@@ -595,14 +595,14 @@ export interface UserAccountProvider {
    *
    * Otherwise, parameters are the same as `invoke`.
    */
-  // readonly invokeClaim: (
-  //   contract: AddressString,
-  //   method: string,
-  //   params: ReadonlyArray<ScriptBuilderParam | undefined>,
-  //   paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-  //   options?: TransactionOptions,
-  //   sourceMaps?: SourceMaps,
-  // ) => Promise<TransactionResult>;
+  readonly invokeClaim: (
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
+    options?: TransactionOptions,
+    sourceMaps?: SourceMaps,
+  ) => Promise<TransactionResult>;
   /**
    * Invokes the constant `method` on `contract` with `params` on `network`.
    */

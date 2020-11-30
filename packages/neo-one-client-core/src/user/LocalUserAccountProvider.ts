@@ -1,14 +1,16 @@
 import {
+  AddressString,
   addressToScriptHash,
   Attribute,
   common,
   crypto,
   GetOptions,
-  IterOptions,
   NetworkType,
+  Param,
   RawAction,
   RelayTransactionResult,
   ScriptBuilder,
+  ScriptBuilderParam,
   SourceMaps,
   Transaction,
   TransactionModel,
@@ -27,7 +29,6 @@ import { utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { Observable } from 'rxjs';
 import { InvokeError, UnknownAccountError } from '../errors';
-import { Hash160 } from '../Hash160';
 import {
   ExecuteInvokeMethodOptions,
   ExecuteInvokeScriptOptions,
@@ -98,7 +99,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
   public readonly keystore: TKeyStore;
   public readonly deleteUserAccount?: (id: UserAccountID) => Promise<void>;
   public readonly updateUserAccountName?: (options: UpdateAccountNameOptions) => Promise<void>;
-  public readonly iterActionsRaw?: (network: NetworkType, options?: IterOptions) => AsyncIterable<RawAction>;
   protected readonly executeInvokeMethod: <T extends TransactionReceipt>(
     options: ExecuteInvokeMethodOptions<T>,
   ) => Promise<TransactionResult<T>>;
@@ -128,11 +128,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
       this.updateUserAccountName = async (options: UpdateAccountNameOptions): Promise<void> => {
         await updateUserAccountName(options);
       };
-    }
-
-    const iterActionsRaw = this.provider.iterActionsRaw;
-    if (iterActionsRaw !== undefined) {
-      this.iterActionsRaw = iterActionsRaw.bind(this.keystore);
     }
 
     this.executeInvokeMethod = this.executeInvoke;
@@ -232,52 +227,60 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     );
   }
 
-  // protected async executeInvokeClaim({
-  //   contract,
-  //   unclaimedAmount,
-  //   attributes,
-  //   method,
-  //   params,
-  //   paramsZipped,
-  //   from,
-  //   sourceMaps,
-  // }: {
-  //   readonly contract: AddressString;
-  //   readonly unclaimedAmount: BigNumber;
-  //   readonly attributes: readonly Attribute[];
-  //   readonly method: string;
-  //   readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
-  //   readonly paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>;
-  //   readonly from: UserAccountID;
-  //   readonly sourceMaps?: SourceMaps;
-  // }): Promise<TransactionResult> {
-  //   const builder = new ScriptBuilder()
-  //     .emitSysCall('System.Contract.Call', common.GAS_CONTRACT_SCRIPT_HASH, 'transfer', [
-  //       addressToScriptHash(contract),
-  //       common.GAS_CONTRACT_SCRIPT_HASH,
-  //       unclaimedAmount.toString(),
-  //     ])
-  //     .build();
+  protected async executeInvokeClaim({
+    contract,
+    unclaimedAmount,
+    attributes,
+    method,
+    params,
+    paramsZipped, // TODO: see old executeInvokeClaim
+    from,
+    sourceMaps,
+    networkFee,
+  }: {
+    readonly contract: AddressString;
+    readonly unclaimedAmount: BigNumber;
+    readonly attributes: readonly Attribute[];
+    readonly method: string;
+    readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
+    readonly paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>;
+    readonly from: UserAccountID;
+    readonly sourceMaps?: SourceMaps;
+    readonly networkFee?: BigNumber;
+  }): Promise<TransactionResult> {
+    const script = new ScriptBuilder()
+      // TODO: check that this is correct script for claiming gas?
+      .emitAppCall(common.nativeHashes.GAS, 'transfer', [
+        addressToScriptHash(contract), // check this is correct address
+        common.nativeHashes.GAS,
+        unclaimedAmount.toString(),
+      ])
+      .build();
 
-  //   const { gas } = await this.getSystemFee({ from, script, attributes });
+    const [{ gas }, { count, messageMagic }] = await Promise.all([
+      this.getSystemFee({ from, script, attributes }),
+      this.getCountAndMagic(from),
+    ]);
 
-  //   const transaction = new TransactionModel({
-  //     systemFee: utils.bigNumberToBN(gas, 8),
-  //     // Since the contract address is an input, we must add a witness for it.
-  //     witnesses: this.getInvokeScripts(method, params, true),
-  //     script,
-  //   });
+    const transaction = new TransactionModel({
+      systemFee: utils.bigNumberToBN(gas, 8),
+      networkFee: utils.bigNumberToBN(networkFee ? networkFee : new BigNumber(0), 8), // TODO: check. should it be optional param or no?
+      // Since the contract address is an input, we must add a witness for it.
+      witnesses: this.getInvokeScripts(method, params, true),
+      script,
+      attributes: this.convertAttributes(attributes),
+      validUntilBlock: count + 240,
+      messageMagic,
+    });
 
-  //   return this.sendTransaction<Transaction>({
-  //     from,
-  //     transaction,
-  //     onConfirm: async ({ receipt }) => receipt,
-  //     sourceMaps,
-  //   });
-  // }
+    return this.sendTransaction<Transaction>({
+      from,
+      transaction,
+      onConfirm: async ({ receipt }) => receipt,
+      sourceMaps,
+    });
+  }
 
-  // TODO: probably want to make sure an "executeTransfer" function is able to transfer any asset
-  // since they're all just contract invocations now
   protected async executeTransfer(
     transfers: readonly Transfer[],
     from: UserAccountID,
@@ -286,22 +289,27 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
   ): Promise<TransactionResult> {
     const sb = new ScriptBuilder();
     transfers.forEach((transfer) => {
-      sb.emitSysCall(
-        'System.Contract.Call',
-        transfer.asset === Hash160.NEO ? common.nativeHashes.NEO : common.nativeHashes.GAS,
-        'transfer',
-        [addressToScriptHash(from.address), addressToScriptHash(transfer.to), transfer.amount.toString()],
-      );
+      // TODO: check transfer.asset
+      sb.emitAppCall(common.stringToUInt160(transfer.asset), 'transfer', [
+        addressToScriptHash(from.address),
+        addressToScriptHash(transfer.to),
+        transfer.amount.toString(),
+      ]);
     });
     const script = sb.build();
 
-    const { gas } = await this.getSystemFee({ from, attributes, script });
+    const [{ gas }, { count, messageMagic }] = await Promise.all([
+      this.getSystemFee({ from, attributes, script }),
+      this.getCountAndMagic(from),
+    ]);
 
     const transaction = new TransactionModel({
       systemFee: utils.bigNumberToBN(gas, 8), // TODO: check. fee for transfer method is 0.08 GAS
       networkFee: utils.bigNumberToBN(networkFee, 8), // TODO: check
       attributes: this.convertAttributes(attributes),
       script,
+      validUntilBlock: count + 240,
+      messageMagic,
     });
 
     return this.sendTransaction<Transaction>({
@@ -321,22 +329,25 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     const unclaimedAmount = await this.provider.getUnclaimed(from.network, from.address);
     const toHash = crypto.toScriptHash(crypto.createSignatureRedeemScript(common.stringToECPoint(toAccount.publicKey)));
     const script = new ScriptBuilder()
-      .emitSysCall('System.Contract.Call', common.nativeHashes.GAS, 'transfer', [
+      .emitAppCall(common.nativeHashes.GAS, 'transfer', [
         addressToScriptHash(from.address),
         common.nativeHashes.GAS,
         unclaimedAmount.toString(),
       ])
       .build();
 
-    const { gas } = await this.getSystemFee({ script, from, attributes });
+    const [{ gas }, { count, messageMagic }] = await Promise.all([
+      this.getSystemFee({ from, attributes, script }),
+      this.getCountAndMagic(from),
+    ]);
 
     const transaction = new TransactionModel({
       systemFee: utils.bigNumberToBN(gas, 8), // TODO: check this. check decimals
       networkFee: utils.bigNumberToBN(networkFee, 8), // TODO: check decimals
-      signers: undefined, // ?
-      witnesses: undefined, // ?
       script,
       attributes: this.convertAttributes(attributes),
+      messageMagic,
+      validUntilBlock: count + 240,
     });
 
     return this.sendTransaction<Transaction>({
@@ -347,24 +358,26 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     });
   }
 
+  // TODO: see invokeScript and invokeFunction in neo-modules
   private async executeInvoke<T extends TransactionReceipt>({
     script,
     from,
     attributes,
-    gas,
+    systemFee,
+    networkFee,
     witnesses,
     onConfirm,
     sourceMaps,
   }: ExecuteInvokeScriptOptions<T>): Promise<TransactionResult<T>> {
-    // TODO: check
-    const { gas: systemFee } = await this.getSystemFee({ attributes, script, from });
+    const { count, messageMagic } = await this.getCountAndMagic(from);
     const invokeTransaction = new TransactionModel({
       systemFee: utils.bigNumberToBN(systemFee, 8), // TODO: check
-      networkFee: utils.bigNumberToBN(gas, 8), // TODO: check
+      networkFee: utils.bigNumberToBN(networkFee ? networkFee : new BigNumber(0), 8), // TODO: check. should it be optional param or no?
       attributes: this.convertAttributes(attributes),
-      signers: [], // TODO: ?
       script,
       witnesses,
+      validUntilBlock: count + 240,
+      messageMagic,
     });
 
     try {
