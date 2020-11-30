@@ -464,7 +464,7 @@ export class InvokeSmartContractHelper extends Helper {
     };
 
     // [number]
-    sb.emitSysCall(node, 'Neo.Runtime.GetTrigger');
+    sb.emitSysCall(node, 'System.Runtime.GetTrigger');
     sb.emitHelper(
       node,
       options,
@@ -503,7 +503,7 @@ export class InvokeSmartContractHelper extends Helper {
               // []
               sb.emitOp(node, 'DROP');
               // [transaction]
-              sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+              sb.emitSysCall(node, 'System.Runtime.GetScriptContainer');
               // [type]
               sb.emitSysCall(node, 'Neo.Transaction.GetType');
               sb.emitHelper(

@@ -37,7 +37,7 @@ export class ArrayPush extends BuiltinInstanceMemberCall {
       sb.emitOp(node, 'APPEND');
     });
     // [number]
-    sb.emitOp(node, 'ARRAYSIZE');
+    sb.emitOp(node, 'SIZE');
     if (optionsIn.pushValue) {
       // [val]
       sb.emitHelper(node, options, sb.helpers.wrapNumber);

@@ -27,7 +27,7 @@ export class CacheStorageHelper extends Helper {
     // [map]
     sb.emitOp(node, 'PICKITEM');
     // [number, map]
-    sb.emitSysCall(node, 'Neo.Runtime.GetTrigger');
+    sb.emitSysCall(node, 'System.Runtime.GetTrigger');
     // [number, number, map]
     sb.emitPushInt(node, 0x10);
     sb.emitHelper(

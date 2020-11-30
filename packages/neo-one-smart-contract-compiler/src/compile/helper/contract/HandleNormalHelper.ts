@@ -51,7 +51,7 @@ export class HandleNormalHelper extends Helper {
           // [arg, arg]
           sb.emitOp(decl, 'DUP');
           // [transaction, arg, arg]
-          sb.emitSysCall(decl, 'System.ExecutionEngine.GetScriptContainer');
+          sb.emitSysCall(decl, 'System.Runtime.GetScriptContainer');
           // [arg]
           sb.emitOp(decl, 'APPEND');
         }

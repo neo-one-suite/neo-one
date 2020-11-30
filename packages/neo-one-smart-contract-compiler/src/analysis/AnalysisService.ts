@@ -193,6 +193,10 @@ export class AnalysisService {
     return this.extractLiteral(original, 'Hash256Constructor', common.stringToUInt256, common.bufferToUInt256);
   }
 
+  public extractLiteralHash160(original: ts.Expression): UInt160 | undefined {
+    return this.extractLiteral(original, 'Hash160Constructor', common.stringToUInt160, common.bufferToUInt160);
+  }
+
   public extractLiteralPublicKey(original: ts.Expression): ECPoint | undefined {
     return this.extractLiteral(original, 'PublicKeyConstructor', common.stringToECPoint, common.bufferToECPoint);
   }

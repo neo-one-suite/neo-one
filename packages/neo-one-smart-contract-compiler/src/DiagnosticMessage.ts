@@ -40,6 +40,7 @@ export enum DiagnosticMessage {
   ResolveOneType = 'Expected type to resolve to one known type',
   InvalidAddress = 'Argument to Address.from must be a string literal address.',
   InvalidHash256 = 'Argument to Hash256.from must be a string literal hash256.',
+  InvalidHash160 = 'Argument to Hash160.from must be a string literal hash160.',
   InvalidPublicKey = 'Argument to PublicKey.from must be a string literal publicKey.',
   EventNotifierArguments = 'The arguments to createEventNotifier must be string literals.',
   InvalidBuiltinCall = 'Value is not callable.',

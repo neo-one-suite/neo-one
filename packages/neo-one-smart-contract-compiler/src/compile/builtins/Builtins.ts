@@ -239,7 +239,12 @@ export class Builtins {
   }
 
   public addContractMember(value: string, member: string, builtin: Builtin): void {
-    this.addMemberBase(value, member, builtin, this.getContract());
+    try {
+      this.addMemberBase(value, member, builtin, this.getContract());
+    } catch (e) {
+      console.log(member, value);
+      throw e;
+    }
   }
 
   public addInterface(value: string, builtin: Builtin): void {
@@ -397,7 +402,12 @@ export class Builtins {
   }
 
   private getInterfaceSymbolBase(name: string, file: ts.SourceFile): ts.Symbol {
-    return throwIfNull(this.getInterfaceSymbolMaybe(name, file));
+    try {
+      return throwIfNull(this.getInterfaceSymbolMaybe(name, file));
+    } catch (e) {
+      console.log(name);
+      throw e;
+    }
   }
 
   private getInterfaceSymbolMaybe(name: string, file: ts.SourceFile): ts.Symbol | undefined {

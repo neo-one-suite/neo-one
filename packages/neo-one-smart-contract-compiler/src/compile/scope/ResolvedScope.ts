@@ -249,7 +249,7 @@ export class ResolvedScope implements Scope {
       // [scopes, scopes]
       sb.emitOp(node, 'DUP');
       // [size, scopes]
-      sb.emitOp(node, 'ARRAYSIZE');
+      sb.emitOp(node, 'SIZE');
       // [size - 1, scopes]
       sb.emitOp(node, 'DEC');
       // []

@@ -58,7 +58,7 @@ export class BindFunctionThisHelper extends Helper {
       sb.helpers.if({
         condition: () => {
           // [size, func, this, func]
-          sb.emitOp(node, 'ARRAYSIZE');
+          sb.emitOp(node, 'SIZE');
           // [3, size, func, this, func]
           sb.emitPushInt(node, 3);
           // [hasThis, func, this, func]

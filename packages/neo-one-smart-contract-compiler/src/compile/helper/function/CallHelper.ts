@@ -39,7 +39,7 @@ export class CallHelper extends Helper {
       sb.helpers.if({
         condition: () => {
           // [size, [scopes, this], func]
-          sb.emitOp(node, 'ARRAYSIZE');
+          sb.emitOp(node, 'SIZE');
           // [3, size, [scopes, this], func]
           sb.emitPushInt(node, 3);
           // [size === 3, [scopes, this], func]
@@ -64,20 +64,22 @@ export class CallHelper extends Helper {
       }),
     );
 
-    // [func]
-    sb.emitOp(node, 'TOALTSTACK');
+    // TODO: I believe the commented out code can be replaced with this new call
+    sb.emitOp(node, 'CALLA');
+    // // [func]
+    // sb.emitOp(node, 'TOALTSTACK');
 
-    // Push the target on the stack
-    // [0, func]
-    sb.emitPushInt(node, 0);
-    // [target]
-    sb.emitOp(node, 'PICKITEM');
+    // // Push the target on the stack
+    // // [0, func]
+    // sb.emitPushInt(node, 0);
+    // // [target]
+    // sb.emitOp(node, 'PICKITEM');
 
-    // Call function
-    sb.emitCall(node);
+    // // Call function
+    // sb.emitCall(node);
 
-    // Remove scope
-    sb.emitOp(node, 'FROMALTSTACK');
+    // // Remove scope
+    // sb.emitOp(node, 'FROMALTSTACK');
     sb.emitOp(node, 'DROP');
 
     sb.emitHelper(node, optionsIn, sb.helpers.handleCompletion);

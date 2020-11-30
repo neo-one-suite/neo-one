@@ -57,7 +57,7 @@ export class ParametersHelper extends Helper {
               // [argsarr, argsarr]
               sb.emitOp(param, 'DUP');
               // [size, argsarr]
-              sb.emitOp(param, 'ARRAYSIZE');
+              sb.emitOp(param, 'SIZE');
               // [idx, size, argsarr]
               sb.emitPushInt(param, idx);
               // [lt, argsarr]
@@ -107,7 +107,7 @@ export class ParametersHelper extends Helper {
               // [argsarr, argsarr]
               sb.emitOp(param, 'DUP');
               // [size, argsarr]
-              sb.emitOp(param, 'ARRAYSIZE');
+              sb.emitOp(param, 'SIZE');
               // [idx, size, argsarr]
               sb.emitPushInt(param, idx);
               // [size <= idx, argsarr]

@@ -89,7 +89,7 @@ export class CommonStorageHelper extends Helper {
         },
         whenFalse: () => {
           // [number, valueBuffer]
-          sb.emitSysCall(node, 'Neo.Runtime.GetTrigger');
+          sb.emitSysCall(node, 'System.Runtime.GetTrigger');
           // [number, number, valueBuffer]
           sb.emitPushInt(node, 0x10);
           sb.emitHelper(

@@ -11,7 +11,7 @@ export class ApplicationMatchesVerificationHelper extends Helper {
     const options = sb.pushValueOptions(optionsIn);
 
     // [transaction]
-    sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+    sb.emitSysCall(node, 'System.Runtime.GetScriptContainer');
     // [buffer]
     sb.emitSysCall(node, 'Neo.InvocationTransaction.GetScript');
     // [buffer, buffer]
@@ -25,7 +25,7 @@ export class ApplicationMatchesVerificationHelper extends Helper {
     // [appCall, appCallHash, 21, buffer]
     sb.emitPushBuffer(node, Buffer.from([Op.APPCALL]));
     // [hash, appCall, appCallHash, 21, buffer]
-    sb.emitSysCall(node, 'System.ExecutionEngine.GetExecutingScriptHash');
+    sb.emitSysCall(node, 'System.Runtime.GetExecutingScriptHash');
     // [appCallHash, appCallHash, 21, buffer]
     sb.emitOp(node, 'CAT');
     sb.emitHelper(
@@ -50,7 +50,7 @@ export class ApplicationMatchesVerificationHelper extends Helper {
           // [argsHash]
           sb.emitOp(node, 'HASH160');
           // [entryHash, argsHash]
-          sb.emitSysCall(node, 'System.ExecutionEngine.GetEntryScriptHash');
+          sb.emitSysCall(node, 'System.Runtime.GetEntryScriptHash');
           // [boolean]
           sb.emitOp(node, 'EQUAL');
         },

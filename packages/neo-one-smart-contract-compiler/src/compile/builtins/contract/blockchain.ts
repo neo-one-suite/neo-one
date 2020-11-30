@@ -21,7 +21,7 @@ class BlockchainCurrentCallerContract extends BuiltinMemberValue {
       // [buffer, buffer]
       sb.emitOp(node, 'DUP');
       // [contract, buffer]
-      sb.emitSysCall(node, 'Neo.Blockchain.GetContract');
+      sb.emitSysCall(node, 'System.Blockchain.GetContract');
       sb.emitHelper(
         node,
         options,
@@ -55,17 +55,17 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractMember(
     'BlockchainConstructor',
     'currentBlockTime',
-    new SysCallMemberValue('Neo.Runtime.GetTime', Types.Number),
+    new SysCallMemberValue('System.Runtime.GetTime', Types.Number),
   );
   builtins.addContractMember(
     'BlockchainConstructor',
     'currentHeight',
-    new SysCallMemberValue('Neo.Blockchain.GetHeight', Types.Number),
+    new SysCallMemberValue('System.Blockchain.GetHeight', Types.Number),
   );
   builtins.addContractMember(
     'BlockchainConstructor',
     'currentTransaction',
-    new SysCallMemberValue('System.ExecutionEngine.GetScriptContainer', Types.Transaction),
+    new SysCallMemberValue('System.Runtime.GetScriptContainer', Types.Transaction),
   );
   builtins.addContractMember('BlockchainConstructor', 'currentCallerContract', new BlockchainCurrentCallerContract());
 };

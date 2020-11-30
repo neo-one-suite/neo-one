@@ -91,14 +91,38 @@ export interface Hash256Constructor {
    * @returns `Hash256` for the specified `value`
    */
   readonly from: (value: string) => Hash256;
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+
+export const Hash160: Hash160Constructor;
+export interface Hash160 extends Buffer {
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+
+export interface Hash160Constructor {
   /**
-   * `Hash256` of the NEO `Asset`.
+   * Creates a `Hash160` from a literal string.
+   *
+   * @example
+   *
+   * const hash = Hash160.from('0x668e0c1f9d7b70a99dd9e06eadd4c784d641afbc');
+   *
+   * @param value Literal string for a `Hash160`.
+   * @returns `Hash160` for the specified `value`
    */
-  readonly NEO: Hash256;
+  readonly from: (value: string) => Hash160;
   /**
-   * `Hash256` of the GAS `Asset`.
+   * `Hash160` of the NEO `Contract`.
    */
-  readonly GAS: Hash256;
+  readonly NEO: Hash160;
+  /**
+   * `Hash160` of the GAS `Contract`.
+   */
+  readonly GAS: Hash160;
+  /**
+   * `Hash160` of the Policy `Contract`.
+   */
+  readonly Policy: Hash160;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 
@@ -151,111 +175,11 @@ export type Fixed8 = Fixed<8>;
 /**
  * `Attribute` usage flag indicates the type of the data.
  *
- * @see BufferAttributeUsage
- * @see PublicKeyAttributeUsage
- * @see AddressAttributeUsage
- * @see Hash256AttributeUsage
+ * @see HighPriorityAttribute
  */
 export enum AttributeUsage {
-  ContractHash = 0x00,
-  ECDH02 = 0x02,
-  ECDH03 = 0x03,
-  Script = 0x20,
-  Vote = 0x30,
-  DescriptionUrl = 0x81,
-  Description = 0x90,
-  Hash1 = 0xa1,
-  Hash2 = 0xa2,
-  Hash3 = 0xa3,
-  Hash4 = 0xa4,
-  Hash5 = 0xa5,
-  Hash6 = 0xa6,
-  Hash7 = 0xa7,
-  Hash8 = 0xa8,
-  Hash9 = 0xa9,
-  Hash10 = 0xaa,
-  Hash11 = 0xab,
-  Hash12 = 0xac,
-  Hash13 = 0xad,
-  Hash14 = 0xae,
-  Hash15 = 0xaf,
-  Remark = 0xf0,
-  Remark1 = 0xf1,
-  Remark2 = 0xf2,
-  Remark3 = 0xf3,
-  Remark4 = 0xf4,
-  Remark5 = 0xf5,
-  Remark6 = 0xf6,
-  Remark7 = 0xf7,
-  Remark8 = 0xf8,
-  Remark9 = 0xf9,
-  Remark10 = 0xfa,
-  Remark11 = 0xfb,
-  Remark12 = 0xfc,
-  Remark13 = 0xfd,
-  Remark14 = 0xfe,
-  Remark15 = 0xff,
+  HighPriority = 1,
 }
-
-/**
- * `Attribute` usage flag indicating the data is an arbitrary `Buffer`
- *
- * @see BufferAttribute
- */
-export type BufferAttributeUsage =
-  | AttributeUsage.DescriptionUrl
-  | AttributeUsage.Description
-  | AttributeUsage.Remark
-  | AttributeUsage.Remark1
-  | AttributeUsage.Remark2
-  | AttributeUsage.Remark3
-  | AttributeUsage.Remark4
-  | AttributeUsage.Remark5
-  | AttributeUsage.Remark6
-  | AttributeUsage.Remark7
-  | AttributeUsage.Remark8
-  | AttributeUsage.Remark9
-  | AttributeUsage.Remark10
-  | AttributeUsage.Remark11
-  | AttributeUsage.Remark12
-  | AttributeUsage.Remark13
-  | AttributeUsage.Remark14
-  | AttributeUsage.Remark15;
-/**
- * `Attribute` usage flag indicating the data is a `PublicKey`
- *
- * @see PublicKeyAttribute
- */
-export type PublicKeyAttributeUsage = AttributeUsage.ECDH02 | AttributeUsage.ECDH03;
-/**
- * `Attribute` usage flag indicating the data is an `Address`
- *
- * @see AddressAttribute
- */
-export type AddressAttributeUsage = AttributeUsage.Script;
-/**
- * `Attribute` usage flag indicating the data is a `Hash256`
- *
- * @see Hash256Attribute
- */
-export type Hash256AttributeUsage =
-  | AttributeUsage.ContractHash
-  | AttributeUsage.Vote
-  | AttributeUsage.Hash1
-  | AttributeUsage.Hash2
-  | AttributeUsage.Hash3
-  | AttributeUsage.Hash4
-  | AttributeUsage.Hash5
-  | AttributeUsage.Hash6
-  | AttributeUsage.Hash7
-  | AttributeUsage.Hash8
-  | AttributeUsage.Hash9
-  | AttributeUsage.Hash10
-  | AttributeUsage.Hash11
-  | AttributeUsage.Hash12
-  | AttributeUsage.Hash13
-  | AttributeUsage.Hash14
-  | AttributeUsage.Hash15;
 
 /**
  * Base interface for `Attribute`s
@@ -265,263 +189,107 @@ export type Hash256AttributeUsage =
 export const AttributeBase: AttributeBaseConstructor;
 export interface AttributeBase {
   readonly usage: AttributeUsage;
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+
+export interface AttributeBaseData {
+  readonly usage: AttributeUsage;
   readonly data: Buffer;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
+
 export interface AttributeBaseConstructor {
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 
-/**
- * `Attribute` whose data is an arbitrary `Buffer`.
- */
-export interface BufferAttribute extends AttributeBase {
-  readonly usage: BufferAttributeUsage;
-  readonly data: Buffer;
-}
-/**
- * `Attribute` whose data is a `PublicKey`.
- */
-export interface PublicKeyAttribute extends AttributeBase {
-  readonly usage: PublicKeyAttributeUsage;
-  readonly data: PublicKey;
-}
-/**
- * `Attribute` whose data is an `Address`.
- */
-export interface AddressAttribute extends AttributeBase {
-  readonly usage: AddressAttributeUsage;
-  readonly data: Address;
-}
-/**
- * `Attribute` whose data is a `Hash256`.
- */
-export interface Hash256Attribute extends AttributeBase {
-  readonly usage: Hash256AttributeUsage;
-  readonly data: Hash256;
+export interface HighPriorityAttribute extends AttributeBase {
+  readonly usage: AttributeUsage.HighPriority;
 }
 
 /**
  * `Attribute`s are used to store additional data on `Transaction`s. Most `Attribute`s are used to store arbitrary data, whereas some, like `AddressAttribute`, have specific uses in the NEO
- * protocol.
+ * protocol. The only attribute currently available on the neo3 protocol is the "HighPriority" attribute.
  */
-export type Attribute = BufferAttribute | PublicKeyAttribute | AddressAttribute | Hash256Attribute;
+export type Attribute = HighPriorityAttribute;
+
+export enum WitnessScope {
+  None = 0x00,
+  CalledByEntry = 0x01,
+  CustomContracts = 0x10,
+  CustomGroups = 0x20,
+  Global = 0x80,
+}
+export const WitnessScopeBase: WitnessScopeBaseConstructor;
+export interface WitnessScopeBase {
+  readonly scope: WitnessScope;
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+
+export interface WitnessScopeBaseConstructor {
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+
+export interface NoneWitnessScope extends WitnessScopeBase {
+  readonly scope: WitnessScope.None;
+}
+
+export interface CalledByEntryWitnessScope extends WitnessScopeBase {
+  readonly scope: WitnessScope.CalledByEntry;
+}
+
+export interface CustomContractsWitnessScope extends WitnessScopeBase {
+  readonly scope: WitnessScope.CustomContracts;
+}
+
+export interface CustomGroupsWitnessScope extends WitnessScopeBase {
+  readonly scope: WitnessScope.CustomGroups;
+}
+
+export interface GlobalWitnessScope extends WitnessScopeBase {
+  readonly scope: WitnessScope.Global;
+}
 
 /**
- * `Output`s represent the destination `Address` and amount transferred of a given `Asset`.
+ * Base interface for `WitnessScope`
  *
- * The sum of the unspent `Output`s of an `Address` represent the total balance of the `Address`.
+ * @see WitnessScope
  */
-export const Output: OutputConstructor;
-export interface Output {
-  /**
-   * Destination `Address`.
-   */
-  readonly address: Address;
-  /**
-   * `Hash256` of the `Asset` that was transferred.
-   */
-  readonly asset: Hash256;
-  /**
-   * Amount transferred.
-   */
-  readonly value: Fixed8;
-  readonly [OpaqueTagSymbol0]: unique symbol;
-}
-export interface OutputConstructor {
-  readonly [OpaqueTagSymbol0]: unique symbol;
-}
 
-/**
- * `Input`s are a reference to an `Output` of a `Transaction` that has been persisted to the blockchain. The sum of the `value`s of the referenced `Output`s is the total amount transferred in the `Transaction`.
- */
-export const Input: InputConstructor;
-export interface Input {
+export const Signer: SignerConstructor;
+export interface Signer {
   /**
-   * `Hash256` of the `Transaction` this input references.
+   * `Hash160` representing the account of this signer.
    */
-  readonly hash: Hash256;
+  readonly account: Hash160;
   /**
-   * `Output` index within the `Transaction` this input references.
+   * `Scopes` of this signature.
    */
-  readonly index: Integer;
+  readonly scopes: WitnessScope;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export interface InputConstructor {
-  readonly [OpaqueTagSymbol0]: unique symbol;
-}
-
-/**
- * Constants that specify the type of a `Transaction`.
- */
-export enum TransactionType {
-  /**
-   * First `Transaction` in each block which contains the `Block` rewards for the consensus node that produced the `Block`.
-   *
-   * @see MinerTransaction
-   */
-  Miner = 0x00,
-  /**
-   * Issues new currency of a first-class `Asset`.
-   *
-   * @see IssueTransaction
-   */
-  Issue = 0x01,
-  /**
-   * Claims GAS for a set of spent `Output`s.
-   *
-   * @see ClaimTransaction
-   */
-  Claim = 0x02,
-  /**
-   * Enrolls a new validator for a given `PublicKey`.
-   *
-   * @see EnrollmentTransaction
-   * @deprecated
-   */
-  Enrollment = 0x20,
-  /**
-   * Registers a new first class `Asset`
-   *
-   * @see RegisterTransaction
-   * @deprecated Replaced by `Client#registerAsset`
-   */
-  Register = 0x40,
-  /**
-   * Transfers first class `Asset`s
-   *
-   * @see ContractTransaction
-   */
-  Contract = 0x80,
-  State = 0x90,
-  /**
-   * Registers a new `Contract`
-   *
-   * @see PublishTransaction
-   * @deprecated Replaced by `Client#publish`
-   */
-  Publish = 0xd0,
-  /**
-   * Runs a script in the NEO VM.
-   *
-   * @see InvocationTransaction
-   */
-  Invocation = 0xd1,
-}
-
-/**
- * Base interface for all `Transaction`s.
- */
-export const TransactionBase: TransactionBaseConstructor;
-export interface TransactionBase {
+export interface SignerConstructor {}
+export interface Transaction {
   /**
    * `Hash256` of this `Transaction`.
    */
   readonly hash: Hash256;
   /**
-   * Type of the `Transaction`.
-   *
-   * @see TransactionType
-   */
-  readonly type: TransactionType;
-  /**
    * `Attribute`s attached to the `Transaction`.
+   * TODO: for now we leave attributes out since the only available attribute is not
+   * relevant to smart contract execution.
    *
    * @see Attribute
    */
-  readonly attributes: Attribute[];
+  // readonly attributes: Attribute[];
   /**
-   * `Output`s of the `Transaction`.
+   * `Signer`s attached to the `Transaction`.
    *
-   * @see Output
+   * @see Signer
    */
-  readonly outputs: Output[];
-  /**
-   * `Input`s of the `Transaction`.
-   *
-   * @see Input
-   */
-  readonly inputs: Input[];
-  /**
-   * Corresponding `Output`s for the `Input`s of the `Transaction`.
-   *
-   * @see Output
-   */
-  readonly references: Output[];
-  /**
-   * `Output`s which have not been spent.
-   *
-   * @see Output
-   */
-  readonly unspentOutputs: Output[];
+  readonly signers: Signer[];
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export interface TransactionBaseConstructor {}
 
-/**
- * First `Transaction` in each `Block` which contains the `Block` rewards for the consensus node that produced the `Block`.
- */
-export interface MinerTransaction extends TransactionBase {
-  readonly type: TransactionType.Miner;
-}
-/**
- * Issues new currency of a first-class `Asset`.
- */
-export interface IssueTransaction extends TransactionBase {
-  readonly type: TransactionType.Issue;
-}
-/**
- * Claims GAS for a set of spent `Output`s.
- */
-export interface ClaimTransaction extends TransactionBase {
-  readonly type: TransactionType.Claim;
-}
-/**
- * Enrolls a new validator for a given `PublicKey`.
- *
- * @deprecated
- */
-export interface EnrollmentTransaction extends TransactionBase {
-  readonly type: TransactionType.Enrollment;
-}
-/**
- * Registers a new first class `Asset`.
- *
- * @deprecated Replaced by `Client#registerAsset`
- */
-export interface RegisterTransaction extends TransactionBase {
-  readonly type: TransactionType.Register;
-}
-/**
- * `Transaction` that transfers first class `Asset`s.
- */
-export interface ContractTransaction extends TransactionBase {
-  readonly type: TransactionType.Contract;
-}
-/**
- * Contains the state of votes.
- */
-export interface StateTransaction extends TransactionBase {
-  readonly type: TransactionType.State;
-}
-/**
- * Registers a new `Contract`
- *
- * @deprecated Replaced by `Client#publish`
- */
-export interface PublishTransaction extends TransactionBase {
-  readonly type: TransactionType.Publish;
-}
-/**
- * `Transaction` which runs a script in the NEO VM.
- */
-export interface InvocationTransaction extends TransactionBase {
-  readonly type: TransactionType.Invocation;
-  /**
-   * Code that was executed in NEO VM.
-   */
-  readonly script: Buffer;
-}
 /**
  * `Transaction`s are persisted to the blockchain and represent various functionality like transferring first class `Asset`s or executing smart contracts.
  *
@@ -531,20 +299,9 @@ export interface InvocationTransaction extends TransactionBase {
  *
  * const transactionHash = Hash256.from('0xd6572a459b95d9136b7a713c5485ca709f9efa4f08f1c25dd792672d2bd75bfb');
  * const transaction = Transaction.for(transactionHash);
- * const transactionOutputs = transaction.outputs;
  *
  */
 export const Transaction: TransactionConstructor;
-export type Transaction =
-  | MinerTransaction
-  | IssueTransaction
-  | ClaimTransaction
-  | EnrollmentTransaction
-  | RegisterTransaction
-  | ContractTransaction
-  | StateTransaction
-  | PublishTransaction
-  | InvocationTransaction;
 export interface TransactionConstructor {
   /**
    * @returns `Transaction` for the specified `hash`.
@@ -580,83 +337,6 @@ export interface AccountConstructor {
    * @returns `Account` for the specified `address`.
    */
   readonly for: (address: Address) => Account;
-  readonly [OpaqueTagSymbol0]: unique symbol;
-}
-
-/**
- * Constants that specify the type of the `Asset`.
- */
-export enum AssetType {
-  Credit = 0x40,
-  Duty = 0x80,
-  /**
-   * Reserved for the NEO `Asset`.
-   */
-  Governing = 0x00,
-  /**
-   * Reserved for the GAS `Asset`.
-   */
-  Utility = 0x01,
-  Currency = 0x08,
-  Share = 0x90,
-  Invoice = 0x98,
-  Token = 0x60,
-}
-
-/**
- * Attributes of a first class asset.
- *
- * Smart contract authors will typically only interact with the NEO and GAS `Asset`s.
- *
- * @example
- *
- * const asset = Asset.for(Hash256.NEO);
- * const neoAmount = asset.amount;
- *
- */
-export const Asset: AssetConstructor;
-export interface Asset {
-  /**
-   * `Hash256` of this `Asset`.
-   */
-  readonly hash: Hash256;
-  /**
-   * `AssetType` of the `Asset`
-   *
-   * @see AssetType
-   */
-  readonly type: AssetType;
-  /**
-   * Total possible supply of the `Asset`
-   */
-  readonly amount: Fixed8;
-  /**
-   * Amount currently available of the `Asset`
-   */
-  readonly available: Fixed8;
-  /**
-   * Precision (number of decimal places) of the `Asset`
-   */
-  readonly precision: Integer;
-  /**
-   * Owner of the `Asset`.
-   */
-  readonly owner: PublicKey;
-  /**
-   * Admin of the `Asset`.
-   */
-  readonly admin: Address;
-  /**
-   * Issuer of the `Asset`.
-   */
-  readonly issuer: Address;
-  readonly [OpaqueTagSymbol0]: unique symbol;
-}
-export interface AssetConstructor {
-  /**
-   * @returns `Asset` for the specified `hash`.
-   */
-  readonly for: (hash: Hash256) => Asset;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 
@@ -1043,7 +723,7 @@ export interface BlockchainConstructor {
   /**
    * `InvocationTransaction` this smart contract is executed in.
    */
-  readonly currentTransaction: InvocationTransaction;
+  readonly currentTransaction: Transaction;
   /**
    * The `Address` of the smart contract that directly invoked the contract.
    *

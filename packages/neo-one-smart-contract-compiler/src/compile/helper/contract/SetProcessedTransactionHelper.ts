@@ -21,7 +21,7 @@ export class SetProcessedTransactionHelper extends Helper {
       }),
     );
     // [transaction, val]
-    sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+    sb.emitSysCall(node, 'System.Runtime.GetScriptContainer');
     // [hash, val]
     sb.emitSysCall(node, 'Neo.Transaction.GetHash');
     // [hashVal, val]

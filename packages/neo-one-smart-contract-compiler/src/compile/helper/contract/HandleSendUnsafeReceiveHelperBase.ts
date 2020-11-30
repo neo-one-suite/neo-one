@@ -31,7 +31,7 @@ export abstract class HandleSendUnsafeReceiveHelperBase extends Helper {
 
     // isProcessed(Blockchain.currentTransaction.hash)
     // [transaction]
-    sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+    sb.emitSysCall(node, 'System.Runtime.GetScriptContainer');
     // [hash]
     sb.emitSysCall(node, 'Neo.Transaction.GetHash');
     // [boolean]
@@ -40,13 +40,13 @@ export abstract class HandleSendUnsafeReceiveHelperBase extends Helper {
     // !isReceiveMethod() && !onlySentAssets()
     if (!this.opposite) {
       // [transaction, boolean]
-      sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+      sb.emitSysCall(node, 'System.Runtime.GetScriptContainer');
       // [outputs, boolean]
       sb.emitSysCall(node, 'Neo.Transaction.GetOutputs');
       // [map, boolean]
       sb.emitHelper(node, options, sb.helpers.getOutputAssetValueMap);
       // [transaction, map, boolean]
-      sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+      sb.emitSysCall(node, 'System.Runtime.GetScriptContainer');
       // [outputs, map, boolean]
       sb.emitSysCall(node, 'Neo.Transaction.GetReferences');
       // [map, boolean]

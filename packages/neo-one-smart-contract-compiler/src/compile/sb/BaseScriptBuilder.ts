@@ -205,7 +205,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
         finalValue = Buffer.concat([byteCodeBuffer, jumpPCBuffer]);
       } else if (value instanceof Line) {
         const currentLine = new BN(idx + 1);
-        const byteCodeBuffer = ByteBuffer[Op.PUSHBYTES4];
+        const byteCodeBuffer = ByteBuffer[Op.PUSHINT32];
         finalValue = Buffer.concat([byteCodeBuffer, currentLine.toArrayLike(Buffer, 'le', 4)]);
       } else {
         finalValue = value;
@@ -288,13 +288,6 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   }
 
   public emitOp(node: ts.Node, code: OpCode, buffer?: Buffer | undefined): void {
-    if (
-      ((code === 'APPCALL' || code === 'TAILCALL') && buffer !== undefined && buffer.equals(Buffer.alloc(20, 0))) ||
-      code === 'CALL_ED'
-    ) {
-      this.mutableFeatures = { ...this.mutableFeatures, dynamicInvoke: true };
-    }
-
     const bytecode = Op[code] as Op | undefined;
     if (bytecode === undefined) {
       /* istanbul ignore next */
@@ -365,7 +358,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   }
 
   public emitSysCall(node: ts.Node, name: SysCallName): void {
-    if (name === 'Neo.Storage.Put' || name === 'Neo.Storage.Delete') {
+    if (name === 'System.Storage.Put' || name === 'System.Storage.Delete') {
       this.mutableFeatures = { ...this.mutableFeatures, storage: true };
     }
 
@@ -566,14 +559,12 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   }
 
   private emitPush(node: ts.Node, value: Buffer): void {
-    if (value.length <= Op.PUSHBYTES75) {
-      this.emitOpByte(node, value.length, value);
-    } else if (value.length < 0x100) {
-      this.emitOp(node, 'PUSHDATA1', new ClientScriptBuilder().emitUInt8(value.length).emit(value).build());
+    if (value.length < 0x100) {
+      this.emitOp(node, 'PUSHDATA1', new ClientScriptBuilder().emitUInt8(value.length).emitRaw(value).build());
     } else if (value.length < 0x10000) {
-      this.emitOp(node, 'PUSHDATA2', new ClientScriptBuilder().emitUInt16LE(value.length).emit(value).build());
+      this.emitOp(node, 'PUSHDATA2', new ClientScriptBuilder().emitUInt16LE(value.length).emitRaw(value).build());
     } else if (value.length < 0x100000000) {
-      this.emitOp(node, 'PUSHDATA4', new ClientScriptBuilder().emitUInt32LE(value.length).emit(value).build());
+      this.emitOp(node, 'PUSHDATA4', new ClientScriptBuilder().emitUInt32LE(value.length).emitRaw(value).build());
     } else {
       throw new Error('Value too large.');
     }

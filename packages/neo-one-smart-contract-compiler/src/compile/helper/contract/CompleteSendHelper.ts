@@ -12,7 +12,7 @@ export class CompleteSendHelper extends Helper {
     const options = sb.pushValueOptions(optionsIn);
 
     // [transaction]
-    sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+    sb.emitSysCall(node, 'System.Runtime.GetScriptContainer');
     // [inputs]
     sb.emitSysCall(node, 'Neo.Transaction.GetInputs');
     sb.emitHelper(
@@ -23,7 +23,7 @@ export class CompleteSendHelper extends Helper {
           // [inputs, inputs]
           sb.emitOp(node, 'DUP');
           // [size, inputs]
-          sb.emitOp(node, 'ARRAYSIZE');
+          sb.emitOp(node, 'SIZE');
           // [0, size, inputs]
           sb.emitPushInt(node, 0);
           // [size == 0, inputs]
@@ -102,7 +102,7 @@ export class CompleteSendHelper extends Helper {
                       // [boolean]
                       sb.emitHelper(node, options, sb.helpers.isCaller);
                       // [transaction, boolean]
-                      sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+                      sb.emitSysCall(node, 'System.Runtime.GetScriptContainer');
                       // [references, boolean]
                       sb.emitSysCall(node, 'Neo.Transaction.GetReferences');
                       // [references, boolean]
@@ -114,14 +114,14 @@ export class CompleteSendHelper extends Helper {
                             // [buffer]
                             sb.emitSysCall(node, 'Neo.Output.GetScriptHash');
                             // [buffer, buffer]
-                            sb.emitSysCall(node, 'System.ExecutionEngine.GetExecutingScriptHash');
+                            sb.emitSysCall(node, 'System.Runtime.GetExecutingScriptHash');
                             // [boolean]
                             sb.emitOp(node, 'EQUAL');
                           },
                         }),
                       );
                       // [size, boolean]
-                      sb.emitOp(node, 'ARRAYSIZE');
+                      sb.emitOp(node, 'SIZE');
                       // [1, size, boolean]
                       sb.emitPushInt(node, 1);
                       // [size == 1, boolean]

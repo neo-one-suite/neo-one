@@ -35,7 +35,7 @@ export class HandleSendHelper extends Helper {
 
     // isProcessed(Blockchain.currentTransaction.hash)
     // [transaction]
-    sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+    sb.emitSysCall(node, 'System.Runtime.GetScriptContainer');
     // [hash]
     sb.emitSysCall(node, 'Neo.Transaction.GetHash');
     // [boolean]
@@ -43,7 +43,7 @@ export class HandleSendHelper extends Helper {
 
     // !firstOutputToSelf()
     // [transaction, boolean]
-    sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+    sb.emitSysCall(node, 'System.Runtime.GetScriptContainer');
     // [outputs, boolean]
     sb.emitSysCall(node, 'Neo.Transaction.GetOutputs');
     // [outputs, outputs, boolean]
@@ -56,7 +56,7 @@ export class HandleSendHelper extends Helper {
       sb.helpers.if({
         condition: () => {
           // [size, outputs, outputs, boolean]
-          sb.emitOp(node, 'ARRAYSIZE');
+          sb.emitOp(node, 'SIZE');
           // [0, size, outputs, outputs, boolean]
           sb.emitPushInt(node, 0);
           // [size <= 0, outputs, outputs, boolean]
@@ -76,7 +76,7 @@ export class HandleSendHelper extends Helper {
           // [buffer, outputs, boolean]
           sb.emitSysCall(node, 'Neo.Output.GetScriptHash');
           // [buffer, buffer, outputs, boolean]
-          sb.emitSysCall(node, 'System.ExecutionEngine.GetExecutingScriptHash');
+          sb.emitSysCall(node, 'System.Runtime.GetExecutingScriptHash');
           // [firstOutputToSelf, outputs, boolean]
           sb.emitOp(node, 'EQUAL');
           // [boolean, outputs, boolean]
@@ -92,7 +92,7 @@ export class HandleSendHelper extends Helper {
 
     // !allInputsAreProcessedAndUnclaimed()
     // [transaction, boolean, outputs]
-    sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+    sb.emitSysCall(node, 'System.Runtime.GetScriptContainer');
     // [inputs, boolean, outputs]
     sb.emitSysCall(node, 'Neo.Transaction.GetInputs');
     sb.emitHelper(
@@ -142,7 +142,7 @@ export class HandleSendHelper extends Helper {
     // [map, boolean, outputs]
     sb.emitHelper(node, options, sb.helpers.getOutputAssetValueMap);
     // [transaction, map, boolean, outputs]
-    sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+    sb.emitSysCall(node, 'System.Runtime.GetScriptContainer');
     // [references, map, boolean, outputs]
     sb.emitSysCall(node, 'Neo.Transaction.GetReferences');
     // [map, boolean, outputs]
@@ -200,7 +200,7 @@ export class HandleSendHelper extends Helper {
             sb.helpers.if({
               condition: () => {
                 // [size, arg, output, arg, output]
-                sb.emitOp(node, 'ARRAYSIZE');
+                sb.emitOp(node, 'SIZE');
                 // [size, size, arg, output, arg, output]
                 sb.emitOp(node, 'DUP');
                 // [0, size, size, arg, output, arg, output]
@@ -299,7 +299,7 @@ export class HandleSendHelper extends Helper {
                   // [receiver, value]
                   sb.emitOp(node, 'SWAP');
                   // [transaction, receiver, value]
-                  sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+                  sb.emitSysCall(node, 'System.Runtime.GetScriptContainer');
                   // [hash, receiver, value]
                   sb.emitSysCall(node, 'Neo.Transaction.GetHash');
                   // [bufferVal, receiver, value]

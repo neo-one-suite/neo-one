@@ -11,13 +11,13 @@ export class RefundAssetsHelper extends Helper {
     const references = sb.scope.addUnique();
 
     // [transaction]
-    sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+    sb.emitSysCall(node, 'System.Runtime.GetScriptContainer');
     // [references]
     sb.emitSysCall(node, 'Neo.Transaction.GetReferences');
     // []
     sb.scope.set(sb, node, options, references);
     // [transaction]
-    sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+    sb.emitSysCall(node, 'System.Runtime.GetScriptContainer');
     // [inputs]
     sb.emitSysCall(node, 'Neo.Transaction.GetInputs');
     // [map, inputs]
@@ -45,7 +45,7 @@ export class RefundAssetsHelper extends Helper {
                 // [buffer, map, input]
                 sb.emitSysCall(node, 'Neo.Output.GetScriptHash');
                 // [buffer, buffer, map, input]
-                sb.emitSysCall(node, 'System.ExecutionEngine.GetExecutingScriptHash');
+                sb.emitSysCall(node, 'System.Runtime.GetExecutingScriptHash');
                 // [boolean, map, input]
                 sb.emitOp(node, 'EQUAL');
               },
@@ -78,7 +78,7 @@ export class RefundAssetsHelper extends Helper {
           // [map, map]
           sb.emitOp(node, 'DUP');
           // [size, map]
-          sb.emitOp(node, 'ARRAYSIZE');
+          sb.emitOp(node, 'SIZE');
           // [1, size, map]
           sb.emitPushInt(node, 1);
           // [size === 1, map]

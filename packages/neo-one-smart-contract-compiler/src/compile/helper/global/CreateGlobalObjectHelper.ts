@@ -37,7 +37,7 @@ export class CreateGlobalObjectHelper extends Helper {
     // [number, map, map]
     sb.emitPushInt(node, GlobalProperty.CallingScriptHash);
     // [buffer, number, map, map]
-    sb.emitSysCall(node, 'System.ExecutionEngine.GetCallingScriptHash');
+    sb.emitSysCall(node, 'System.Runtime.GetCallingScriptHash');
     // [map]
     sb.emitOp(node, 'SETITEM');
 

@@ -10,7 +10,7 @@ export class DidReceiveAssetsHelper extends Helper {
     const options = sb.pushValueOptions(optionsIn);
 
     // [transaction]
-    sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+    sb.emitSysCall(node, 'System.Runtime.GetScriptContainer');
     // [outputs]
     sb.emitSysCall(node, 'Neo.Transaction.GetOutputs');
     // [boolean]
@@ -22,7 +22,7 @@ export class DidReceiveAssetsHelper extends Helper {
           // [hash]
           sb.emitSysCall(node, 'Neo.Output.GetScriptHash');
           // [hash, hash]
-          sb.emitSysCall(node, 'System.ExecutionEngine.GetExecutingScriptHash');
+          sb.emitSysCall(node, 'System.Runtime.GetExecutingScriptHash');
           // [boolean]
           sb.emitOp(node, 'EQUAL');
         },

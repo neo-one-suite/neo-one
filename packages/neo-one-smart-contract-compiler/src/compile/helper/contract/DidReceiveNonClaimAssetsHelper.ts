@@ -11,13 +11,13 @@ export class DidReceiveNonClaimAssetsHelper extends Helper {
     const options = sb.pushValueOptions(optionsIn);
 
     // [transaction]
-    sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+    sb.emitSysCall(node, 'System.Runtime.GetScriptContainer');
     // [outputs]
     sb.emitSysCall(node, 'Neo.Transaction.GetOutputs');
     // [map]
     sb.emitHelper(node, options, sb.helpers.getOutputAssetValueMap);
     // [transaction, map]
-    sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+    sb.emitSysCall(node, 'System.Runtime.GetScriptContainer');
     // [outputs, map]
     sb.emitSysCall(node, 'Neo.Transaction.GetReferences');
     // [map]

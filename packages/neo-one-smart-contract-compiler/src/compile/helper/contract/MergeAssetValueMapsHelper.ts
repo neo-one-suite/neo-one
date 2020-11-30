@@ -36,7 +36,7 @@ export class MergeAssetValueMapsHelper extends Helper {
           // [hash, map, output, map, map]
           sb.emitSysCall(node, 'Neo.Output.GetScriptHash');
           // [hash, hash, map, output, map, map]
-          sb.emitSysCall(node, 'System.ExecutionEngine.GetExecutingScriptHash');
+          sb.emitSysCall(node, 'System.Runtime.GetExecutingScriptHash');
           sb.emitHelper(
             node,
             options,

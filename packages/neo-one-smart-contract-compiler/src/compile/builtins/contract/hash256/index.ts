@@ -1,5 +1,3 @@
-import { common } from '@neo-one/client-common';
-import { BuiltinConstantBufferMemberValue } from '../../BuiltinConstantBufferMemberValue';
 import { BuiltinInterface } from '../../BuiltinInterface';
 import { Builtins } from '../../Builtins';
 import { BuiltinValueObject } from '../../BuiltinValueObject';
@@ -17,14 +15,4 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractValue('Hash256', new Hash256Value());
   builtins.addContractInterface('Hash256Constructor', new Hash256ConstructorInterface());
   builtins.addContractMember('Hash256Constructor', 'from', new Hash256From());
-  builtins.addContractMember(
-    'Hash256Constructor',
-    'NEO',
-    new BuiltinConstantBufferMemberValue(common.stringToUInt256(common.NEO_ASSET_HASH)),
-  );
-  builtins.addContractMember(
-    'Hash256Constructor',
-    'GAS',
-    new BuiltinConstantBufferMemberValue(common.stringToUInt256(common.GAS_ASSET_HASH)),
-  );
 };

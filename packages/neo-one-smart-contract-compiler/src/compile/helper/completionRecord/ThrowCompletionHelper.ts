@@ -18,7 +18,7 @@ export class ThrowCompletionHelper extends Helper {
     // [array]
     sb.emitOp(node, 'PACK');
     // []
-    sb.emitSysCall(node, 'Neo.Runtime.Notify');
+    sb.emitSysCall(node, 'System.Runtime.Notify');
     // []
     sb.emitHelper(node, options, sb.helpers.throwCompletionBase);
   }
