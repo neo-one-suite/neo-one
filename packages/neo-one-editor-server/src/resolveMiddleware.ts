@@ -4,8 +4,6 @@ import { resolveDependencies } from './resolveDependencies';
 export const resolveMiddleware = async (ctx: Context): Promise<void> => {
   if (!ctx.is('application/json')) {
     ctx.throw(415);
-
-    return;
   }
 
   // tslint:disable-next-line no-any
