@@ -1,6 +1,7 @@
 import { BinaryWriter, createSerializeWire, SerializableWire } from '@neo-one/client-common';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from '../Serializable';
 import { BinaryReader } from '../utils';
+import { ConsensusPayload } from './ConsensusPayload';
 
 export interface PreparationPayloadCompactAdd {
   readonly validatorIndex: number;
@@ -8,6 +9,13 @@ export interface PreparationPayloadCompactAdd {
 }
 
 export class PreparationPayloadCompact implements SerializableWire {
+  public static fromPayload(payload: ConsensusPayload): PreparationPayloadCompact {
+    return new PreparationPayloadCompact({
+      validatorIndex: payload.validatorIndex,
+      invocationScript: payload.witness.invocation,
+    });
+  }
+
   public static deserializeWireBase(options: DeserializeWireBaseOptions): PreparationPayloadCompact {
     const { reader } = options;
     const validatorIndex = reader.readUInt16LE();

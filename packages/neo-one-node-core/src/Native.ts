@@ -26,7 +26,7 @@ export interface GASContract extends NEP5NativeContract {}
 export interface PolicyContract extends NativeContract {
   readonly getMaxTransactionsPerBlock: (storage: NativeContractStorageContext) => Promise<number>;
   readonly getMaxBlockSize: (storage: NativeContractStorageContext) => Promise<number>;
-  readonly getMaxBlockSystemFee: (storage: NativeContractStorageContext) => Promise<number>;
+  readonly getMaxBlockSystemFee: (storage: NativeContractStorageContext) => Promise<BN>;
   readonly getFeePerByte: (storage: NativeContractStorageContext) => Promise<number>;
   readonly getBlockedAccounts: (storage: NativeContractStorageContext) => Promise<readonly UInt160[]>;
 }

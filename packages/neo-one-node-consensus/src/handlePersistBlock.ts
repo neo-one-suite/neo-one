@@ -1,21 +1,30 @@
-import { ECPoint } from '@neo-one/client-common';
-import { Blockchain } from '@neo-one/node-core';
-import { initializeNewConsensus } from './common';
-import { ConsensusContext } from './ConsensusContext';
-import { InitialContext } from './context';
+import { PrivateKey } from '@neo-one/client-common';
+import { Blockchain, ConsensusContext } from '@neo-one/node-core';
+import { initializeConsensus } from './common';
+import { TimerContext } from './TimerContext';
 import { Result } from './types';
 
 export const handlePersistBlock = async ({
   blockchain,
-  publicKey,
-  consensusContext,
+  privateKey,
+  context: contextIn,
+  timerContext,
 }: {
   readonly blockchain: Blockchain;
-  readonly publicKey: ECPoint;
-  readonly consensusContext: ConsensusContext;
-}): Promise<Result<InitialContext>> =>
-  initializeNewConsensus({
+  readonly privateKey: PrivateKey;
+  readonly context: ConsensusContext;
+  readonly timerContext: TimerContext;
+}): Promise<Result> => {
+  let context = contextIn;
+  const newTime = Date.now();
+  context = context.clone({ blockReceivedTimeMS: newTime });
+
+  return initializeConsensus({
+    context,
     blockchain,
-    publicKey,
-    consensusContext,
+    privateKey,
+    timerContext,
+    viewNumber: 0,
+    isRecovering: false,
   });
+};

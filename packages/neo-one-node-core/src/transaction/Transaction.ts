@@ -203,7 +203,7 @@ export class Transaction
 
     const maxBlockSysFee = await native.Policy.getMaxBlockSystemFee(storage);
     const sysFee = this.systemFee;
-    if (sysFee.gt(new BN(maxBlockSysFee))) {
+    if (sysFee.gt(maxBlockSysFee)) {
       return VerifyResultModel.PolicyFail;
     }
 

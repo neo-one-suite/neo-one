@@ -2,14 +2,15 @@ import {
   ApplicationLog,
   BinaryReader,
   BlockKey,
+  ConsensusContext,
   ContractIDState,
   ContractState,
   DeserializeWireContext,
-  HashIndexState,
   // InvocationData,
+  HashIndexState,
   HeaderHashList,
-  Nep5Balance,
   // TransactionData,
+  Nep5Balance,
   Nep5BalanceKey,
   Nep5Transfer,
   Nep5TransferKey,
@@ -191,6 +192,12 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
       db,
       key: keys.headerHashIndexKey,
       deserializeValue: (buffer) => ContractIDState.deserializeWire({ context, buffer }),
+    }),
+
+    consensusState: read.createReadMetadataStorage({
+      db,
+      key: keys.consensusStateKey,
+      deserializeValue: (buffer) => ConsensusContext.deserializeWire({ context, buffer }),
     }),
 
     async close(): Promise<void> {

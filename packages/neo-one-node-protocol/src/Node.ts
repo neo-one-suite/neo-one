@@ -32,6 +32,7 @@ import {
   RelayTransactionResult,
   ServerCapability,
   Transaction,
+  TransactionVerificationContext,
   Version,
 } from '@neo-one/node-core';
 import { composeDisposables, Disposable, Labels, noopDisposable, utils as commonUtils } from '@neo-one/utils';
@@ -60,9 +61,7 @@ import {
   PingPayload,
   VersionPayload,
 } from './payload';
-import { maxHashesCount } from './payload/InvPayload';
 import { PeerData } from './PeerData';
-import { TransactionVerificationContext } from './TransactionVerificationContext';
 
 const logger = createChild(nodeLogger, { component: 'node-protocol' });
 
@@ -158,10 +157,9 @@ interface PeerHealth {
   readonly checkTimeSeconds: number;
 }
 
-const trimMemPool = () => Promise.reject(new Error('not implemented yet'));
-
 export class Node implements INode {
   public readonly blockchain: Blockchain;
+  public readonly getNewVerificationContext: () => TransactionVerificationContext;
   // tslint:disable-next-line readonly-keyword
   private mutableMemPool: { [hash: string]: Transaction };
   private readonly transactionVerificationContext: TransactionVerificationContext;
@@ -233,30 +231,26 @@ export class Node implements INode {
   }, 5000);
 
   // tslint:disable-next-line no-unnecessary-type-annotation
-  // private readonly trimMemPool = _.throttle(async (): Promise<void> => {
-  //   const memPool = Object.values(this.mutableMemPool);
-  //   if (memPool.length > MEM_POOL_SIZE) {
-  //     const transactionAndFees = await Promise.all(
-  //       memPool.map<Promise<TransactionAndFee>>(async (transaction) => {
-  //         const networkFee = await transaction.networkFee({
-  //           fees: this.blockchain.settings.fees,
-  //         });
+  private readonly trimMemPool = _.throttle(async (): Promise<void> => {
+    const memPool = Object.values(this.mutableMemPool);
+    if (memPool.length > MEM_POOL_SIZE) {
+      const transactionAndFees = memPool.map((transaction) => {
+        const networkFee = transaction.networkFee;
 
-  //         return { transaction, networkFee };
-  //       }),
-  //     );
+        return { transaction, networkFee };
+      });
 
-  //     const hashesToRemove = _.take<TransactionAndFee>(
-  //       // tslint:disable-next-line no-array-mutation
-  //       transactionAndFees.slice().sort(compareTransactionAndFees),
-  //       this.blockchain.settings.memoryPoolMaxTransactions,
-  //     ).map((transactionAndFee) => transactionAndFee.transaction.hashHex);
-  //     hashesToRemove.forEach((hash) => {
-  //       // tslint:disable-next-line no-dynamic-delete
-  //       delete this.mutableMemPool[hash];
-  //     });
-  //   }
-  // }, TRIM_MEMPOOL_THROTTLE);
+      const hashesToRemove = _.take<TransactionAndFee>(
+        // tslint:disable-next-line no-array-mutation
+        transactionAndFees.slice().sort(compareTransactionAndFees),
+        this.blockchain.settings.memoryPoolMaxTransactions,
+      ).map((transactionAndFee) => transactionAndFee.transaction.hashHex);
+      hashesToRemove.forEach((hash) => {
+        // tslint:disable-next-line no-dynamic-delete
+        delete this.mutableMemPool[hash];
+      });
+    }
+  }, TRIM_MEMPOOL_THROTTLE);
 
   public constructor({
     blockchain,
@@ -289,9 +283,9 @@ export class Node implements INode {
     this.userAgent = `NEO:neo-one-js:3.0.0-preview3`;
 
     this.mutableMemPool = {};
-    this.transactionVerificationContext = new TransactionVerificationContext({
-      getGasBalance: native.GAS.balanceOf.bind(native.GAS),
-    });
+    this.getNewVerificationContext = () =>
+      new TransactionVerificationContext({ getGasBalance: native.GAS.balanceOf.bind(native.GAS) });
+    this.transactionVerificationContext = this.getNewVerificationContext();
     this.mutableKnownBlockHashes = createScalingBloomFilter();
     this.tempKnownBlockHashes = new Set();
     this.mutableKnownTransactionHashes = createScalingBloomFilter();
@@ -429,7 +423,7 @@ export class Node implements INode {
               }
               this.transactionVerificationContext.addTransaction(transaction);
               this.relayTransactionInternal(transaction);
-              await trimMemPool();
+              await this.trimMemPool();
             }
           }
 
@@ -973,7 +967,7 @@ export class Node implements INode {
     payload: GetBlocksPayload,
   ): Promise<void> {
     const hashStart = payload.hashStart;
-    const count = payload.count < 0 || payload.count > maxHashesCount ? maxHashesCount : payload.count;
+    const count = payload.count < 0 || payload.count > GET_BLOCKS_COUNT ? GET_BLOCKS_COUNT : payload.count;
 
     const state = await this.blockchain.blocks.tryGet({ hashOrIndex: hashStart });
     if (state === undefined) {
@@ -1011,7 +1005,7 @@ export class Node implements INode {
     peer: ConnectedPeer<Message, PeerData>,
     payload: GetBlockByIndexPayload,
   ): Promise<void> {
-    const count = payload.count === -1 ? maxHashesCount : Math.min(payload.count, maxHashesCount);
+    const count = payload.count === -1 ? GET_BLOCKS_COUNT : Math.min(payload.count, GET_BLOCKS_COUNT);
     const max = payload.indexStart + count;
     // tslint:disable-next-line: no-loop-statement
     for (let idx = payload.indexStart; idx < max; idx += 1) {

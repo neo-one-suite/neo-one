@@ -42,10 +42,10 @@ export class PolicyContract extends NativeContract {
   public async getMaxBlockSystemFee({ storages }: NativeContractStorageContext) {
     const item = await storages.tryGet(this.createStorageKey(this.prefixes.maxBlockSystemFee).toStorageKey());
     if (item === undefined) {
-      return common.fixedFromDecimal(9000, GASToken.decimals).toNumber();
+      return common.fixedFromDecimal(9000, GASToken.decimals);
     }
 
-    return new BN(item.value).toNumber();
+    return new BN(item.value);
   }
 
   public async getFeePerByte({ storages }: NativeContractStorageContext) {

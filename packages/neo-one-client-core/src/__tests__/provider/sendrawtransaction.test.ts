@@ -13,6 +13,7 @@ import {
 } from '@neo-one/client-common';
 import { constants } from '@neo-one/utils';
 import BN from 'bn.js';
+import { Hash160 } from '../../Hash160';
 import { LocalKeyStore, LocalMemoryStore } from '../../user';
 
 describe('RPC Call sendrawtransaction', () => {
@@ -119,5 +120,77 @@ describe('RPC Call sendrawtransaction', () => {
     // In this case that would be 0xa25e93cc2a5f7108c02e9e3b4898aad9d3e91486 and NY8vnYnwgxs3prMcxnQi7Mog7VHezJgfwx
     console.log(common.uInt160ToString(address));
     console.log(scriptHashToAddress(common.uInt160ToString(address)));
+  });
+
+  test.skip('transaction creation for consensus testing', async () => {
+    const config = {
+      blockchain: {
+        standbyValidators: ['0248be3c070df745a60f3b8b494efcc6caf90244d803a9a72fe95d9bae2120ec70'].map((p) =>
+          common.stringToECPoint(p),
+        ),
+        addressVersion: 23,
+        messageMagic: 7630401,
+      },
+    };
+    const privateKeyString = 'e35fa5d1652c4c65e296c86e63a3da6939bc471b741845be636e2daa320dc770';
+    const privateKey = common.stringToPrivateKey(privateKeyString);
+    const publicKey = crypto.privateKeyToPublicKey(privateKey);
+    const publicKeyString = common.ecPointToHex(publicKey);
+
+    const multiScriptHash = crypto.toScriptHash(
+      crypto.createMultiSignatureVerificationScript(1, config.blockchain.standbyValidators),
+    );
+
+    const multiAddress = crypto.scriptHashToAddress({
+      addressVersion: config.blockchain.addressVersion,
+      scriptHash: multiScriptHash,
+    });
+
+    const scriptHash = crypto.publicKeyToScriptHash(publicKey);
+    const address = crypto.scriptHashToAddress({ addressVersion: config.blockchain.addressVersion, scriptHash });
+
+    await keystore.addUserAccount({
+      network: 'local',
+      privateKey: privateKeyString,
+      name: 'master',
+    });
+
+    const signer = new SignerModel({
+      account: multiScriptHash,
+      scopes: WitnessScopeModel.None,
+    });
+
+    const builder = new ScriptBuilder();
+    builder.emitAppCall(common.nativeHashes.NEO, 'transfer', multiScriptHash, scriptHash, 10);
+    const script = builder.build();
+
+    const txUnsigned = new TransactionModel({
+      script,
+      systemFee: new BN(10000),
+      networkFee: new BN(245000),
+      validUntilBlock: 800000,
+      signers: [signer],
+      messageMagic: config.blockchain.messageMagic,
+    });
+
+    const signature = await keystore.sign({
+      account: {
+        network: 'local',
+        address: privateKeyToAddress('e35fa5d1652c4c65e296c86e63a3da6939bc471b741845be636e2daa320dc770'),
+      },
+      message: txUnsigned.message.toString('hex'),
+    });
+
+    const witness = crypto.createMultiSignatureWitness(
+      1,
+      [publicKey],
+      { [`${common.ecPointToHex(publicKey)}`]: Buffer.from(signature, 'hex') },
+      WitnessModel,
+    );
+
+    const finalTransaction = txUnsigned.clone({ witnesses: [witness] });
+
+    console.log(finalTransaction.serializeWire().toString('hex'));
+    console.log(address);
   });
 });

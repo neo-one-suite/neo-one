@@ -1,4 +1,5 @@
-import { UInt256, VerifyResultModel } from '@neo-one/client-common';
+import { ECPoint, UInt256, VerifyResultModel } from '@neo-one/client-common';
+import { BN } from 'bn.js';
 import { Observable } from 'rxjs';
 import { Block } from './Block';
 import { Header } from './Header';
@@ -45,6 +46,12 @@ export interface Blockchain extends BlockchainStorage {
   readonly getHeader: (hashOrIndex: UInt256 | number) => Promise<Header | undefined>;
   readonly getBlockHash: (index: number) => Promise<UInt256 | undefined>;
   readonly getNextBlockHash: (hash: UInt256) => Promise<UInt256 | undefined>;
+
+  readonly getValidators: () => Promise<readonly ECPoint[]>;
+  readonly getNextBlockValidators: () => Promise<readonly ECPoint[]>;
+  readonly getMaxBlockSize: () => Promise<number>;
+  readonly getMaxBlockSystemFee: () => Promise<BN>;
+  readonly getMaxTransactionsPerBlock: () => Promise<number>;
 
   readonly invokeScript: (script: Buffer, signers?: Signers) => CallReceipt;
   readonly invokeTransaction: <TTransaction extends { readonly script: Buffer }>(

@@ -11,6 +11,7 @@ export enum Prefix {
   CurrentBlock = 0xc0,
   CurrentHeader = 0xc1,
   ContractID = 0xc2,
+  ConsensusState = 0xf4,
   Nep5Balance = 0xf8,
   Nep5TransferSent = 0xf9,
   Nep5TransferReceived = 0xfa,
@@ -132,6 +133,10 @@ const contractIDKey = getMetadataKey({
   prefix: Prefix.ContractID,
 });
 
+const consensusStateKey = getMetadataKey({
+  prefix: Prefix.ConsensusState,
+});
+
 const minBlockKey = createBlockKey({ hashOrIndex: common.ZERO_UINT256 });
 const maxBlockKey = createBlockKey({ hashOrIndex: common.MAX_UINT256 });
 
@@ -169,6 +174,7 @@ export const keys = {
   blockHashIndexKey,
   headerHashIndexKey,
   contractIDKey,
+  consensusStateKey,
   minBlockKey,
   maxBlockKey,
 };

@@ -1,4 +1,14 @@
-import { BinaryWriter, createSerializeWire, crypto, InvalidFormatError } from '@neo-one/client-common';
+import {
+  BinaryWriter,
+  createSerializeWire,
+  crypto,
+  ECPoint,
+  getHashData,
+  InvalidFormatError,
+  PrivateKey,
+} from '@neo-one/client-common';
+import { Contract } from '../Contract';
+import { ContractParametersContext } from '../ContractParametersContext';
 import { NativeContainer } from '../Native';
 import {
   DeserializeWireBaseOptions,
@@ -10,6 +20,7 @@ import { BlockchainStorage } from '../Storage';
 import { BinaryReader, utils } from '../utils';
 import { Verifiable, VerifyOptions } from '../Verifiable';
 import { Witness } from '../Witness';
+import { ConsensusMessage } from './message';
 import { UnsignedConsensusPayload, UnsignedConsensusPayloadAdd } from './UnsignedConsensusPayload';
 
 export interface ConsensusPayloadAdd extends UnsignedConsensusPayloadAdd {
@@ -20,7 +31,30 @@ export interface VerifyConsensusPayloadOptions extends VerifyOptions {
   readonly height: number;
 }
 
-export class ConsensusPayload extends UnsignedConsensusPayload implements SerializableContainer, Verifiable {
+export class ConsensusPayload extends UnsignedConsensusPayload {
+  public static sign(
+    payload: UnsignedConsensusPayload,
+    privateKey: PrivateKey,
+    validators: readonly ECPoint[],
+    messageMagic: number,
+  ): ConsensusPayload {
+    const context = new ContractParametersContext(payload.getScriptHashesForVerifying(validators));
+    const hashData = getHashData(payload.serializeWire(), messageMagic);
+    const publicKey = crypto.privateKeyToPublicKey(privateKey);
+    const signatureContract = Contract.createSignatureContract(publicKey);
+    const signature = crypto.sign({ message: hashData, privateKey });
+    context.addSignature(signatureContract, publicKey, signature);
+
+    return new ConsensusPayload({
+      version: payload.version,
+      previousHash: payload.previousHash,
+      blockIndex: payload.blockIndex,
+      validatorIndex: payload.validatorIndex,
+      consensusMessage: payload.consensusMessage,
+      witness: context.getWitnesses()[0],
+      messageMagic,
+    });
+  }
   public static deserializeWireBase(options: DeserializeWireBaseOptions, validatorsCount = 7): ConsensusPayload {
     const { reader } = options;
     const {
@@ -44,7 +78,7 @@ export class ConsensusPayload extends UnsignedConsensusPayload implements Serial
       validatorIndex,
       data,
       witness,
-      magic: options.context.messageMagic,
+      messageMagic: options.context.messageMagic,
     });
   }
 
@@ -59,17 +93,6 @@ export class ConsensusPayload extends UnsignedConsensusPayload implements Serial
   public readonly witness: Witness;
   public readonly serializeUnsigned = createSerializeWire(this.serializeWireBaseUnsigned);
   public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
-  public readonly getScriptHashesForVerifying = utils.lazyAsync(
-    async (context: { readonly storage: BlockchainStorage; readonly native: NativeContainer }) => {
-      const validators = await context.native.NEO.getNextBlockValidators(context.storage);
-      if (validators.length <= this.validatorIndex) {
-        // TODO: implement a real error
-        throw new Error(`${validators.length} <= ${this.validatorIndex}`);
-      }
-
-      return [crypto.toScriptHash(crypto.createSignatureRedeemScript(validators[this.validatorIndex]))];
-    },
-  );
 
   public constructor(options: ConsensusPayloadAdd) {
     super(options);
@@ -88,6 +111,10 @@ export class ConsensusPayload extends UnsignedConsensusPayload implements Serial
 
   public serializeWireBaseUnsigned(writer: BinaryWriter) {
     super.serializeWireBase(writer);
+  }
+
+  public getDeserializedMessage<T extends ConsensusMessage>() {
+    return this.consensusMessage as T;
   }
 
   public async verify(options: VerifyConsensusPayloadOptions) {

@@ -1,11 +1,10 @@
-import { ConsensusPayload, Transaction } from '@neo-one/node-core';
-import { ConsensusContext } from './ConsensusContext';
-import { Context } from './context';
+import { ConsensusContext, ConsensusPayload, Transaction } from '@neo-one/node-core';
+import { TimerContext } from './TimerContext';
 
-export interface Result<TContext extends Context> {
-  readonly context: TContext;
-  readonly consensusContext?: ConsensusContext;
-  readonly timerSeconds?: number;
+export interface Result {
+  readonly context: ConsensusContext;
+  readonly timerContext?: TimerContext;
+  readonly timerMS?: number;
 }
 export type Event =
   | { readonly type: 'handlePersistBlock' }

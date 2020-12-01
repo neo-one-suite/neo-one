@@ -18,10 +18,10 @@ export interface SerializableJSON<TJSON> {
   readonly serializeJSON: () => TJSON;
 }
 
-export const createGetHashData = (serializeWire: () => Buffer, magic: number) => () => {
+export const getHashData = (wire: Buffer, magic: number) => {
   const writer = new BinaryWriter();
   writer.writeUInt32LE(magic);
-  writer.writeBytes(serializeWire());
+  writer.writeBytes(wire);
 
   return writer.toBuffer();
 };

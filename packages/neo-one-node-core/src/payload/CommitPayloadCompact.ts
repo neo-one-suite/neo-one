@@ -1,6 +1,8 @@
 import { BinaryWriter, createSerializeWire, SerializableWire } from '@neo-one/client-common';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from '../Serializable';
 import { BinaryReader } from '../utils';
+import { ConsensusPayload } from './ConsensusPayload';
+import { CommitConsensusMessage } from './message';
 
 export interface CommitPayloadCompactAdd {
   readonly viewNumber: number;
@@ -10,6 +12,16 @@ export interface CommitPayloadCompactAdd {
 }
 
 export class CommitPayloadCompact implements SerializableWire {
+  public static fromPayload(payload: ConsensusPayload): CommitPayloadCompact {
+    const message = payload.getDeserializedMessage<CommitConsensusMessage>();
+
+    return new CommitPayloadCompact({
+      viewNumber: message.viewNumber,
+      validatorIndex: payload.validatorIndex,
+      signature: message.signature,
+      invocationScript: payload.witness.invocation,
+    });
+  }
   public static deserializeWireBase(options: DeserializeWireBaseOptions): CommitPayloadCompact {
     const { reader } = options;
     const viewNumber = reader.readUInt8();
