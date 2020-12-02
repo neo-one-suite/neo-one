@@ -3,7 +3,7 @@
     {
       "packageName": "@neo-one/client-common",
       "comment": "Fix synchronized-promise in browser.",
-      "type": "none"
+      "type": "minor"
     }
   ],
   "packageName": "@neo-one/client-common",
