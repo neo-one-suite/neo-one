@@ -78,7 +78,7 @@ export class HDKeyStore<Identifier> implements KeyStore {
     this.accountsInternal$ = new BehaviorSubject<HDAccounts<Identifier>>({});
     this.accountsSubscription = this.provider.networks$
       .pipe(
-        mergeScanLatest(async (acc: HDScanInterface<Identifier> | undefined, networks) => {
+        mergeScanLatest(async (acc: HDScanInterface<Identifier> | undefined, networks: readonly string[]) => {
           const networksFiltered = getNewNetworks(acc === undefined ? undefined : acc.scannedNetworks, networks);
           const next = await Promise.all(
             networksFiltered.map(async (network) => this.handler.scanAccounts(network, 5)),
@@ -107,7 +107,7 @@ export class HDKeyStore<Identifier> implements KeyStore {
                 : new Set<NetworkType>([...acc.scannedNetworks].concat(networksFiltered)),
           };
         }),
-        map(({ accounts }) => accounts),
+        map(({ accounts }: { accounts: HDAccounts<Identifier> }) => accounts),
       )
       .subscribe(this.accountsInternal$);
 
