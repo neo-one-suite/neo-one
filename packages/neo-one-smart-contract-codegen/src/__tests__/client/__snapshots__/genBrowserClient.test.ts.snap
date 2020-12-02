@@ -4,7 +4,6 @@ exports[`genBrowserClient Token 1`] = `
 Object {
   "js": "
 import {
-  addLocalKeysSync,
   Client,
   DeveloperClient,
   LocalKeyStore,
@@ -42,9 +41,11 @@ if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true')
   if (localUserAccountProvider !== undefined) {
     const localKeyStore = localUserAccountProvider.keystore;
     if (localKeyStore instanceof LocalKeyStore) {
-      addLocalKeysSync([
-        { network: 'local', name: 'master', privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv' },
-      ], localKeyStore);
+      Promise.all([
+        localKeyStore.addUserAccount({ network: 'local', name: 'master', privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv' }),
+      ]).catch(() => {
+        // do nothing
+      });
     }
   }
 }
@@ -59,7 +60,6 @@ export const createDeveloperClients = () => ({
   ",
   "ts": "
 import {
-  addLocalKeysSync,
   Client,
   DeveloperClient,
   DeveloperClients,
@@ -105,9 +105,11 @@ if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true')
   if (localUserAccountProvider !== undefined) {
     const localKeyStore = localUserAccountProvider.keystore;
     if (localKeyStore instanceof LocalKeyStore) {
-      addLocalKeysSync([
-        { network: 'local', name: 'master', privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv' },
-      ], localKeyStore);
+      Promise.all([
+        localKeyStore.addUserAccount({ network: 'local', name: 'master', privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv' }),
+      ]).catch(() => {
+        // do nothing
+      });
     }
   }
 }

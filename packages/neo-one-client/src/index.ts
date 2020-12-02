@@ -181,7 +181,6 @@ export {
 } from '@neo-one/client-common';
 
 export {
-  addLocalKeysSync,
   Client,
   connectRemoteUserAccountProvider,
   Dapi,
