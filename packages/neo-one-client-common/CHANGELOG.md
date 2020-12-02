@@ -1,6 +1,17 @@
 # Change Log - @neo-one/client-common
 
-This log was last generated on Thu, 23 Jul 2020 22:11:12 GMT and should not be manually modified.
+This log was last generated on Wed, 02 Dec 2020 21:05:40 GMT and should not be manually modified.
+
+## 2.7.1
+Wed, 02 Dec 2020 21:05:40 GMT
+
+### Patches
+
+- Fix synchronized-promise in browser.
+
+### Updates
+
+- Update elliptic dependency.
 
 ## 2.7.0
 Thu, 23 Jul 2020 22:11:12 GMT

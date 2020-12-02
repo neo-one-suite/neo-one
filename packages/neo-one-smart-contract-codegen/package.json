@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract-codegen",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "description": "NEO•ONE TypeScript smart contract codegen.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -14,8 +14,8 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/cli-common": "^2.7.0",
-    "@neo-one/client-common": "^2.7.0",
-    "@neo-one/client-core": "^2.7.0",
+    "@neo-one/client-common": "^2.7.1",
+    "@neo-one/client-core": "^2.7.1",
     "@neo-one/utils": "^2.6.1",
     "lodash": "^4.17.15",
     "prettier": "^2.0.1",

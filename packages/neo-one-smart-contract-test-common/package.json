@@ -14,8 +14,8 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/cli-common": "^2.7.0",
-    "@neo-one/client-common": "^2.7.0",
-    "@neo-one/client-core": "^2.7.0",
+    "@neo-one/client-common": "^2.7.1",
+    "@neo-one/client-core": "^2.7.1",
     "@neo-one/client-full-core": "^2.7.0",
     "@neo-one/logger": "^2.6.1",
     "@neo-one/smart-contract-compiler": "^2.7.0",

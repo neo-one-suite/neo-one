@@ -13,8 +13,8 @@
     "@neo-one/smart-contract": "^2.7.0"
   },
   "devDependencies": {
-    "@neo-one/client-common": "^2.7.0",
-    "@neo-one/client-core": "^2.7.0",
+    "@neo-one/client-common": "^2.7.1",
+    "@neo-one/client-core": "^2.7.1",
     "@types/jest": "^24.0.18",
     "bignumber.js": "^9.0.0",
     "tslib": "^1.10.0"
