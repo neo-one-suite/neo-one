@@ -14,8 +14,8 @@
   "sideEffects": false,
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
-    "@neo-one/client-common": "^2.7.0",
-    "@neo-one/client-core": "^2.7.0",
+    "@neo-one/client-common": "^2.7.1",
+    "@neo-one/client-core": "^2.7.1",
     "@neo-one/client-full-common": "^2.7.0",
     "@neo-one/client-full-core": "^2.7.0",
     "@neo-one/smart-contract": "^2.7.0",

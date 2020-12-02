@@ -11,8 +11,8 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-common": "^2.7.0",
-    "@neo-one/client-core": "^2.7.0",
+    "@neo-one/client-common": "^2.7.1",
+    "@neo-one/client-core": "^2.7.1",
     "@neo-one/node-blockchain": "^2.7.0",
     "@neo-one/node-core": "^2.7.0",
     "@neo-one/node-neo-settings": "^2.7.0",

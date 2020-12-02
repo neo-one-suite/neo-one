@@ -16,7 +16,7 @@
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
     "@ledgerhq/hw-transport-u2f": "^4.68.2",
-    "@neo-one/client-common": "^2.7.0",
+    "@neo-one/client-common": "^2.7.1",
     "@neo-one/node-vm": "^2.7.0",
     "@neo-one/utils": "^2.6.1",
     "lodash": "^4.17.15",

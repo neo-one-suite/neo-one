@@ -13,7 +13,7 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client": "^2.7.0",
+    "@neo-one/client": "^2.7.1",
     "@neo-one/client-full-core": "^2.7.0"
   },
   "devDependencies": {
