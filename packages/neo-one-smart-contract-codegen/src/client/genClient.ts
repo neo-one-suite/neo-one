@@ -32,11 +32,16 @@ export const genClient = ({
     if (localUserAccountProvider !== undefined) {
       const localKeyStore = localUserAccountProvider.keystore;
       if (localKeyStore instanceof LocalKeyStore) {
-        addLocalKeysSync([
+        Promise.all([
           ${wallets
-            .map(({ name, wif }) => `{ network: '${localDevNetworkName}', name: '${name}', privateKey: '${wif}' },`)
+            .map(
+              ({ name, wif }) =>
+                `localKeyStore.addUserAccount({ network: '${localDevNetworkName}', name: '${name}', privateKey: '${wif}' }),`,
+            )
             .join('\n          ')}
-        ], localKeyStore);
+        ]).catch(() => {
+          // do nothing
+        });
       }
     }
   }`;
@@ -71,7 +76,6 @@ export const genClient = ({
   return {
     js: `
 import {
-  addLocalKeysSync,
   Client,
   DapiUserAccountProvider,
   DeveloperClient,
@@ -105,7 +109,6 @@ export const createDeveloperClients = (host = 'localhost') => ${createDeveloperC
   `,
     ts: `
 import {
-  addLocalKeysSync,
   Client,
   DapiUserAccountProvider,
   DeveloperClient,

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/smart-contract-codegen",
+      "comment": "Fix synchronized-promise in browser.",
+      "type": "none"
+    }
+  ],
+  "packageName": "@neo-one/smart-contract-codegen",
+  "email": "spencercorwin@icloud.com"
+}
