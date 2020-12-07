@@ -305,7 +305,12 @@ const validateConfig = async (rootDir: string, configIn: any): Promise<Configura
     },
     migration: {
       ...config.migration,
-      path: nodePath.resolve(rootDir, config.migration.path),
+      path: nodePath.resolve(
+        rootDir,
+        newLanguage === undefined || newLanguage === 'javascript'
+          ? config.migration.path
+          : config.migration.path.slice(0, -3).concat('.ts'),
+      ),
     },
     contracts: {
       ...config.contracts,
