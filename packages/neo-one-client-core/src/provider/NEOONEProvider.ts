@@ -80,6 +80,25 @@ export class NEOONEProvider implements Provider {
     return this.getProvider(network).testInvoke(transaction);
   }
 
+  public async getFeePerByte(network: NetworkType): Promise<BigNumber> {
+    return this.getProvider(network).getFeePerByte();
+  }
+
+  public async getVerificationCost(
+    network: NetworkType,
+    hash: AddressString,
+    transaction: TransactionModel,
+  ): Promise<{
+    readonly fee: BigNumber;
+    readonly size: number;
+  }> {
+    return this.getProvider(network).getVerificationCost(hash, transaction);
+  }
+
+  public async testTransaction(network: NetworkType, transaction: TransactionModel): Promise<RawCallReceipt> {
+    return this.getProvider(network).testTransaction(transaction);
+  }
+
   public async call(
     network: NetworkType,
     contract: AddressString,

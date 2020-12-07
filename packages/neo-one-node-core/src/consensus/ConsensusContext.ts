@@ -167,33 +167,37 @@ export class ConsensusContext {
     return this.viewChanging && !this.moreThanFNodesCommittedOrLost;
   }
 
-  public clone({
-    viewNumber,
-    myIndex,
-    validators,
-    blockReceivedTimeMS,
-    verificationContext,
-    blockOptions,
-    preparationPayloads,
-    commitPayloads,
-    changeViewPayloads,
-    lastChangeViewPayloads,
-    transactions,
-    transactionHashes,
-  }: Partial<ConsensusContextAdd>) {
+  public clone(options: Partial<ConsensusContextAdd>) {
+    const { blockOptions, ...rest } = options;
+    const consensusData = blockOptions?.consensusData;
+    const newConsensusData = consensusData
+      ? {
+          ...this.blockBuilder.consensusData,
+          ...consensusData,
+        }
+      : this.blockBuilder.consensusData;
+
     return new ConsensusContext({
-      viewNumber: viewNumber ?? this.viewNumber,
-      myIndex: myIndex ?? this.myIndex,
-      validators: validators ?? this.validators,
-      blockReceivedTimeMS: blockReceivedTimeMS ?? this.blockReceivedTimeMS,
-      verificationContext: verificationContext ?? this.verificationContext,
-      blockOptions: blockOptions === undefined ? this.blockBuilder : this.blockBuilder.clone(blockOptions),
-      preparationPayloads: preparationPayloads ?? this.preparationPayloads,
-      commitPayloads: commitPayloads ?? this.commitPayloads,
-      changeViewPayloads: changeViewPayloads ?? this.changeViewPayloads,
-      lastChangeViewPayloads: lastChangeViewPayloads ?? this.lastChangeViewPayloads,
-      transactions: transactions ?? this.transactions,
-      transactionHashes: transactionHashes ?? this.transactionHashes,
+      viewNumber: this.viewNumber,
+      myIndex: this.myIndex,
+      validators: this.validators,
+      blockReceivedTimeMS: this.blockReceivedTimeMS,
+      verificationContext: this.verificationContext,
+      blockOptions:
+        blockOptions === undefined
+          ? this.blockBuilder
+          : {
+              ...this.blockBuilder,
+              ...blockOptions,
+              consensusData: newConsensusData,
+            },
+      preparationPayloads: this.preparationPayloads,
+      commitPayloads: this.commitPayloads,
+      changeViewPayloads: this.changeViewPayloads,
+      lastChangeViewPayloads: this.lastChangeViewPayloads,
+      transactions: this.transactions,
+      transactionHashes: this.transactionHashes,
+      ...rest,
     });
   }
 

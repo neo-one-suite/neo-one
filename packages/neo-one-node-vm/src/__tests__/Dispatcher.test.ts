@@ -1,7 +1,7 @@
-import { ScriptBuilder, TriggerType, VMState } from '@neo-one/client-common';
+import { common, ScriptBuilder, TriggerType, VMState } from '@neo-one/client-common';
+import { BN } from 'bn.js';
 import { ApplicationEngine } from '../ApplicationEngine';
 import { Dispatcher } from '../Dispatcher';
-import { blockchainSettingsToProtocolSettings } from '../utils';
 
 describe('Dispatcher Tests', () => {
   const dispatcher = new Dispatcher();
@@ -10,30 +10,36 @@ describe('Dispatcher Tests', () => {
   });
 
   test('withApplicationEngine -- NOP Script', () => {
-    const state = dispatcher.withApplicationEngine(
+    const result = dispatcher.withApplicationEngine(
       {
         trigger: TriggerType.Application,
         testMode: true,
-        gas: 0,
+        gas: common.ONE_HUNDRED_FIXED8,
       },
       (engine) => {
         expect(engine.state).toEqual(VMState.BREAK);
 
         const script = new ScriptBuilder();
-        script.emitOp('NOP');
+        script.emitOp('PUSHNULL');
 
         engine.loadScript(script.build());
 
-        return engine.execute();
+        engine.execute();
+
+        return {
+          gasconsumed: engine.gasConsumed,
+          state: engine.state,
+          stack: engine.resultStack,
+        };
       },
     );
 
-    expect(state).toEqual(VMState.HALT);
+    expect(result.state).toEqual(VMState.HALT);
 
     // check that the dispatcher reset the engine.
     const postEngine = new ApplicationEngine(dispatcher);
     expect(postEngine.resultStack).toEqual([]);
-    expect(postEngine.gasConsumed).toEqual(0);
+    expect(postEngine.gasConsumed).toEqual(new BN(0));
     expect(postEngine.state).toEqual(VMState.BREAK);
     expect(() => postEngine.execute()).toThrow();
   });
@@ -95,5 +101,9 @@ describe('Dispatcher Tests', () => {
 
   test('Dispatcher returns config without initializing config', () => {
     expect(dispatcher.getConfig()).toBeDefined();
+  });
+
+  test.only('test command', () => {
+    console.log(dispatcher.test());
   });
 });

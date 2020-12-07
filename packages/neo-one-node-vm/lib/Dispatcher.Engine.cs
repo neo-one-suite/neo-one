@@ -186,9 +186,9 @@ namespace NEOONE
             return this.engine.ScriptContainer;
         }
 
-        private long _getGasConsumed()
+        private string _getGasConsumed()
         {
-            return this.engine != null ? this.engine.GasConsumed : 0;
+            return this.engine != null ? this.engine.GasConsumed.ToString() : "0";
         }
 
         private dynamic[] _getNotifications()

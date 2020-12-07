@@ -1,4 +1,5 @@
 import { BinaryWriter } from '../../../BinaryWriter';
+import { IOHelper } from '../../../IOHelper';
 import { createSerializeWire, SerializableWire, SerializeWire } from '../../Serializable';
 import { AttributeTypeModel } from './AttributeTypeModel';
 
@@ -14,5 +15,13 @@ export abstract class AttributeBaseModel implements SerializableWire {
 
   protected serializeWithoutTypeBase(_writer: BinaryWriter): void {
     // do nothing
+  }
+
+  public get size() {
+    return IOHelper.sizeOfUInt8 + this.sizeExclusive();
+  }
+
+  protected sizeExclusive(): number {
+    return 0;
   }
 }

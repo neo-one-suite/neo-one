@@ -1,4 +1,5 @@
 import {
+  AccountContract,
   BinaryWriter,
   createSerializeWire,
   crypto,
@@ -7,7 +8,6 @@ import {
   InvalidFormatError,
   PrivateKey,
 } from '@neo-one/client-common';
-import { Contract } from '../Contract';
 import { ContractParametersContext } from '../ContractParametersContext';
 import { NativeContainer } from '../Native';
 import {
@@ -41,7 +41,7 @@ export class ConsensusPayload extends UnsignedConsensusPayload {
     const context = new ContractParametersContext(payload.getScriptHashesForVerifying(validators));
     const hashData = getHashData(payload.serializeWire(), messageMagic);
     const publicKey = crypto.privateKeyToPublicKey(privateKey);
-    const signatureContract = Contract.createSignatureContract(publicKey);
+    const signatureContract = AccountContract.createSignatureContract(publicKey);
     const signature = crypto.sign({ message: hashData, privateKey });
     context.addSignature(signatureContract, publicKey, signature);
 
@@ -55,15 +55,15 @@ export class ConsensusPayload extends UnsignedConsensusPayload {
       messageMagic,
     });
   }
-  public static deserializeWireBase(options: DeserializeWireBaseOptions, validatorsCount = 7): ConsensusPayload {
-    const { reader } = options;
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): ConsensusPayload {
+    const { reader, context } = options;
     const {
       version,
       previousHash,
       blockIndex,
       validatorIndex,
       data,
-    } = super.deserializeUnsignedConsensusPayloadWireBase(options, validatorsCount);
+    } = super.deserializeUnsignedConsensusPayloadWireBase(options, context.validatorsCount);
     const count = reader.readInt8();
     if (count !== 1) {
       throw new InvalidFormatError(`expected exactly 1 witness`);

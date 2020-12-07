@@ -28,6 +28,7 @@ export const checkPreparations = async (contextIn: ConsensusContext, node: Node,
   ) {
     const { context: newContext, payload } = await makeCommit({ context, node, privateKey });
     context = newContext;
+
     // TODO: find out if we need to be doing this
     // await saveContext(context);
     node.relayConsensusPayload(payload);

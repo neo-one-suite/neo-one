@@ -1,8 +1,9 @@
 import { Constructor } from '@neo-one/utils';
 import BN from 'bn.js';
 import { BinaryWriter } from '../../BinaryWriter';
-import { ECPoint, PrivateKey } from '../../common';
+import { ECPoint, PrivateKey, UInt160 } from '../../common';
 import { crypto } from '../../crypto';
+import { IOHelper } from '../../IOHelper';
 import { SerializableWire } from '../Serializable';
 import { SignerModel } from '../SignerModel';
 import { WitnessModel } from '../WitnessModel';
@@ -29,6 +30,13 @@ export class TransactionModel<
   >
   extends FeelessTransactionModel<TAttribute, TWitness, TSigner>
   implements SerializableWire {
+  public static readonly headerSize =
+    IOHelper.sizeOfUInt8 +
+    IOHelper.sizeOfUInt32LE +
+    IOHelper.sizeOfUInt64LE +
+    IOHelper.sizeOfUInt64LE +
+    IOHelper.sizeOfUInt32LE;
+
   protected static readonly WitnessConstructor: Constructor<WitnessModel> = WitnessModel;
 
   public readonly systemFee: BN;
@@ -61,6 +69,10 @@ export class TransactionModel<
 
     this.systemFee = systemFee;
     this.networkFee = networkFee;
+  }
+
+  public getScriptHashesForVerifying(): readonly UInt160[] {
+    return this.signers.map((signer) => signer.account);
   }
 
   public clone(

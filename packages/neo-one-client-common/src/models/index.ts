@@ -1,3 +1,4 @@
+export * from './AccountContract';
 export * from './ContractParameterTypeModel';
 export * from './SignerModel';
 export * from './VerifyResultModel';

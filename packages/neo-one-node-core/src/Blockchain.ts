@@ -1,4 +1,4 @@
-import { ECPoint, UInt256, VerifyResultModel } from '@neo-one/client-common';
+import { ECPoint, UInt160, UInt256, VerifyResultModel } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { Observable } from 'rxjs';
 import { Block } from './Block';
@@ -52,12 +52,21 @@ export interface Blockchain extends BlockchainStorage {
   readonly getMaxBlockSize: () => Promise<number>;
   readonly getMaxBlockSystemFee: () => Promise<BN>;
   readonly getMaxTransactionsPerBlock: () => Promise<number>;
+  readonly getFeePerByte: () => Promise<BN>;
 
   readonly invokeScript: (script: Buffer, signers?: Signers) => CallReceipt;
   readonly invokeTransaction: <TTransaction extends { readonly script: Buffer }>(
     transaction: TTransaction,
-    gas: number,
+    gas: BN,
   ) => CallReceipt;
+  readonly testTransaction: (transaction: Transaction) => CallReceipt;
+  readonly getVerificationCost: (
+    contractHash: UInt160,
+    transaction: Transaction,
+  ) => Promise<{
+    readonly fee: BN;
+    readonly size: number;
+  }>;
 
   // readonly updateSettings: (settings: BlockchainSettings) => void;
   readonly stop: () => Promise<void>;

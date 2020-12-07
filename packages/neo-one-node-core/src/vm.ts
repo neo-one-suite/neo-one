@@ -1,4 +1,5 @@
 import { TriggerType, UInt256, VMState } from '@neo-one/client-common';
+import { BN } from 'bn.js';
 import { Block } from './Block';
 import { CallFlags } from './CallFlags';
 import { Notification } from './Notification';
@@ -8,7 +9,7 @@ import { Transaction } from './transaction';
 
 export interface CallReceipt {
   readonly state: VMState;
-  readonly gasConsumed: number;
+  readonly gasConsumed: BN;
   readonly stack: readonly StackItem[];
   readonly notifications: readonly Notification[];
 }
@@ -19,7 +20,7 @@ export interface ApplicationEngineOptions {
   readonly trigger: TriggerType;
   readonly container?: SerializableContainer;
   readonly snapshot?: SnapshotName;
-  readonly gas: number;
+  readonly gas: BN;
   readonly testMode: boolean;
 }
 
@@ -30,12 +31,12 @@ export interface RunEngineOptions {
   readonly persistingBlock?: Block;
   readonly offset?: number;
   readonly testMode?: boolean;
-  readonly gas?: number;
+  readonly gas?: BN;
 }
 
 export interface ApplicationEngine {
   readonly trigger: TriggerType;
-  readonly gasConsumed: number;
+  readonly gasConsumed: BN;
   readonly resultStack: readonly StackItem[];
   readonly state: VMState;
   readonly notifications: readonly StackItem[];
@@ -65,7 +66,7 @@ export interface ApplicationExecuted {
   readonly transaction?: Transaction;
   readonly trigger: TriggerType;
   readonly state: VMState;
-  readonly gasConsumed: number;
+  readonly gasConsumed: BN;
   readonly stack: readonly StackItem[];
   readonly notifications: readonly Notification[];
 }

@@ -11,6 +11,7 @@ import {
   UInt256,
   VMState,
 } from '@neo-one/client-common';
+import { BN } from 'bn.js';
 import { Notification } from './Notification';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from './Serializable';
 import { StackItem, stackItemToJSON } from './StackItems';
@@ -20,7 +21,7 @@ export interface ApplicationLogAdd {
   readonly txid?: UInt256;
   readonly trigger: TriggerType;
   readonly vmState: VMState;
-  readonly gasConsumed: number;
+  readonly gasConsumed: BN;
   readonly stack: readonly StackItem[];
   readonly notifications: readonly Notification[];
 }
@@ -42,7 +43,7 @@ export class ApplicationLog implements SerializableWire {
   public readonly txid?: UInt256;
   public readonly trigger: TriggerType;
   public readonly vmState: VMState;
-  public readonly gasConsumed: number;
+  public readonly gasConsumed: BN;
   public readonly stack: readonly StackItem[];
   public readonly notifications: readonly Notification[];
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));

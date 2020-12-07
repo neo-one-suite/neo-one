@@ -22,6 +22,7 @@ import {
   UnclaimedGASJSON,
   ValidatorJSON,
   VerboseTransactionJSON,
+  VerificationCostJSON,
   VersionJSON,
 } from '@neo-one/client-common';
 import { RelayTransactionError } from '../errors';
@@ -76,6 +77,10 @@ export class JSONRPCClient {
     return this.withInstance(async (provider) => provider.request({ method: 'getblockcount' }));
   }
 
+  public async getFeePerByte(): Promise<string> {
+    return this.withInstance(async (provider) => provider.request({ method: 'getfeeperbyte' }));
+  }
+
   public async getContract(address: AddressString): Promise<ContractJSON> {
     return this.withInstance(async (provider) =>
       provider.request({
@@ -106,6 +111,24 @@ export class JSONRPCClient {
       provider.request({
         method: 'invokescript',
         params: [script, ...verifications],
+      }),
+    );
+  }
+
+  public async getVerificationCost(hash: AddressString, transaction: BufferString): Promise<VerificationCostJSON> {
+    return this.withInstance(async (provider) =>
+      provider.request({
+        method: 'getverificationcost',
+        params: [hash, transaction],
+      }),
+    );
+  }
+
+  public async testTransaction(transaction: BufferString): Promise<CallReceiptJSON> {
+    return this.withInstance(async (provider) =>
+      provider.request({
+        method: 'testtransaction',
+        params: [transaction],
       }),
     );
   }

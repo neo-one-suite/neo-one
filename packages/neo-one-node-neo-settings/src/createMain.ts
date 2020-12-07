@@ -2,6 +2,8 @@ import { common as clientCommon, crypto } from '@neo-one/client-common';
 import { Settings } from '@neo-one/node-core';
 import { common } from './common';
 
+const mainNetMessageMagic = 5195086;
+
 const DEFAULT_VALIDATORS: readonly string[] = [
   '03b209fd4f53a7170ea4444e0cb0a6bb6a53c2bd016926989cf85f9b0fba17a70c',
   '02df48f60e8f3e01c48ff40b9b7f1310d7a8b2a193188befe1c2e3df740e895093',
@@ -49,6 +51,7 @@ export const createMain = ({
   const commonSettings = common({
     privateNet,
     consensusAddress,
+    messageMagic: mainNetMessageMagic,
   });
 
   return {
@@ -57,29 +60,13 @@ export const createMain = ({
     generationAmount: commonSettings.generationAmount,
     millisecondsPerBlock:
       millisecondsPerBlock === undefined ? commonSettings.millisecondsPerBlock : millisecondsPerBlock,
-    // maxTransactionsPerBlock: commonSettings.maxTransactionsPerBlock,
     standbyCommittee,
     committeeMembersCount: standbyCommittee.length,
     memoryPoolMaxTransactions: commonSettings.memoryPoolMaxTransactions,
     validatorsCount: standbyValidators.length,
-    // fees: {
-    //   [TransactionType.Enrollment]: clientCommon.fixed8FromDecimal(1000),
-    //   [TransactionType.Issue]: clientCommon.fixed8FromDecimal(500),
-    //   [TransactionType.Publish]: clientCommon.fixed8FromDecimal(500),
-    //   [TransactionType.Register]: clientCommon.fixed8FromDecimal(10000),
-    // },
-
-    // registerValidatorFee: clientCommon.fixed8FromDecimal(1000),
-    messageMagic: 5195086,
+    messageMagic: mainNetMessageMagic,
     addressVersion: clientCommon.NEO_ADDRESS_VERSION,
     privateKeyVersion: clientCommon.NEO_PRIVATE_KEY_VERSION,
     standbyValidators,
-    // vm: {
-    //   storageContext: {
-    //     v0: {
-    //       index: 0,
-    //     },
-    //   },
-    // },
   };
 };

@@ -20,6 +20,7 @@ export class BlockBuilder {
   public readonly nextConsensus?: UInt160;
   public readonly witness?: Witness;
   public readonly hash?: UInt256;
+  public readonly messageMagic?: number;
 
   public constructor(options: BlockPartial) {
     this.merkleRoot = options.merkleRoot;
@@ -32,6 +33,7 @@ export class BlockBuilder {
     this.nextConsensus = options.nextConsensus;
     this.witness = options.witness;
     this.hash = options.hash;
+    this.messageMagic = options.messageMagic;
   }
 
   public clone({
@@ -48,7 +50,13 @@ export class BlockBuilder {
   }: BlockPartial) {
     return new BlockBuilder({
       merkleRoot: merkleRoot ?? this.merkleRoot,
-      consensusData: consensusData ?? this.consensusData,
+      consensusData:
+        consensusData === undefined
+          ? this.consensusData
+          : {
+              primaryIndex: consensusData.primaryIndex ?? this.consensusData?.primaryIndex,
+              nonce: consensusData.nonce ?? this.consensusData?.nonce,
+            },
       transactions: transactions ?? this.transactions,
       version: version ?? this.version,
       previousHash: previousHash ?? this.previousHash,
@@ -73,17 +81,17 @@ export class BlockBuilder {
   }
 
   public getBlock() {
+    const consensusData = this.getConsensusData();
     const options = {
-      merkleRoot: this.merkleRoot,
-      consensusData: this.getConsensusData(),
-      transactions: this.transactions,
+      consensusData,
+      transactions: this.transactions ?? [],
       version: this.version,
       previousHash: this.previousHash,
       timestamp: this.timestamp,
       index: this.index,
       nextConsensus: this.nextConsensus,
       witness: this.witness,
-      hash: this.hash,
+      messageMagic: this.messageMagic,
     };
 
     // TODO: we could assert all these options but we'd throw anyway, maybe clean up.

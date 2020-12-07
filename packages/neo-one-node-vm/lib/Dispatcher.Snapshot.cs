@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Neo;
+using Neo.IO;
 using Neo.Ledger;
 using Neo.Network.P2P.Payloads;
 using Neo.Persistence;
@@ -43,6 +44,8 @@ namespace NEOONE
                     {
                         block.Deserialize(reader);
                     }
+
+                    var tmp = block.Hash.ToString();
 
                     return this._snapshotBlocksAdd(this.selectSnapshot(args.snapshot), blockHash, block);
 

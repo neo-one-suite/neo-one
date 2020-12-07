@@ -1,11 +1,19 @@
-import { common, crypto, ECPoint, IOHelper, PrivateKey, ScriptBuilder, UInt256 } from '@neo-one/client-common';
+import {
+  AccountContract,
+  common,
+  crypto,
+  ECPoint,
+  IOHelper,
+  PrivateKey,
+  ScriptBuilder,
+  UInt256,
+} from '@neo-one/client-common';
 import {
   Blockchain,
   BlockchainStorage,
   ChangeViewConsensusMessage,
   CommitConsensusMessage,
   ConsensusContext,
-  Contract,
   ContractParametersContext,
   getBlockScriptHashesForVerifying,
   getM,
@@ -66,7 +74,7 @@ const getPrimaryIndex = ({
 
 export const createBlock = async (contextIn: ConsensusContext, storage: BlockchainStorage) => {
   let { context } = ensureHeader(contextIn);
-  const contract = Contract.createMultiSigContract(context.M, context.validators);
+  const contract = AccountContract.createMultiSigContract(context.M, context.validators);
   const scriptHashOptions = {
     previousHash: utils.nullthrows(context.blockBuilder.previousHash),
     witness: context.blockBuilder.witness,
@@ -152,7 +160,7 @@ export const ensureMaxBlockLimitation = async (
       }
 
       const newBlockSystemFee = acc.blockSystemFee.add(transaction.systemFee);
-      if (newBlockSystemFee > maxBlockSystemFee) {
+      if (newBlockSystemFee.gt(maxBlockSystemFee)) {
         return {
           ...acc,
           blockSize: newBlockSize,
@@ -210,6 +218,8 @@ export const reset = async ({
       previousHash: blockchain.currentBlock.hash,
       index: blockchain.currentBlockIndex + 1,
       nextConsensus: crypto.getConsensusAddress(validators),
+      merkleRoot: undefined,
+      messageMagic: blockchain.settings.messageMagic,
     };
 
     const previousValidators = context.validators;

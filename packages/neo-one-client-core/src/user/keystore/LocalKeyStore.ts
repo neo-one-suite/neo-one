@@ -1,4 +1,5 @@
 import {
+  AccountContract,
   BufferString,
   common,
   crypto,
@@ -190,6 +191,7 @@ export class LocalKeyStore implements KeyStore {
         id: wallet.userAccount.id,
         name,
         publicKey: wallet.userAccount.publicKey,
+        contract: wallet.userAccount.contract,
       };
 
       if (wallet.type === 'locked') {
@@ -272,6 +274,8 @@ export class LocalKeyStore implements KeyStore {
         nep2 = await encryptNEP2({ privateKey, password });
       }
 
+      const contract = AccountContract.createSignatureContract(common.stringToECPoint(publicKey));
+
       const userAccount = {
         id: {
           network,
@@ -279,6 +283,7 @@ export class LocalKeyStore implements KeyStore {
         },
         name: name === undefined ? address : name,
         publicKey,
+        contract,
       };
 
       const unlockedWallet: UnlockedWallet = {
@@ -292,6 +297,64 @@ export class LocalKeyStore implements KeyStore {
       if (nep2 !== undefined) {
         wallet = { type: 'locked', userAccount, nep2 };
       }
+
+      await this.capture(async () => this.store.saveWallet(wallet), 'neo_save_wallet');
+
+      this.updateWallet(unlockedWallet);
+
+      if (this.currentAccount === undefined) {
+        this.currentAccountInternal$.next(wallet.userAccount);
+      }
+
+      return unlockedWallet;
+    }, 'neo_add_account');
+  }
+
+  /**
+   * not a true implementation, just serves as a helper for private net.
+   * @internal
+   */
+  public async addMultiSigUserAccount({
+    network,
+    privateKeys: privateKeysIn,
+    name,
+  }: {
+    readonly network: NetworkType;
+    readonly privateKeys: readonly BufferString[];
+    readonly name?: string;
+  }): Promise<LocalWallet> {
+    await this.initPromise;
+
+    return this.capture(async () => {
+      const pk = privateKeysIn[0];
+
+      const privateKey = args.assertPrivateKey('privateKey', pk);
+      const publicKey = privateKeyToPublicKey(privateKey);
+      const ecPoint = common.stringToECPoint(publicKey);
+      const address = crypto.scriptHashToAddress({
+        addressVersion: common.NEO_ADDRESS_VERSION,
+        scriptHash: crypto.toScriptHash(crypto.createMultiSignatureVerificationScript(1, [ecPoint])),
+      });
+
+      const contract = AccountContract.createMultiSigContract(1, [ecPoint]);
+
+      const userAccount = {
+        id: {
+          network,
+          address,
+        },
+        name: name === undefined ? address : name,
+        publicKey,
+        contract,
+      };
+
+      const unlockedWallet: UnlockedWallet = {
+        type: 'unlocked',
+        userAccount,
+        privateKey,
+      };
+
+      const wallet: LocalWallet = unlockedWallet;
 
       await this.capture(async () => this.store.saveWallet(wallet), 'neo_save_wallet');
 

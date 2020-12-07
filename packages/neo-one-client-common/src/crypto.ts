@@ -556,8 +556,8 @@ const decryptNEP2 = async ({
   return common.bufferToPrivateKey(privateKey);
 };
 
-const checkSigUInt = Buffer.from([0x747476aa]);
-const checkMultiSigUint = Buffer.from([0xc7c34cba]);
+const checkMultisigWithECDsaSecp256r1 = Buffer.from('138defaf', 'hex');
+const verifyECDsaSecp256r1 = Buffer.from('95440d78', 'hex');
 
 // tslint:disable
 const isMultiSigContract = (script: Buffer) => {
@@ -616,7 +616,7 @@ const isMultiSigContract = (script: Buffer) => {
   if (script[i++] !== Op.PUSHNULL) return false;
   if (script[i++] !== Op.SYSCALL) return false;
   if (script.length !== i + 4) return false;
-  if (script.slice(i) !== checkMultiSigUint) return false;
+  if (!script.slice(i).equals(checkMultisigWithECDsaSecp256r1)) return false;
   return true;
 };
 // tslint:enable
@@ -683,7 +683,7 @@ const isMultiSigContractWithResult = (script: Buffer): MultiSigResult => {
   if (script[i++] !== Op.PUSHNULL) return { result: false };
   if (script[i++] !== Op.SYSCALL) return { result: false };
   if (script.length !== i + 4) return { result: false };
-  if (script.slice(i) !== checkMultiSigUint) return { result: false };
+  if (!script.slice(i).equals(checkMultisigWithECDsaSecp256r1)) return { result: false };
   return { result: true, m, n, points };
 };
 // tslint:enable
@@ -694,7 +694,7 @@ const isSignatureContract = (script: Buffer) =>
   script[1] === 33 &&
   script[35] === Op.PUSHNULL &&
   script[36] === Op.SYSCALL &&
-  script.slice(37) === checkSigUInt;
+  script.slice(37).equals(verifyECDsaSecp256r1);
 
 const isStandardContract = (script: Buffer) => isSignatureContract(script) || isMultiSigContract(script);
 

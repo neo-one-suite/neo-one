@@ -74,7 +74,7 @@ export const startFullNode = async ({
 
     const storage = levelupStorage({
       db: LevelUp(rocks),
-      context: { messageMagic: blockchainSettings.messageMagic },
+      context: { messageMagic: blockchainSettings.messageMagic, validatorsCount: blockchainSettings.validatorsCount },
     });
 
     disposable = composeDisposable(async () => storage.close(), disposable);

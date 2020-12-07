@@ -51,10 +51,10 @@ export class PolicyContract extends NativeContract {
   public async getFeePerByte({ storages }: NativeContractStorageContext) {
     const item = await storages.tryGet(this.createStorageKey(this.prefixes.feePerByte).toStorageKey());
     if (item === undefined) {
-      return 1000;
+      return new BN(1000);
     }
 
-    return new BN(item.value).toNumber();
+    return new BN(item.value);
   }
 
   public async getBlockedAccounts({ storages }: NativeContractStorageContext): Promise<readonly UInt160[]> {

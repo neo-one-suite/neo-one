@@ -21,9 +21,6 @@ export const createDeserializeAttributeType = (type: AttributeTypeModel) => (opt
 };
 
 export abstract class AttributeBase extends AttributeBaseModel implements SerializableJSON<AttributeJSON> {
-  public get size() {
-    return IOHelper.sizeOfUInt8 + this.sizeExclusive();
-  }
   public serializeJSON(): AttributeJSON {
     return {
       type: toJSONAttributeType(this.type),
@@ -33,9 +30,5 @@ export abstract class AttributeBase extends AttributeBaseModel implements Serial
   // Must not be implemented in C# land yet?
   public async verify(_verifyOptions: VerifyOptions, _tx: Transaction) {
     return Promise.resolve(true);
-  }
-
-  protected sizeExclusive(): number {
-    return 0;
   }
 }

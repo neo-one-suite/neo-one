@@ -261,7 +261,7 @@ export abstract class BlockBase implements EquatableKey, SerializableContainer, 
       return false;
     }
 
-    return verifyWitnesses(vm, this, storage, native, 1);
+    return verifyWitnesses(vm, this, storage, native, utils.ONE);
   }
 
   protected readonly sizeExclusive: () => number = () => 0;

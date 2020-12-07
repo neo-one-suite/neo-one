@@ -17,8 +17,8 @@ export interface ConsensusDataAdd {
 
 export class ConsensusData implements SerializableWire, SerializableJSON<ConsensusDataJSON> {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): ConsensusData {
-    const { reader } = options;
-    const primaryIndex = reader.readVarUIntLE(DEFAULT_VALIDATORS_COUNT.subn(1)).toNumber();
+    const { reader, context } = options;
+    const primaryIndex = reader.readVarUIntLE(context.validatorsCount - 1).toNumber();
     const nonce = reader.readUInt64LE();
 
     return new this({
@@ -33,12 +33,12 @@ export class ConsensusData implements SerializableWire, SerializableJSON<Consens
   public readonly sizeInternal = utils.lazy(
     () => IOHelper.sizeOfVarUIntLE(this.primaryIndex) + IOHelper.sizeOfUInt64LE,
   );
-  public readonly hashInternal = utils.lazy(() => crypto.hash256(this.serializeWire()));
 
   public constructor({ primaryIndex, nonce }: ConsensusDataAdd) {
     this.primaryIndex = primaryIndex;
     this.nonce = nonce;
   }
+  public readonly hashInternal = () => crypto.hash256(this.serializeWire());
 
   public get hash(): UInt256 {
     return this.hashInternal();

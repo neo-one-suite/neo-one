@@ -21,18 +21,13 @@ export const serializeSettings = (settings: Settings) => {
     genesisBlock: genesisBlock.serializeWire().toString('hex'),
     decrementInterval,
     generationAmount,
-    // fees: _.fromPairs(
-    //   Object.entries(fees).map(([key, fee]) => [key, fee === undefined ? JSON.stringify(undefined) : fee.toString(10)]),
-    // ),
     privateKeyVersion,
     standbyValidators: standbyValidators.map((validator) => common.ecPointToString(validator)),
     standbyCommittee: standbyCommittee.map((validator) => common.ecPointToString(validator)),
     committeeMembersCount,
     validatorsCount,
-    // registerValidatorFee: registerValidatorFee.toString(10),
     messageMagic,
     addressVersion,
-    // vm,
     millisecondsPerBlock,
     memoryPoolMaxTransactions,
   };
@@ -55,16 +50,12 @@ export const deserializeSettings = (settings: any): Settings => {
     memoryPoolMaxTransactions,
   } = settings;
 
-  const context = { messageMagic };
+  const context = { messageMagic, validatorsCount };
 
   return {
     genesisBlock: Block.deserializeWire({ context, buffer: Buffer.from(genesisBlock, 'hex') }),
     decrementInterval,
     generationAmount,
-    // fees: _.fromPairs(
-    //   Object.entries(fees).map(([key, fee]) => [key, fee === undefined ? undefined : new BN(fee as string, 10)]),
-    // ),
-    // registerValidatorFee: new BN(registerValidatorFee, 10),
     messageMagic,
     addressVersion,
     privateKeyVersion,
@@ -72,7 +63,6 @@ export const deserializeSettings = (settings: any): Settings => {
     standbyCommittee: standbyCommittee.map((validator: string) => common.stringToECPoint(validator)),
     committeeMembersCount,
     validatorsCount,
-    // vm,
     millisecondsPerBlock,
     memoryPoolMaxTransactions,
   };

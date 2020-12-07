@@ -66,6 +66,7 @@ function lazyInput<Value, Input>(getValue: (input: Input) => Value): (input: Inp
 }
 
 const randomUInt = (): number => Math.floor(Math.random() * UINT_MAX_NUMBER);
+const randomUShort = (): number => Math.floor(Math.random() * USHORT_MAX_NUMBER);
 
 export const utils = {
   FD: new BN(0xfd),
@@ -98,4 +99,5 @@ export const utils = {
   lazy,
   lazyInput,
   randomUInt,
+  randomUShort,
 };

@@ -23,7 +23,7 @@ export function convertCallReceipt(receipt: CallReceiptJSON): RawCallReceipt {
   return {
     script: JSONHelper.readBuffer(receipt.script),
     state: receipt.state,
-    gasConsumed: new BigNumber(receipt.gasconsumed),
+    gasConsumed: common.fixedToDecimal(new BN(receipt.gasconsumed), 0),
     stack: typeof receipt.stack === 'string' ? receipt.stack : receipt.stack.map(convertStackItem),
     notifications: receipt.notifications.map(convertNotification),
   };

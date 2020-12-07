@@ -1,4 +1,5 @@
 import {
+  AccountContract,
   common,
   ContractParameterTypeModel,
   crypto,
@@ -8,7 +9,6 @@ import {
   WitnessScopeModel,
 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
-import { Contract } from '../Contract';
 import { ContractParametersContext } from '../ContractParametersContext';
 import { Signer } from '../Signer';
 import { Transaction } from '../transaction';
@@ -32,22 +32,24 @@ const getTransaction = (sender: UInt160) =>
     ],
     networkFee: new BN(0),
     systemFee: new BN(0),
+    validUntilBlock: 2000,
+    messageMagic: 73450591,
   });
 
 describe('ContractParametersContext Test', () => {
   let privateKey: PrivateKey;
   let publicKey: ECPoint;
-  let contract: Contract;
+  let contract: AccountContract;
   beforeEach(() => {
     // tslint:disable-next-line: prefer-array-literal
     privateKey = common.asPrivateKey(Buffer.from(new Array(32).fill(0x01)));
     publicKey = crypto.privateKeyToPublicKey(privateKey);
-    contract = Contract.createSignatureContract(publicKey);
+    contract = AccountContract.createSignatureContract(publicKey);
   });
 
   test('addWithIndex', () => {
     const context = new ContractParametersContext([common.ZERO_UINT160]);
-    const testContract = new Contract({
+    const testContract = new AccountContract({
       script: Buffer.from([0x00]),
       parameterList: [0x10],
       scriptHash: common.ZERO_UINT160,
@@ -64,7 +66,7 @@ describe('ContractParametersContext Test', () => {
 
   test('add', () => {
     const context = new ContractParametersContext([common.ZERO_UINT160]);
-    const testContract = new Contract({
+    const testContract = new AccountContract({
       script: Buffer.from([0x00]),
       parameterList: [0x10],
       scriptHash: common.ZERO_UINT160,

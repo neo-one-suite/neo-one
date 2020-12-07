@@ -43,16 +43,6 @@ export interface VerboseData {
 export class Transaction
   extends TransactionModel<Attribute, Witness, Signer>
   implements SerializableContainer, Verifiable {
-  public static readonly headerSize =
-    IOHelper.sizeOfUInt8 +
-    IOHelper.sizeOfUInt32LE +
-    IOHelper.sizeOfUInt64LE +
-    IOHelper.sizeOfUInt64LE +
-    IOHelper.sizeOfUInt32LE;
-
-  public get size() {
-    return this.sizeInternal();
-  }
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Transaction {
     const {
       version,
@@ -170,6 +160,10 @@ export class Transaction
       return attribute;
     });
   }
+  public get size() {
+    return this.sizeInternal();
+  }
+
   public readonly type: SerializableContainerType = 'Transaction';
   private readonly sizeInternal = utils.lazy(
     () =>
@@ -179,10 +173,6 @@ export class Transaction
       IOHelper.sizeOfVarBytesLE(this.script) +
       IOHelper.sizeOfArray(this.witnesses, (witness) => witness.size),
   );
-
-  public getScriptHashesForVerifying(): readonly UInt160[] {
-    return this.signers.map((signer) => signer.account);
-  }
 
   public async verifyForEachBlock(
     verifyOptions: VerifyOptions,
@@ -253,12 +243,12 @@ export class Transaction
       return VerifyResultModel.Invalid;
     }
     const feePerByte = await native.Policy.getFeePerByte(storage);
-    const netFee = this.networkFee.subn(this.size * feePerByte);
+    const netFee = this.networkFee.sub(feePerByte.muln(this.size));
     if (netFee.ltn(0)) {
       return VerifyResultModel.InsufficientFunds;
     }
 
-    const witnessVerify = await verifyWitnesses(vm, this, storage, native, common.fixed8ToDecimal(netFee).toNumber());
+    const witnessVerify = await verifyWitnesses(vm, this, storage, native, netFee);
     if (!witnessVerify) {
       return VerifyResultModel.Invalid;
     }
