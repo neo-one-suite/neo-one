@@ -2,6 +2,39 @@
   "name": "@neo-one/smart-contract-test",
   "entries": [
     {
+      "version": "2.7.1",
+      "tag": "@neo-one/smart-contract-test_v2.7.1",
+      "date": "Tue, 08 Dec 2020 19:29:01 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-common\" from `^2.7.0` to `^3.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-core\" from `^2.7.0` to `^3.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node\" from `^2.7.0` to `^3.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-neo-settings\" from `^2.7.0` to `^3.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/smart-contract-compiler-node\" from `^2.7.0` to `^2.7.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/smart-contract-test-common\" from `^2.7.0` to `^2.7.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/utils\" from `^2.6.1` to `^3.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/smart-contract-lib\" from `^2.7.0` to `^2.7.1`"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.7.0",
       "tag": "@neo-one/smart-contract-test_v2.7.0",
       "date": "Thu, 23 Jul 2020 22:11:12 GMT",

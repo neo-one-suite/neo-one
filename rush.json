@@ -6,14 +6,8 @@
   "ensureConsistentVersions": true,
   "suppressNodeLtsWarning": true,
   "approvedPackagesPolicy": {
-    "reviewCategories": [
-      "production",
-      "tools",
-      "web"
-    ],
-    "ignoredNpmScopes": [
-      "@types"
-    ]
+    "reviewCategories": ["production", "tools", "web"],
+    "ignoredNpmScopes": ["@types"]
   },
   "repository": {
     "url": "https://github.com/neo-one-suite/neo-one.git"
@@ -44,21 +38,21 @@
       "packageName": "@neo-one/cli",
       "projectFolder": "packages/neo-one-cli",
       "reviewCategory": "production",
-      "shouldPublish": false,
+      "shouldPublish": true,
       "versionPolicyName": "CoreReleasePolicy"
     },
     {
       "packageName": "@neo-one/cli-common",
       "projectFolder": "packages/neo-one-cli-common",
       "reviewCategory": "production",
-      "shouldPublish": false,
+      "shouldPublish": true,
       "versionPolicyName": "CoreReleasePolicy"
     },
     {
       "packageName": "@neo-one/cli-common-node",
       "projectFolder": "packages/neo-one-cli-common-node",
       "reviewCategory": "production",
-      "shouldPublish": false,
+      "shouldPublish": true,
       "versionPolicyName": "CoreReleasePolicy"
     },
     {

@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract-test",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "description": "NEO•ONE TypeScript smart contract test harness.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -13,13 +13,13 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-common": "^2.7.0",
-    "@neo-one/client-core": "^2.7.0",
-    "@neo-one/node": "^2.7.0",
-    "@neo-one/node-neo-settings": "^2.7.0",
-    "@neo-one/smart-contract-compiler-node": "^2.7.0",
-    "@neo-one/smart-contract-test-common": "^2.7.0",
-    "@neo-one/utils": "^2.6.1",
+    "@neo-one/client-common": "^3.0.0",
+    "@neo-one/client-core": "^3.0.0",
+    "@neo-one/node": "^3.0.0",
+    "@neo-one/node-neo-settings": "^3.0.0",
+    "@neo-one/smart-contract-compiler-node": "^2.7.1",
+    "@neo-one/smart-contract-test-common": "^2.7.1",
+    "@neo-one/utils": "^3.0.0",
     "lodash": "^4.17.15",
     "memdown": "^5.0.0",
     "tslib": "^1.10.0"
@@ -27,7 +27,7 @@
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
     "@neo-one/smart-contract": "^2.7.0",
-    "@neo-one/smart-contract-lib": "^2.7.0",
+    "@neo-one/smart-contract-lib": "^2.7.1",
     "@types/jest": "^24.0.18",
     "@types/lodash": "^4.14.138",
     "@types/memdown": "^3.0.0",

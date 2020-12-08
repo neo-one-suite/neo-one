@@ -2,6 +2,64 @@
   "name": "@neo-one/node",
   "entries": [
     {
+      "version": "3.0.0",
+      "tag": "@neo-one/node_v3.0.0",
+      "date": "Tue, 08 Dec 2020 19:29:01 GMT",
+      "comments": {
+        "major": [
+          {
+            "comment": "3.0.0preview3-alpha release bump"
+          }
+        ],
+        "none": [
+          {
+            "comment": "Pin level-js and levelup deps."
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-switch\" from `^2.7.0` to `^3.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-blockchain\" from `^2.7.0` to `^3.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-core\" from `^2.7.0` to `^3.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-http-rpc\" from `^2.7.0` to `^3.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-native\" from `^2.7.0` to `^3.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-network\" from `^2.7.0` to `^3.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-offline\" from `^2.7.0` to `^3.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-protocol\" from `^2.7.0` to `^3.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-storage-levelup\" from `^2.7.0` to `^3.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-vm\" from `^2.7.0` to `^3.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/utils\" from `^2.6.1` to `^3.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-common\" from `^2.7.0` to `^3.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-neo-settings\" from `^2.7.0` to `^3.0.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.7.0",
       "tag": "@neo-one/node_v2.7.0",
       "date": "Thu, 23 Jul 2020 22:11:12 GMT",

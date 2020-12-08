@@ -2,6 +2,18 @@
   "name": "@neo-one/react-common",
   "entries": [
     {
+      "version": "3.0.0",
+      "tag": "@neo-one/react-common_v3.0.0",
+      "date": "Tue, 08 Dec 2020 19:29:01 GMT",
+      "comments": {
+        "major": [
+          {
+            "comment": "3.0.0preview3-alpha release bump"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.7.0",
       "tag": "@neo-one/react-common_v2.7.0",
       "date": "Thu, 23 Jul 2020 22:11:12 GMT",
