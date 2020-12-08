@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "3.0.1-preview3 release",
+      "type": "patch",
+      "packageName": "@neo-one/client-core"
+    }
+  ],
+  "packageName": "@neo-one/client-core",
+  "email": "danwbyrne@gmail.com"
+}

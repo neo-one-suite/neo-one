@@ -3,7 +3,7 @@
     {
       "packageName": "@neo-one/cli",
       "comment": "fixup cli start network command",
-      "type": "minor"
+      "type": "patch"
     }
   ],
   "packageName": "@neo-one/cli",

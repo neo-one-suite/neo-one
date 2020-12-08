@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-storage-cache",
-  "version": "2.7.0",
+  "version": "3.0.0",
   "description": "NEO•ONE node storage cache.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -13,10 +13,10 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-common": "^2.7.0",
-    "@neo-one/node-core": "^2.7.0",
-    "@neo-one/node-storage-common": "^2.7.0",
-    "@neo-one/utils": "^2.6.1",
+    "@neo-one/client-common": "^3.0.0",
+    "@neo-one/node-core": "^3.0.0",
+    "@neo-one/node-storage-common": "^3.0.0",
+    "@neo-one/utils": "^3.0.0",
     "@types/lru-cache": "^5.1.0",
     "lru-cache": "^5.0.0",
     "tslib": "^1.10.0"

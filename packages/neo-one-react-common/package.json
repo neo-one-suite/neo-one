@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/react-common",
-  "version": "2.7.0",
+  "version": "3.0.0",
   "description": "NEO•ONE shared react.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",

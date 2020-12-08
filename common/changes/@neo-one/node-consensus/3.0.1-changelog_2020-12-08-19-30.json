@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "3.0.1-preview3 release",
+      "type": "patch",
+      "packageName": "@neo-one/node-consensus"
+    }
+  ],
+  "packageName": "@neo-one/node-consensus",
+  "email": "danwbyrne@gmail.com"
+}
