@@ -17,7 +17,7 @@
     "@neo-one/client-core": "^3.0.0",
     "@neo-one/node": "^3.0.0",
     "@neo-one/node-neo-settings": "^3.0.0",
-    "@neo-one/smart-contract-compiler-node": "^2.7.1",
+    "@neo-one/smart-contract-compiler-node": "^2.7.2-preview3",
     "@neo-one/smart-contract-test-common": "^2.7.1",
     "@neo-one/utils": "^3.0.0",
     "lodash": "^4.17.15",

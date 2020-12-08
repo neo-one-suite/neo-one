@@ -32,7 +32,7 @@
     "@neo-one/node-neo-settings": "^3.0.0",
     "@neo-one/smart-contract-codegen": "^2.7.1",
     "@neo-one/smart-contract-compiler": "^3.0.0",
-    "@neo-one/smart-contract-compiler-node": "^2.7.1",
+    "@neo-one/smart-contract-compiler-node": "^2.7.2-preview3",
     "@neo-one/utils": "^3.0.0",
     "@neo-one/utils-node": "^2.6.2",
     "@types/listr": "^0.14.2",
