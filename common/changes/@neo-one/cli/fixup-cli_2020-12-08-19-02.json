@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/cli",
+      "comment": "fixup cli start network command",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@neo-one/cli",
+  "email": "danwbyrne@gmail.com"
+}

@@ -14,7 +14,7 @@ describe.skip('Test LocalUserAccountProvider transfer methods -- local network',
       ),
     },
     network: {
-      rpcURL: 'http://localhost:8081/rpc',
+      rpcURL: 'http://localhost:9040/rpc',
       name: 'local',
     },
   };

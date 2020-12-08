@@ -4,4 +4,5 @@ import * as network from './network';
 
 export const command = 'stop';
 export const describe = 'Stops NEO•ONE services.';
-export const builder = (yargsBuilder: typeof yargs) => yargsBuilder.command(network).command(neotracker);
+// TODO: neotracker command added back
+export const builder = (yargsBuilder: typeof yargs) => yargsBuilder.command(network); /*.command(neotracker)*/
