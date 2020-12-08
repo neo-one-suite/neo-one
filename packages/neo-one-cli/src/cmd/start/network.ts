@@ -24,8 +24,8 @@ export const handler = () => {
       options: {
         path: config.network.path,
         blockchain: createMain({
-          address: common.uInt160ToString(crypto.privateKeyToScriptHash(privateKey)),
           standbyValidators: [common.ecPointToString(publicKey)],
+          extraCommitteeMembers: [],
           privateNet: true,
         }),
         node: {
