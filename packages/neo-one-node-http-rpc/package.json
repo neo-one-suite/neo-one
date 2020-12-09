@@ -15,7 +15,7 @@
   "dependencies": {
     "@neo-one/cli-common-node": "^2.7.1",
     "@neo-one/http": "^2.7.0",
-    "@neo-one/http-context": "^2.7.1",
+    "@neo-one/http-context": "^2.7.2-preview3",
     "@neo-one/logger": "^2.6.1",
     "@neo-one/node-core": "^3.0.0",
     "@neo-one/node-native": "^3.0.0",
