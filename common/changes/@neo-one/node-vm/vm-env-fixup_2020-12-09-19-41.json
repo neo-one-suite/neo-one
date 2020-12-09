@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/node-vm",
+      "comment": "add default environment variable instead of requiring them from the user",
+      "type": "none"
+    }
+  ],
+  "packageName": "@neo-one/node-vm",
+  "email": "danwbyrne@gmail.com"
+}

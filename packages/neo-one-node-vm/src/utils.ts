@@ -6,7 +6,9 @@ import { InvalidByteError, InvalidIntError, InvalidUIntError } from './errors';
 import { ProtocolSettings } from './Methods';
 import { DefaultMethods, DispatcherFunc } from './types';
 
-const APP_ROOT = path.resolve(__dirname, '..');
+const directory = path.basename(__dirname);
+const APP_ROOT =
+  directory === 'cjs' || directory === 'esm' ? path.resolve(__dirname, '..', '..') : path.resolve(__dirname, '..');
 const CSHARP_APP_ROOT = process.env.EDGE_APP_ROOT ?? path.resolve(APP_ROOT, 'lib', 'bin', 'Debug', 'netcoreapp3.0');
 
 export const constants = {
@@ -19,6 +21,14 @@ type EdgeOptions = (() => void) | string | Params | Source | TSQL;
 export const createCSharpDispatchInvoke = <Methods extends DefaultMethods>(
   options: EdgeOptions,
 ): DispatcherFunc<Methods> => {
+  if (process.env.EDGE_APP_ROOT === undefined) {
+    process.env.EDGE_APP_ROOT = CSHARP_APP_ROOT;
+  }
+
+  if (process.env.EDGE_USE_CORECLR === undefined) {
+    process.env.EDGE_USE_CORECLR = '1';
+  }
+
   const invokeFunction = func(options);
 
   return (input) => invokeFunction(input, true);
