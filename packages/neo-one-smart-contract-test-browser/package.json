@@ -11,12 +11,12 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-core": "^3.0.0",
+    "@neo-one/client-core": "3.0.1-preview3",
     "@neo-one/local-browser": "^2.3.1",
     "@neo-one/local-singleton": "^2.3.1",
     "@neo-one/node-browser": "^2.3.0",
-    "@neo-one/smart-contract-test-common": "^2.7.1",
-    "@neo-one/utils": "^3.0.0",
+    "@neo-one/smart-contract-test-common": "2.7.2-preview3",
+    "@neo-one/utils": "3.0.1-preview3",
     "@neo-one/worker": "^2.3.0",
     "core-js": "^3.2.1",
     "tslib": "^1.10.0"

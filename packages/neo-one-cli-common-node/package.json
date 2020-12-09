@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/cli-common-node",
-  "version": "2.7.1",
+  "version": "2.7.2-preview3",
   "description": "NEO•ONE code common to the node cli and other node packages in NEO•ONE.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -13,9 +13,9 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/cli-common": "^3.0.0",
-    "@neo-one/client-core": "^3.0.0",
-    "@neo-one/client-full-core": "^3.0.0",
+    "@neo-one/cli-common": "3.0.1-preview3",
+    "@neo-one/client-core": "3.0.1-preview3",
+    "@neo-one/client-full-core": "3.0.1-preview3",
     "@types/lodash": "^4.14.138",
     "cosmiconfig": "^6.0.0",
     "fs-extra": "^8.1.0",
