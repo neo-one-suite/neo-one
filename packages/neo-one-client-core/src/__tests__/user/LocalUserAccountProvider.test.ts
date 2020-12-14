@@ -1,7 +1,7 @@
-import { common, crypto, ScriptBuilder } from '@neo-one/client-common';
+import { common, crypto } from '@neo-one/client-common';
 import { constants } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import { NEOONEProvider, NEOONEDataProvider } from '../../provider';
+import { NEOONEProvider } from '../../provider';
 import { LocalKeyStore, LocalMemoryStore, LocalUserAccountProvider } from '../../user';
 
 const secondaryKeyString = '04c1784140445016cf0f8cc86dd10ad8764e1a89c563c500e21ac19a5d905ab3';
@@ -138,25 +138,71 @@ describe.skip('Test LocalUserAccountProvider transfer methods -- staging network
 
     expect(stackReturn.value).toEqual(true);
   });
+
+  test('Claim Gas -- forming our own transaction', async () => {
+    const keystore = new LocalKeyStore(new LocalMemoryStore());
+    const account = await keystore.addUserAccount(masterAccount);
+
+    const provider = new NEOONEProvider([providerOptions]);
+    const localProvider = new LocalUserAccountProvider({ provider, keystore });
+
+    const unclaimedInit = await provider.getUnclaimed('test', account.userAccount.id.address);
+
+    const transfer = {
+      amount: new BigNumber(0),
+      asset: common.nativeScriptHashes.NEO,
+      to: account.userAccount.id.address,
+    };
+
+    const result = await localProvider.transfer([transfer], {
+      maxNetworkFee: new BigNumber(-1),
+      maxSystemFee: new BigNumber(-1),
+    });
+
+    await result.confirmed();
+
+    const unclaimedPost = await provider.getUnclaimed('test', account.userAccount.id.address);
+    expect(unclaimedPost.toNumber()).toBeLessThan(unclaimedInit.toNumber());
+  });
+
+  test('Claim Gas -- using LUAP method', async () => {
+    const keystore = new LocalKeyStore(new LocalMemoryStore());
+    const account = await keystore.addUserAccount(masterAccount);
+
+    const provider = new NEOONEProvider([providerOptions]);
+    const localProvider = new LocalUserAccountProvider({ provider, keystore });
+
+    const unclaimedInit = await provider.getUnclaimed('test', account.userAccount.id.address);
+
+    const result = await localProvider.claim({
+      from: account.userAccount.id,
+      maxNetworkFee: new BigNumber(-1),
+      maxSystemFee: new BigNumber(-1),
+    });
+
+    await result.confirmed();
+
+    const unclaimedPost = await provider.getUnclaimed('test', account.userAccount.id.address);
+    expect(unclaimedPost.toNumber()).toBeLessThan(unclaimedInit.toNumber());
+  });
 });
 
-describe('contract info / usage testing', () => {
+describe.skip('contract info / usage testing', () => {
   const knownContractHashString = '0x79597a92440ce385fe1b0f4d9d2a92ca8608a575';
-  const knownContractHash = common.stringToUInt160(knownContractHashString);
 
   const providerOptions = {
     network: 'test',
-    rpcURL: 'http://localhost:8081/rpc',
+    rpcURL: 'https://staging.neotracker.io/rpc',
   };
   const provider = new NEOONEProvider([providerOptions]);
 
-  test('use `call` to get name of NEO contract', async () => {
-    const result = await provider.call('test', common.nativeScriptHashes.NEO, 'name', []);
+  test('use `call` to get name of a non-native contract', async () => {
+    const result = await provider.call('test', knownContractHashString, 'name', []);
     const value = result.stack[0];
     if (typeof value === 'string') {
       throw new Error(value);
     }
 
-    expect(value.value).toEqual('NEO');
+    expect(value.value).toEqual('S3 Plus');
   });
 });

@@ -457,6 +457,7 @@ export interface TrimmedBlockJSON extends BlockBaseJSON {
 }
 
 export interface NetworkSettingsJSON {
+  readonly blockcount: number;
   readonly decrementinterval: number;
   readonly generationamount: readonly number[];
   readonly privatekeyversion: number;

@@ -1,11 +1,18 @@
 import * as nodePath from 'path';
 import { ApplicationEngine, CreateOptions } from './ApplicationEngine';
-import { BaseMethods, EngineMethods, ProtocolSettings, ProtocolSettingsReturn, SnapshotMethods } from './Methods';
+import {
+  BaseMethods,
+  EngineMethods,
+  ProtocolSettings,
+  ProtocolSettingsReturn,
+  SnapshotMethods,
+  TestMethods,
+} from './Methods';
 import { SnapshotHandler } from './SnapshotHandler';
 import { DispatcherFunc } from './types';
 import { constants, createCSharpDispatchInvoke, validateProtocolSettings } from './utils';
 
-export interface DispatcherMethods extends BaseMethods, SnapshotMethods, EngineMethods {}
+export interface DispatcherMethods extends BaseMethods, SnapshotMethods, EngineMethods, TestMethods {}
 
 const engineAssemblyOptions = {
   assemblyFile: nodePath.join(constants.CSHARP_APP_ROOT, 'Dispatcher.dll'),
@@ -84,6 +91,21 @@ export class Dispatcher {
   public getConfig(): ProtocolSettingsReturn {
     return this.dispatch({
       method: 'get_config',
+    });
+  }
+
+  public updateStore(storage: ReadonlyArray<{ key: Buffer; value: Buffer }>): void {
+    const tableChanges = storage.map((change) => ({
+      table: change.key[0],
+      key: change.key.slice(1),
+      value: change.value,
+    }));
+
+    this.dispatch({
+      method: 'test_update_store',
+      args: {
+        changes: tableChanges,
+      },
     });
   }
 

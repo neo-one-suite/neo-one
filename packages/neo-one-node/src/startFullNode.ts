@@ -6,13 +6,15 @@ import { NativeContainer } from '@neo-one/node-native';
 import { Network, NetworkOptions } from '@neo-one/node-network';
 import { dumpChain, loadChain } from '@neo-one/node-offline';
 import { Node, NodeOptions } from '@neo-one/node-protocol';
-import { storage as levelupStorage } from '@neo-one/node-storage-levelup';
+import { storage as levelupStorage, streamToObservable } from '@neo-one/node-storage-levelup';
 import { blockchainSettingsToProtocolSettings, Dispatcher } from '@neo-one/node-vm';
 import { composeDisposable, Disposable, noopDisposable } from '@neo-one/utils';
 import { AbstractLevelDOWN } from 'abstract-leveldown';
 import fs from 'fs-extra';
 import LevelUp from 'levelup';
 import RocksDB from 'rocksdb';
+import Memdown from 'memdown';
+import { toArray } from 'rxjs/operators';
 
 export interface LoggingOptions {
   readonly level?: 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace' | 'silent';
@@ -38,6 +40,16 @@ export interface FullNodeOptions {
   readonly leveldown?: AbstractLevelDOWN;
 }
 
+const getUpdateVMMemoryStore = (vm: Dispatcher, db: any) => async () => {
+  const updates = await streamToObservable<{ readonly key: Buffer; readonly value: Buffer }>(() =>
+    db.createReadStream(),
+  )
+    .pipe(toArray())
+    .toPromise();
+
+  vm.updateStore(updates);
+};
+
 export const startFullNode = async ({
   options: {
     path: dataPath,
@@ -52,17 +64,20 @@ export const startFullNode = async ({
   leveldown: customLeveldown,
 }: FullNodeOptions): Promise<Disposable> => {
   let disposable = noopDisposable;
+  const isMemoryStore = customLeveldown !== undefined && customLeveldown instanceof Memdown;
   try {
-    await fs.ensureDir(dataPath);
+    if (!isMemoryStore) {
+      await fs.ensureDir(dataPath);
+    }
 
     if (telemetry !== undefined && telemetry.logging !== undefined && telemetry.logging.level !== undefined) {
       setGlobalLogLevel(telemetry.logging.level);
     }
 
-    const rocks = customLeveldown === undefined ? RocksDB(dataPath) : customLeveldown;
+    const level = customLeveldown === undefined ? RocksDB(dataPath) : customLeveldown;
     disposable = composeDisposable(disposable, async () => {
       await new Promise((resolve, reject) => {
-        rocks.close((err) => {
+        level.close((err) => {
           if (err) {
             reject(err);
           } else {
@@ -72,8 +87,10 @@ export const startFullNode = async ({
       });
     });
 
+    const db = LevelUp(level);
+
     const storage = levelupStorage({
-      db: LevelUp(rocks),
+      db,
       context: { messageMagic: blockchainSettings.messageMagic, validatorsCount: blockchainSettings.validatorsCount },
     });
 
@@ -82,7 +99,7 @@ export const startFullNode = async ({
     const native = new NativeContainer(blockchainSettings);
 
     const vm = new Dispatcher({
-      levelDBPath: dataPath,
+      levelDBPath: isMemoryStore ? undefined : dataPath,
       protocolSettings: blockchainSettingsToProtocolSettings(blockchainSettings),
     });
 
@@ -93,6 +110,7 @@ export const startFullNode = async ({
       storage,
       native,
       vm,
+      onPersist: isMemoryStore ? getUpdateVMMemoryStore(vm, db) : undefined,
     });
 
     disposable = composeDisposable(async () => blockchain.stop(), disposable);

@@ -1,4 +1,4 @@
-import { common, crypto, privateKeyToScriptHash } from '@neo-one/client-common';
+import { common, crypto } from '@neo-one/client-common';
 import { FullNode } from '@neo-one/node';
 import { createMain } from '@neo-one/node-neo-settings';
 import { constants } from '@neo-one/utils';
@@ -17,7 +17,7 @@ export const createNode = async () => {
       blockchain: createMain({
         privateNet: true,
         standbyValidators: [constants.PRIVATE_NET_PUBLIC_KEY],
-        address: privateKeyToScriptHash(privateKey),
+        extraCommitteeMembers: [],
       }),
       path: '/tmp/fakePath/',
       rpc: {
@@ -35,6 +35,7 @@ export const createNode = async () => {
     },
     leveldown: MemDown(),
   });
+
   await node.start();
 
   return {

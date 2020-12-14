@@ -481,6 +481,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
 
   private convertNetworkSettings(settings: NetworkSettingsJSON): NetworkSettings {
     return {
+      blockCount: settings.blockcount,
       decrementInterval: settings.decrementinterval,
       generationAmount: settings.generationamount,
       privateKeyVersion: settings.privatekeyversion,

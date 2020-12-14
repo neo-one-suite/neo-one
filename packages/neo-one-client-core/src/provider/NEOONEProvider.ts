@@ -15,6 +15,7 @@ import {
   Transaction,
   TransactionModel,
   TransactionReceipt,
+  UInt160Hex,
 } from '@neo-one/client-common';
 import BigNumber from 'bignumber.js';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -86,7 +87,7 @@ export class NEOONEProvider implements Provider {
 
   public async getVerificationCost(
     network: NetworkType,
-    hash: AddressString,
+    hash: UInt160Hex,
     transaction: TransactionModel,
   ): Promise<{
     readonly fee: BigNumber;
@@ -101,7 +102,7 @@ export class NEOONEProvider implements Provider {
 
   public async call(
     network: NetworkType,
-    contract: AddressString,
+    contract: UInt160Hex,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
   ): Promise<RawCallReceipt> {

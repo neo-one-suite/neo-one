@@ -2,12 +2,13 @@ import { CallReceiptJSON, common, crypto, scriptHashToAddress, SourceMaps } from
 import { Blockchain } from '@neo-one/node-blockchain';
 import { test as testNet } from '@neo-one/node-neo-settings';
 import { storage } from '@neo-one/node-storage-levelup';
-import { vm } from '@neo-one/node-vm';
+import { Dispatcher, blockchainSettingsToProtocolSettings } from '@neo-one/node-vm';
 import LevelUp from 'levelup';
 import MemDown from 'memdown';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import { throwOnDiagnosticErrorOrWarning } from '../../utils';
+import { NativeContainer } from '@neo-one/node-native';
 
 export interface ExecuteOptions {
   readonly prelude?: Buffer;
@@ -28,13 +29,16 @@ export const executeScript = async (
   readonly receipt: CallReceiptJSON;
   readonly sourceMaps: SourceMaps;
 }> => {
+  const settings = testNet();
+  const dispatcher = new Dispatcher({ protocolSettings: blockchainSettingsToProtocolSettings(settings) });
   const blockchain = await Blockchain.create({
-    settings: testNet(),
+    settings,
     storage: storage({
-      context: { messageMagic: testNet().messageMagic },
+      context: { messageMagic: settings.messageMagic, validatorsCount: settings.validatorsCount },
       db: LevelUp(MemDown()),
     }),
-    vm,
+    vm: dispatcher,
+    native: new NativeContainer(settings),
   });
 
   throwOnDiagnosticErrorOrWarning(diagnostics, ignoreWarnings);
@@ -45,9 +49,10 @@ export const executeScript = async (
   const address = scriptHashToAddress(common.uInt160ToString(crypto.toScriptHash(code)));
   await blockchain.stop();
 
+  // TODO: pickup here, how are we converting this?
   return {
     receipt: {
-      result: receipt.result.serializeJSON(blockchain.serializeJSONContext),
+      result: receipt,
       actions: receipt.actions.map((action) => action.serializeJSON(blockchain.serializeJSONContext)),
     },
     sourceMaps: {

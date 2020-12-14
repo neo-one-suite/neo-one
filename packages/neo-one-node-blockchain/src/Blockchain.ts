@@ -61,6 +61,7 @@ export interface CreateBlockchainOptions {
   readonly storage: Storage;
   readonly native: NativeContainer;
   readonly vm: VM;
+  readonly onPersist?: () => void | Promise<void>;
 }
 
 export interface BlockchainOptions extends CreateBlockchainOptions {
@@ -119,7 +120,13 @@ export const recoverHeaderIndex = async (storage: Storage) => {
   });
 };
 export class Blockchain {
-  public static async create({ settings, storage, native, vm }: CreateBlockchainOptions): Promise<BlockchainType> {
+  public static async create({
+    settings,
+    storage,
+    native,
+    vm,
+    onPersist,
+  }: CreateBlockchainOptions): Promise<BlockchainType> {
     const headerIndexCache = await recoverHeaderIndex(storage);
     if (headerIndexCache.length > 0) {
       const currentHeaderHash = await headerIndexCache.get(headerIndexCache.length - 1);
@@ -137,6 +144,7 @@ export class Blockchain {
         native,
         vm,
         currentBlock,
+        onPersist,
       });
     }
 
@@ -146,6 +154,7 @@ export class Blockchain {
       storage,
       native,
       vm,
+      onPersist,
     });
 
     await blockchain.persistBlock({ block: settings.genesisBlock });
@@ -164,6 +173,7 @@ export class Blockchain {
   private readonly storage: Storage;
   private readonly native: NativeContainer;
   private readonly vm: VM;
+  private readonly onPersist: () => void | Promise<void>;
 
   private mutableBlockQueue: PriorityQueue<Entry> = new PriorityQueue({
     comparator: (a, b) => a.block.index - b.block.index,
@@ -190,6 +200,7 @@ export class Blockchain {
       validatorsCount: this.settings.validatorsCount,
     };
     this.mutableCurrentBlock = options.currentBlock;
+    this.onPersist = options.onPersist === undefined ? this.vm.updateSnapshots : options.onPersist;
     this.start();
   }
 
@@ -288,9 +299,9 @@ export class Blockchain {
     return this.storage.contractID;
   }
 
-  public get consensusState() {
-    return this.storage.consensusState;
-  }
+  // public get consensusState() {
+  //   return this.storage.consensusState;
+  // }
 
   public get serializeJSONContext() {
     return {
@@ -784,7 +795,7 @@ export class Blockchain {
     const applicationLogUpdates = this.updateApplicationLogs({ applicationsExecuted, block });
     await this.storage.commit(applicationLogUpdates);
 
-    this.vm.updateSnapshots();
+    await this.onPersist();
   }
 
   private createPersistingBlockchain(): PersistingBlockchain {

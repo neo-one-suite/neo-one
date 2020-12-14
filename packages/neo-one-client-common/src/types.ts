@@ -2437,6 +2437,7 @@ export type ParamJSON =
  * Constant settings used to initialize the client APIs.
  */
 export interface NetworkSettings {
+  readonly blockCount: number;
   readonly decrementInterval: number;
   readonly generationAmount: readonly number[];
   readonly privateKeyVersion: number;

@@ -1,12 +1,12 @@
 namespace NEOONE.Storage.RocksDB
 {
-    class Settings
-    {
-        public string Path { get; }
+  class Settings
+  {
+    public string Path { get; }
 
-        public Settings(string path)
-        {
-            this.Path = path;
-        }
+    public Settings(string path)
+    {
+      this.Path = path;
     }
+  }
 }

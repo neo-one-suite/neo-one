@@ -6,7 +6,6 @@ import {
   AttributeModel,
   Block,
   common,
-  FeelessTransactionModel,
   ForwardValue,
   GetOptions,
   Hash256String,
@@ -21,8 +20,6 @@ import {
   RawInvocationData,
   RawInvokeReceipt,
   ScriptBuilderParam,
-  Signer,
-  SignerModel,
   SourceMaps,
   Transaction,
   TransactionModel,
@@ -30,16 +27,15 @@ import {
   TransactionReceipt,
   TransactionResult,
   Transfer,
-  UInt160,
   UserAccount,
   UserAccountID,
   utils,
   Witness,
   WitnessModel,
+  UInt160Hex,
 } from '@neo-one/client-common';
 import { Labels, utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import { BN } from 'bn.js';
 import debug from 'debug';
 import { Observable } from 'rxjs';
 import { clientUtils } from '../clientUtils';
@@ -124,7 +120,7 @@ export interface Provider {
   readonly testTransaction: (network: NetworkType, transaction: TransactionModel) => Promise<RawCallReceipt>;
   readonly call: (
     network: NetworkType,
-    contract: AddressString,
+    contract: UInt160Hex,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
   ) => Promise<RawCallReceipt>;
@@ -136,7 +132,7 @@ export interface Provider {
   readonly getAccount: (network: NetworkType, address: AddressString) => Promise<Account>;
   readonly getVerificationCost: (
     network: NetworkType,
-    hash: AddressString,
+    hash: UInt160Hex,
     transaction: TransactionModel,
   ) => Promise<{
     readonly fee: BigNumber;
@@ -208,7 +204,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
   public async claim(options?: TransactionOptions): Promise<TransactionResult> {
     const { from, attributes, maxNetworkFee, maxSystemFee, validBlockCount } = this.getTransactionOptions(options);
 
-    return this.capture(async () => this.executeClaim(from, attributes, networkFee), {
+    return this.capture(async () => this.executeClaim(from, attributes, maxNetworkFee, maxSystemFee, validBlockCount), {
       name: 'neo_claim',
     });
   }
@@ -658,7 +654,9 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
   protected abstract async executeClaim(
     from: UserAccountID,
     attributes: readonly Attribute[],
-    networkFee: BigNumber,
+    maxNetworkFee: BigNumber,
+    maxSystemFee: BigNumber,
+    validBlockCount: number,
   ): Promise<TransactionResult>;
 
   protected async invokeRaw<T extends TransactionReceipt>({
@@ -723,17 +721,6 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
         },
       },
     );
-  }
-
-  protected async getCountAndMagic(
-    network: NetworkType,
-  ): Promise<{ readonly count: number; readonly messageMagic: number }> {
-    const [count, { messageMagic }] = await Promise.all([
-      this.provider.getBlockCount(network),
-      this.provider.getNetworkSettings(network),
-    ]);
-
-    return { count, messageMagic };
   }
 
   private getScriptAndInvokeMethodOptions(
