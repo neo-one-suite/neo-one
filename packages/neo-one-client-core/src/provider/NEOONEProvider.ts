@@ -76,8 +76,8 @@ export class NEOONEProvider implements Provider {
     return this.getProvider(network).getApplicationLogData(hash);
   }
 
-  public async testInvoke(network: NetworkType, transaction: FeelessTransactionModel): Promise<RawCallReceipt> {
-    return this.getProvider(network).testInvoke(transaction);
+  public async testInvoke(network: NetworkType, script: Buffer): Promise<RawCallReceipt> {
+    return this.getProvider(network).testInvoke(script);
   }
 
   public async getFeePerByte(network: NetworkType): Promise<BigNumber> {

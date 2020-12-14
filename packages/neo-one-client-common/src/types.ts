@@ -2246,7 +2246,7 @@ export interface RawIntegerStackItem extends RawStackItemBase {
 
 export interface RawByteStringStackItem extends RawStackItemBase {
   readonly type: 'ByteString';
-  readonly value: Buffer;
+  readonly value: string;
 }
 
 export interface RawBufferStackItem extends RawStackItemBase {

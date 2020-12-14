@@ -56,6 +56,7 @@ import {
   TransactionReceiptJSON,
   VerifyResultJSON,
   VerifyResultModel,
+  UInt160Hex,
 } from '@neo-one/client-common';
 import { utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
@@ -125,8 +126,8 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return this.convertApplicationLogData(applicationLogData);
   }
 
-  public async testInvoke(transaction: FeelessTransactionModel): Promise<RawCallReceipt> {
-    const receipt = await this.mutableClient.testInvokeRaw(transaction.script.toString('hex'));
+  public async testInvoke(script: Buffer): Promise<RawCallReceipt> {
+    const receipt = await this.mutableClient.testInvokeRaw(script.toString('hex'));
 
     return convertCallReceipt(receipt);
   }
@@ -210,27 +211,17 @@ export class NEOONEDataProvider implements DeveloperProvider {
   }
 
   public async call(
-    contract: AddressString,
+    contract: UInt160Hex,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    validUntilBlock?: number,
   ): Promise<RawCallReceipt> {
-    const countPromise = validUntilBlock ? Promise.resolve(0) : this.mutableClient.getBlockCount();
-    const [count, { messagemagic: messageMagic }] = await Promise.all([
-      countPromise,
-      this.mutableClient.getNetworkSettings(),
-    ]);
-    const testTransaction = new FeelessTransactionModel({
-      script: clientUtils.getInvokeMethodScript({
-        address: contract,
-        method,
-        params,
-      }),
-      validUntilBlock: validUntilBlock ? validUntilBlock : count + 240,
-      messageMagic,
+    const script = clientUtils.getInvokeMethodScript({
+      scriptHash: contract,
+      method,
+      params,
     });
 
-    return this.testInvoke(testTransaction);
+    return this.testInvoke(script);
   }
 
   public async runConsensusNow(): Promise<void> {

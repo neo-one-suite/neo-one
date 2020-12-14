@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/client-core",
+      "comment": "disable `call` and edit `testInvoke` call",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@neo-one/client-core",
+  "email": "danwbyrne@gmail.com"
+}

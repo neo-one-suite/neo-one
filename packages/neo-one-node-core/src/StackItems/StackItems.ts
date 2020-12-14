@@ -157,7 +157,7 @@ export const stackItemToJSON = (item: StackItem, context?: Set<StackItem>): Stac
     case StackItemType.ByteString:
       const byteString = assertByteStringStackItem(item);
 
-      return { type: 'ByteString', value: JSONHelper.writeBase64Buffer(byteString.getBuffer()) };
+      return { type: 'ByteString', value: byteString.getBuffer().toString('ascii') };
 
     case StackItemType.Integer:
       const integer = assertIntegerStackItem(item);

@@ -2,7 +2,7 @@ import { TriggerType, VMState } from '@neo-one/client-common';
 import { CallFlags, SerializableContainer, serializeScriptContainer, SnapshotName } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
-import { parseStackItems } from './converters';
+import { parseStackItems, convertLog } from './converters';
 import { EngineMethods } from './Methods';
 import { DispatcherFunc } from './types';
 
@@ -69,6 +69,12 @@ export class ApplicationEngine {
         method: 'getnotifications',
       }),
     );
+  }
+
+  public get logs() {
+    return this.dispatch({
+      method: 'getlogs',
+    }).map(convertLog);
   }
 
   public create({ trigger, container, gas, snapshot, testMode }: CreateOptions) {
