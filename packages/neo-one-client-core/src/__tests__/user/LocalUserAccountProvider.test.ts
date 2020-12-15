@@ -142,21 +142,20 @@ describe.skip('Test LocalUserAccountProvider transfer methods -- staging network
 
 describe('contract info / usage testing', () => {
   const knownContractHashString = '0x79597a92440ce385fe1b0f4d9d2a92ca8608a575';
-  const knownContractHash = common.stringToUInt160(knownContractHashString);
 
   const providerOptions = {
     network: 'test',
-    rpcURL: 'http://localhost:8081/rpc',
+    rpcURL: 'https://staging.neotracker.io/rpc',
   };
   const provider = new NEOONEProvider([providerOptions]);
 
   test('use `call` to get name of NEO contract', async () => {
-    const result = await provider.call('test', common.nativeScriptHashes.NEO, 'name', []);
+    const result = await provider.call('test', knownContractHashString, 'name', []);
     const value = result.stack[0];
     if (typeof value === 'string') {
       throw new Error(value);
     }
 
-    expect(value.value).toEqual('NEO');
+    expect(value.value).toEqual('S3 Plus');
   });
 });

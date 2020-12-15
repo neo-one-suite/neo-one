@@ -122,12 +122,12 @@ export interface Provider {
   readonly getApplicationLogData: (network: NetworkType, hash: Hash256String) => Promise<RawApplicationLogData>;
   readonly testInvoke: (network: NetworkType, script: Buffer) => Promise<RawCallReceipt>;
   readonly testTransaction: (network: NetworkType, transaction: TransactionModel) => Promise<RawCallReceipt>;
-  readonly call: (
-    network: NetworkType,
-    contract: AddressString,
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-  ) => Promise<RawCallReceipt>;
+  // readonly call: (
+  //   network: NetworkType,
+  //   contract: AddressString,
+  //   method: string,
+  //   params: ReadonlyArray<ScriptBuilderParam | undefined>,
+  // ) => Promise<RawCallReceipt>;
   readonly getNetworkSettings: (network: NetworkType) => Promise<NetworkSettings>;
   readonly getBlockCount: (network: NetworkType) => Promise<number>;
   readonly getFeePerByte: (network: NetworkType) => Promise<BigNumber>;
@@ -466,14 +466,14 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     );
   }
 
-  public async call(
-    network: NetworkType,
-    contract: AddressString,
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-  ): Promise<RawCallReceipt> {
-    return this.provider.call(network, contract, method, params);
-  }
+  // public async call(
+  //   network: NetworkType,
+  //   contract: AddressString,
+  //   method: string,
+  //   params: ReadonlyArray<ScriptBuilderParam | undefined>,
+  // ): Promise<RawCallReceipt> {
+  //   return this.provider.call(network, contract, method, params);
+  // }
 
   public async getSystemFee({
     network,

@@ -99,14 +99,14 @@ export class NEOONEProvider implements Provider {
     return this.getProvider(network).testTransaction(transaction);
   }
 
-  public async call(
-    network: NetworkType,
-    contract: AddressString,
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-  ): Promise<RawCallReceipt> {
-    return this.getProvider(network).call(contract, method, params);
-  }
+  // public async call(
+  //   network: NetworkType,
+  //   contract: AddressString,
+  //   method: string,
+  //   params: ReadonlyArray<ScriptBuilderParam | undefined>,
+  // ): Promise<RawCallReceipt> {
+  //   return this.getProvider(network).call(contract, method, params);
+  // }
 
   public async getNetworkSettings(network: NetworkType): Promise<NetworkSettings> {
     return this.getProvider(network).getNetworkSettings();
