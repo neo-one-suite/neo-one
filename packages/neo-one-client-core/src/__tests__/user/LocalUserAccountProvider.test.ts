@@ -1,7 +1,7 @@
-import { common, crypto } from '@neo-one/client-common';
+import { common, crypto, ScriptBuilder } from '@neo-one/client-common';
 import { constants } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import { NEOONEProvider } from '../../provider';
+import { NEOONEProvider, NEOONEDataProvider } from '../../provider';
 import { LocalKeyStore, LocalMemoryStore, LocalUserAccountProvider } from '../../user';
 
 const secondaryKeyString = '04c1784140445016cf0f8cc86dd10ad8764e1a89c563c500e21ac19a5d905ab3';
@@ -137,5 +137,26 @@ describe.skip('Test LocalUserAccountProvider transfer methods -- staging network
     }
 
     expect(stackReturn.value).toEqual(true);
+  });
+});
+
+describe('contract info / usage testing', () => {
+  const knownContractHashString = '0x79597a92440ce385fe1b0f4d9d2a92ca8608a575';
+  const knownContractHash = common.stringToUInt160(knownContractHashString);
+
+  const providerOptions = {
+    network: 'test',
+    rpcURL: 'http://localhost:8081/rpc',
+  };
+  const provider = new NEOONEProvider([providerOptions]);
+
+  test('use `call` to get name of NEO contract', async () => {
+    const result = await provider.call('test', common.nativeScriptHashes.NEO, 'name', []);
+    const value = result.stack[0];
+    if (typeof value === 'string') {
+      throw new Error(value);
+    }
+
+    expect(value.value).toEqual('NEO');
   });
 });

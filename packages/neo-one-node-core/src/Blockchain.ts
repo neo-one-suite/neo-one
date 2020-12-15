@@ -55,10 +55,6 @@ export interface Blockchain extends BlockchainStorage {
   readonly getFeePerByte: () => Promise<BN>;
 
   readonly invokeScript: (script: Buffer, signers?: Signers) => CallReceipt;
-  readonly invokeTransaction: <TTransaction extends { readonly script: Buffer }>(
-    transaction: TTransaction,
-    gas: BN,
-  ) => CallReceipt;
   readonly testTransaction: (transaction: Transaction) => CallReceipt;
   readonly getVerificationCost: (
     contractHash: UInt160,

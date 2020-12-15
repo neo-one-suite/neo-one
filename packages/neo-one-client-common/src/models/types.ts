@@ -121,6 +121,7 @@ export interface RawInvocationResultErrorJSON {
   readonly gasconsumed: string;
   readonly stack: string;
   readonly notifications: readonly NotificationJSON[];
+  readonly logs: readonly LogJSON[];
 }
 
 export interface RawInvocationResultSuccessJSON {
@@ -480,6 +481,9 @@ export interface NotificationJSON {
   readonly state: readonly StackItemJSON[] | string;
 }
 
+export interface LogJSON {
+  readonly message: string;
+}
 export interface CallReceiptJSON {
   readonly script: string;
   readonly state: keyof typeof VMState;

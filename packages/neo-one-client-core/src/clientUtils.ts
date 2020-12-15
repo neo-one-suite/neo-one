@@ -6,6 +6,7 @@ import {
   NetworkType,
   ScriptBuilder,
   ScriptBuilderParam,
+  UInt160Hex,
 } from '@neo-one/client-common';
 import sp from 'synchronized-promise';
 import { LocalKeyStore } from './user';
@@ -24,16 +25,16 @@ const getInvokeMethodInvocationScript = ({
 };
 
 const getInvokeMethodScript = ({
-  address,
+  scriptHash,
   method,
   params,
 }: {
-  readonly address: AddressString;
+  readonly scriptHash: UInt160Hex;
   readonly method: string;
   readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
 }): Buffer => {
   const sb = new ScriptBuilder();
-  sb.emitAppCall(common.stringToUInt160(addressToScriptHash(address)), method, ...params);
+  sb.emitAppCall(common.stringToUInt160(scriptHash), method, ...params);
 
   return sb.build();
 };

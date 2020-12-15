@@ -42,7 +42,7 @@ export function convertStackItem(item: StackItemJSON): RawStackItem {
     case 'Buffer':
       return { type: 'Buffer', value: Buffer.from(item.value, 'hex') };
     case 'ByteString':
-      return { type: 'ByteString', value: Buffer.from(item.value, 'hex') };
+      return { type: 'ByteString', value: item.value };
     case 'Array':
       return { type: 'Array', value: item.value.map(convertStackItem) };
     case 'Map':

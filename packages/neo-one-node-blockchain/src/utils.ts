@@ -36,6 +36,7 @@ const getApplicationExecuted = (engine: ApplicationEngine, container?: Verifiabl
   gasConsumed: engine.gasConsumed,
   stack: engine.resultStack,
   notifications: engine.notifications.map((item) => Notification.fromStackItem(item, container)),
+  logs: engine.logs,
 });
 
 const getCallReceipt = (engine: ApplicationEngine, container?: Verifiable) => ({
@@ -43,6 +44,7 @@ const getCallReceipt = (engine: ApplicationEngine, container?: Verifiable) => ({
   gasConsumed: engine.gasConsumed,
   stack: engine.resultStack,
   notifications: engine.notifications.map((item) => Notification.fromStackItem(item, container)),
+  logs: engine.logs,
 });
 
 const verifyContract = async (contract: ContractState, vm: VM, transaction: Transaction) => {

@@ -120,7 +120,7 @@ export interface Provider {
     options?: GetOptions,
   ) => Promise<TransactionReceipt>;
   readonly getApplicationLogData: (network: NetworkType, hash: Hash256String) => Promise<RawApplicationLogData>;
-  readonly testInvoke: (network: NetworkType, transaction: FeelessTransactionModel) => Promise<RawCallReceipt>;
+  readonly testInvoke: (network: NetworkType, script: Buffer) => Promise<RawCallReceipt>;
   readonly testTransaction: (network: NetworkType, transaction: TransactionModel) => Promise<RawCallReceipt>;
   readonly call: (
     network: NetworkType,
@@ -206,7 +206,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
   }
 
   public async claim(options?: TransactionOptions): Promise<TransactionResult> {
-    const { from, attributes, networkFee } = this.getTransactionOptions(options);
+    const { from, attributes, maxNetworkFee, maxSystemFee, validBlockCount } = this.getTransactionOptions(options);
 
     return this.capture(async () => this.executeClaim(from, attributes, networkFee), {
       name: 'neo_claim',

@@ -52,7 +52,6 @@ import { HeaderIndexCache } from './HeaderIndexCache';
 import { PersistingBlockchain } from './PersistingBlockchain';
 import { utils } from './utils';
 import { verifyWitnesses } from './verify';
-import { wrapExecuteScripts } from './wrapExecuteScripts';
 
 const logger = createChild(nodeLogger, { service: 'blockchain' });
 
@@ -508,26 +507,6 @@ export class Blockchain {
       container: signers,
       gas: common.TEN_FIXED8,
     });
-  }
-
-  public invokeTransaction<TTransaction extends { readonly script: Buffer }>(
-    transaction: TTransaction,
-    gas: BN,
-  ): CallReceipt {
-    return this.vm.withApplicationEngine(
-      {
-        trigger: TriggerType.Application,
-        gas,
-        // container: transaction,
-        snapshot: 'main',
-        testMode: true,
-      },
-      (engine) => {
-        engine.loadScript(transaction.script);
-
-        return wrapExecuteScripts(engine);
-      },
-    );
   }
 
   private runEngineWrapper({
