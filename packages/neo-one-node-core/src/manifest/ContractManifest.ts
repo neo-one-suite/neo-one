@@ -23,23 +23,18 @@ export class ContractManifest extends ContractManifestModel<ContractABI, Contrac
 
   private static deserializeJSON(json: ContractManifestJSON) {
     const groups = json.groups.map((group) => ContractGroup.deserializeJSON(group));
-    const { payable, storage: hasStorage } = json.features;
-    const features = getContractProperties({ payable, hasStorage });
     const supportedStandards = json.supportedstandards;
     const abi = ContractABI.deserializeJSON(json.abi);
     const permissions = json.permissions.map((permission) => ContractPermission.deserializeJSON(permission));
     const trusts = utils.wildCardFromJSON<UInt160>(json.trusts, JSONHelper.readUInt160);
-    const safeMethods = utils.wildCardFromJSON<string>(json.safemethods, (input) => input);
     const extra = json.extra;
 
     return new this({
       groups,
-      features,
       supportedStandards,
       abi,
       permissions,
       trusts,
-      safeMethods,
       extra,
     });
   }

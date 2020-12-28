@@ -412,6 +412,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
         crypto.addressToScriptHash({ addressVersion, address: from.address }),
         crypto.addressToScriptHash({ addressVersion, address: transfer.to }),
         transfer.amount.toNumber(),
+        undefined,
       );
     });
 

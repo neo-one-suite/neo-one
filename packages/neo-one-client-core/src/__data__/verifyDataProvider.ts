@@ -96,8 +96,6 @@ const verifyManifest = (manifest: ContractManifest, manifestJSON: ContractManife
   expect(manifest.hash).toEqual(scriptHashToAddress(manifestJSON.hash));
   // TODO: hashHex
   expect(manifest.trusts).toEqual(manifestJSON.trusts);
-  expect(manifest.safeMethods).toEqual(manifestJSON.safeMethods);
-  expect(manifest.features).toEqual(manifestJSON.features);
   expect(manifest.supportedStandards).toEqual(manifestJSON.supportedStandards);
   expect(manifest.extra).toEqual(manifestJSON.extra);
   verifyAbi(manifest.abi, manifestJSON.abi);
@@ -114,8 +112,6 @@ const verifyManifest = (manifest: ContractManifest, manifestJSON: ContractManife
 const verifyContract = (contract: Contract, contractJSON: ContractJSON, returnType = 'Buffer') => {
   expect(contract.id).toEqual(contractJSON.id);
   expect(contract.script).toEqual(contractJSON.script);
-  expect(contract.hasStorage).toEqual(contractJSON.hasStorage);
-  expect(contract.payable).toEqual(contractJSON.payable);
   verifyManifest(contract.manifest, contractJSON.manifest);
 };
 

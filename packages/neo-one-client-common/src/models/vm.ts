@@ -277,6 +277,10 @@ export enum SysCall {
   'System.Storage.Put' = 'System.Storage.Put',
   'System.Storage.PutEx' = 'System.Storage.PutEx',
   'System.Storage.Delete' = 'System.Storage.Delete',
+  'System.Binary.Base58Encode' = 'System.Binary.Base58Encode',
+  'System.Binary.Base58Decode' = 'System.Binary.Base58Decode',
+  'System.Binary.Itoa' = 'System.Binary.Itoa',
+  'System.Binary.Atoi' = 'System.Binary.Atoi',
 }
 
 export type SysCallName = keyof typeof SysCall;

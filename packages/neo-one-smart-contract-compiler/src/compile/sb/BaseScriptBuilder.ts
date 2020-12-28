@@ -57,7 +57,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   private readonly mutableExportMap: { [K in string]?: Set<string> } = {};
   private mutableNextModuleIndex = 0;
   private mutableCurrentModuleIndex = 0;
-  private mutableFeatures: Features = { storage: false, dynamicInvoke: false };
+  private mutableFeatures: Features = { dynamicInvoke: false };
 
   public constructor(
     public readonly context: Context,
@@ -365,10 +365,6 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   }
 
   public emitSysCall(node: ts.Node, name: SysCallName): void {
-    if (name === 'Neo.Storage.Put' || name === 'Neo.Storage.Delete') {
-      this.mutableFeatures = { ...this.mutableFeatures, storage: true };
-    }
-
     const sysCallBuffer = Buffer.allocUnsafe(4);
     sysCallBuffer.writeUInt32LE(toSysCallHash(assertSysCall(name)), 0);
     const writer = new BinaryWriter();

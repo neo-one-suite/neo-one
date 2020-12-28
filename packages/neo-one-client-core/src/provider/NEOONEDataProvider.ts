@@ -373,18 +373,11 @@ export class NEOONEDataProvider implements DeveloperProvider {
   private convertContractManifest(manifest: ContractManifestJSON): ContractManifest {
     return {
       groups: manifest.groups.map(this.convertContractGroup),
-      features: {
-        storage: manifest.features.storage,
-        payable: manifest.features.payable,
-      },
       supportedStandards: manifest.supportedstandards,
       abi: this.convertContractABI(manifest.abi),
       permissions: manifest.permissions.map(this.convertContractPermission),
       trusts: manifest.trusts,
-      safeMethods: manifest.safemethods,
       extra: manifest.extra,
-      hasStorage: manifest.features.storage,
-      payable: manifest.features.payable,
     };
   }
 

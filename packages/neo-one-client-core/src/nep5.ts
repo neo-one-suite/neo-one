@@ -140,17 +140,10 @@ export const abi = (decimals: number): ContractABIClient => ({
 export const manifest = (decimals: number): ContractManifestClient => ({
   hash: common.uInt160ToString(blankHash),
   groups: [],
-  features: {
-    storage: true,
-    payable: true,
-  },
   supportedStandards: [],
   abi: abi(decimals),
   permissions: [],
   trusts: '*',
-  safeMethods: '*',
-  hasStorage: true,
-  payable: true,
 });
 
 export const getDecimals = async (
