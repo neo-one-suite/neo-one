@@ -91,4 +91,5 @@ export interface VM {
   readonly withSnapshots: <T = void>(
     func: (snapshots: { readonly main: SnapshotHandler; readonly clone: Omit<SnapshotHandler, 'clone'> }) => T,
   ) => T;
+  readonly updateStore: (storage: ReadonlyArray<{ key: Buffer; value: Buffer }>) => void;
 }

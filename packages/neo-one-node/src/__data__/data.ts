@@ -3,7 +3,7 @@ import { Block, ConsensusData, Signer, Transaction, Witness } from '@neo-one/nod
 import { BN } from 'bn.js';
 import { debugBlockJSON, genesisJSON, secondBlockJSON, thirdBlockJSON } from './jsonBlocks';
 
-const convertBlock = (json: BlockJSON) =>
+const convertBlock = (json: BlockJSON, messageMagic: number) =>
   new Block({
     version: json.version,
     previousHash: JSONHelper.readUInt256(json.previousblockhash),
@@ -43,6 +43,7 @@ const convertBlock = (json: BlockJSON) =>
                 scopes: (signer.scopes as any) === 'FeeOnly' ? WitnessScopeModel.None : toWitnessScope(signer.scopes),
               }),
           ),
+          messageMagic,
         }),
     ),
     consensusData: json.consensusdata
@@ -51,11 +52,12 @@ const convertBlock = (json: BlockJSON) =>
           nonce: new BN(json.consensusdata.nonce, 16),
         })
       : undefined,
+    messageMagic,
   });
 
-export const data = {
-  genesisBlock: convertBlock(genesisJSON as any),
-  secondBlock: convertBlock(secondBlockJSON as any),
-  thirdBlock: convertBlock(thirdBlockJSON as any),
-  debugBlock: convertBlock(debugBlockJSON as any),
-};
+export const getData = (messageMagic: number) => ({
+  genesisBlock: convertBlock(genesisJSON as any, messageMagic),
+  secondBlock: convertBlock(secondBlockJSON as any, messageMagic),
+  thirdBlock: convertBlock(thirdBlockJSON as any, messageMagic),
+  debugBlock: convertBlock(debugBlockJSON as any, messageMagic),
+});

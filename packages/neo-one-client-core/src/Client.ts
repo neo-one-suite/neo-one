@@ -645,12 +645,12 @@ export class Client<
   ): Promise<RawCallReceipt> {
     try {
       args.assertString('network', network);
-      args.assertAddress('contract', contract);
+      const contractHash = args.tryGetUInt160Hex('contract', contract);
       args.assertString('method', method);
       args
         .assertArray('params', params)
         .forEach((param) => args.assertNullableScriptBuilderParam('params.param', param));
-      const receipt = await this.getNetworkProvider(network).call(network, contract, method, params);
+      const receipt = await this.getNetworkProvider(network).call(network, contractHash, method, params);
       await this.hooks.afterCall.promise(receipt);
 
       return receipt;

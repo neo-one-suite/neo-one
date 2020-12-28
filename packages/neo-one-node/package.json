@@ -42,8 +42,10 @@
     "@types/jest": "^24.0.18",
     "@types/leveldown": "^4.0.0",
     "@types/levelup": "^3.1.1",
+    "@types/memdown": "^3.0.0",
     "@types/rocksdb": "3.0.0",
     "bn.js": "^5.0.0",
-    "gulp": "~4.0.2"
+    "gulp": "~4.0.2",
+    "memdown": "^5.0.0"
   }
 }

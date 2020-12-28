@@ -132,7 +132,7 @@ export interface BlockchainStorage {
   readonly nep5TransfersSent: ReadFindStorage<Nep5TransferKey, Nep5Transfer>;
   readonly nep5TransfersReceived: ReadFindStorage<Nep5TransferKey, Nep5Transfer>;
   readonly applicationLogs: ReadStorage<TransactionKey, ApplicationLogJSON>;
-  readonly consensusState: ReadMetadataStorage<ConsensusContext>;
+  // readonly consensusState: ReadMetadataStorage<ConsensusContext>;
   readonly transactions: ReadStorage<TransactionKey, TransactionState>;
   readonly contracts: ReadStorage<ContractKey, ContractState>;
   readonly storages: ReadFindStorage<StorageKey, StorageItem>;

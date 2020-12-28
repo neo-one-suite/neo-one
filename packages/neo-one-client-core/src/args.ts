@@ -112,6 +112,22 @@ export const assertAddress = (name: string, addressIn?: unknown): AddressString 
   }
 };
 
+export const tryGetUInt160Hex = (name: string, addressOrUInt160In: unknown): UInt160Hex => {
+  const addressOrUInt160 = assertString(name, addressOrUInt160In);
+
+  try {
+    scriptHashToAddress(addressOrUInt160);
+
+    return addressOrUInt160;
+  } catch {
+    try {
+      return addressToScriptHash(addressOrUInt160);
+    } catch {
+      throw new InvalidArgumentError('AddressOrUInt160', name, addressOrUInt160);
+    }
+  }
+};
+
 export const assertHash256 = (name: string, hash?: unknown): Hash256String => {
   const value = assertString(name, hash);
 
@@ -798,7 +814,6 @@ export const assertContractManifest = (name: string, value?: unknown): ContractM
   }
 
   return {
-    hash: assertProperty(value, 'ContractManifest', 'hash', assertUInt160Hex),
     groups: assertProperty(value, 'ContractManifest', 'groups', assertArray).map((group) =>
       assertContractGroup('ContractManifest.groups', group),
     ),
@@ -950,7 +965,7 @@ export const assertTransfer = (name: string, value?: unknown): Transfer => {
 
   return {
     amount: assertProperty(value, 'Transfer', 'amount', assertBigNumber),
-    asset: assertProperty(value, 'Transfer', 'asset', assertAddress),
+    asset: assertProperty(value, 'Transfer', 'asset', tryGetUInt160Hex),
     to: assertProperty(value, 'Transfer', 'to', assertAddress),
   };
 };
@@ -1009,8 +1024,8 @@ export const assertTransactionOptions = (name: string, options?: unknown): Trans
     attributes: assertProperty(options, 'TransactionOptions', 'attributes', assertNullableArray).map((value) =>
       assertAttribute('TransactionOption.attributes', value),
     ),
-    networkFee: assertProperty(options, 'TransactionOptions', 'networkFee', assertNullableBigNumber),
-    systemFee: assertProperty(options, 'TransactionOptions', 'systemFee', assertNullableBigNumber),
+    maxNetworkFee: assertProperty(options, 'TransactionOptions', 'networkFee', assertNullableBigNumber),
+    maxSystemFee: assertProperty(options, 'TransactionOptions', 'systemFee', assertNullableBigNumber),
   };
 };
 
@@ -1034,13 +1049,13 @@ export const assertInvokeSendUnsafeReceiveTransactionOptions = (
       'attributes',
       assertNullableArray,
     ).map((value) => assertAttribute('TransactionOption.attributes', value)),
-    networkFee: assertProperty(
+    maxNetworkFee: assertProperty(
       options,
       'InvokeSendUnsafeReceiveTransactionOptions',
       'networkFee',
       assertNullableBigNumber,
     ),
-    systemFee: assertProperty(
+    maxSystemFee: assertProperty(
       options,
       'InvokeSendUnsafeReceiveTransactionOptions',
       'systemFee',

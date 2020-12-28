@@ -1,17 +1,17 @@
 /// <reference types="@neo-one/build-tools/types/e2e" />
 
 import {
-  ABI,
   common,
   Contract,
   crypto,
   InvocationResult,
-  InvocationTransaction,
   RawInvokeReceipt,
   scriptHashToAddress,
   SmartContractDefinition,
   SourceMaps,
   UserAccountID,
+  Transaction,
+  ContractABI,
 } from '@neo-one/client-common';
 import { DeveloperClient, LocalKeyStore, LocalWallet, NEOONEDataProvider, SmartContract } from '@neo-one/client-core';
 import { Client, InvokeExecuteTransactionOptions, ReadClient } from '@neo-one/client-full-core';
@@ -21,10 +21,10 @@ import { Modifiable } from '@neo-one/utils';
 import * as appRootDir from 'app-root-dir';
 import BigNumber from 'bignumber.js';
 import ts from 'typescript';
-import { createNode } from '../../../../neo-one-smart-contract-test/src/createNode';
 import { compile } from '../../compile';
 import { CompileResult, LinkedContracts } from '../../compile/types';
 import { Context } from '../../Context';
+import { createNode } from '@neo-one/smart-contract-test';
 import { createContextForPath, createContextForSnippet } from '../../createContext';
 import { throwOnDiagnosticErrorOrWarning } from '../../utils';
 import { checkRawResult } from './extractors';
@@ -57,7 +57,7 @@ export interface TestNode {
     options?: InvokeExecuteTransactionOptions,
   ) => Promise<{
     readonly receipt: RawInvokeReceipt;
-    readonly transaction: InvocationTransaction;
+    readonly transaction: Transaction;
     readonly sourceMaps: SourceMaps;
   }>;
   readonly compileScript: (script: string) => CompileResult;
@@ -70,7 +70,7 @@ export interface TestNode {
 
 export interface Options {
   readonly script: Buffer;
-  readonly abi: ABI;
+  readonly abi: ContractABI;
   readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
   readonly ignoreWarnings?: boolean;
 }
@@ -140,8 +140,8 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
     await developerClient.runConsensusNow();
   });
   client.hooks.beforeRelay.tapPromise('DeveloperClient', async (options) => {
-    // tslint:disable-next-line no-object-mutation
-    options.systemFee = new BigNumber(-1);
+    options.maxNetworkFee = new BigNumber(-1);
+    options.maxSystemFee = new BigNumber(-1);
   });
 
   return {
@@ -156,7 +156,7 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
         publish(client, developerClient, context, outputScript, outerOptions.ignoreWarnings),
         sourceMap,
       ]);
-      mutableSourceMaps[result.address] = resolvedSourceMap;
+      mutableSourceMaps[result.hash] = resolvedSourceMap;
 
       return result;
     },
@@ -175,15 +175,11 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
         publish(client, developerClient, context, outputScript, outerOptions.ignoreWarnings),
         sourceMap,
       ]);
-      mutableSourceMaps[result.address] = resolvedSourceMap;
+      mutableSourceMaps[result.hash] = resolvedSourceMap;
 
       return {
         contract: result,
-        definition: {
-          abi,
-          networks: { [networkName]: { address: result.address } },
-          sourceMaps: mutableSourceMaps,
-        },
+        definition: createContractDefinition(result, mutableSourceMaps),
       };
     },
     async addContractFromSnippet(snippetPath, linked = {}): Promise<Contract> {
@@ -207,7 +203,7 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
         publish(client, developerClient, context, outputScript, outerOptions.ignoreWarnings),
         sourceMap,
       ]);
-      mutableSourceMaps[result.address] = resolvedSourceMap;
+      mutableSourceMaps[result.hash] = resolvedSourceMap;
 
       return result;
     },
@@ -225,7 +221,12 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
       ] = await sourceMap;
       const result = await userAccountProviders.memory.__execute(
         outputScript,
-        { from: masterWallet.userAccount.id, systemFee: new BigNumber(-1), ...options },
+        {
+          from: masterWallet.userAccount.id,
+          maxSystemFee: new BigNumber(-1),
+          maxNetworkFee: new BigNumber(-1),
+          ...options,
+        },
         mutableSourceMaps,
       );
 

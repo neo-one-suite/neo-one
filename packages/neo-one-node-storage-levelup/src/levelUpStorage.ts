@@ -1,9 +1,7 @@
-import { common } from '@neo-one/client-common';
 import {
   ApplicationLog,
   BinaryReader,
   BlockKey,
-  ConsensusContext,
   ContractIDState,
   ContractState,
   DeserializeWireContext,
@@ -195,11 +193,11 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
       deserializeValue: (buffer) => ContractIDState.deserializeWire({ context, buffer }),
     }),
 
-    consensusState: read.createReadMetadataStorage({
-      db,
-      key: keys.consensusStateKey,
-      deserializeValue: (buffer) => ConsensusContext.deserializeWire({ context, buffer }),
-    }),
+    // consensusState: read.createReadMetadataStorage({
+    //   db,
+    //   key: keys.consensusStateKey,
+    //   deserializeValue: (buffer) => ConsensusContext.deserializeWire({ context, buffer }),
+    // }),
 
     async close(): Promise<void> {
       await db.close();

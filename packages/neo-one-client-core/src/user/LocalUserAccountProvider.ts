@@ -403,10 +403,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
       throw new Error('temporary');
     }
 
-    const [{ addressVersion }, { count, messageMagic }] = await Promise.all([
-      this.provider.getNetworkSettings(from.network),
-      this.getCountAndMagic(from.network),
-    ]);
+    const { addressVersion, blockCount, messageMagic } = await this.provider.getNetworkSettings(from.network);
 
     transfers.forEach((transfer) => {
       sb.emitAppCall(
@@ -426,7 +423,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     });
 
     const nonce = utils.randomUShort();
-    const validUntilBlock = count + validBlockCount;
+    const validUntilBlock = blockCount + validBlockCount;
 
     const feelessTransaction = new TransactionModel({
       version: 0,
@@ -475,39 +472,17 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
   protected async executeClaim(
     from: UserAccountID,
     attributes: readonly Attribute[],
-    networkFee: BigNumber,
+    maxNetworkFee: BigNumber,
+    maxSystemFee: BigNumber,
+    validBlockCount: number,
   ): Promise<TransactionResult> {
-    const toAccount = this.getUserAccount(from);
-    const unclaimedAmount = await this.provider.getUnclaimed(from.network, from.address);
-    const toHash = crypto.toScriptHash(crypto.createSignatureRedeemScript(common.stringToECPoint(toAccount.publicKey)));
-    const script = new ScriptBuilder()
-      .emitAppCall(common.nativeHashes.GAS, 'transfer', [
-        addressToScriptHash(from.address),
-        common.nativeHashes.GAS,
-        unclaimedAmount.toString(),
-      ])
-      .build();
+    const transfer: Transfer = {
+      to: from.address,
+      asset: common.nativeScriptHashes.NEO,
+      amount: new BigNumber(0),
+    };
 
-    const [{ gas }, { count, messageMagic }] = await Promise.all([
-      this.getSystemFee({ from, attributes, script }),
-      this.getCountAndMagic(from),
-    ]);
-
-    const transaction = new TransactionModel({
-      systemFee: utils.bigNumberToBN(gas, 8), // TODO: check this. check decimals
-      networkFee: utils.bigNumberToBN(networkFee, 8), // TODO: check decimals
-      script,
-      attributes: this.convertAttributes(attributes),
-      messageMagic,
-      validUntilBlock: count + 240,
-    });
-
-    return this.sendTransaction<Transaction>({
-      from,
-      transaction,
-      onConfirm: async ({ receipt }) => receipt,
-      networkFee,
-    });
+    return this.executeTransfer([transfer], from, attributes, maxNetworkFee, maxSystemFee, validBlockCount);
   }
 
   // TODO: see invokeScript and invokeFunction in neo-modules

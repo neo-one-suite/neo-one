@@ -14,27 +14,29 @@ export const checkResult = async (receiptIn: CallReceiptJSON, sourceMaps: Source
 };
 
 export const checkRawResult = async (receipt: RawCallReceipt, sourceMaps: SourceMaps, checkStack = false) => {
-  if (receipt.result.state === 'FAULT') {
+  if (receipt.state === 'FAULT') {
     enableConsoleLogForTest();
     try {
-      const message = await processActionsAndMessage({
-        actions: receipt.actions,
-        message: receipt.result.message,
-        sourceMaps,
-      });
+      // TODO: reimplement this message processing
+      // const message = await processActionsAndMessage({
+      //   actions: receipt.actions,
+      //   message: receipt.message,
+      //   sourceMaps,
+      // });
 
-      throw new Error(message);
+      throw new Error(receipt.stack as string);
     } finally {
       disableConsoleLogForTest();
     }
   }
 
-  await processConsoleLogMessages({
-    actions: receipt.actions,
-    sourceMaps,
-  });
+  // TODO: reimplement this log processing
+  // await processConsoleLogMessages({
+  //   actions: receipt.actions,
+  //   sourceMaps,
+  // });
 
-  if (checkStack && receipt.result.stack.length !== 0) {
-    throw new Error(`Found leftover stack items, length: ${receipt.result.stack.length}`);
+  if (checkStack && receipt.stack.length !== 0) {
+    throw new Error(`Found leftover stack items, length: ${receipt.stack.length}`);
   }
 };

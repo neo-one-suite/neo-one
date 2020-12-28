@@ -867,6 +867,7 @@ export const createHandler = ({
       } = blockchain.settings;
 
       return {
+        blockcount: blockchain.currentBlockIndex + 1,
         decrementinterval: decrementInterval,
         generationamount: generationAmount,
         privatekeyversion: privateKeyVersion,
