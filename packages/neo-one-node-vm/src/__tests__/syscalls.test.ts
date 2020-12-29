@@ -13,8 +13,7 @@ describe('Application Engine SysCall Tests', () => {
     dispatcher.reset();
     engine.create({
       trigger: TriggerType.Application,
-      gas: 0,
-      testMode: true,
+      gas: common.TWENTY_FIXED_8,
     });
 
     script = new ScriptBuilder();
@@ -27,7 +26,7 @@ describe('Application Engine SysCall Tests', () => {
       script.emitPushString('null');
       script.emitSysCall('System.Json.Deserialize');
 
-      engine.loadScript(script.build());
+      engine.loadScript({ script: script.build() });
       const state = engine.execute();
       expect(state).toEqual('HALT');
 
@@ -40,7 +39,7 @@ describe('Application Engine SysCall Tests', () => {
       script.emitPushString('***');
       script.emitSysCall('System.Json.Deserialize');
 
-      engine.loadScript(script.build());
+      engine.loadScript({ script: script.build() });
       const state = engine.execute();
       expect(state).toEqual('FAULT');
       expect(engine.resultStack.length).toEqual(0);
@@ -50,7 +49,7 @@ describe('Application Engine SysCall Tests', () => {
       script.emitPushString('123.45');
       script.emitSysCall('System.Json.Deserialize');
 
-      engine.loadScript(script.build());
+      engine.loadScript({ script: script.build() });
       const state = engine.execute();
       expect(state).toEqual('FAULT');
       expect(engine.resultStack.length).toEqual(0);
@@ -75,7 +74,7 @@ describe('Application Engine SysCall Tests', () => {
       script.emitOp('SETITEM');
       script.emitSysCall('System.Json.Serialize');
 
-      engine.loadScript(script.build());
+      engine.loadScript({ script: script.build() });
       const state = engine.execute();
       expect(state).toEqual('HALT');
 
@@ -93,7 +92,7 @@ describe('Application Engine SysCall Tests', () => {
       script.emitSysCall('System.Storage.GetContext');
       script.emitSysCall('System.Json.Serialize');
 
-      engine.loadScript(script.build());
+      engine.loadScript({ script: script.build() });
       const state = engine.execute();
       expect(state).toEqual('FAULT');
       expect(engine.resultStack.length).toEqual(0);
@@ -103,8 +102,7 @@ describe('Application Engine SysCall Tests', () => {
   test('System.Callback.Invoke -- Halt', () => {
     engine.create({
       trigger: TriggerType.Application,
-      gas: 1,
-      testMode: false,
+      gas: common.TWENTY_FIXED_8,
     });
 
     script = new ScriptBuilder();
@@ -124,7 +122,7 @@ describe('Application Engine SysCall Tests', () => {
     script.emitOp('SUB');
     script.emitOp('RET');
 
-    engine.loadScript(script.build());
+    engine.loadScript({ script: script.build() });
     const state = engine.execute();
     expect(state).toEqual('HALT');
 
@@ -136,8 +134,7 @@ describe('Application Engine SysCall Tests', () => {
   test('System.Callback.CreateFromSyscall -- Halt', () => {
     engine.create({
       trigger: TriggerType.Application,
-      gas: 1,
-      testMode: false,
+      gas: common.TWENTY_FIXED_8,
     });
 
     script = new ScriptBuilder();
@@ -149,7 +146,7 @@ describe('Application Engine SysCall Tests', () => {
     script.emitSysCall('System.Callback.CreateFromSyscall');
     script.emitSysCall('System.Callback.Invoke');
 
-    engine.loadScript(script.build());
+    engine.loadScript({ script: script.build() });
     const state = engine.execute();
     expect(state).toEqual('HALT');
 
@@ -171,19 +168,19 @@ describe('Application Engine SysCall Tests', () => {
       nextConsensus: common.ZERO_UINT160,
       consensusData: new ConsensusData({ nonce: new BN(1), primaryIndex: 1 }),
       transactions: [],
+      messageMagic: 1951352142,
     });
 
     test('With Snapshot option -- Halt', () => {
       engine.create({
         trigger: TriggerType.Application,
-        gas: 0,
-        testMode: true,
+        gas: common.TWENTY_FIXED_8,
         snapshot: 'main',
       });
       script.emitPushUInt256(block.hash);
       script.emitSysCall('System.Blockchain.GetBlock');
 
-      engine.loadScript(script.build());
+      engine.loadScript({ script: script.build() });
       const state = engine.execute();
       expect(state).toEqual('HALT');
 
@@ -193,11 +190,11 @@ describe('Application Engine SysCall Tests', () => {
     });
 
     test('Without Snapshot option -- Fault', () => {
-      engine.create({ trigger: TriggerType.Application, gas: 0, testMode: true });
+      engine.create({ trigger: TriggerType.Application, gas: common.TWENTY_FIXED_8 });
       script.emitPushUInt256(block.hash);
       script.emitSysCall('System.Blockchain.GetBlock');
 
-      engine.loadScript(script.build());
+      engine.loadScript({ script: script.build() });
       const state = engine.execute();
       expect(state).toEqual('FAULT');
     });

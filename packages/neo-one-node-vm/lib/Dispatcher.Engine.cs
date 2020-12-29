@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using Neo;
 using Neo.IO;
 using Neo.Network.P2P.Payloads;
 using Neo.Persistence;
@@ -82,25 +83,33 @@ namespace NEOONE
         case EngineMethod.create:
           TriggerType trigger = (TriggerType)args.trigger;
           long gas = long.Parse((string)args.gas);
-          bool testMode = (bool)args.testMode;
           IVerifiable container = null;
           if (args.container != null)
           {
             container = deserializeContainer(args.container);
           }
-          return this._create(trigger, container, this.selectSnapshot(args.snapshot, false), gas, testMode);
+          return this._create(trigger, container, this.selectSnapshot(args.snapshot, false), gas);
 
         case EngineMethod.execute:
           return this._execute();
 
         case EngineMethod.loadscript:
           Script script = new Script((byte[])args.script);
-          CallFlags flag = (CallFlags)((byte)args.flag);
-          return this._loadScript(script, flag);
+          CallFlags flags = (CallFlags)((byte)args.flags);
+          UInt160 scriptHash = null;
+          int initialPosition = 0;
 
-        case EngineMethod.setinstructionpointer:
-          int position = (int)args.position;
-          return this._setInstructionPointer(position);
+          if (args.scriptHash != null)
+          {
+            scriptHash = UInt160.Parse((string)args.scriptHash);
+          }
+
+          if (args.initialPosition != null)
+          {
+            initialPosition = (int)args.intialPosition;
+          }
+
+          return this._loadScript(script, flags, scriptHash, initialPosition);
 
         case EngineMethod.getvmstate:
           return this._getVMState();
@@ -139,10 +148,10 @@ namespace NEOONE
       }
     }
 
-    private bool _create(TriggerType trigger, IVerifiable container, StoreView snapshot, long gas, bool testMode = false)
+    private bool _create(TriggerType trigger, IVerifiable container, StoreView snapshot, long gas)
     {
       this.disposeEngine();
-      this.engine = ApplicationEngine.Create(trigger, container, snapshot, gas, testMode);
+      this.engine = ApplicationEngine.Create(trigger, container, snapshot, gas);
 
       return true;
     }
@@ -153,18 +162,10 @@ namespace NEOONE
       return this.engine.Execute();
     }
 
-    private bool _loadScript(Script script, CallFlags flag)
+    private bool _loadScript(Script script, CallFlags flags, UInt160 hash = null, int initialPosition = 0)
     {
       this.isEngineInitialized();
-      this.engine.LoadScript(script, flag);
-      return true;
-    }
-
-    private bool _setInstructionPointer(int initialPosition)
-    {
-      this.isEngineInitialized();
-      this.engine.CurrentContext.InstructionPointer = initialPosition;
-
+      this.engine.LoadScript(script, flags, hash, initialPosition);
       return true;
     }
 

@@ -1,4 +1,4 @@
-import { common, ScriptBuilder, TriggerType, UInt256, WitnessScopeModel } from '@neo-one/client-common';
+import { common, ScriptBuilder, TriggerType, UInt256, WitnessScopeModel, VMState } from '@neo-one/client-common';
 import { assertArrayStackItem, Block, ConsensusData, Signer, Transaction, Witness } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import { Dispatcher } from '../Dispatcher';
@@ -11,7 +11,9 @@ const createGetBlockScript = (hash: UInt256) => {
   return script.build();
 };
 
+// if these tests break when we go to mainnet it is likely the message magic
 describe('TS <--> C# Storage Test', () => {
+  const messageMagic = 5195086;
   test('add a block to the snapshot -- returns Block StackItems -- memory', () => {
     const dispatcher = new Dispatcher();
     const tx = new Transaction({
@@ -29,6 +31,7 @@ describe('TS <--> C# Storage Test', () => {
           invocation: Buffer.from([]),
         }),
       ],
+      messageMagic,
     });
 
     const block = new Block({
@@ -43,6 +46,7 @@ describe('TS <--> C# Storage Test', () => {
       nextConsensus: common.ZERO_UINT160,
       consensusData: new ConsensusData({ nonce: new BN(1), primaryIndex: 1 }),
       transactions: [tx],
+      messageMagic,
     });
 
     const script = createGetBlockScript(block.hash);
@@ -55,13 +59,12 @@ describe('TS <--> C# Storage Test', () => {
         {
           trigger: TriggerType.Application,
           snapshot: 'main',
-          gas: 0,
-          testMode: true,
+          gas: common.TWENTY_FIXED_8,
         },
         (engine) => {
-          engine.loadScript(script);
+          engine.loadScript({ script });
           const newState = engine.execute();
-          expect(newState).toEqual('HALT');
+          expect(newState).toEqual(VMState.HALT);
 
           const resultStack = engine.resultStack;
           const arr = assertArrayStackItem(resultStack[0]).array;
@@ -89,6 +92,7 @@ describe('TS <--> C# Storage Test', () => {
           invocation: Buffer.from([]),
         }),
       ],
+      messageMagic,
     });
 
     const block = new Block({
@@ -103,6 +107,7 @@ describe('TS <--> C# Storage Test', () => {
       nextConsensus: common.ZERO_UINT160,
       consensusData: new ConsensusData({ nonce: new BN(1), primaryIndex: 1 }),
       transactions: [tx],
+      messageMagic,
     });
 
     const script = createGetBlockScript(block.hash);
@@ -115,11 +120,10 @@ describe('TS <--> C# Storage Test', () => {
         {
           trigger: TriggerType.Application,
           snapshot: 'main',
-          gas: 0,
-          testMode: true,
+          gas: common.TWENTY_FIXED_8,
         },
         (engine) => {
-          engine.loadScript(script);
+          engine.loadScript({ script });
           const newState = engine.execute();
           expect(newState).toEqual('HALT');
 

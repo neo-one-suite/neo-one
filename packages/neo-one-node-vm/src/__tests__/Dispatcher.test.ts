@@ -13,7 +13,6 @@ describe('Dispatcher Tests', () => {
     const result = dispatcher.withApplicationEngine(
       {
         trigger: TriggerType.Application,
-        testMode: true,
         gas: common.ONE_HUNDRED_FIXED8,
       },
       (engine) => {
@@ -22,7 +21,7 @@ describe('Dispatcher Tests', () => {
         const script = new ScriptBuilder();
         script.emitOp('PUSHNULL');
 
-        engine.loadScript(script.build());
+        engine.loadScript({ script: script.build() });
 
         engine.execute();
 
@@ -101,9 +100,5 @@ describe('Dispatcher Tests', () => {
 
   test('Dispatcher returns config without initializing config', () => {
     expect(dispatcher.getConfig()).toBeDefined();
-  });
-
-  test.only('test command', () => {
-    console.log(dispatcher.test());
   });
 });

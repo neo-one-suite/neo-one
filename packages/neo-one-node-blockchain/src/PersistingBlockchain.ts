@@ -37,10 +37,9 @@ export class PersistingBlockchain {
             trigger: TriggerType.System,
             snapshot: 'main',
             gas: utils.ZERO,
-            testMode: true,
           },
           (engine) => {
-            engine.loadScript(this.onPersistNativeContractScript);
+            engine.loadScript({ script: this.onPersistNativeContractScript });
             const result = engine.execute();
             if (result !== VMState.HALT) {
               throw new PersistNativeContractsError();
@@ -89,10 +88,9 @@ export class PersistingBlockchain {
         container: transaction,
         snapshot: 'clone',
         gas: transaction.systemFee,
-        testMode: false,
       },
       (engine) => {
-        engine.loadScript(transaction.script);
+        engine.loadScript({ script: transaction.script });
         const state = engine.execute();
         if (state === VMState.HALT) {
           clone.deleteTransaction(transaction.hash);

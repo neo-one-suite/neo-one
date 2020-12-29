@@ -60,16 +60,15 @@ const verifyContract = async (contract: ContractState, vm: VM, transaction: Tran
       container: transaction,
       snapshot: 'clone',
       gas: new BN(0),
-      testMode: true,
     },
     (engine) => {
-      engine.loadScript(contract.script, CallFlags.None);
-      engine.setInstructionPointer(verify.offset);
-      if (init !== undefined) {
-        engine.setInstructionPointer(init.offset);
-      }
+      engine.loadScript({
+        script: contract.script,
+        flags: CallFlags.None,
+        initialPosition: init ? init.offset : verify.offset,
+      });
 
-      engine.loadScript(Buffer.from([]), CallFlags.None);
+      engine.loadScript({ script: Buffer.from([]), flags: CallFlags.None });
       const result = engine.execute();
 
       if (result === VMState.FAULT) {

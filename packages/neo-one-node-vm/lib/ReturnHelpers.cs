@@ -174,6 +174,8 @@ namespace NEOONE
       public string[] seedList;
       public int millisecondsPerBlock;
       public int memoryPoolMaxTransactions;
+      public int maxTraceableBlocks;
+      public dynamic nativeActivations;
 
       public ProtocolSettingsReturn(ProtocolSettings value)
       {
@@ -185,6 +187,8 @@ namespace NEOONE
         this.seedList = value.SeedList;
         this.millisecondsPerBlock = Convert.ToInt32(value.MillisecondsPerBlock);
         this.memoryPoolMaxTransactions = value.MemoryPoolMaxTransactions;
+        this.maxTraceableBlocks = Convert.ToInt32(value.MaxTraceableBlocks);
+        this.nativeActivations = value.MaxTraceableBlocks;
       }
     }
   }

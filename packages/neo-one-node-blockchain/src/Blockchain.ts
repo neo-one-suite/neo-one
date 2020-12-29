@@ -507,7 +507,6 @@ export class Blockchain {
       snapshot: 'clone',
       container: transaction,
       gas: common.ONE_HUNDRED_FIXED8,
-      testMode: true,
     });
   }
 
@@ -516,7 +515,6 @@ export class Blockchain {
       script,
       snapshot: 'main',
       container: signers,
-      gas: common.TEN_FIXED8,
     });
   }
 
@@ -526,8 +524,7 @@ export class Blockchain {
     container,
     persistingBlock,
     offset = 0,
-    testMode = false,
-    gas = new BN(0),
+    gas = common.TEN_FIXED8,
   }: RunEngineOptions): CallReceipt {
     return this.vm.withSnapshots(({ main, clone }) => {
       const handler = snapshot === 'main' ? main : clone;
@@ -543,11 +540,9 @@ export class Blockchain {
           container,
           snapshot,
           gas,
-          testMode,
         },
         (engine) => {
-          engine.loadScript(script);
-          engine.setInstructionPointer(offset);
+          engine.loadScript({ script: script, initialPosition: offset });
           engine.execute();
 
           return utils.getCallReceipt(engine, container);
