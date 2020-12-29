@@ -59,7 +59,7 @@ describe('TS <--> C# Storage Test', () => {
         {
           trigger: TriggerType.Application,
           snapshot: 'main',
-          gas: common.TWENTY_FIXED_8,
+          gas: common.TWENTY_FIXED8,
         },
         (engine) => {
           engine.loadScript({ script });
@@ -120,7 +120,7 @@ describe('TS <--> C# Storage Test', () => {
         {
           trigger: TriggerType.Application,
           snapshot: 'main',
-          gas: common.TWENTY_FIXED_8,
+          gas: common.TWENTY_FIXED8,
         },
         (engine) => {
           engine.loadScript({ script });

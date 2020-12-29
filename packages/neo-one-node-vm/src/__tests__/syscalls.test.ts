@@ -13,7 +13,7 @@ describe('Application Engine SysCall Tests', () => {
     dispatcher.reset();
     engine.create({
       trigger: TriggerType.Application,
-      gas: common.TWENTY_FIXED_8,
+      gas: common.TWENTY_FIXED8,
     });
 
     script = new ScriptBuilder();
@@ -102,7 +102,7 @@ describe('Application Engine SysCall Tests', () => {
   test('System.Callback.Invoke -- Halt', () => {
     engine.create({
       trigger: TriggerType.Application,
-      gas: common.TWENTY_FIXED_8,
+      gas: common.TWENTY_FIXED8,
     });
 
     script = new ScriptBuilder();
@@ -134,7 +134,7 @@ describe('Application Engine SysCall Tests', () => {
   test('System.Callback.CreateFromSyscall -- Halt', () => {
     engine.create({
       trigger: TriggerType.Application,
-      gas: common.TWENTY_FIXED_8,
+      gas: common.TWENTY_FIXED8,
     });
 
     script = new ScriptBuilder();
@@ -174,7 +174,7 @@ describe('Application Engine SysCall Tests', () => {
     test('With Snapshot option -- Halt', () => {
       engine.create({
         trigger: TriggerType.Application,
-        gas: common.TWENTY_FIXED_8,
+        gas: common.TWENTY_FIXED8,
         snapshot: 'main',
       });
       script.emitPushUInt256(block.hash);
@@ -190,7 +190,7 @@ describe('Application Engine SysCall Tests', () => {
     });
 
     test('Without Snapshot option -- Fault', () => {
-      engine.create({ trigger: TriggerType.Application, gas: common.TWENTY_FIXED_8 });
+      engine.create({ trigger: TriggerType.Application, gas: common.TWENTY_FIXED8 });
       script.emitPushUInt256(block.hash);
       script.emitSysCall('System.Blockchain.GetBlock');
 

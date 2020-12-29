@@ -1,21 +1,24 @@
 // tslint:disable no-array-mutation no-object-mutation
-import { TriggerType, VMState } from '@neo-one/client-common';
+import { TriggerType, VMState, common } from '@neo-one/client-common';
 import { ApplicationExecuted, Block, SnapshotHandler, Transaction, VM } from '@neo-one/node-core';
-import { PersistNativeContractsError } from './errors';
-import { utils, utils as blockchainUtils } from './utils';
+import { PersistNativeContractsError, PostPersistError } from './errors';
+import { utils } from './utils';
 
 interface PersistingBlockchainOptions {
   readonly vm: VM;
   readonly onPersistNativeContractScript: Buffer;
+  readonly postPersistNativeContractScript: Buffer;
 }
 
 export class PersistingBlockchain {
   private readonly vm: VM;
   private readonly onPersistNativeContractScript: Buffer;
+  private readonly postPersistNativeContractScript: Buffer;
 
   public constructor(options: PersistingBlockchainOptions) {
     this.vm = options.vm;
     this.onPersistNativeContractScript = options.onPersistNativeContractScript;
+    this.postPersistNativeContractScript = options.postPersistNativeContractScript;
   }
 
   public persistBlock(
@@ -31,33 +34,38 @@ export class PersistingBlockchain {
       const appsExecuted: ApplicationExecuted[] = [];
 
       main.setPersistingBlock(block);
-      if (block.index > 0) {
-        const executed = this.vm.withApplicationEngine<ApplicationExecuted>(
-          {
-            trigger: TriggerType.System,
-            snapshot: 'main',
-            gas: utils.ZERO,
-          },
-          (engine) => {
-            engine.loadScript({ script: this.onPersistNativeContractScript });
-            const result = engine.execute();
-            if (result !== VMState.HALT) {
-              throw new PersistNativeContractsError();
-            }
+      const executed = this.vm.withApplicationEngine<ApplicationExecuted>(
+        {
+          trigger: TriggerType.OnPersist,
+          snapshot: 'main',
+          gas: common.TWENTY_FIXED8,
+        },
+        (engine) => {
+          engine.loadScript({ script: this.onPersistNativeContractScript });
+          const result = engine.execute();
+          if (result !== VMState.HALT) {
+            throw new PersistNativeContractsError();
+          }
 
-            return blockchainUtils.getApplicationExecuted(engine);
-          },
-        );
+          return utils.getApplicationExecuted(engine);
+        },
+      );
 
-        appsExecuted.push(executed);
-      }
+      appsExecuted.push(executed);
 
       main.addBlock(block);
       main.clone();
 
       const executedTransactions = this.persistTransactions(block, main, clone);
 
-      return { changeBatch: main.getChangeSet(), applicationsExecuted: appsExecuted.concat(executedTransactions) };
+      main.changeBlockHashIndex(block.index, block.hash);
+
+      const postPersistExecuted = this.postPersist();
+
+      return {
+        changeBatch: main.getChangeSet(),
+        applicationsExecuted: appsExecuted.concat(executedTransactions).concat(postPersistExecuted),
+      };
     });
   }
 
@@ -100,7 +108,27 @@ export class PersistingBlockchain {
           main.clone();
         }
 
-        return blockchainUtils.getApplicationExecuted(engine, transaction);
+        return utils.getApplicationExecuted(engine, transaction);
+      },
+    );
+  }
+
+  private postPersist(): ApplicationExecuted {
+    return this.vm.withApplicationEngine(
+      {
+        trigger: TriggerType.PostPersist,
+        container: undefined,
+        gas: common.TWENTY_FIXED8,
+        snapshot: 'main',
+      },
+      (engine) => {
+        engine.loadScript({ script: this.postPersistNativeContractScript });
+        const result = engine.execute();
+        if (result !== VMState.HALT) {
+          throw new PostPersistError();
+        }
+
+        return utils.getApplicationExecuted(engine);
       },
     );
   }

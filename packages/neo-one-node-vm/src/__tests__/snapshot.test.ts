@@ -8,12 +8,10 @@ describe('ApplicationEngine test', () => {
     dispatcher.reset();
   });
   test('withApplicationEngine -- NOP Script -- Halt', () => {
-    const engine = new ApplicationEngine(dispatcher);
-    engine.create({
-      trigger: TriggerType.Application,
-      gas: common.TWENTY_FIXED8,
-    });
+    dispatcher.withSnapshots(({ main }) => {
+      main.changeBlockHashIndex(1, common.ZERO_UINT256);
 
-    expect(engine.state).toEqual(VMState.BREAK);
+      console.log(dispatcher.test());
+    });
   });
 });

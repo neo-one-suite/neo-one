@@ -1,6 +1,6 @@
 import { common, ScriptBuilder } from '@neo-one/client-common';
 import { Blockchain } from '@neo-one/node-blockchain';
-import { ContractState } from '@neo-one/node-core';
+import { ContractState, StorageItem } from '@neo-one/node-core';
 import { NativeContainer } from '@neo-one/node-native';
 import { test as createTest } from '@neo-one/node-neo-settings';
 import { storage as levelupStorage } from '@neo-one/node-storage-levelup';
@@ -9,6 +9,7 @@ import LevelUp from 'levelup';
 import RocksDB from 'rocksdb';
 import Memdown from 'memdown';
 import { getData } from '../__data__';
+import { BN } from 'bn.js';
 
 const rawReadStreamPromise = async (db: any, options: { readonly gte: Buffer; readonly lte: Buffer }) =>
   new Promise((resolve, reject) => {
@@ -31,11 +32,12 @@ const rawReadStreamPromise = async (db: any, options: { readonly gte: Buffer; re
       .on('end', resolve);
   });
 
-describe.skip('Blockchain invocation / storage tests', () => {
-  test('dispatcher can retrieve logs after invocation', async () => {
+describe('Blockchain invocation / storage tests', () => {
+  test('Can persist the first 3 blocks with disk storage', async () => {
     const blockchainSettings = createTest();
     const levelDBPath = '/Users/danielbyrne/Desktop/node-data';
     const db = LevelUp(RocksDB(levelDBPath));
+    const blockData = getData(blockchainSettings.messageMagic);
 
     const storage = levelupStorage({
       db,
@@ -59,14 +61,13 @@ describe.skip('Blockchain invocation / storage tests', () => {
       native,
     });
 
-    const builder = new ScriptBuilder();
-    builder.emitSysCall('System.Runtime.Log', 'Hello world!');
-    const script = builder.build();
+    await blockchain.persistBlock({ block: blockData.secondBlock });
 
-    const result = blockchain.invokeScript(script);
+    expect(blockchain.currentBlockIndex).toEqual(1);
 
-    expect(result.logs.length).toEqual(1);
-    expect(result.logs[0].message).toEqual('Hello world!');
+    await blockchain.persistBlock({ block: blockData.thirdBlock });
+
+    expect(blockchain.currentBlockIndex).toEqual(2);
   });
 });
 
@@ -75,6 +76,23 @@ describe('VM memory store for testing', () => {
     const settings = createTest();
     const blockData = getData(settings.messageMagic);
     const db = LevelUp(Memdown());
+
+    const getChanges = async () =>
+      new Promise<Array<{ key: Buffer; value: Buffer }>>((resolve, reject) => {
+        let changesInternal: Array<{ key: Buffer; value: Buffer }> = [];
+        db.createReadStream()
+          .on('data', (data) => {
+            changesInternal = changesInternal.concat(data);
+          })
+          .on('close', () => resolve(changesInternal))
+          .on('end', () => resolve(changesInternal))
+          .on('error', (reason) => reject(reason));
+      });
+
+    const onPersist = async () => {
+      const changes = await getChanges();
+      dispatcher.updateStore(changes);
+    };
 
     const storage = levelupStorage({
       db,
@@ -95,23 +113,15 @@ describe('VM memory store for testing', () => {
       storage,
       vm: dispatcher,
       native,
+      onPersist,
     });
-
-    const changes = await new Promise<Array<{ key: Buffer; value: Buffer }>>((resolve, reject) => {
-      let changesInternal: Array<{ key: Buffer; value: Buffer }> = [];
-      db.createReadStream()
-        .on('data', (data) => {
-          changesInternal = changesInternal.concat(data);
-        })
-        .on('close', () => resolve(changesInternal))
-        .on('end', () => resolve(changesInternal))
-        .on('error', (reason) => reject(reason));
-    });
-
-    dispatcher.updateStore(changes);
 
     await blockchain.persistBlock({ block: blockData.secondBlock });
 
     expect(blockchain.currentBlockIndex).toEqual(1);
+
+    await blockchain.persistBlock({ block: blockData.thirdBlock });
+
+    expect(blockchain.currentBlockIndex).toEqual(2);
   });
 });

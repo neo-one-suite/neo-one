@@ -28,6 +28,10 @@ export const PersistNativeContractsError = makeErrorWithCode(
   'PERSIST_NATIVE_CONTRACTS_FAILED',
   () => 'Engine state !== HALT when persisting native contract scripts',
 );
+export const PostPersistError = makeErrorWithCode(
+  'POST_PERSIST_SCRIPT_FAILED',
+  () => 'Engine state !== HALT when running post persist scripts',
+);
 export const ContractStateFetchError = makeErrorWithCode(
   'FETCH_CONTRACT_FAILED',
   (hash: string) => `failed to fetch contract state with hash: ${hash} from storage.`,

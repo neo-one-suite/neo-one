@@ -7,6 +7,7 @@ using Neo.Persistence;
 using Neo.VM;
 using NEOONE.Storage;
 using System.Threading;
+using Neo.IO.Caching;
 
 namespace NEOONE
 {
@@ -37,18 +38,13 @@ namespace NEOONE
       {
         case SnapshotMethod.snapshot_blocks_add:
           UInt256 blockHash = new UInt256((byte[])args.hash);
-          Console.WriteLine("got block hash");
           byte[] blockSerialized = (byte[])args.block;
-          Console.WriteLine("got block serialized");
           Block block = new Block();
           using (MemoryStream ms = new MemoryStream(blockSerialized))
           using (BinaryReader reader = new BinaryReader(ms))
           {
             block.Deserialize(reader);
           }
-
-          var tmp = block.Hash.ToString();
-          Console.WriteLine("tmp block hash calculated");
 
           return this._snapshotBlocksAdd(this.selectSnapshot(args.snapshot), blockHash, block);
 

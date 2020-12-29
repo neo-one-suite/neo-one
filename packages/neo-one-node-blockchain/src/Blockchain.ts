@@ -57,6 +57,7 @@ const logger = createChild(nodeLogger, { service: 'blockchain' });
 
 export interface CreateBlockchainOptions {
   readonly onPersistNativeContractScript?: Buffer;
+  readonly postPersistNativeContractScript?: Buffer;
   readonly settings: BlockchainSettings;
   readonly storage: Storage;
   readonly native: NativeContainer;
@@ -167,6 +168,7 @@ export class Blockchain {
   public readonly verifyWitnesses = verifyWitnesses;
   public readonly settings: BlockchainSettings;
   public readonly onPersistNativeContractScript: Buffer;
+  public readonly postPersistNativeContractScript: Buffer;
 
   // tslint:disable-next-line: readonly-array
   private readonly headerIndexCache: HeaderIndexCache;
@@ -195,12 +197,15 @@ export class Blockchain {
     this.vm = options.vm;
     this.onPersistNativeContractScript =
       options.onPersistNativeContractScript ?? utils.getOnPersistNativeContractScript();
+    this.postPersistNativeContractScript =
+      options.postPersistNativeContractScript ?? utils.getPostPersistNativeContractScript();
     this.deserializeWireContext = {
       messageMagic: this.settings.messageMagic,
       validatorsCount: this.settings.validatorsCount,
     };
     this.mutableCurrentBlock = options.currentBlock;
-    this.onPersist = options.onPersist === undefined ? this.vm.updateSnapshots : options.onPersist;
+    this.onPersist =
+      options.onPersist === undefined ? () => Promise.resolve(this.vm.updateSnapshots()) : options.onPersist;
     this.start();
   }
 
@@ -796,6 +801,7 @@ export class Blockchain {
   private createPersistingBlockchain(): PersistingBlockchain {
     return new PersistingBlockchain({
       onPersistNativeContractScript: this.onPersistNativeContractScript,
+      postPersistNativeContractScript: this.postPersistNativeContractScript,
       vm: this.vm,
     });
   }

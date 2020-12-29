@@ -106,7 +106,7 @@ namespace NEOONE
 
           if (args.initialPosition != null)
           {
-            initialPosition = (int)args.intialPosition;
+            initialPosition = (int)args.initialPosition;
           }
 
           return this._loadScript(script, flags, scriptHash, initialPosition);
