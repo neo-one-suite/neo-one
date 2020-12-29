@@ -12,16 +12,12 @@ export class ContractStateModel<TContractManifest extends ContractManifestModel 
   public readonly id: number;
   public readonly script: Buffer;
   public readonly manifest: TContractManifest;
-  public readonly hasStorage: boolean;
-  public readonly payable: boolean;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   public constructor({ script, manifest, id }: ContractStateModelAdd<TContractManifest>) {
     this.id = id;
     this.script = script;
     this.manifest = manifest;
-    this.hasStorage = manifest.hasStorage;
-    this.payable = manifest.payable;
   }
 
   public serializeWireBase(writer: BinaryWriter): void {

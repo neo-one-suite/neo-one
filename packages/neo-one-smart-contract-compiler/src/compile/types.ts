@@ -33,12 +33,11 @@ export interface VisitOptions {
 }
 
 export interface Features {
-  readonly storage: boolean;
+  // TODO: is dynamicInvoke even a thing now?
   readonly dynamicInvoke: boolean;
 }
 export interface ScriptBuilderResult {
   readonly code: Buffer;
-  readonly features: Features;
   readonly sourceMap: Promise<RawSourceMap>;
 }
 export interface CompileResult {

@@ -106,6 +106,7 @@ const contractRegisterToContractModel = (contractIn: ContractRegister): Contract
                       name: param.name,
                     }),
                 ),
+          safe: methodIn.safe,
         }),
     ),
     events: contractIn.manifest.abi.events.map(
@@ -122,10 +123,6 @@ const contractRegisterToContractModel = (contractIn: ContractRegister): Contract
     groups: contractIn.manifest.groups.map(
       (group) => new ContractGroupModel({ publicKey: group.publicKey, signature: Buffer.from(group.signature, 'hex') }),
     ),
-    features: getContractProperties({
-      hasStorage: contractIn.manifest.features.storage,
-      payable: contractIn.manifest.features.payable,
-    }),
     supportedStandards: contractIn.manifest.supportedStandards,
     abi,
     permissions: contractIn.manifest.permissions.map(
@@ -136,7 +133,6 @@ const contractRegisterToContractModel = (contractIn: ContractRegister): Contract
         }),
     ),
     trusts: contractIn.manifest.trusts,
-    safeMethods: contractIn.manifest.safeMethods,
     extra: contractIn.manifest.extra,
   });
 

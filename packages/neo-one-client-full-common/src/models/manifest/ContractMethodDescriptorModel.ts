@@ -12,6 +12,7 @@ export interface ContractMethodDescriptorModelAdd<
 > extends ContractEventDescriptorModelAdd<TContractParameterDefinition> {
   readonly returnType: ContractParameterTypeModel;
   readonly offset: number;
+  readonly safe: boolean;
 }
 
 export class ContractMethodDescriptorModel<
@@ -21,11 +22,13 @@ export class ContractMethodDescriptorModel<
   implements SerializableJSON<ContractMethodDescriptorJSON> {
   public readonly returnType: ContractParameterTypeModel;
   public readonly offset: number;
+  public readonly safe: boolean;
 
   public constructor(options: ContractMethodDescriptorModelAdd<TContractParameterDefinition>) {
     super(options);
     this.returnType = options.returnType;
     this.offset = options.offset;
+    this.safe = options.safe;
   }
 
   public serializeJSON(): ContractMethodDescriptorJSON {
@@ -33,6 +36,7 @@ export class ContractMethodDescriptorModel<
       ...super.serializeJSON(),
       offset: this.offset,
       returntype: toJSONContractParameterType(this.returnType),
+      safe: this.safe,
     };
   }
 }

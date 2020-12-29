@@ -347,6 +347,7 @@ export interface ContractMethodDescriptorJSON {
   readonly parameters: readonly ContractParameterDefinitionJSON[];
   readonly offset: number;
   readonly returntype: ContractParameterTypeJSON;
+  readonly safe: boolean;
 }
 
 export interface ContractEventDescriptorJSON {
@@ -377,11 +378,6 @@ export interface ContractManifestJSON {
   readonly groups: readonly ContractGroupJSON[];
   readonly permissions: readonly ContractPermissionJSON[];
   readonly trusts: WildcardContainerJSON;
-  readonly safemethods: WildcardContainerJSON;
-  readonly features: {
-    readonly storage: boolean;
-    readonly payable: boolean;
-  };
   readonly supportedstandards: readonly string[];
   readonly extra?: JSONObject;
 }

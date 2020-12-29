@@ -39,7 +39,6 @@ export {
   ContractABIClient,
   ContractEventDescriptor,
   ContractEventDescriptorClient,
-  ContractFeatures,
   ContractGroup,
   ContractManifest,
   ContractManifestClient,

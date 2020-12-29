@@ -93,7 +93,7 @@ const createContractABIJSON = (options: Partial<ContractABIJSON> = {}): Contract
 });
 
 const createManifestJSON = (options: Partial<ContractManifestJSON> = {}): ContractManifestJSON => {
-  const { abi, features, ...optionsIn } = options;
+  const { abi, ...optionsIn } = options;
 
   return {
     hash: keys[0].scriptHashString,
@@ -102,12 +102,6 @@ const createManifestJSON = (options: Partial<ContractManifestJSON> = {}): Contra
     groups: [], // TODO
     permissions: [], // TODO
     trusts: '*',
-    safeMethods: '*',
-    features: {
-      storage: true,
-      payable: true,
-      ...features,
-    },
     supportedStandards: [], // TODO
     ...optionsIn,
   };
@@ -120,8 +114,6 @@ const createContractJSON = (options: Partial<ContractJSON> = {}): ContractJSON =
     id: 0,
     script: data.buffers.b,
     manifest: createManifestJSON(manifest),
-    hasStorage: true,
-    payable: true,
     ...optionsIn,
   };
 };

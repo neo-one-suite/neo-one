@@ -16,7 +16,6 @@ export * from './HeaderHashList';
 export * from './Native';
 export * from './network';
 export * from './Notification';
-export * from './Prices';
 export * from './payload';
 export * from './Serializable';
 export * from './Settings';
