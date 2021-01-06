@@ -389,6 +389,7 @@ export interface ContractParameterDefinitionJSON {
 
 export interface ContractJSON {
   readonly id: number;
+  readonly updatecounter: number;
   readonly hash: string;
   readonly script: string;
   readonly manifest: ContractManifestJSON;

@@ -124,7 +124,7 @@ namespace NEOONE
 
     private dynamic _test()
     {
-      return this.snapshot.PersistingBlock.Index.ToString();
+      return sizeof(uint);
     }
 
     private NEOONE.ReturnHelpers.ProtocolSettingsReturn _getConfig()

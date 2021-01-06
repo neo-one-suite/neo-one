@@ -187,6 +187,15 @@ const createPrivateKey = (): PrivateKey => common.bufferToPrivateKey(randomBytes
 
 const toScriptHash = hash160;
 
+const getContractHash = (sender: UInt160, script: Buffer) => {
+  const builder = new ScriptBuilder();
+  builder.emitOp('ABORT');
+  builder.emitPushUInt160(sender);
+  builder.emitPush(script);
+
+  return toScriptHash(builder.build());
+};
+
 // Takes various formats and converts to standard ECPoint
 const toECPoint = (publicKey: Buffer): ECPoint => toECPointFromKeyPair(ec().keyFromPublic(publicKey));
 
@@ -891,6 +900,7 @@ export const crypto = {
   verify,
   privateKeyToPublicKey,
   toScriptHash,
+  getContractHash,
   toECPoint,
   createKeyPair,
   scriptHashToAddress,
