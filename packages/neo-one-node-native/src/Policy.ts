@@ -1,5 +1,5 @@
 import { common, UInt160 } from '@neo-one/client-common';
-import { NativeContractStorageContext, utils } from '@neo-one/node-core';
+import { NativeContractStorageContext } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import { GASToken } from './GASToken';
 import { NativeContract } from './NativeContract';
@@ -12,12 +12,17 @@ export class PolicyContract extends NativeContract {
     blockedAccounts: Buffer.from([15]),
     maxBlockSize: Buffer.from([12]),
     maxBlockSystemFee: Buffer.from([17]),
+    execFeeFactor: Buffer.from([18]),
+    storagePrice: Buffer.from([19]),
   };
+
+  private readonly defaultExecFeeFactor = 30;
+  private readonly defaultStoragePrice = 100000;
 
   public constructor() {
     super({
       id: -3,
-      name: 'Policy',
+      name: 'PolicyContract',
     });
   }
 
@@ -57,12 +62,28 @@ export class PolicyContract extends NativeContract {
     return new BN(item.value);
   }
 
-  public async getBlockedAccounts({ storages }: NativeContractStorageContext): Promise<readonly UInt160[]> {
-    const item = await storages.tryGet(this.createStorageKey(this.prefixes.blockedAccounts).toStorageKey());
-    if (item !== undefined) {
-      return utils.getSerializableArrayFromStorageItem(item, (reader) => reader.readUInt160());
+  public async getExecFeeFactor({ storages }: NativeContractStorageContext) {
+    const item = await storages.tryGet(this.createStorageKey(this.prefixes.execFeeFactor).toStorageKey());
+    if (item === undefined) {
+      return this.defaultExecFeeFactor;
     }
 
-    return [];
+    return new BN(item.value).toNumber();
+  }
+
+  public async getStoragePrice({ storages }: NativeContractStorageContext) {
+    const item = await storages.tryGet(this.createStorageKey(this.prefixes.storagePrice).toStorageKey());
+    if (item === undefined) {
+      return this.defaultStoragePrice;
+    }
+
+    return new BN(item.value).toNumber();
+  }
+
+  public async isBlocked({ storages }: NativeContractStorageContext, account: UInt160) {
+    const item = await storages.tryGet(
+      this.createStorageKey(this.prefixes.blockedAccounts).addBuffer(account).toStorageKey(),
+    );
+    return item !== undefined;
   }
 }
