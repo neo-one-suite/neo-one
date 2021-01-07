@@ -52,11 +52,11 @@ namespace NEOONE.Storage.RocksDB
       byte[] fullKey = getFullKey(table, keyOrPrefix);
       using var it = db.NewIterator(defaultFamily, Options.ReadDefault);
       if (direction == SeekDirection.Forward)
-        for (it.Seek(fullKey); it.Valid(); it.Next())
-          yield return (it.Key(), it.Value());
+        for (it.Seek(fullKey); it.Valid() && it.Key()[0] == table; it.Next())
+          yield return (it.Key()[1..], it.Value());
       else
-        for (it.SeekForPrev(fullKey); it.Valid(); it.Prev())
-          yield return (it.Key(), it.Value());
+        for (it.SeekForPrev(fullKey); it.Valid() && it.Key()[0] == table; it.Prev())
+          yield return (it.Key()[1..], it.Value());
     }
 
     public bool Contains(byte table, byte[] key)

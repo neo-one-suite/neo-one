@@ -211,6 +211,7 @@ const isWildcard = (input: unknown): input is Wildcard => input === '*';
 
 const NEGATIVE_SATOSHI_FIXED8 = new BN(-1);
 const TEN_FIXED8 = fixed8FromDecimal(10);
+const TWENTY_FIXED8 = fixed8FromDecimal(20);
 const ONE_HUNDRED_FIXED8 = fixed8FromDecimal(100);
 const FOUR_HUNDRED_FIXED8 = fixed8FromDecimal(400);
 const FIVE_HUNDRED_FIXED8 = fixed8FromDecimal(500);
@@ -249,6 +250,7 @@ export const common = {
   MAX_UINT256,
   NEGATIVE_SATOSHI_FIXED8,
   TEN_FIXED8,
+  TWENTY_FIXED8,
   ONE_HUNDRED_FIXED8,
   FOUR_HUNDRED_FIXED8,
   FIVE_HUNDRED_FIXED8,

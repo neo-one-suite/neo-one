@@ -177,13 +177,27 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     // tslint:disable-next-line
     for (const hash of hashes) {
       try {
-        const witnessScript = this.getUserAccount({
+        let witnessScript: Buffer | undefined;
+        witnessScript = this.tryGetUserAccount({
           network,
           address: crypto.scriptHashToAddress({
             addressVersion: common.NEO_ADDRESS_VERSION,
             scriptHash: hash,
           }),
-        }).contract.script;
+        })?.contract.script;
+
+        if (witnessScript === undefined && transaction.witnesses.length !== 0) {
+          transaction.witnesses.forEach((witness) => {
+            if (crypto.toScriptHash(witness.verification).equals(hash)) {
+              witnessScript = witness.verification;
+            }
+          });
+        }
+
+        // TODO: Implemented looking up the witness verification script by contract hash: https://github.com/neo-project/neo/blob/master/src/neo/Wallets/Wallet.cs#L390
+        if (witnessScript === undefined) {
+          throw new Error('Contract witness script not yet implemented');
+        }
 
         const multiSig = crypto.isMultiSigContractWithResult(witnessScript);
         if (multiSig.result) {
@@ -533,10 +547,14 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     }
   }
 
-  private getUserAccount(id: UserAccountID): UserAccount {
-    const userAccount = this.keystore
+  private tryGetUserAccount(id: UserAccountID): UserAccount | undefined {
+    return this.keystore
       .getUserAccounts()
       .find((account) => account.id.network === id.network && account.id.address === id.address);
+  }
+
+  private getUserAccount(id: UserAccountID): UserAccount {
+    const userAccount = this.tryGetUserAccount(id);
     if (userAccount === undefined) {
       throw new UnknownAccountError(id.address);
     }

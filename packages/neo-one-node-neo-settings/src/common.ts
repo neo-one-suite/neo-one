@@ -106,7 +106,7 @@ const getGenesisBlock = ({ consensusAddress, messageMagic }: GetGenesisBlockOpti
       primaryIndex: 0,
       nonce: new BN(2083236893),
     }),
-    transactions: [getDeployNativeContracts(messageMagic)],
+    transactions: [],
     messageMagic,
   });
 

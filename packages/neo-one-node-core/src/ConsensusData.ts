@@ -1,6 +1,5 @@
 import { BinaryWriter, ConsensusDataJSON, crypto, IOHelper, JSONHelper, UInt256 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
-import { DEFAULT_VALIDATORS_COUNT } from './constants';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,

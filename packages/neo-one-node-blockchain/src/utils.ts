@@ -10,20 +10,22 @@ import {
   Verifiable,
   VM,
 } from '@neo-one/node-core';
-import { BN } from 'bn.js';
 import { ScriptVerifyError } from './errors';
 
 const hashListBatchSize = 2000;
 
 const getOnPersistNativeContractScript = coreUtils.lazy(() => {
-  const hashes = [common.nativeHashes.GAS, common.nativeHashes.NEO];
-  const script = new ScriptBuilder();
-  hashes.forEach((hash) => {
-    script.emitAppCall(hash, 'onPersist');
-    script.emitOp('DROP');
-  });
+  const builder = new ScriptBuilder();
+  builder.emitSysCall('System.Contract.NativeOnPersist');
 
-  return script.build();
+  return builder.build();
+});
+
+const getPostPersistNativeContractScript = coreUtils.lazy(() => {
+  const builder = new ScriptBuilder();
+  builder.emitSysCall('System.Contract.NativePostPersist');
+
+  return builder.build();
 });
 
 // tslint:disable-next-line: no-any
@@ -59,17 +61,16 @@ const verifyContract = async (contract: ContractState, vm: VM, transaction: Tran
       trigger: TriggerType.Verification,
       container: transaction,
       snapshot: 'clone',
-      gas: new BN(0),
-      testMode: true,
+      gas: common.TWENTY_FIXED8,
     },
     (engine) => {
-      engine.loadScript(contract.script, CallFlags.None);
-      engine.setInstructionPointer(verify.offset);
-      if (init !== undefined) {
-        engine.setInstructionPointer(init.offset);
-      }
+      engine.loadScript({
+        script: contract.script,
+        flags: CallFlags.None,
+        initialPosition: init ? init.offset : verify.offset,
+      });
 
-      engine.loadScript(Buffer.from([]), CallFlags.None);
+      engine.loadScript({ script: Buffer.from([]), flags: CallFlags.None });
       const result = engine.execute();
 
       if (result === VMState.FAULT) {
@@ -105,6 +106,7 @@ export const utils = {
   getApplicationExecuted,
   getCallReceipt,
   getOnPersistNativeContractScript,
+  getPostPersistNativeContractScript,
   verifyContract,
   blockComparator,
   isTransaction,

@@ -3,7 +3,8 @@ using Neo.Persistence;
 using RocksDbSharp;
 using System;
 using System.Collections.Generic;
-
+using System.IO;
+using Neo;
 namespace NEOONE.Storage.RocksDB
 {
   internal class Snapshot : ISnapshot
@@ -48,10 +49,12 @@ namespace NEOONE.Storage.RocksDB
 
       if (direction == SeekDirection.Forward)
         for (it.Seek(fullKey); it.Valid() && it.Key()[0] == table; it.Next())
-          yield return (it.Key(), it.Value());
+          yield return (it.Key()[1..], it.Value());
       else
         for (it.SeekForPrev(fullKey); it.Valid() && it.Key()[0] == table; it.Prev())
-          yield return (it.Key(), it.Value());
+        {
+          yield return (it.Key()[1..], it.Value());
+        }
     }
 
     public bool Contains(byte table, byte[] key)
@@ -63,7 +66,6 @@ namespace NEOONE.Storage.RocksDB
     public byte[] TryGet(byte table, byte[] key)
     {
       byte[] fullKey = key == null ? new byte[] { table } : store.getFullKey(table, key);
-      // Console.WriteLine($"trying to get from rocksdb store, key: {BitConverter.ToString(fullKey)}");
       return db.Get(fullKey ?? Array.Empty<byte>(), store.defaultFamily, options);
     }
 

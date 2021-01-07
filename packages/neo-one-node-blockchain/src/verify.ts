@@ -64,14 +64,10 @@ export const verifyWithApplicationEngine = (
   init?: ContractMethodDescriptor,
 ): ExecuteScriptResult =>
   vm.withApplicationEngine(
-    { trigger: TriggerType.Verification, container: verifiable, snapshot: 'clone', gas, testMode: false },
+    { trigger: TriggerType.Verification, container: verifiable, snapshot: 'clone', gas },
     (engine) => {
-      engine.loadScript(verification, CallFlags.None);
-      engine.setInstructionPointer(offset);
-      if (init !== undefined) {
-        engine.setInstructionPointer(init.offset);
-      }
-      engine.loadScript(verifiable.witnesses[index].invocation, CallFlags.None);
+      engine.loadScript({ script: verification, flags: CallFlags.None, initialPosition: init ? init.offset : offset });
+      engine.loadScript({ script: verifiable.witnesses[index].invocation, flags: CallFlags.None });
 
       const state = engine.execute();
       if (state === VMState.FAULT) {

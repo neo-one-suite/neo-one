@@ -38,7 +38,7 @@ export interface FeelessTransactionModelAdd<
 
 export const MAX_TRANSACTION_ATTRIBUTES = 16;
 export const MAX_TRANSACTION_SIZE = 102400;
-export const MAX_VALID_UNTIL_BLOCK_INCREMENT = 2102400;
+export const MAX_VALID_UNTIL_BLOCK_INCREMENT = 5760; // 24 hours
 export const DEFAULT_VERSION = 0;
 
 export class FeelessTransactionModel<

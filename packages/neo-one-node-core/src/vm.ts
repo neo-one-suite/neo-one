@@ -29,7 +29,6 @@ export interface ApplicationEngineOptions {
   readonly container?: SerializableContainer;
   readonly snapshot?: SnapshotName;
   readonly gas: BN;
-  readonly testMode: boolean;
 }
 
 export interface RunEngineOptions {
@@ -38,8 +37,14 @@ export interface RunEngineOptions {
   readonly container?: SerializableContainer;
   readonly persistingBlock?: Block;
   readonly offset?: number;
-  readonly testMode?: boolean;
   readonly gas?: BN;
+}
+
+export interface LoadScriptOptions {
+  readonly script: Buffer;
+  readonly flags?: CallFlags;
+  readonly scriptHash?: UInt160;
+  readonly initialPosition?: number;
 }
 
 export interface ApplicationEngine {
@@ -49,9 +54,8 @@ export interface ApplicationEngine {
   readonly state: VMState;
   readonly notifications: readonly StackItem[];
   readonly logs: readonly VMLog[];
-  readonly loadScript: (script: Buffer, flag?: CallFlags) => boolean;
+  readonly loadScript: (options: LoadScriptOptions) => boolean;
   readonly execute: () => VMState;
-  readonly setInstructionPointer: (position: number) => boolean;
 }
 
 export type SnapshotPartial = 'blocks' | 'transactions';
@@ -92,4 +96,5 @@ export interface VM {
     func: (snapshots: { readonly main: SnapshotHandler; readonly clone: Omit<SnapshotHandler, 'clone'> }) => T,
   ) => T;
   readonly updateStore: (storage: ReadonlyArray<{ key: Buffer; value: Buffer }>) => void;
+  readonly test: () => any;
 }

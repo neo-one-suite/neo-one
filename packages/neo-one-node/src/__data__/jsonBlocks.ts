@@ -48,55 +48,55 @@ export const genesisJSON = {
 };
 
 export const secondBlockJSON = {
-  hash: '0x8f30c34a8a8ef997155aa4a0ef6664d872a127ecc3bb6a85b7bbc55d6d9912f5',
+  hash: '0x2cf3b022f8ef6b863f47746ce9a9e38e3f1762ea47f3ede3be81118c1fa1ee24',
   size: 700,
   version: 0,
-  previousblockhash: '0xc359030132be10fd19cfd0a27e289fe04acb0c5c4ca5254af8a2d99498c7da45',
-  merkleroot: '0x9ff5ba403c81151c0d031b548fe6cff82ef61a01be72c38ecc81d4bc2f1ee01c',
-  time: 1596537327793,
+  previousblockhash: '0xc4d50ea6bd8e0d1422714f8edbd4eee182b9f6958b2b0795bf6f3e9f9117ee03',
+  merkleroot: '0x3443a50bc7b0e475ce658c9f089656b41c8bb26abf5c4ce1df88513e63b29ab8',
+  time: 1608609566819,
   index: 1,
   nextconsensus: 'NgPkjjLTNcQad99iRYeXRUuowE4gxLAnDL',
   witnesses: [
     {
       invocation:
-        'DED/2tpnw4uN5407xKQuwAXw+Hm9L4P51hSMfjwbEcm7pN+aFdn5+d/VxT9ifDX0KQRGlbericqr6h2gQvnJYvHqDECO9w/7PAccs3K3yqAZ4zDTpsnxxDU5EyR1PNNcBUx31lFGyHtjcxhce+YNYxcJc2zOFFk+lFmCBn+ZiF1HZrkPDEBbpwRGODeexXqSws2VQPrOg/BiCNYKmAj3vPW8HvC3ypnly/Hfy8lYF9iZiIighzUALC4QzQpxdq1IdNMSH22jDEAe/l0FF8HXc6e20zT6x0D8XvrITHsKMxxe4S5hGYwojgBDjJPcMwvJbT83AF+sorbZc7SMaCGwT1XOEg+9M0G2DEDOK/OsvMqyKgyHf/gz5QFgQxPjHKuuMoN38+OLuMRP36K4Eunv7oql3KstrgpVIqZHtETEHmxMEFIFXu5hFEa8',
+        'DEBOggaxB6SzzC40ATwnTZ7MibqI2otBM0q1QtKHqmXnBU6PmHXOXASYcO1evD/yptiwRW/k1b2E5I50W933JdM4DEBfe8Tz4SYWgwYxznqpjoRftsxYNErtdKrkmmQiyd01DTIuE7k96KfoEkixwtzI00fJr90NB+upKXakAdN9sauWDEDkDsyC7mCGZoEMoAIE3oLDgvYclrYu+HNtDMBpNV1cDmh7dIo/QTDS4klaGoPq6plz/y8r9WEYSU1HueXkxPGDDEBDEN06fn+gPez+jkOHNVbddWImxlwHtR4CZtQyFyA8lo0x+rg3z6gq+mr4jrRGFKyuDoDUjvlanQiyT49z2WeRDEDDpBV3R0smZ2cNn2AVwX5K5uiCSosjg1JyQQVW7s2SXSOiMlhpdHMSIM3Dn+0QgCDDfyieOqclDSxOdiKgeSzY',
       verification:
         'FQwhAwCbdUDhDyVi5f2PrJ6uwlFmpYsm5BI0j/WoaSe/rCKiDCEDAgXpzvrqWh38WAryDI1aokaLsBSPGl5GBfxiLIDmBLoMIQIUuvDO6jpm8X5+HoOeol/YvtbNgua7bmglAYkGX0T/AQwhAj6bMuqJuU0GbmSbEk/VDjlu6RNp6OKmrhsRwXDQIiVtDCEDQI3NQWOW9keDrFh+oeFZPFfZ/qiAyKahkg6SollHeAYMIQKng0vpsy4pgdFXy1u9OstCz9EepcOxAiTXpE6YxZEPGwwhAroscPWZbzV6QxmHBYWfriz+oT4RcpYoAHcrPViKnUq9FwtBE43vrw==',
     },
   ],
   consensusdata: {
-    primary: 1,
-    nonce: 'f490dfe92971e572',
+    primary: 6,
+    nonce: 'c4bea6633614241c',
   },
   tx: [],
-  confirmations: 294767,
-  nextblockhash: '0x84fa4b26af4b00095d66714a3a2ec63acdeff7ae27ca5d4f6cbe5db2691d7fae',
+  confirmations: 44876,
+  nextblockhash: '0x1fc795278c20f9a50ce6b9a9a2617ce2bb94e05c9737b7e94a3124029f3a786f',
 };
 
 export const thirdBlockJSON = {
-  hash: '0x84fa4b26af4b00095d66714a3a2ec63acdeff7ae27ca5d4f6cbe5db2691d7fae',
+  hash: '0x1fc795278c20f9a50ce6b9a9a2617ce2bb94e05c9737b7e94a3124029f3a786f',
   size: 700,
   version: 0,
-  previousblockhash: '0x8f30c34a8a8ef997155aa4a0ef6664d872a127ecc3bb6a85b7bbc55d6d9912f5',
-  merkleroot: '0x905819ef1743d2f7e522dacc90a365dd7e872ebdee74f2dfcad61d5089dc9f64',
-  time: 1596537468402,
+  previousblockhash: '0x2cf3b022f8ef6b863f47746ce9a9e38e3f1762ea47f3ede3be81118c1fa1ee24',
+  merkleroot: '0x89378f1c6005485d124c1eae9fc82e8639fb7a5b4e167c15305edec80c81fac0',
+  time: 1608609583168,
   index: 2,
   nextconsensus: 'NgPkjjLTNcQad99iRYeXRUuowE4gxLAnDL',
   witnesses: [
     {
       invocation:
-        'DEC3IxKTiG/yHShrtaN2aDBWLCoiLCvaUHmir1TovNGookWVKqB6NxwJb1capeJk50HtWntpz4B/k0oDd9Y33F8xDEDikpijBQ+rl4WJCHN7DPumv8OvtBhszmDKqX3wEJyaKAUL8rLsncDbsgIwJTxPyMUDIrU8BbVIEYDAH0KvB5AfDECcu9VKxSaC5mJdWvwguqw74ZU31UIG2cn5FMGg/EPMwFQeJEW/HTZNIIJNvE8lQ5i6C7wZ5QJFRLXavqDwvO+TDEBokh+09rXIVbcmzGBqddJ+Kq9mp7UAH9XTcTtDiQaeKQ39krUyySuaUjZm54kHsi70OsAqkK+hfSIpYZ4qKLeUDEA5qVvZMvHzv9NR6ekPvKpTquy32qgY+quCJt1BSeBaOGAZ4wTVs3Guw+HvFfarRPORYy186jVzQM1tAbPR+oiQ',
+        'DEBvYhef2pK9W5sjqltgniuPFz7NvJ634EX2DcH5oHjh5/jxvjobPWNUZipHvp9FPkJwRxS/3+BL6UMYWxqslJ0ADEAsqKff5hGys7yVwtZUKS1oBklkJ/l9HlzglV/ETUp+f3uK1h9miqg19myjtAgM6YVdE3+4KEQ/hagfTks91DMdDEBOQbnr5gC5ADyFbHrVRHhwIgy4CaCILZAD+XghMN6yzyNCUzJMruTpcVLz6j4xO3vVhRrSYOc5Ys+G8lrXhKTyDEBOBG824/s6MgJ/pymHYoQeuaKH1owwV1UtOb0hkDiidZOS7+xrf74/MKuph0PObNY41NQcYEibOs57F7qQYkG5DECSVNLMQdDvlzBbPKx6nDUJlBIaMBf5rnwweukFFJ1wHhnNbX3d0ZnbJhjWGj/dhAkGvUvkQlciEEtMXa/HJVF1',
       verification:
         'FQwhAwCbdUDhDyVi5f2PrJ6uwlFmpYsm5BI0j/WoaSe/rCKiDCEDAgXpzvrqWh38WAryDI1aokaLsBSPGl5GBfxiLIDmBLoMIQIUuvDO6jpm8X5+HoOeol/YvtbNgua7bmglAYkGX0T/AQwhAj6bMuqJuU0GbmSbEk/VDjlu6RNp6OKmrhsRwXDQIiVtDCEDQI3NQWOW9keDrFh+oeFZPFfZ/qiAyKahkg6SollHeAYMIQKng0vpsy4pgdFXy1u9OstCz9EepcOxAiTXpE6YxZEPGwwhAroscPWZbzV6QxmHBYWfriz+oT4RcpYoAHcrPViKnUq9FwtBE43vrw==',
     },
   ],
   consensusdata: {
-    primary: 1,
-    nonce: '3b23f5541d704aaa',
+    primary: 2,
+    nonce: 'eff262be7f3dfa91',
   },
   tx: [],
-  confirmations: 311250,
-  nextblockhash: '0xfd4d6fdf33eaec2d574590af1c8cbfcaa9d990b4ecc1cf0e60670b951be214a2',
+  confirmations: 44886,
+  nextblockhash: '0x84ba503f0a990cdaa0f1336f375d6b382f0728a63ea4c3cf7fc958d578cef8f0',
 };
 
 export const debugBlockJSON = {

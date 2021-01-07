@@ -1,7 +1,7 @@
 // import { PutBatch, DeleteBatch } from '@neo-one/node-core';
 
 type ChangeType = 'Added' | 'Changed' | 'Deleted';
-type ItemType = 'block' | 'transaction' | 'contract' | 'storage' | 'headerHashList';
+type ItemType = 'block' | 'transaction' | 'storage' | 'headerHashList';
 
 export interface ChangeReturn {
   readonly type: ChangeType;
@@ -14,7 +14,6 @@ export interface ChangeReturn {
 enum Prefix {
   Block = 0x01,
   Transaction = 0x02,
-  Contract = 0x50,
   Storage = 0x70,
   HeaderHashList = 0x80,
   CurrentBlock = 0xc0,
@@ -30,8 +29,6 @@ const addPrefixToKey = (type: ItemType, key: Buffer) => {
       return addPrefix(Prefix.Block, key);
     case 'transaction':
       return addPrefix(Prefix.Transaction, key);
-    case 'contract':
-      return addPrefix(Prefix.Contract, key);
     case 'storage':
       return addPrefix(Prefix.Storage, key);
     case 'headerHashList':

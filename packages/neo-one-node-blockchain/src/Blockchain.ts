@@ -57,6 +57,7 @@ const logger = createChild(nodeLogger, { service: 'blockchain' });
 
 export interface CreateBlockchainOptions {
   readonly onPersistNativeContractScript?: Buffer;
+  readonly postPersistNativeContractScript?: Buffer;
   readonly settings: BlockchainSettings;
   readonly storage: Storage;
   readonly native: NativeContainer;
@@ -167,6 +168,7 @@ export class Blockchain {
   public readonly verifyWitnesses = verifyWitnesses;
   public readonly settings: BlockchainSettings;
   public readonly onPersistNativeContractScript: Buffer;
+  public readonly postPersistNativeContractScript: Buffer;
 
   // tslint:disable-next-line: readonly-array
   private readonly headerIndexCache: HeaderIndexCache;
@@ -195,12 +197,15 @@ export class Blockchain {
     this.vm = options.vm;
     this.onPersistNativeContractScript =
       options.onPersistNativeContractScript ?? utils.getOnPersistNativeContractScript();
+    this.postPersistNativeContractScript =
+      options.postPersistNativeContractScript ?? utils.getPostPersistNativeContractScript();
     this.deserializeWireContext = {
       messageMagic: this.settings.messageMagic,
       validatorsCount: this.settings.validatorsCount,
     };
     this.mutableCurrentBlock = options.currentBlock;
-    this.onPersist = options.onPersist === undefined ? this.vm.updateSnapshots : options.onPersist;
+    this.onPersist =
+      options.onPersist === undefined ? () => Promise.resolve(this.vm.updateSnapshots()) : options.onPersist;
     this.start();
   }
 
@@ -507,7 +512,6 @@ export class Blockchain {
       snapshot: 'clone',
       container: transaction,
       gas: common.ONE_HUNDRED_FIXED8,
-      testMode: true,
     });
   }
 
@@ -516,7 +520,6 @@ export class Blockchain {
       script,
       snapshot: 'main',
       container: signers,
-      gas: common.TEN_FIXED8,
     });
   }
 
@@ -526,8 +529,7 @@ export class Blockchain {
     container,
     persistingBlock,
     offset = 0,
-    testMode = false,
-    gas = new BN(0),
+    gas = common.TEN_FIXED8,
   }: RunEngineOptions): CallReceipt {
     return this.vm.withSnapshots(({ main, clone }) => {
       const handler = snapshot === 'main' ? main : clone;
@@ -543,11 +545,9 @@ export class Blockchain {
           container,
           snapshot,
           gas,
-          testMode,
         },
         (engine) => {
-          engine.loadScript(script);
-          engine.setInstructionPointer(offset);
+          engine.loadScript({ script: script, initialPosition: offset });
           engine.execute();
 
           return utils.getCallReceipt(engine, container);
@@ -801,6 +801,7 @@ export class Blockchain {
   private createPersistingBlockchain(): PersistingBlockchain {
     return new PersistingBlockchain({
       onPersistNativeContractScript: this.onPersistNativeContractScript,
+      postPersistNativeContractScript: this.postPersistNativeContractScript,
       vm: this.vm,
     });
   }

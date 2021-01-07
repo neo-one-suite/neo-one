@@ -124,7 +124,7 @@ namespace NEOONE
 
     private dynamic _test()
     {
-      return ApplicationEngine.Neo_Crypto_CheckMultisigWithECDsaSecp256r1.Hash.ToString();
+      return this.snapshot.PersistingBlock.Index.ToString();
     }
 
     private NEOONE.ReturnHelpers.ProtocolSettingsReturn _getConfig()
