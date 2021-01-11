@@ -1,5 +1,5 @@
 import { TriggerType, VMState, UInt160Hex } from '@neo-one/client-common';
-import { CallFlags, SerializedScriptContainer, SnapshotName, LoadScriptOptions } from '@neo-one/node-core';
+import { CallFlags, SerializedScriptContainer, SnapshotName, LoadContractOptions } from '@neo-one/node-core';
 import { StackItemReturn, LogReturn } from '../converters';
 import { DefaultMethods, DispatchMethod } from '../types';
 
@@ -30,4 +30,5 @@ export interface EngineMethods extends DefaultMethods {
   // methods
   readonly execute: DispatchMethod<keyof typeof VMState>;
   readonly loadscript: DispatchMethod<boolean, LoadScriptVMArgs>;
+  readonly loadcontract: DispatchMethod<boolean, LoadContractOptions>;
 }

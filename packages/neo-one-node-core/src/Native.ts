@@ -1,11 +1,11 @@
 import { ECPoint, UInt160 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
+import { ContractState } from './ContractState';
+import { DesignationRole } from './DesignationRole';
+import { OracleRequest } from './OracleRequest';
 import { ReadFindStorage } from './Storage';
 import { StorageItem } from './StorageItem';
 import { StorageKey } from './StorageKey';
-import { ContractState } from './ContractState';
-import { OracleRequest } from './OracleRequest';
-import { DesignationRole } from './DesignationRole';
 
 export type OracleRequestResults = ReadonlyArray<readonly [BN, OracleRequest]>;
 
@@ -53,10 +53,11 @@ export interface NEOContract extends NEP17NativeContract {
   readonly getCommitteeAddress: (storage: NativeContractStorageContext) => Promise<UInt160>;
   readonly unclaimedGas: (storage: NativeContractStorageContext, account: UInt160, end: number) => Promise<BN>;
   readonly getNextBlockValidators: (storage: NativeContractStorageContext) => Promise<readonly ECPoint[]>;
+  readonly computeNextBlockValidators: (storage: NativeContractStorageContext) => Promise<readonly ECPoint[]>;
 }
 
 export interface ManagementContract extends NativeContract {
-  readonly getContract: (storage: NativeContractStorageContext, hash: UInt160) => Promise<ContractState>;
+  readonly getContract: (storage: NativeContractStorageContext, hash: UInt160) => Promise<ContractState | undefined>;
   readonly listContracts: (storage: NativeContractStorageContext) => Promise<readonly ContractState[]>;
 }
 
@@ -70,7 +71,7 @@ export interface DesignationContract extends NativeContract {
 }
 
 export interface OracleContract extends NativeContract {
-  readonly getRequest: (storage: NativeContractStorageContext, id: BN) => Promise<OracleRequest>;
+  readonly getRequest: (storage: NativeContractStorageContext, id: BN) => Promise<OracleRequest | undefined>;
   readonly getRequests: (storage: NativeContractStorageContext) => Promise<OracleRequestResults>;
   readonly getRequestsByUrl: (storage: NativeContractStorageContext, url: string) => Promise<readonly OracleRequest[]>;
 }
@@ -82,4 +83,5 @@ export interface NativeContainer {
   readonly Management: ManagementContract;
   readonly Designation: DesignationContract;
   readonly Oracle: OracleContract;
+  readonly isNative: (hash: UInt160) => boolean;
 }

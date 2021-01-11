@@ -1,11 +1,12 @@
-import { UInt160 } from '@neo-one/client-common';
+import { common, UInt160 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { NativeContainer } from './Native';
 import { SerializableContainer } from './Serializable';
 import { BlockchainStorage } from './Storage';
-import { VM } from './vm';
+import { SnapshotName, VM } from './vm';
 import { Witness } from './Witness';
 
+export const maxVerificationGas = common.fixed8FromDecimal('0.5');
 export interface Verifiable {
   readonly getScriptHashesForVerifying: (context: {
     readonly storage: BlockchainStorage;
@@ -19,19 +20,31 @@ export interface ExecuteScriptResult {
   readonly result: boolean;
 }
 
-export type VerifyWitnesses = (
-  vm: VM,
-  verifiable: SerializableContainer,
-  storage: BlockchainStorage,
-  native: NativeContainer,
-  gasIn: BN,
-) => Promise<boolean>;
+export interface VerifyWitnessesOptions {
+  readonly vm: VM;
+  readonly verifiable: SerializableContainer;
+  readonly storage: BlockchainStorage;
+  readonly native: NativeContainer;
+  readonly gas: BN;
+  readonly snapshot?: SnapshotName;
+}
+
+export type VerifyWitnesses = (options: VerifyWitnessesOptions) => Promise<boolean>;
+
+export interface VerifyWitnessOptions extends VerifyWitnessesOptions {
+  readonly hash: UInt160;
+  readonly witness: Witness;
+}
+
+export type VerifyWitness = (options: VerifyWitnessOptions) => Promise<ExecuteScriptResult>;
 
 export interface VerifyOptions {
+  readonly height: number;
   readonly vm: VM;
   readonly storage: BlockchainStorage;
   readonly native: NativeContainer;
   readonly verifyWitnesses: VerifyWitnesses;
+  readonly verifyWitness: VerifyWitness;
 }
 
 /* I think all of this might be a useless abstraction of blockchain properties. */

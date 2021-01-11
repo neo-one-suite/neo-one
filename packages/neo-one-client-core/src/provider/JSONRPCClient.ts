@@ -81,6 +81,10 @@ export class JSONRPCClient {
     return this.withInstance(async (provider) => provider.request({ method: 'getfeeperbyte' }));
   }
 
+  public async getExecFeeFactor(): Promise<number> {
+    return this.withInstance(async (provider) => provider.request({ method: 'getexecfeefactor' }));
+  }
+
   public async getContract(address: AddressString): Promise<ContractJSON> {
     return this.withInstance(async (provider) =>
       provider.request({

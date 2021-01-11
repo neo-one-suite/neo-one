@@ -12,7 +12,6 @@ import {
   NetworkType,
   Op,
   Param,
-  RawAction,
   RelayTransactionResult,
   ScriptBuilder,
   ScriptBuilderParam,
@@ -33,7 +32,6 @@ import {
   WitnessScopeModel,
 } from '@neo-one/client-common';
 import { processActionsAndMessage } from '@neo-one/client-switch';
-import { utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { Observable } from 'rxjs';
 import { InsufficientNetworkFeeError, InvokeError, UnknownAccountError } from '../errors';
@@ -171,6 +169,11 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
       IOHelper.sizeOfVarBytesLE(transaction.script) +
       IOHelper.sizeOfVarUIntLE(hashes.length);
 
+    const [feePerByte, execFeeFactor] = await Promise.all([
+      this.provider.getFeePerByte(network),
+      this.provider.getExecFeeFactor(network),
+    ]);
+
     let size = initSize;
     let fee = new BigNumber(0);
 
@@ -194,9 +197,9 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
           });
         }
 
-        // TODO: Implemented looking up the witness verification script by contract hash: https://github.com/neo-project/neo/blob/master/src/neo/Wallets/Wallet.cs#L390
+        // it may seem odd to throw here and continue logic, but it helps keep our other checks type safe when it IS defined.
         if (witnessScript === undefined) {
-          throw new Error('Contract witness script not yet implemented');
+          throw new Error('Witness still not defined so we try to look it up as a contract with a "verify" method');
         }
 
         const multiSig = crypto.isMultiSigContractWithResult(witnessScript);
@@ -205,17 +208,21 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
           const sizeInv = m * 66;
           const sizeMulti = IOHelper.sizeOfVarUIntLE(sizeInv) + sizeInv + IOHelper.sizeOfVarBytesLE(witnessScript);
 
-          const initMFee = getOpCodePrice(Op.PUSHDATA1).multipliedBy(m);
+          const initMFee = getOpCodePrice(Op.PUSHDATA1).multipliedBy(m).multipliedBy(execFeeFactor);
           const mBuilder = new ScriptBuilder();
           const mScript = mBuilder.emitPushInt(m).build();
-          const mFee = getOpCodePrice(mScript[0]).plus(initMFee);
+          const mFee = getOpCodePrice(mScript[0]).multipliedBy(execFeeFactor).plus(initMFee);
 
-          const initNFee = getOpCodePrice(Op.PUSHDATA1).multipliedBy(n);
+          const initNFee = getOpCodePrice(Op.PUSHDATA1).multipliedBy(n).multipliedBy(execFeeFactor);
           const nBuilder = new ScriptBuilder();
           const nScript = nBuilder.emitPushInt(n).build();
-          const nFee = getOpCodePrice(nScript[0]).plus(initNFee);
+          const nFee = getOpCodePrice(nScript[0]).multipliedBy(execFeeFactor).plus(initNFee);
 
-          const totalFee = getOpCodePrice(Op.PUSHNULL).plus(ECDsaVerifyPrice.multipliedBy(n)).plus(mFee).plus(nFee);
+          const totalFee = getOpCodePrice(Op.PUSHNULL)
+            .plus(ECDsaVerifyPrice.multipliedBy(n))
+            .multipliedBy(execFeeFactor)
+            .plus(mFee)
+            .plus(nFee);
 
           size = size + sizeMulti;
           fee = fee.plus(totalFee);
@@ -224,7 +231,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
           const sigFee = getOpCodePrice(Op.PUSHDATA1)
             .multipliedBy(2)
             .plus(getOpCodePrice(Op.PUSHNULL))
-            .plus(ECDsaVerifyPrice);
+            .plus(ECDsaVerifyPrice)
+            .multipliedBy(execFeeFactor);
 
           size = size + sigSize;
           fee = fee.plus(sigFee);
@@ -241,8 +249,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
         size = size + newSize;
       }
     }
-
-    const feePerByte = await this.provider.getFeePerByte(network);
 
     const gas = fee.plus(feePerByte.multipliedBy(size)).integerValue(BigNumber.ROUND_UP);
     if (gas.gt(utils.ZERO_BIG_NUMBER) && maxFee.lt(gas) && !maxFee.eq(utils.NEGATIVE_ONE_BIG_NUMBER)) {
@@ -426,7 +432,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
         crypto.addressToScriptHash({ addressVersion, address: from.address }),
         crypto.addressToScriptHash({ addressVersion, address: transfer.to }),
         transfer.amount.toNumber(),
-        undefined,
+        transfer.data ?? undefined,
       );
     });
 

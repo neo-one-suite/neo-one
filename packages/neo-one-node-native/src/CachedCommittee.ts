@@ -1,5 +1,5 @@
-import { StackItem, assertArrayStackItem, assertStructStackItem } from '@neo-one/node-core';
-import { ECPoint, common } from '@neo-one/client-common';
+import { common, ECPoint } from '@neo-one/client-common';
+import { assertArrayStackItem, assertStructStackItem, StackItem } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 
 interface CachedCommitteeElement {

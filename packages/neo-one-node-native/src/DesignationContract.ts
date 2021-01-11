@@ -17,6 +17,12 @@ export class DesignationContract extends NativeContract {
     });
   }
 
+  /**
+   * passing in height and index is a pretty HMMM way to do this but in the vein of being
+   * consistent with C# code as much as possible we will do it like this. The reasoning
+   * being that our snapshot equivalent 'storage' doesn't have knowledge of the current height,
+   * that is a blockchain abstraction. In almost no situation should this first error actually throw.
+   */
   public async getDesignatedByRole(
     { storages }: NativeContractStorageContext,
     role: Role,

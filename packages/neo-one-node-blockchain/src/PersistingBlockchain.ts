@@ -1,5 +1,5 @@
 // tslint:disable no-array-mutation no-object-mutation
-import { TriggerType, VMState, common } from '@neo-one/client-common';
+import { common, TriggerType, VMState } from '@neo-one/client-common';
 import { ApplicationExecuted, Block, SnapshotHandler, Transaction, VM } from '@neo-one/node-core';
 import { PersistNativeContractsError, PostPersistError } from './errors';
 import { utils } from './utils';

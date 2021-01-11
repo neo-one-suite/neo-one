@@ -1,15 +1,15 @@
 import { crypto } from '@neo-one/client-common';
-import { NativeContract } from './NativeContract';
 import {
-  NativeContractStorageContext,
-  utils,
-  StackItem,
   assertArrayStackItem,
-  OracleRequestResults,
+  NativeContractStorageContext,
   OracleRequest,
+  OracleRequestResults,
+  StackItem,
+  utils,
 } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import { map, toArray } from 'rxjs/operators';
+import { NativeContract } from './NativeContract';
 
 export class OracleContract extends NativeContract {
   private readonly prefixes = {
@@ -48,6 +48,7 @@ export class OracleContract extends NativeContract {
       .pipe(
         map(
           ({ key, value }) =>
+            // tslint:disable-next-line: no-useless-cast
             [new BN(key.key.slice(1), 'le'), utils.getInteroperable(value, OracleRequest.fromStackItem)] as const,
         ),
         toArray(),
@@ -87,7 +88,7 @@ class IdList {
     return new IdList(list);
   }
 
-  public list: readonly BN[];
+  public readonly list: readonly BN[];
 
   public constructor(list: readonly BN[]) {
     this.list = list;

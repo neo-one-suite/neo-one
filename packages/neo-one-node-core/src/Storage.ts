@@ -134,12 +134,10 @@ export interface BlockchainStorage {
   readonly applicationLogs: ReadStorage<TransactionKey, ApplicationLogJSON>;
   // readonly consensusState: ReadMetadataStorage<ConsensusContext>;
   readonly transactions: ReadStorage<TransactionKey, TransactionState>;
-  readonly contracts: ReadStorage<ContractKey, ContractState>;
   readonly storages: ReadFindStorage<StorageKey, StorageItem>;
   readonly headerHashList: ReadStorage<HeaderKey, HeaderHashList>;
   readonly blockHashIndex: ReadMetadataStorage<HashIndexState>;
   readonly headerHashIndex: ReadMetadataStorage<HashIndexState>;
-  readonly contractID: ReadMetadataStorage<ContractIDState>;
 }
 
 export interface Storage extends BlockchainStorage {

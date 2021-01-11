@@ -9,6 +9,7 @@ import {
   AccountContract,
   AttributeTypeModel,
   NotificationJSON,
+  OracleResponseCode,
   StackItemJSON,
   TriggerTypeJSON,
   VerifyResultModel,
@@ -73,21 +74,28 @@ export type NetworkType = 'main' | 'test' | string;
  * @see Attribute
  */
 export interface AttributeBase {
+  /**
+   * `type` specifies the `Attribute` type
+   */
   readonly type: AttributeTypeModel;
 }
 /**
  * `Attribute` whose transaction is "high priority".
  */
 export interface HighPriorityAttribute extends AttributeBase {
-  /**
-   * `type` specifies the `Attribute` type
-   */
   readonly type: AttributeTypeModel.HighPriority;
+}
+
+export interface OracleResponse extends AttributeBase {
+  readonly type: AttributeTypeModel.OracleResponse;
+  readonly id: BigNumber;
+  readonly code: OracleResponseCode;
+  readonly result: BufferString;
 }
 /**
  * `Attribute`s are used to store additional data on `Transaction`s.
  */
-export type Attribute = HighPriorityAttribute;
+export type Attribute = HighPriorityAttribute | OracleResponse;
 
 export type WitnessScope =
   | 'None'
@@ -429,6 +437,10 @@ export interface Transfer {
    * Destination address.
    */
   readonly to: AddressString;
+  /**
+   * Additional data to be attached to the transaction. Typed as `any` but should be used cautiously since it will need to be converted.
+   */
+  readonly data?: any;
 }
 
 /**

@@ -1,4 +1,4 @@
-import { TriggerType, UInt256, VMState, Log, UInt160 } from '@neo-one/client-common';
+import { Log, TriggerType, UInt160, UInt256, VMState } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { Block } from './Block';
 import { CallFlags } from './CallFlags';
@@ -47,6 +47,13 @@ export interface LoadScriptOptions {
   readonly initialPosition?: number;
 }
 
+export interface LoadContractOptions {
+  readonly hash: UInt160;
+  readonly flags: CallFlags;
+  readonly method: string;
+  readonly packParameters?: boolean;
+}
+
 export interface ApplicationEngine {
   readonly trigger: TriggerType;
   readonly gasConsumed: BN;
@@ -55,6 +62,7 @@ export interface ApplicationEngine {
   readonly notifications: readonly StackItem[];
   readonly logs: readonly VMLog[];
   readonly loadScript: (options: LoadScriptOptions) => boolean;
+  readonly loadContract: (options: LoadContractOptions) => boolean;
   readonly execute: () => VMState;
 }
 
@@ -71,6 +79,7 @@ export interface SnapshotHandler {
   readonly setPersistingBlock: (block: Block) => boolean;
   readonly hasPersistingBlock: () => boolean;
   // TODO: type the returning changeSet
+  // tslint:disable-next-line: no-any
   readonly getChangeSet: () => any;
   readonly clone: () => void;
 }
@@ -95,6 +104,7 @@ export interface VM {
   readonly withSnapshots: <T = void>(
     func: (snapshots: { readonly main: SnapshotHandler; readonly clone: Omit<SnapshotHandler, 'clone'> }) => T,
   ) => T;
-  readonly updateStore: (storage: ReadonlyArray<{ key: Buffer; value: Buffer }>) => void;
+  readonly updateStore: (storage: ReadonlyArray<{ readonly key: Buffer; readonly value: Buffer }>) => void;
+  // tslint:disable-next-line: no-any
   readonly test: () => any;
 }

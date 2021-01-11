@@ -221,15 +221,21 @@ const TEN_THOUSAND_FIXED8 = fixed8FromDecimal(10000);
 const ONE_HUNDRED_MILLION_FIXED8 = fixed8FromDecimal(100000000);
 
 const nativeScriptHashes = {
-  GAS: '0x668e0c1f9d7b70a99dd9e06eadd4c784d641afbc',
-  NEO: '0xde5f57d430d3dece511cf975a8d37848cb9e0525',
-  Policy: '0xce06595079cd69583126dbfd1d2e25cca74cffe9',
+  Management: '0xcd97b70d82d69adfcd9165374109419fade8d6ab',
+  NEO: '0x0a46e2e37c9987f570b4af253fb77e7eef0f72b6',
+  GAS: '0xa6a6c15dcdc9b997dac448b6926522d22efeedfb',
+  Policy: '0xdde31084c0fdbebc7f5ed5f53a38905305ccee14',
+  Oracle: '0xb1c37d5847c2ae36bdde31d0cc833a7ad9667f8f',
+  Designation: '0xc0073f4c7069bf38995780c9da065f9b3949ea7a',
 };
 
 const nativeHashes = {
+  Management: hexToUInt160(nativeScriptHashes.Management),
   GAS: hexToUInt160(nativeScriptHashes.GAS),
   NEO: hexToUInt160(nativeScriptHashes.NEO),
   Policy: hexToUInt160(nativeScriptHashes.Policy),
+  Oracle: hexToUInt160(nativeScriptHashes.Oracle),
+  Designation: hexToUInt160(nativeScriptHashes.Designation),
 };
 
 export const common = {

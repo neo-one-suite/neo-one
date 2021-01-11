@@ -2,8 +2,7 @@ import { common, ContractJSON, IOHelper, JSONHelper, UInt160 } from '@neo-one/cl
 import { ContractStateModel } from '@neo-one/client-full-common';
 import { ContractManifest } from './manifest';
 import { utils } from './utils';
-import { StackItem } from './StackItems';
-import { assertArrayStackItem } from 'dist/cjs';
+import { StackItem, assertArrayStackItem } from './StackItems';
 
 export interface ContractStateAdd {
   readonly id: number;

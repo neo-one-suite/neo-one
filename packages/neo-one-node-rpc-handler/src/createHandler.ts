@@ -9,7 +9,6 @@ import {
   toVMStateJSON,
   TransactionJSON,
   TransactionReceiptJSON,
-  utils as commonUtils,
   VerboseTransactionJSON,
   VerifyResultModel,
 } from '@neo-one/client-common';
@@ -23,7 +22,6 @@ import {
   Nep5Transfer,
   Nep5TransferKey,
   Node,
-  Signer,
   Signers,
   StackItem,
   stackItemToJSON,
@@ -125,6 +123,7 @@ const RPC_METHODS: { readonly [key: string]: string } = {
 
   // NEO•ONE
   getfeeperbyte: 'getfeeperbyte',
+  getexecfeefactor: 'getexecfeefactor',
   getverificationcost: 'getverificationcost',
   relaytransaction: 'relaytransaction',
   getallstorage: 'getallstorage',
@@ -306,6 +305,7 @@ export const createHandler = ({
 
     try {
       const stack = stackIn.map((item: StackItem) => stackItemToJSON(item, undefined));
+
       return {
         script: script.toString('hex'),
         state: toVMStateJSON(state),
@@ -481,7 +481,7 @@ export const createHandler = ({
     },
     [RPC_METHODS.getvalidators]: async () => {
       const [validators, candidates] = await Promise.all([
-        native.NEO.getValidators({ storages: blockchain.storages }),
+        native.NEO.computeNextBlockValidators({ storages: blockchain.storages }),
         native.NEO.getCandidates({ storages: blockchain.storages }),
       ]);
 
@@ -886,6 +886,7 @@ export const createHandler = ({
 
       return feePerByte.toString();
     },
+    [RPC_METHODS.getexecfeefactor]: async () => native.Policy.getExecFeeFactor({ storages: blockchain.storages }),
     [RPC_METHODS.getverificationcost]: async (args) => {
       const hash = JSONHelper.readUInt160(args[0]);
       const transaction = Transaction.deserializeWire({

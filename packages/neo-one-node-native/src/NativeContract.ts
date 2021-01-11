@@ -1,4 +1,4 @@
-import { crypto, ScriptBuilder, UInt160, common } from '@neo-one/client-common';
+import { common, crypto, ScriptBuilder, UInt160 } from '@neo-one/client-common';
 import { KeyBuilder } from './KeyBuilder';
 
 export interface NativeContractAdd {

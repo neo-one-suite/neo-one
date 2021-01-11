@@ -199,3 +199,17 @@ export const getOpCodePrice = (value: Op): BigNumber => {
 
   return fee;
 };
+
+export const signatureContractCost = getOpCodePrice(Op.PUSHDATA1)
+  .multipliedBy(2)
+  .plus(getOpCodePrice(Op.PUSHNULL))
+  .plus(getOpCodePrice(Op.SYSCALL))
+  .plus(ECDsaVerifyPrice);
+
+export const multiSignatureContractCost = (m: number, n: number) =>
+  getOpCodePrice(Op.PUSHDATA1)
+    .multipliedBy(m + n)
+    .plus(getOpCodePrice(Op.PUSHINT8).multipliedBy(2))
+    .plus(getOpCodePrice(Op.PUSHNULL))
+    .plus(getOpCodePrice(Op.SYSCALL))
+    .plus(ECDsaVerifyPrice.multipliedBy(n));

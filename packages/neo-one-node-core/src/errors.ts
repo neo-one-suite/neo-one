@@ -1,3 +1,4 @@
+import { OracleResponseCode } from '@neo-one/client-common';
 import { makeErrorWithCode } from '@neo-one/utils';
 
 // tslint:disable-next-line export-name
@@ -73,4 +74,9 @@ export const InvalidFullNodeCapabilityTypeError = makeErrorWithCode(
 export const InvalidOpCodeError = makeErrorWithCode(
   'INVALID_OP_CODE_ERROR',
   (value: number) => `Cannot find fee for OpCode ${value}.`,
+);
+export const InvalidOracleResultError = makeErrorWithCode(
+  'INVALID_ORACLE_RESULT_ERROR',
+  (code: OracleResponseCode, resultLength: number) =>
+    `Expected result.length to be 0 with response code ${OracleResponseCode[code]}, found: ${resultLength}`,
 );

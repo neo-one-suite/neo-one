@@ -5,6 +5,7 @@ import {
   serializeScriptContainer,
   SnapshotName,
   LoadScriptOptions,
+  LoadContractOptions,
 } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
@@ -110,6 +111,18 @@ export class ApplicationEngine {
         flags,
         scriptHash: scriptHash ? common.uInt160ToHex(scriptHash) : undefined,
         initialPosition,
+      },
+    });
+  }
+
+  public loadContract({ hash, method, flags, packParameters = false }: LoadContractOptions) {
+    return this.dispatch({
+      method: 'loadcontract',
+      args: {
+        hash,
+        method,
+        flags,
+        packParameters,
       },
     });
   }

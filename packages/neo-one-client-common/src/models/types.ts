@@ -3,7 +3,7 @@ import { UInt256Hex } from '../common';
 import { UserAccount } from '../types';
 import { ContractParameterTypeModel } from './ContractParameterTypeModel';
 import { StorageFlagsModel } from './StorageFlagsModel';
-import { AttributeTypeModel } from './transaction/attribute/AttributeTypeModel';
+import { AttributeTypeModel } from './transaction';
 import { TriggerType, TriggerTypeJSON } from './trigger';
 import { VerifyResultModel } from './VerifyResultModel';
 import { VMState, VMStateJSON } from './vm';
@@ -196,9 +196,22 @@ export interface SignerJSON {
   readonly allowedgroups?: readonly string[];
 }
 
-export interface AttributeJSON {
+export interface AttributeJSONBase {
   readonly type: AttributeTypeJSON;
 }
+
+export interface HighPriorityAttributeJSON extends AttributeJSONBase {
+  readonly type: 'HighPriority';
+}
+
+export interface OracleResponseJSON extends AttributeJSONBase {
+  readonly type: 'OracleResponse';
+  readonly id: string;
+  readonly code: number;
+  readonly result: string;
+}
+
+export type AttributeJSON = HighPriorityAttributeJSON | OracleResponseJSON;
 
 export type AttributeTypeJSON = keyof typeof AttributeTypeModel;
 

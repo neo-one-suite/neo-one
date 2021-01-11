@@ -9,7 +9,7 @@ export class PolicyContract extends NativeContract {
   private readonly prefixes = {
     maxTransactionsPerBlock: Buffer.from([23]),
     feePerByte: Buffer.from([10]),
-    blockedAccounts: Buffer.from([15]),
+    blockedAccount: Buffer.from([15]),
     maxBlockSize: Buffer.from([12]),
     maxBlockSystemFee: Buffer.from([17]),
     execFeeFactor: Buffer.from([18]),
@@ -82,8 +82,9 @@ export class PolicyContract extends NativeContract {
 
   public async isBlocked({ storages }: NativeContractStorageContext, account: UInt160) {
     const item = await storages.tryGet(
-      this.createStorageKey(this.prefixes.blockedAccounts).addBuffer(account).toStorageKey(),
+      this.createStorageKey(this.prefixes.blockedAccount).addBuffer(account).toStorageKey(),
     );
+
     return item !== undefined;
   }
 }

@@ -1,6 +1,7 @@
 import {
   AccountContract,
   BinaryWriter,
+  common,
   createSerializeWire,
   crypto,
   ECPoint,
@@ -9,16 +10,14 @@ import {
   PrivateKey,
 } from '@neo-one/client-common';
 import { ContractParametersContext } from '../ContractParametersContext';
-import { NativeContainer } from '../Native';
 import {
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
   SerializableContainer,
   SerializableContainerType,
 } from '../Serializable';
-import { BlockchainStorage } from '../Storage';
-import { BinaryReader, utils } from '../utils';
-import { Verifiable, VerifyOptions } from '../Verifiable';
+import { BinaryReader } from '../utils';
+import { VerifyOptions } from '../Verifiable';
 import { Witness } from '../Witness';
 import { ConsensusMessage } from './message';
 import { UnsignedConsensusPayload, UnsignedConsensusPayloadAdd } from './UnsignedConsensusPayload';
@@ -26,12 +25,7 @@ import { UnsignedConsensusPayload, UnsignedConsensusPayloadAdd } from './Unsigne
 export interface ConsensusPayloadAdd extends UnsignedConsensusPayloadAdd {
   readonly witness: Witness;
 }
-
-export interface VerifyConsensusPayloadOptions extends VerifyOptions {
-  readonly height: number;
-}
-
-export class ConsensusPayload extends UnsignedConsensusPayload {
+export class ConsensusPayload extends UnsignedConsensusPayload implements SerializableContainer {
   public static sign(
     payload: UnsignedConsensusPayload,
     privateKey: PrivateKey,
@@ -117,11 +111,11 @@ export class ConsensusPayload extends UnsignedConsensusPayload {
     return this.consensusMessage as T;
   }
 
-  public async verify(options: VerifyConsensusPayloadOptions) {
+  public async verify(options: VerifyOptions) {
     if (this.blockIndex <= options.height) {
       return false;
     }
 
-    return options.verifyWitnesses(options.vm, this, options.storage, options.native, 0.02);
+    return options.verifyWitnesses(options.vm, this, options.storage, options.native, common.fixed8FromDecimal('0.02'));
   }
 }

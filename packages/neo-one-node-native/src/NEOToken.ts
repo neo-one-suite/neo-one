@@ -1,11 +1,11 @@
-import { common, crypto, ECPoint, UInt160 } from '@neo-one/client-common';
+import { common, crypto, ECPoint, InvalidFormatError, UInt160 } from '@neo-one/client-common';
 import { BlockchainSettings, Candidate, NativeContractStorageContext, utils } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import { filter, map, toArray } from 'rxjs/operators';
 import { CandidateState, NEOAccountState } from './AccountStates';
-import { NEP17NativeContract } from './Nep17';
 import { CachedCommittee } from './CachedCommittee';
+import { NEP17NativeContract } from './Nep17';
 
 type Storages = NativeContractStorageContext['storages'];
 
@@ -21,6 +21,15 @@ interface GasRecord {
   readonly index: number;
   readonly gasPerBlock: BN;
 }
+
+const candidateSort = (a: Candidate, b: Candidate) => {
+  const voteComp = a.votes.cmp(b.votes);
+  if (voteComp !== 0) {
+    return voteComp;
+  }
+
+  return a.publicKey.compare(b.publicKey);
+};
 
 export class NEOToken extends NEP17NativeContract {
   public readonly totalAmount: BN;
@@ -91,7 +100,19 @@ export class NEOToken extends NEP17NativeContract {
 
   public async getCommitteeFromCache({ storages }: NativeContractStorageContext): Promise<CachedCommittee> {
     const item = await storages.get(this.createStorageKey(this.prefixes.committee).toStorageKey());
+
     return utils.getInteroperable(item, CachedCommittee.fromStackItem);
+  }
+
+  public async computeNextBlockValidators(storage: NativeContractStorageContext): Promise<readonly ECPoint[]> {
+    const committeeMembers = await this.computeCommitteeMembers(storage);
+
+    return _.take(
+      committeeMembers.map(({ publicKey }) => publicKey),
+      this.settings.validatorsCount,
+    )
+      .slice()
+      .sort(common.ecPointCompare);
   }
 
   public async unclaimedGas({ storages }: NativeContractStorageContext, account: UInt160, end: number) {
@@ -126,8 +147,7 @@ export class NEOToken extends NEP17NativeContract {
       return new BN(0);
     }
     if (value.ltn(0)) {
-      // TODO: create a real error for here
-      throw new Error('negative value not supported');
+      throw new InvalidFormatError('negative value not supported');
     }
 
     const neoHolderReward = await this.calculateNeoHolderReward(storages, value, start, end);
@@ -158,6 +178,7 @@ export class NEOToken extends NEP17NativeContract {
   private async calculateNeoHolderReward(storages: Storages, value: BN, start: number, end: number) {
     let sum = new BN(0);
     const sortedGasRecords = await this.getSortedGasRecords(storages, end);
+    // tslint:disable-next-line: no-loop-statement
     for (const { index, gasPerBlock } of sortedGasRecords) {
       if (index > start) {
         sum = sum.add(gasPerBlock.muln(end - index));
@@ -171,14 +192,31 @@ export class NEOToken extends NEP17NativeContract {
   }
 
   private async getSortedGasRecords(storages: Storages, end: number): Promise<readonly GasRecord[]> {
-    const key = this.createStorageKey(this.prefixes.gasPerBlock).addUInt32BE(end).toSearchPrefix();
+    const prefix = this.createStorageKey(this.prefixes.gasPerBlock).addUInt32BE(end).toSearchPrefix();
     const boundary = this.createStorageKey(this.prefixes.gasPerBlock).toSearchPrefix();
-    const range = await storages.find$(key, boundary).pipe(toArray()).toPromise();
+    const range = await storages.find$(prefix, boundary).pipe(toArray()).toPromise();
+
     return range
       .map(({ key, value }) => ({
         index: key.key.readUInt32BE(4),
         gasPerBlock: new BN(value.value, 'le'),
       }))
       .reverse();
+  }
+
+  private async computeCommitteeMembers({ storages }: NativeContractStorageContext): Promise<readonly Candidate[]> {
+    const item = await storages.get(this.createStorageKey(this.prefixes.votersCount).toStorageKey());
+    const votersCount = new BN(item.value).toNumber();
+    const voterTurnout = votersCount / this.totalAmount.toNumber();
+    const candidates = await this.getCandidates({ storages });
+
+    if (voterTurnout < this.effectiveVoterTurnout || candidates.length < this.settings.committeeMembersCount) {
+      return this.settings.standbyCommittee.map((member) => ({
+        publicKey: member,
+        votes: candidates.find((candidate) => candidate.publicKey.equals(member))?.votes ?? new BN(0),
+      }));
+    }
+
+    return _.take(candidates.slice().sort(candidateSort), this.settings.committeeMembersCount);
   }
 }

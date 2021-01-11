@@ -135,11 +135,6 @@ const compareTransactionAndFees = (val1: TransactionAndFee, val2: TransactionAnd
   return val1.transaction.hash.compare(val2.transaction.hash);
 };
 
-// TODO: We should note what some of these settings used to be, I've made them more aggressive
-// while we are testing syncing; and then testnet can be a bit slow.
-// const GET_BLOCKS_THROTTLE_MS = 1000;
-// const GET_BLOCKS_TIME_MS = 5000;
-
 const MEM_POOL_SIZE = 5000;
 const GET_BLOCKS_COUNT = 500;
 // Assume that we get 500 back, but if not, at least request every 10 seconds
@@ -162,6 +157,8 @@ export class Node implements INode {
   public readonly getNewVerificationContext: () => TransactionVerificationContext;
   // tslint:disable-next-line readonly-keyword
   private mutableMemPool: { [hash: string]: Transaction };
+  // tslint:disable-next-line: readonly-keyword
+  private readonly mutableSentCommands: { [k: number]: boolean } = {};
   private readonly transactionVerificationContext: TransactionVerificationContext;
   private readonly network: Network<Message, PeerData>;
   private readonly options: Options;
@@ -498,6 +495,7 @@ export class Node implements INode {
 
   private sendMessage(peer: Peer<Message> | ConnectedPeer<Message, PeerData>, message: Message): void {
     peer.write(message.serializeWire());
+    this.mutableSentCommands[message.value.command] = true;
   }
   private readonly negotiate = async (peer: Peer<Message>): Promise<NegotiateResult<PeerData>> => {
     this.sendMessage(
@@ -847,6 +845,11 @@ export class Node implements INode {
   }
 
   private onAddrMessageReceived(addr: AddrPayload): void {
+    if (!this.mutableSentCommands[Command.GetAddr]) {
+      return;
+    }
+    this.mutableSentCommands[Command.GetAddr] = false;
+
     addr.addressList
       .filter((address) => !LOCAL_HOST_ADDRESSES.has(address.address))
       .filter((address) => address.port > 0)

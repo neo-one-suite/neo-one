@@ -1,7 +1,7 @@
-import { NativeContract } from './NativeContract';
-import { NativeContractStorageContext, utils, ContractState } from '@neo-one/node-core';
 import { UInt160 } from '@neo-one/client-common';
+import { ContractState, NativeContractStorageContext, utils } from '@neo-one/node-core';
 import { map, toArray } from 'rxjs/operators';
+import { NativeContract } from './NativeContract';
 
 export class ManagementContract extends NativeContract {
   private readonly prefixes = {
@@ -31,6 +31,7 @@ export class ManagementContract extends NativeContract {
 
   public async listContracts({ storages }: NativeContractStorageContext) {
     const searchPrefix = this.createStorageKey(this.prefixes.contract).toSearchPrefix();
+
     return storages
       .find$(searchPrefix)
       .pipe(
