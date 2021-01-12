@@ -197,6 +197,21 @@ export const ensureMaxBlockLimitation = async (
   };
 };
 
+const validatorsChanged = (blockchain: Blockchain) => {
+  if (blockchain.currentBlockIndex === 0) {
+    return false;
+  }
+
+  const currentBlock = blockchain.currentBlock;
+  const prevBlock = blockchain.previousBlock;
+
+  if (prevBlock === undefined) {
+    throw new Error('expected previous block');
+  }
+
+  return !currentBlock.nextConsensus.equals(prevBlock.nextConsensus);
+};
+
 export const reset = async ({
   blockchain,
   privateKey,
@@ -217,7 +232,7 @@ export const reset = async ({
     const initialBlockOptions = {
       previousHash: blockchain.currentBlock.hash,
       index: blockchain.currentBlockIndex + 1,
-      nextConsensus: crypto.getConsensusAddress(validators),
+      nextConsensus: crypto.getConsensusAddress(blockchain.shouldRefreshCommittee(1) ? validators : nextValidators),
       merkleRoot: undefined,
       messageMagic: blockchain.settings.messageMagic,
     };
@@ -239,9 +254,24 @@ export const reset = async ({
     const changeViewPayloads = _.range(nextValidators.length).map(() => undefined);
     const lastChangeViewPayloads = _.range(nextValidators.length).map(() => undefined);
     const commitPayloads = _.range(nextValidators.length).map(() => undefined);
-    let lastSeenMessage = context.lastSeenMessage;
-    if (context.lastSeenMessage.length === 0) {
-      lastSeenMessage = _.range(nextValidators.length).map(() => -1);
+    const prevLastSeenMessage = context.lastSeenMessage;
+    let lastSeenMessage = prevLastSeenMessage;
+    if (validatorsChanged(blockchain) || Object.values(context.lastSeenMessage).length === 0) {
+      lastSeenMessage = nextValidators.reduce<{ readonly [k: string]: number | undefined }>((acc, validator) => {
+        const validatorHex = common.ecPointToHex(validator);
+        const prevIndex = prevLastSeenMessage[validatorHex];
+        if (prevIndex !== undefined) {
+          return {
+            ...acc,
+            validatorHex: prevIndex,
+          };
+        }
+
+        return {
+          ...acc,
+          validatorHex: blockchain.currentBlockIndex,
+        };
+      }, {});
     }
 
     const publicKey = crypto.privateKeyToPublicKey(privateKey);
@@ -260,55 +290,52 @@ export const reset = async ({
       }),
     };
   }
-  {
-    const mutableLastChangeViewPayloads = [...context.lastChangeViewPayloads];
-    _.range(mutableLastChangeViewPayloads.length).forEach((i) => {
-      // tslint:disable-next-line: prefer-conditional-expression
-      if (
-        (context.changeViewPayloads[i]?.getDeserializedMessage<ChangeViewConsensusMessage>().newViewNumber ?? -1) >=
-        viewNumber
-      ) {
-        mutableLastChangeViewPayloads[i] = context.changeViewPayloads[i];
-      } else {
-        mutableLastChangeViewPayloads[i] = undefined;
-      }
-    });
-
-    const primaryIndex = getPrimaryIndex({ context, viewNumber });
-    const newBlockOptions = {
-      consensusData: {
-        primaryIndex,
-      },
-      merkleRoot: undefined,
-      timestamp: new BN(0),
-      transactions: undefined,
-    };
-
-    const preparationPayloads = _.range(context.validators.length).map(() => undefined);
-
-    const mutableLastSeenMessage = [...context.lastSeenMessage];
-    if (context.myIndex >= 0) {
-      mutableLastSeenMessage[context.myIndex] = utils.nullthrows(context.blockBuilder?.index);
+  const mutableLastChangeViewPayloads = [...context.lastChangeViewPayloads];
+  _.range(mutableLastChangeViewPayloads.length).forEach((i) => {
+    // tslint:disable-next-line: prefer-conditional-expression
+    if (
+      (context.changeViewPayloads[i]?.getDeserializedMessage<ChangeViewConsensusMessage>().newViewNumber ?? -1) >=
+      viewNumber
+    ) {
+      mutableLastChangeViewPayloads[i] = context.changeViewPayloads[i];
+    } else {
+      mutableLastChangeViewPayloads[i] = undefined;
     }
+  });
 
-    return {
-      context: context.clone({
-        viewNumber,
-        lastChangeViewPayloads: mutableLastChangeViewPayloads,
-        blockOptions: newBlockOptions,
-        transactionHashes: undefined,
-        preparationPayloads,
-        lastSeenMessage: mutableLastSeenMessage,
-      }),
-    };
+  const primaryIndex = getPrimaryIndex({ context, viewNumber });
+  const newBlockOptions = {
+    consensusData: {
+      primaryIndex,
+    },
+    merkleRoot: undefined,
+    timestamp: new BN(0),
+    transactions: undefined,
+  };
+
+  const preparationPayloads = _.range(context.validators.length).map(() => undefined);
+
+  const mutableLastSeenMessage = { ...context.lastSeenMessage };
+  if (context.myIndex >= 0) {
+    mutableLastSeenMessage[context.myIndex] = utils.nullthrows(context.blockBuilder?.index);
   }
+
+  return {
+    context: context.clone({
+      viewNumber,
+      lastChangeViewPayloads: mutableLastChangeViewPayloads,
+      blockOptions: newBlockOptions,
+      transactionHashes: undefined,
+      preparationPayloads,
+      lastSeenMessage: mutableLastSeenMessage,
+    }),
+  };
 };
 
-// TODO: not convinced we need to reload this that often
-export const saveContext = async (context: ConsensusContext) => {};
+export const saveContext = async (_context: ConsensusContext) => {
+  throw new Error('not implemented');
+};
 
-// TODO: pickup here, everything SHOULD be set up correctly, now we just need to
-// sort out how it all goes together and then starts
 export const getInitialContext = ({
   blockchain,
   publicKey,

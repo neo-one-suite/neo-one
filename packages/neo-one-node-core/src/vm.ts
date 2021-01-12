@@ -1,4 +1,4 @@
-import { Log, TriggerType, UInt160, UInt256, VMState } from '@neo-one/client-common';
+import { TriggerType, UInt160, UInt256, VMState } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { Block } from './Block';
 import { CallFlags } from './CallFlags';
@@ -6,6 +6,14 @@ import { Notification } from './Notification';
 import { SerializableContainer } from './Serializable';
 import { StackItem } from './StackItems';
 import { Transaction } from './transaction';
+
+export const executionLimits = {
+  maxShift: 256,
+  maxStackSize: 2 * 1024,
+  maxItemSize: 1024 * 1024,
+  maxInvocationStackSize: 1024,
+  maxTryNestingDepth: 16,
+};
 
 export interface VMLog {
   readonly containerHash?: UInt256;

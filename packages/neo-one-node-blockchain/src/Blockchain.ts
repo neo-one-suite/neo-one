@@ -449,6 +449,10 @@ export class Blockchain {
     return this.native.Policy.getFeePerByte(this.storage);
   }
 
+  public shouldRefreshCommittee(offset = 0): boolean {
+    return (this.currentBlockIndex + offset) % this.settings.committeeMembersCount === 0;
+  }
+
   public async persistBlock({
     block,
     verify = false,

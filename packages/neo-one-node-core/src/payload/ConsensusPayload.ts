@@ -32,7 +32,7 @@ export class ConsensusPayload extends UnsignedConsensusPayload implements Serial
     validators: readonly ECPoint[],
     messageMagic: number,
   ): ConsensusPayload {
-    const context = new ContractParametersContext(payload.getScriptHashesForVerifying(validators));
+    const context = new ContractParametersContext(payload.getScriptHashesForVerifyingFromValidators(validators));
     const hashData = getHashData(payload.serializeWire(), messageMagic);
     const publicKey = crypto.privateKeyToPublicKey(privateKey);
     const signatureContract = AccountContract.createSignatureContract(publicKey);
@@ -116,6 +116,12 @@ export class ConsensusPayload extends UnsignedConsensusPayload implements Serial
       return false;
     }
 
-    return options.verifyWitnesses(options.vm, this, options.storage, options.native, common.fixed8FromDecimal('0.02'));
+    return options.verifyWitnesses({
+      vm: options.vm,
+      verifiable: this,
+      storage: options.storage,
+      native: options.native,
+      gas: common.fixed8FromDecimal('0.02'),
+    });
   }
 }

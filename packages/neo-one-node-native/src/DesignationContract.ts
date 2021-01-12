@@ -1,13 +1,13 @@
-import { NativeContract } from './NativeContract';
+import { common, ECPoint } from '@neo-one/client-common';
 import {
-  NativeContractStorageContext,
-  utils,
-  StackItem,
   assertArrayStackItem,
   DesignationRole as Role,
+  NativeContractStorageContext,
+  StackItem,
+  utils,
 } from '@neo-one/node-core';
 import { map, toArray } from 'rxjs/operators';
-import { ECPoint, common } from '@neo-one/client-common';
+import { NativeContract } from './NativeContract';
 
 export class DesignationContract extends NativeContract {
   public constructor() {
@@ -30,7 +30,6 @@ export class DesignationContract extends NativeContract {
     index: number,
   ): Promise<readonly ECPoint[]> {
     if (height + 1 < index) {
-      // TODO: implement makeError
       throw new Error(`index: ${index} out of range for getDesignatedByRole.`);
     }
 

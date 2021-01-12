@@ -1,4 +1,4 @@
-import { common, ContractParameterTypeModel, ECPoint, SignatureString, UInt160 } from '@neo-one/client-common';
+import { common, ContractParameterTypeModel, ECPoint, UInt160 } from '@neo-one/client-common';
 import { constants } from '@neo-one/utils';
 import {
   ContractABIModel,
@@ -72,7 +72,7 @@ export const contractMethodDescriptorModel = (
   returnType: ContractParameterTypeModel = ContractParameterTypeModel.Void,
   name = 'function',
   offset = 0,
-) => new ContractMethodDescriptorModel({ name, parameters, returnType, offset });
+) => new ContractMethodDescriptorModel({ name, parameters, returnType, offset, safe: true });
 
 export const contractEventDescriptorModel = (
   parameters: readonly ContractParameterDefinitionModel[] = [contractParamDefinitionModel.boolean],
@@ -117,6 +117,7 @@ export const contractManifestModel = (
   supportedStandards: readonly string[] = [],
 ) => new ContractManifestModel({ groups, supportedStandards, abi, permissions, trusts });
 
+// TODO: fixup
 export const contractModel = (
   id = 1,
   script: Buffer = Buffer.alloc(25),

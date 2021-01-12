@@ -415,7 +415,7 @@ export const createHandler = ({
     },
     [RPC_METHODS.getcontractstate]: async (args) => {
       const hash = JSONHelper.readUInt160(args[0]);
-      const contract = await blockchain.contracts.tryGet(hash);
+      const contract = await native.Management.getContract({ storages: blockchain.storages }, hash);
       if (contract === undefined) {
         throw new JSONRPCError(-100, 'Unknown contract');
       }
@@ -463,7 +463,7 @@ export const createHandler = ({
     },
     [RPC_METHODS.getstorage]: async (args) => {
       const hash = JSONHelper.readUInt160(args[0]);
-      const state = await blockchain.contracts.tryGet(hash);
+      const state = await native.Management.getContract({ storages: blockchain.storages }, hash);
       if (state === undefined) {
         return undefined;
       }
@@ -701,7 +701,10 @@ export const createHandler = ({
       const storedBalances = await blockchain.nep5Balances.find$(scriptHash).pipe(toArray()).toPromise();
       const validBalances = await Promise.all(
         storedBalances.map(async ({ key, value }) => {
-          const assetStillExists = await blockchain.contracts.tryGet(key.assetScriptHash);
+          const assetStillExists = await native.Management.getContract(
+            { storages: blockchain.storages },
+            key.assetScriptHash,
+          );
           if (!assetStillExists) {
             return undefined;
           }
@@ -779,7 +782,7 @@ export const createHandler = ({
       if (hash.equals(NEO) || hash.equals(GAS) || hash.equals(Policy)) {
         throw new Error("Can't get all storage for native contracts.");
       }
-      const contract = await blockchain.contracts.tryGet(hash);
+      const contract = await native.Management.getContract({ storages: blockchain.storages }, hash);
       if (contract === undefined) {
         return [];
       }

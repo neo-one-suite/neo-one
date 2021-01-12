@@ -1,4 +1,4 @@
-import { AddChange, Change, ChangeSet, DeleteChange, ReadMetadataStorage, ReadStorage } from '@neo-one/node-core';
+import { AddChange, Change, ChangeSet, DeleteChange, ReadStorage } from '@neo-one/node-core';
 
 interface DeleteMetadataTrackedChanged {
   readonly type: 'delete';
@@ -15,10 +15,6 @@ interface DeleteTrackedChange<Key> extends DeleteMetadataTrackedChanged {
 interface AddTrackedChange<Key, Value> extends AddMetadataTrackedChange<Value> {
   readonly key: Key;
 }
-
-type TrackedMetadataChange<Value = undefined> = Value extends undefined
-  ? DeleteMetadataTrackedChanged
-  : AddMetadataTrackedChange<Value>;
 
 type TrackedChange<Key, Value> = DeleteTrackedChange<Key> | AddTrackedChange<Key, Value>;
 

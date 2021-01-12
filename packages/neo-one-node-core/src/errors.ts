@@ -1,4 +1,4 @@
-import { OracleResponseCode } from '@neo-one/client-common';
+import { OracleResponseCode, UInt256Hex } from '@neo-one/client-common';
 import { makeErrorWithCode } from '@neo-one/utils';
 
 // tslint:disable-next-line export-name
@@ -79,4 +79,13 @@ export const InvalidOracleResultError = makeErrorWithCode(
   'INVALID_ORACLE_RESULT_ERROR',
   (code: OracleResponseCode, resultLength: number) =>
     `Expected result.length to be 0 with response code ${OracleResponseCode[code]}, found: ${resultLength}`,
+);
+export const InvalidValidatorsError = makeErrorWithCode(
+  'INVALID_VALIDATORS_ERROR',
+  (length: number, index: number) =>
+    `Validator index out of range when getting scriptHashes, found length ${length} but need index: ${index}.`,
+);
+export const InvalidPreviousHeaderError = makeErrorWithCode(
+  'INVALID_PREVIOUS_HEADER_ERROR',
+  (hash: UInt256Hex) => `previous header hash ${hash} did not return a valid Header from storage`,
 );

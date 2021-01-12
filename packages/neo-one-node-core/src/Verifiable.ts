@@ -7,11 +7,16 @@ import { SnapshotName, VM } from './vm';
 import { Witness } from './Witness';
 
 export const maxVerificationGas = common.fixed8FromDecimal('0.5');
+
+export interface GetScriptHashesContext {
+  readonly storage: BlockchainStorage;
+  readonly native: NativeContainer;
+}
+
 export interface Verifiable {
-  readonly getScriptHashesForVerifying: (context: {
-    readonly storage: BlockchainStorage;
-    readonly native: NativeContainer;
-  }) => Promise<readonly UInt160[]> | readonly UInt160[];
+  readonly getScriptHashesForVerifying: (
+    context: GetScriptHashesContext,
+  ) => Promise<readonly UInt160[]> | readonly UInt160[];
   readonly witnesses: readonly Witness[];
 }
 
