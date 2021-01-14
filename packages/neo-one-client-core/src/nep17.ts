@@ -30,7 +30,6 @@ export interface NEP17TransferEvent extends Event<'transfer', NEP17TransferEvent
 export interface NEP17SmartContract<TClient extends Client = Client> extends SmartContract<TClient, NEP17Event> {
   readonly balanceOf: (address: AddressString, options?: SmartContractReadOptions) => Promise<BigNumber>;
   readonly decimals: (options?: SmartContractReadOptions) => Promise<BigNumber>;
-  readonly name: (options?: SmartContractReadOptions) => Promise<string>;
   readonly owner: (options?: SmartContractReadOptions) => Promise<AddressString>;
   readonly symbol: (options?: SmartContractReadOptions) => Promise<string>;
   readonly totalSupply: (options?: SmartContractReadOptions) => Promise<BigNumber>;

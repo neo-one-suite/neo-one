@@ -14,6 +14,8 @@ interface TokenPayableContract {
   readonly onRevokeSendTransfer: (from: Address, amount: Fixed<0>, asset: Address) => void;
 }
 
+// TODO: this whole definition will need to be updated to actually meet the current standard
+// see https://github.com/neo-project/proposals/pull/126
 export function NEP17Token<TBase extends Constructor<SmartContract>>(Base: TBase) {
   abstract class NEP17TokenClass extends Base {
     public abstract readonly name: string;
