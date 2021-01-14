@@ -24,7 +24,7 @@ import {
   Header,
   Mempool,
   NativeContainer,
-  Nep5Balance,
+  Nep17Balance,
   Notification,
   RunEngineOptions,
   Signers,
@@ -46,7 +46,7 @@ import {
   GenesisBlockNotRegisteredError,
   RecoverBlockchainError,
 } from './errors';
-import { getNep5UpdateOptions } from './getNep5UpdateOptions';
+import { getNep17UpdateOptions } from './getNep17UpdateOptions';
 import { HeaderIndexCache } from './HeaderIndexCache';
 import { PersistingBlockchain } from './PersistingBlockchain';
 import { utils } from './utils';
@@ -256,16 +256,16 @@ export class Blockchain {
     return this.storage.blocks;
   }
 
-  public get nep5Balances() {
-    return this.storage.nep5Balances;
+  public get nep17Balances() {
+    return this.storage.nep17Balances;
   }
 
-  public get nep5TransfersReceived() {
-    return this.storage.nep5TransfersReceived;
+  public get nep17TransfersReceived() {
+    return this.storage.nep17TransfersReceived;
   }
 
-  public get nep5TransfersSent() {
-    return this.storage.nep5TransfersSent;
+  public get nep17TransfersSent() {
+    return this.storage.nep17TransfersSent;
   }
 
   public get applicationLogs() {
@@ -649,32 +649,32 @@ export class Blockchain {
     return [updateBlockHashIndex, updateHeaderHashIndex];
   }
 
-  private updateNep5Balances({
+  private updateNep17Balances({
     applicationsExecuted,
     block,
   }: {
     readonly applicationsExecuted: readonly ApplicationExecuted[];
     readonly block: Block;
   }) {
-    const { assetKeys, transfersSent, transfersReceived } = getNep5UpdateOptions({
+    const { assetKeys, transfersSent, transfersReceived } = getNep17UpdateOptions({
       applicationsExecuted,
       block,
     });
 
-    const nep5BalancePairs = assetKeys.map((key) => {
+    const nep17BalancePairs = assetKeys.map((key) => {
       const script = new ScriptBuilder().emitAppCall(key.assetScriptHash, 'balanceOf', key.userScriptHash).build();
       const callReceipt = this.invokeScript(script);
       const balanceBuffer = callReceipt.stack[0].getInteger().toBuffer();
 
-      return { key, value: new Nep5Balance({ balanceBuffer, lastUpdatedBlock: this.currentBlockIndex }) };
+      return { key, value: new Nep17Balance({ balanceBuffer, lastUpdatedBlock: this.currentBlockIndex }) };
     });
 
-    const nep5BalanceChangeSet: ChangeSet = nep5BalancePairs.map(({ key, value }) => {
+    const nep17BalanceChangeSet: ChangeSet = nep17BalancePairs.map(({ key, value }) => {
       if (value.balance.eqn(0)) {
         return {
           type: 'delete',
           change: {
-            type: 'nep5Balance',
+            type: 'nep17Balance',
             key,
           },
         };
@@ -683,7 +683,7 @@ export class Blockchain {
       return {
         type: 'add',
         change: {
-          type: 'nep5Balance',
+          type: 'nep17Balance',
           key,
           value,
         },
@@ -691,27 +691,27 @@ export class Blockchain {
       };
     });
 
-    const nep5TransfersSentChangeSet: ChangeSet = transfersSent.map(({ key, value }) => ({
+    const nep17TransfersSentChangeSet: ChangeSet = transfersSent.map(({ key, value }) => ({
       type: 'add',
       subType: 'add',
       change: {
-        type: 'nep5TransferSent',
+        type: 'nep17TransferSent',
         key,
         value,
       },
     }));
 
-    const nep5TransfersReceivedChangeSet: ChangeSet = transfersReceived.map(({ key, value }) => ({
+    const nep17TransfersReceivedChangeSet: ChangeSet = transfersReceived.map(({ key, value }) => ({
       type: 'add',
       subType: 'add',
       change: {
-        type: 'nep5TransferReceived',
+        type: 'nep17TransferReceived',
         key,
         value,
       },
     }));
 
-    return nep5BalanceChangeSet.concat(nep5TransfersReceivedChangeSet, nep5TransfersSentChangeSet);
+    return nep17BalanceChangeSet.concat(nep17TransfersReceivedChangeSet, nep17TransfersSentChangeSet);
   }
 
   private updateApplicationLogs({
@@ -772,8 +772,8 @@ export class Blockchain {
     const blockMetadataBatch = this.updateBlockMetadata(block);
     await this.storage.commit(blockMetadataBatch);
 
-    const nep5Updates = this.updateNep5Balances({ applicationsExecuted, block });
-    await this.storage.commit(nep5Updates);
+    const nep17Updates = this.updateNep17Balances({ applicationsExecuted, block });
+    await this.storage.commit(nep17Updates);
 
     const applicationLogUpdates = this.updateApplicationLogs({ applicationsExecuted, block });
     await this.storage.commit(applicationLogUpdates);

@@ -1,6 +1,6 @@
 // tslint:disable no-object-mutation
 import styled from '@emotion/styled';
-import { nep5 } from '@neo-one/client-core';
+import { nep17 } from '@neo-one/client-core';
 import { Box, usePrevious, useStream } from '@neo-one/react-common';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
@@ -75,7 +75,7 @@ export function BalanceSelector() {
       accountState$.pipe(filter(utils.notNull)).pipe(
         switchMap(async ({ currentUserAccount, account }) => {
           if (asset.type === 'token') {
-            const smartContract = nep5.createNEP5SmartContract(
+            const smartContract = nep17.createNEP17SmartContract(
               client,
               { [asset.token.network]: { address: asset.token.address } },
               asset.token.decimals,

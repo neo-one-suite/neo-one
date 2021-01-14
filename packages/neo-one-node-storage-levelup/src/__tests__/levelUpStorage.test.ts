@@ -2,8 +2,8 @@ import { common } from '@neo-one/client-common';
 import {
   AddChange,
   DeleteChange,
-  Nep5Balance,
-  Nep5BalanceKey,
+  Nep17Balance,
+  Nep17BalanceKey,
   Storage,
   StorageItem,
   StorageKey,
@@ -16,7 +16,7 @@ import { storage as levelUpStorage } from '../';
 describe('levelUpStorage', () => {
   let storage: Storage;
   beforeEach(async () => {
-    storage = levelUpStorage({ db: LevelUp(MemDown()), context: { messageMagic: 1953787457 } });
+    storage = levelUpStorage({ db: LevelUp(MemDown()), context: { messageMagic: 1953787457, validatorsCount: 7 } });
   });
   test('deleted items are undefined', async () => {
     const hash = common.bufferToUInt160(Buffer.from('3775292229eccdf904f16fff8e83e7cffdc0f0ce', 'hex'));
@@ -51,23 +51,23 @@ describe('levelUpStorage', () => {
     expect(thirdGet).toEqual(undefined);
   });
 
-  test('Can add and retrieve Nep5Balance', async () => {
-    const value = new Nep5Balance({ balanceBuffer: new BN(10).toBuffer('le'), lastUpdatedBlock: 1 });
-    const key = new Nep5BalanceKey({
+  test('Can add and retrieve Nep17Balance', async () => {
+    const value = new Nep17Balance({ balanceBuffer: new BN(10).toBuffer('le'), lastUpdatedBlock: 1 });
+    const key = new Nep17BalanceKey({
       userScriptHash: common.bufferToUInt160(Buffer.from('3775292229eccdf904f16fff8e83e7cffdc0f0ce', 'hex')),
       assetScriptHash: common.bufferToUInt160(Buffer.from('3775292229eccdf904f16fff8e83e7cffdc0f0ce', 'hex')),
     });
 
     const addChange: AddChange = {
-      type: 'nep5Balance',
+      type: 'nep17Balance',
       key,
       value,
     };
 
-    const firstGet = await storage.nep5Balances.tryGet(key);
+    const firstGet = await storage.nep17Balances.tryGet(key);
     expect(firstGet).toBeUndefined();
     await storage.commit([{ type: 'add', change: addChange, subType: 'add' }]);
-    const secondGet = await storage.nep5Balances.tryGet(key);
+    const secondGet = await storage.nep17Balances.tryGet(key);
     expect(secondGet).toBeDefined();
     expect(secondGet?.balance.toString()).toEqual('10');
     expect(secondGet?.lastUpdatedBlock).toEqual(1);

@@ -1,17 +1,17 @@
-import { createSerializeWire, IOHelper, Nep5TransferModel, UInt160, UInt256 } from '@neo-one/client-common';
+import { createSerializeWire, IOHelper, Nep17TransferModel, UInt160, UInt256 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from './Serializable';
 import { BinaryReader, utils } from './utils';
 
-export interface Nep5TransferAdd {
+export interface Nep17TransferAdd {
   readonly userScriptHash: UInt160;
   readonly blockIndex: number;
   readonly txHash: UInt256;
   readonly amountBuffer: Buffer;
 }
 
-export class Nep5Transfer extends Nep5TransferModel {
-  public static deserializeWireBase(options: DeserializeWireBaseOptions): Nep5Transfer {
+export class Nep17Transfer extends Nep17TransferModel {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): Nep17Transfer {
     const { reader } = options;
     const userScriptHash = reader.readUInt160();
     const blockIndex = reader.readUInt32LE();
@@ -26,7 +26,7 @@ export class Nep5Transfer extends Nep5TransferModel {
     });
   }
 
-  public static deserializeWire(options: DeserializeWireOptions): Nep5Transfer {
+  public static deserializeWire(options: DeserializeWireOptions): Nep17Transfer {
     return this.deserializeWireBase({
       context: options.context,
       reader: new BinaryReader(options.buffer),
@@ -51,7 +51,7 @@ export class Nep5Transfer extends Nep5TransferModel {
   }
 
   public clone() {
-    return new Nep5Transfer({
+    return new Nep17Transfer({
       userScriptHash: this.userScriptHash,
       blockIndex: this.blockIndex,
       txHash: this.txHash,

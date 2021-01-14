@@ -270,7 +270,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
   }
 
   public async getAccount(address: AddressString): Promise<Account> {
-    const balances = await this.mutableClient.getNep5Balances(address);
+    const balances = await this.mutableClient.getNep17Balances(address);
 
     return {
       address,

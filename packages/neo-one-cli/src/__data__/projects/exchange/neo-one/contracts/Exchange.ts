@@ -40,7 +40,7 @@ const notifyFilled = createEventNotifier<Address, Hash256, Fixed8, Address, Fixe
   'amountToTake',
 );
 
-interface NEP5 {
+interface NEP17 {
   readonly transfer: (from: Address, to: Address, amount: Fixed8) => boolean;
 }
 
@@ -81,22 +81,22 @@ export class Exchange extends SmartContract {
     return this.offers.get(offerHash);
   }
 
-  public depositNEP5(from: Address, assetID: Address, amount: Fixed8): void {
+  public depositNEP17(from: Address, assetID: Address, amount: Fixed8): void {
     if (!Address.isCaller(from)) throw new Error('Caller was not the sender!');
     if (amount < 1) throw new Error('Amount must be greater than 0!');
 
-    this.transferNEP5(from, this.address, assetID, amount);
+    this.transferNEP17(from, this.address, assetID, amount);
     this.balances.set([from, assetID], this.balanceOf(from, assetID) + amount);
     notifyDeposited(from, assetID, amount);
   }
 
-  public withdrawNEP5(from: Address, assetID: Address, amount: Fixed8): void {
+  public withdrawNEP17(from: Address, assetID: Address, amount: Fixed8): void {
     if (amount < 0) throw new Error(`Amount must be greater than 0: ${amount}`);
     const balance = this.balanceOf(from, assetID);
     if (balance < amount) throw new Error(`Not enough Balance to withdraw ${amount}!`);
     if (!Address.isCaller(from)) throw new Error('Caller is not authorized to withdraw funds!');
 
-    this.transferNEP5(this.address, from, assetID, amount);
+    this.transferNEP17(this.address, from, assetID, amount);
     this.balances.set([from, assetID], this.balanceOf(from, assetID) - amount);
     notifyWithdrawn(from, assetID, amount);
   }
@@ -309,9 +309,9 @@ export class Exchange extends SmartContract {
     return crypto.hash256(offerBuffer);
   }
 
-  private transferNEP5(from: Address, to: Address, assetID: Address, amount: Fixed8): void {
-    const nep5Asset = SmartContract.for<NEP5>(assetID);
-    if (!nep5Asset.transfer(from, to, amount)) {
+  private transferNEP17(from: Address, to: Address, assetID: Address, amount: Fixed8): void {
+    const nep17Asset = SmartContract.for<NEP17>(assetID);
+    if (!nep17Asset.transfer(from, to, amount)) {
       throw new Error('Failed to transfer NEP-5 tokens!');
     }
   }

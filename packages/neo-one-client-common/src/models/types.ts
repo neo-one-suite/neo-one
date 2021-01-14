@@ -408,24 +408,24 @@ export interface ContractJSON {
   readonly manifest: ContractManifestJSON;
 }
 
-export interface Nep5TransfersJSON {
+export interface Nep17TransfersJSON {
   readonly address: string;
-  readonly received: readonly Nep5TransferJSON[];
-  readonly sent: readonly Nep5TransferJSON[];
+  readonly received: readonly Nep17TransferJSON[];
+  readonly sent: readonly Nep17TransferJSON[];
 }
 
-export interface Nep5BalancesJSON {
+export interface Nep17BalancesJSON {
   readonly address: string;
-  readonly balance: readonly Nep5BalanceJSON[];
+  readonly balance: readonly Nep17BalanceJSON[];
 }
 
-export interface Nep5BalanceJSON {
+export interface Nep17BalanceJSON {
   readonly assethash: string;
   readonly amount: string;
   readonly lastupdatedblock: number;
 }
 
-export interface Nep5TransferJSON {
+export interface Nep17TransferJSON {
   readonly timestamp: number;
   readonly assethash: string;
   readonly transferaddress: string;

@@ -69,7 +69,7 @@ const checkBalances = async ({
   expect(tokensDeposited.toString()).toEqual(expected.tokensOnExchange);
 };
 
-const depositNEP5 = async ({
+const depositNEP17 = async ({
   token,
   tokenAssetID,
   exchange,
@@ -97,7 +97,7 @@ const depositNEP5 = async ({
   expect(approveDepositReceipt.result.value).toEqual(true);
 
   const [exchangeDepositReceipt] = await Promise.all([
-    exchange.depositNEP5.confirmed(from.address, tokenAssetID, amount, { from }),
+    exchange.depositNEP17.confirmed(from.address, tokenAssetID, amount, { from }),
     developerClient.runConsensusNow(),
   ]);
   expect(exchangeDepositReceipt.result.state).toEqual('HALT');
@@ -107,7 +107,7 @@ const depositNEP5 = async ({
   await checkBalances({ token, tokenAssetID, from, exchange, exchangeAddress, expected });
 };
 
-const withdrawNEP5 = async ({
+const withdrawNEP17 = async ({
   token,
   tokenAssetID,
   exchange,
@@ -127,7 +127,7 @@ const withdrawNEP5 = async ({
   readonly developerClient: DeveloperClient;
 }) => {
   const [exchangeWithdrawalReceipt] = await Promise.all([
-    exchange.withdrawNEP5.confirmed(from.address, tokenAssetID, amount, { from }),
+    exchange.withdrawNEP17.confirmed(from.address, tokenAssetID, amount, { from }),
     developerClient.runConsensusNow(),
   ]);
   expect(exchangeWithdrawalReceipt.result.state).toEqual('HALT');
@@ -137,7 +137,7 @@ const withdrawNEP5 = async ({
   await checkBalances({ token, tokenAssetID, from, exchange, exchangeAddress, expected });
 };
 
-const verifyNEP5NEP5Exchange = async ({
+const verifyNEP17NEP17Exchange = async ({
   token,
   tokenAssetID,
   coin,
@@ -158,7 +158,7 @@ const verifyNEP5NEP5Exchange = async ({
   readonly toAccountID: UserAccountID;
   readonly developerClient: DeveloperClient;
 }) => {
-  await depositNEP5({
+  await depositNEP17({
     token,
     tokenAssetID,
     exchange,
@@ -169,7 +169,7 @@ const verifyNEP5NEP5Exchange = async ({
     developerClient,
   });
 
-  await withdrawNEP5({
+  await withdrawNEP17({
     token,
     tokenAssetID,
     exchange,
@@ -187,7 +187,7 @@ const verifyNEP5NEP5Exchange = async ({
   );
   expect(coinTransferReceipt.result.value).toEqual(true);
 
-  await depositNEP5({
+  await depositNEP17({
     token: coin,
     tokenAssetID: coinAssetID,
     exchange,
@@ -300,7 +300,7 @@ const verifyExchangeContractTesting = async (codegenPath: string) => {
       const coinAssetID = coin.definition.networks[masterAccountID.network].address;
       const exchangeAddress = exchange.definition.networks[masterAccountID.network].address;
 
-      await verifyNEP5NEP5Exchange({
+      await verifyNEP17NEP17Exchange({
         token,
         tokenAssetID,
         coin,

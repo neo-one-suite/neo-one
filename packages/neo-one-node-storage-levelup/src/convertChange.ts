@@ -12,29 +12,29 @@ import { UnknownChangeTypeError, UnknownTypeError } from './errors';
 
 const convertAddChange = (change: AddChange): readonly PutBatch[] => {
   switch (change.type) {
-    case 'nep5Balance':
+    case 'nep17Balance':
       return [
         {
           type: 'put',
-          key: keys.createNep5BalanceKey(change.key),
+          key: keys.createNep17BalanceKey(change.key),
           value: change.value.serializeWire(),
         },
       ];
 
-    case 'nep5TransferReceived':
+    case 'nep17TransferReceived':
       return [
         {
           type: 'put',
-          key: keys.createNep5TransferReceivedKey(change.key),
+          key: keys.createNep17TransferReceivedKey(change.key),
           value: change.value.serializeWire(),
         },
       ];
 
-    case 'nep5TransferSent':
+    case 'nep17TransferSent':
       return [
         {
           type: 'put',
-          key: keys.createNep5TransferSentKey(change.key),
+          key: keys.createNep17TransferSentKey(change.key),
           value: change.value.serializeWire(),
         },
       ];
@@ -140,10 +140,10 @@ const convertDeleteChange = (change: DeleteChange): DelBatch => {
         key: keys.createStorageKey(change.key),
       };
 
-    case 'nep5Balance':
+    case 'nep17Balance':
       return {
         type: 'del',
-        key: keys.createNep5BalanceKey(change.key),
+        key: keys.createNep17BalanceKey(change.key),
       };
 
     default:

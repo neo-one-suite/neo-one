@@ -19,8 +19,8 @@ import {
   CallReceipt,
   getEndpointConfig,
   NativeContainer,
-  Nep5Transfer,
-  Nep5TransferKey,
+  Nep17Transfer,
+  Nep17TransferKey,
   Node,
   Signers,
   StackItem,
@@ -113,9 +113,9 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   sendmany: 'sendmany',
   sendtoaddress: 'sendtoaddress',
 
-  // NEP5
-  getnep5transfers: 'getnep5transfers',
-  getnep5balances: 'getnep5balances',
+  // NEP17
+  getnep17transfers: 'getnep17transfers',
+  getnep17balances: 'getnep17balances',
 
   // TODO: I want to say both of these can be removed since you can make changes to policy contract storage
   updatesettings: 'updatesettings',
@@ -140,7 +140,7 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   INVALID: 'INVALID',
 };
 
-const mapToTransfers = ({ key, value }: { readonly key: Nep5TransferKey; readonly value: Nep5Transfer }) => ({
+const mapToTransfers = ({ key, value }: { readonly key: Nep17TransferKey; readonly value: Nep17Transfer }) => ({
   timestamp: key.timestampMS.toNumber(),
   assethash: common.uInt160ToString(key.assetScriptHash),
   transferaddress: scriptHashToAddress(common.uInt160ToString(value.userScriptHash)),
@@ -659,8 +659,8 @@ export const createHandler = ({
       throw new JSONRPCError(-101, 'Not implemented');
     },
 
-    // Nep5
-    [RPC_METHODS.getnep5transfers]: async (args) => {
+    // Nep17
+    [RPC_METHODS.getnep17transfers]: async (args) => {
       const addressVersion = blockchain.settings.addressVersion;
       const { address, scriptHash } = getScriptHashAndAddress(args[0], addressVersion);
 
@@ -678,11 +678,11 @@ export const createHandler = ({
       const gte = Buffer.concat([scriptHash, startTimeBytes]);
       const lte = Buffer.concat([scriptHash, endTimeBytes]);
 
-      const sentPromise = blockchain.nep5TransfersSent
+      const sentPromise = blockchain.nep17TransfersSent
         .find$(gte, lte)
         .pipe(take(1000), map(mapToTransfers), toArray())
         .toPromise();
-      const receivedPromise = blockchain.nep5TransfersReceived
+      const receivedPromise = blockchain.nep17TransfersReceived
         .find$(gte, lte)
         .pipe(take(1000), map(mapToTransfers), toArray())
         .toPromise();
@@ -695,10 +695,10 @@ export const createHandler = ({
         address,
       };
     },
-    [RPC_METHODS.getnep5balances]: async (args) => {
+    [RPC_METHODS.getnep17balances]: async (args) => {
       const addressVersion = blockchain.settings.addressVersion;
       const { address, scriptHash } = getScriptHashAndAddress(args[0], addressVersion);
-      const storedBalances = await blockchain.nep5Balances.find$(scriptHash).pipe(toArray()).toPromise();
+      const storedBalances = await blockchain.nep17Balances.find$(scriptHash).pipe(toArray()).toPromise();
       const validBalances = await Promise.all(
         storedBalances.map(async ({ key, value }) => {
           const assetStillExists = await native.Management.getContract(

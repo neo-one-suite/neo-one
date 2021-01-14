@@ -4,35 +4,35 @@ import {
   Block,
   isByteStringStackItem,
   isIntegerStackItem,
-  Nep5BalanceKey,
-  Nep5Transfer,
-  Nep5TransferKey,
+  Nep17BalanceKey,
+  Nep17Transfer,
+  Nep17TransferKey,
 } from '@neo-one/node-core';
 import { utils } from './utils';
 
-export interface Nep5TransferReturn {
-  readonly key: Nep5TransferKey;
-  readonly value: Nep5Transfer;
+export interface Nep17TransferReturn {
+  readonly key: Nep17TransferKey;
+  readonly value: Nep17Transfer;
 }
 
-export interface Nep5UpdateOptions {
-  readonly assetKeys: readonly Nep5BalanceKey[];
-  readonly transfersSent: readonly Nep5TransferReturn[];
-  readonly transfersReceived: readonly Nep5TransferReturn[];
+export interface Nep17UpdateOptions {
+  readonly assetKeys: readonly Nep17BalanceKey[];
+  readonly transfersSent: readonly Nep17TransferReturn[];
+  readonly transfersReceived: readonly Nep17TransferReturn[];
 }
 
-export function getNep5UpdateOptions({
+export function getNep17UpdateOptions({
   applicationsExecuted,
   block,
 }: {
   readonly applicationsExecuted: readonly ApplicationExecuted[];
   readonly block: Block;
-}): Nep5UpdateOptions {
+}): Nep17UpdateOptions {
   let transferIndex = 0;
-  const nep5BalancesChanged = new Set<string>();
-  const mutableNep5BalancesChangedKeys: Nep5BalanceKey[] = [];
-  const mutableTransfersSent: Nep5TransferReturn[] = [];
-  const mutableTransfersReceived: Nep5TransferReturn[] = [];
+  const nep17BalancesChanged = new Set<string>();
+  const mutableNep17BalancesChangedKeys: Nep17BalanceKey[] = [];
+  const mutableTransfersSent: Nep17TransferReturn[] = [];
+  const mutableTransfersReceived: Nep17TransferReturn[] = [];
 
   applicationsExecuted.forEach((appExecuted) => {
     if (appExecuted.state === VMState.FAULT) {
@@ -77,26 +77,26 @@ export function getNep5UpdateOptions({
 
       if (fromBytes !== undefined) {
         from = common.bufferToUInt160(fromBytes);
-        const fromKey = new Nep5BalanceKey({ userScriptHash: from, assetScriptHash: scriptHash });
+        const fromKey = new Nep17BalanceKey({ userScriptHash: from, assetScriptHash: scriptHash });
         const fromKeyString = fromKey.serializeWire().toString('hex');
         // No need to check address balance for every single transfer. Just need to check new balances for
         // addresses that we know have transferred assets
 
-        // mutableNep5BalancesChangedKeys will be used to run scripts to check storage for new balance of each address
+        // mutableNep17BalancesChangedKeys will be used to run scripts to check storage for new balance of each address
         // whose balance we know has changed based on the transfers we know happened
-        if (!nep5BalancesChanged.has(fromKeyString)) {
-          nep5BalancesChanged.add(fromKeyString);
-          mutableNep5BalancesChangedKeys.push(fromKey);
+        if (!nep17BalancesChanged.has(fromKeyString)) {
+          nep17BalancesChanged.add(fromKeyString);
+          mutableNep17BalancesChangedKeys.push(fromKey);
         }
       }
 
       if (toBytes !== undefined) {
         to = common.bufferToUInt160(toBytes);
-        const toKey = new Nep5BalanceKey({ userScriptHash: to, assetScriptHash: scriptHash });
+        const toKey = new Nep17BalanceKey({ userScriptHash: to, assetScriptHash: scriptHash });
         const toKeyString = toKey.serializeWire().toString('hex');
-        if (!nep5BalancesChanged.has(toKeyString)) {
-          nep5BalancesChanged.add(toKeyString);
-          mutableNep5BalancesChangedKeys.push(toKey);
+        if (!nep17BalancesChanged.has(toKeyString)) {
+          nep17BalancesChanged.add(toKeyString);
+          mutableNep17BalancesChangedKeys.push(toKey);
         }
       }
 
@@ -106,13 +106,13 @@ export function getNep5UpdateOptions({
 
         if (!from.equals(common.ZERO_UINT160)) {
           mutableTransfersSent.push({
-            key: new Nep5TransferKey({
+            key: new Nep17TransferKey({
               userScriptHash: from,
               timestampMS: block.timestamp,
               assetScriptHash: scriptHash,
               blockTransferNotificationIndex: transferIndex,
             }),
-            value: new Nep5Transfer({
+            value: new Nep17Transfer({
               userScriptHash: to,
               txHash,
               blockIndex: block.index,
@@ -123,13 +123,13 @@ export function getNep5UpdateOptions({
 
         if (!to.equals(common.ZERO_UINT160)) {
           mutableTransfersReceived.push({
-            key: new Nep5TransferKey({
+            key: new Nep17TransferKey({
               userScriptHash: to,
               timestampMS: block.timestamp,
               assetScriptHash: scriptHash,
               blockTransferNotificationIndex: transferIndex,
             }),
-            value: new Nep5Transfer({
+            value: new Nep17Transfer({
               userScriptHash: from,
               txHash,
               blockIndex: block.index,
@@ -144,7 +144,7 @@ export function getNep5UpdateOptions({
   });
 
   return {
-    assetKeys: mutableNep5BalancesChangedKeys,
+    assetKeys: mutableNep17BalancesChangedKeys,
     transfersSent: mutableTransfersSent,
     transfersReceived: mutableTransfersReceived,
   };

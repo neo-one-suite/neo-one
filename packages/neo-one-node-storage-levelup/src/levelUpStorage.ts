@@ -9,10 +9,10 @@ import {
   HashIndexState,
   HeaderHashList,
   // TransactionData,
-  Nep5Balance,
-  Nep5BalanceKey,
-  Nep5Transfer,
-  Nep5TransferKey,
+  Nep17Balance,
+  Nep17BalanceKey,
+  Nep17Transfer,
+  Nep17TransferKey,
   Storage,
   StorageItem,
   StorageKey,
@@ -86,41 +86,41 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
   return {
     blocks,
 
-    nep5Balances: read.createReadAllFindStorage({
+    nep17Balances: read.createReadAllFindStorage({
       db,
-      searchRange: keys.getAllNep5BalanceSearchRange,
-      getSearchRange: keys.getNep5BalanceSearchRange,
-      serializeKey: keys.createNep5BalanceKey,
+      searchRange: keys.getAllNep17BalanceSearchRange,
+      getSearchRange: keys.getNep17BalanceSearchRange,
+      serializeKey: keys.createNep17BalanceKey,
       deserializeValue: (buffer) =>
-        Nep5Balance.deserializeWire({
+        Nep17Balance.deserializeWire({
           context,
           buffer,
         }),
-      deserializeKey: (buffer) => Nep5BalanceKey.deserializeWire({ context, buffer }),
+      deserializeKey: (buffer) => Nep17BalanceKey.deserializeWire({ context, buffer }),
     }),
 
-    nep5TransfersReceived: read.createReadFindStorage({
+    nep17TransfersReceived: read.createReadFindStorage({
       db,
-      getSearchRange: keys.getNep5TransferReceivedSearchRange,
-      serializeKey: keys.createNep5TransferReceivedKey,
+      getSearchRange: keys.getNep17TransferReceivedSearchRange,
+      serializeKey: keys.createNep17TransferReceivedKey,
       deserializeValue: (buffer) =>
-        Nep5Transfer.deserializeWire({
+        Nep17Transfer.deserializeWire({
           context,
           buffer,
         }),
-      deserializeKey: (buffer) => Nep5TransferKey.deserializeWire({ context, buffer }),
+      deserializeKey: (buffer) => Nep17TransferKey.deserializeWire({ context, buffer }),
     }),
 
-    nep5TransfersSent: read.createReadFindStorage({
+    nep17TransfersSent: read.createReadFindStorage({
       db,
-      getSearchRange: keys.getNep5TransferSentSearchRange,
-      serializeKey: keys.createNep5TransferSentKey,
+      getSearchRange: keys.getNep17TransferSentSearchRange,
+      serializeKey: keys.createNep17TransferSentKey,
       deserializeValue: (buffer) =>
-        Nep5Transfer.deserializeWire({
+        Nep17Transfer.deserializeWire({
           context,
           buffer,
         }),
-      deserializeKey: (buffer) => Nep5TransferKey.deserializeWire({ context, buffer }),
+      deserializeKey: (buffer) => Nep17TransferKey.deserializeWire({ context, buffer }),
     }),
 
     applicationLogs: read.createReadStorage({

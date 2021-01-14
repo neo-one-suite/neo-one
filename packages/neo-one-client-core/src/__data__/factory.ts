@@ -78,7 +78,7 @@ import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
 import { ContractEventDescriptor, ContractMethodDescriptor } from '../../../neo-one-node-core/src/manifest';
 import { Hash160 } from '../Hash160';
-import * as nep5 from '../nep5';
+import * as nep17 from '../nep17';
 import { LockedWallet, UnlockedWallet } from '../user';
 import { data } from './data';
 import { keys } from './keys';
@@ -724,7 +724,7 @@ const createStringABIParameter = (options: Partial<StringABIParameter> = {}): St
 });
 
 const createABI = (options: Partial<ContractABI> = {}): ContractABI => ({
-  ...nep5.abi(8),
+  ...nep17.abi(8),
   ...options,
 });
 

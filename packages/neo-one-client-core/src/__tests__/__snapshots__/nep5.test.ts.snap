@@ -98,7 +98,7 @@ Object {
 }
 `;
 
-exports[`nep5 createNEP5SmartContract 1`] = `
+exports[`nep5 createNEP17SmartContract 1`] = `
 Array [
   Array [
     Object {

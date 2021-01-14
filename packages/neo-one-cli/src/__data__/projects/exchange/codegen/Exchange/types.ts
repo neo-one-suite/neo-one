@@ -86,7 +86,7 @@ export interface ExchangeSmartContract<TClient extends Client = Client> extends 
       options?: TransactionOptions & GetOptions,
     ) => Promise<InvokeReceipt<boolean, ExchangeEvent> & { readonly transaction: InvocationTransaction }>;
   };
-  readonly depositNEP5: {
+  readonly depositNEP17: {
     (from: AddressString, assetID: AddressString, amount: BigNumber, options?: TransactionOptions): Promise<
       TransactionResult<InvokeReceipt<undefined, ExchangeEvent>, InvocationTransaction>
     >;
@@ -171,7 +171,7 @@ export interface ExchangeSmartContract<TClient extends Client = Client> extends 
       options?: TransactionOptions & GetOptions,
     ) => Promise<InvokeReceipt<undefined, ExchangeEvent> & { readonly transaction: InvocationTransaction }>;
   };
-  readonly withdrawNEP5: {
+  readonly withdrawNEP17: {
     (from: AddressString, assetID: AddressString, amount: BigNumber, options?: TransactionOptions): Promise<
       TransactionResult<InvokeReceipt<undefined, ExchangeEvent>, InvocationTransaction>
     >;
@@ -198,7 +198,7 @@ export interface ExchangeMigrationSmartContract {
     owner?: AddressString | Promise<AddressString>,
     options?: TransactionOptions & GetOptions,
   ) => Promise<InvokeReceipt<boolean, ExchangeEvent> & { readonly transaction: InvocationTransaction }>;
-  readonly depositNEP5: (
+  readonly depositNEP17: (
     from: AddressString | Promise<AddressString>,
     assetID: AddressString | Promise<AddressString>,
     amount: BigNumber | Promise<BigNumber>,
@@ -247,7 +247,7 @@ export interface ExchangeMigrationSmartContract {
     feeAddress: AddressString | Promise<AddressString>,
     options?: TransactionOptions & GetOptions,
   ) => Promise<InvokeReceipt<undefined, ExchangeEvent> & { readonly transaction: InvocationTransaction }>;
-  readonly withdrawNEP5: (
+  readonly withdrawNEP17: (
     from: AddressString | Promise<AddressString>,
     assetID: AddressString | Promise<AddressString>,
     amount: BigNumber | Promise<BigNumber>,

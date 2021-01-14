@@ -694,7 +694,7 @@ export interface DeveloperProvider {
 }
 
 /**
- * An `Account` represents the balances of NEO, GAS an other NEP5 assets at a given `Address`.
+ * An `Account` represents the balances of NEO, GAS an other NEP17 assets at a given `Address`.
  */
 export interface Account {
   /**

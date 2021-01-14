@@ -1,5 +1,5 @@
 import { TransactionResult, UserAccount } from '@neo-one/client-common';
-import { nep5 } from '@neo-one/client-core';
+import { nep17 } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import * as React from 'react';
 import { useNetworkClients } from './DeveloperToolsContext';
@@ -69,7 +69,7 @@ export function WalletTransfer() {
 
     // tslint:disable-next-line possible-timing-attack
     if (asset.type === 'token') {
-      const smartContract = nep5.createNEP5SmartContract(
+      const smartContract = nep17.createNEP17SmartContract(
         client,
         { [asset.token.network]: { address: asset.token.address } },
         asset.token.decimals,
