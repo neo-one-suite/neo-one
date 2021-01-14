@@ -33,7 +33,12 @@ export class ContractState extends ContractStateModel<ContractManifest> {
   }
 
   private readonly sizeInternal = utils.lazy(
-    () => IOHelper.sizeOfUInt32LE + IOHelper.sizeOfVarBytesLE(this.script) + this.manifest.size,
+    () =>
+      IOHelper.sizeOfUInt32LE +
+      +IOHelper.sizeOfUInt16LE +
+      IOHelper.sizeOfUInt160 +
+      IOHelper.sizeOfVarBytesLE(this.script) +
+      this.manifest.size,
   );
 
   public get size() {
@@ -48,6 +53,10 @@ export class ContractState extends ContractStateModel<ContractManifest> {
       script: this.script,
       manifest: this.manifest,
     });
+  }
+
+  public canCall(manifest: ContractManifest, method: string) {
+    return this.manifest.permissions.some((permission) => permission.isAllowed(manifest, method));
   }
 
   public serializeJSON(): ContractJSON {

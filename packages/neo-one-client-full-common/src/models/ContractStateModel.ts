@@ -1,5 +1,5 @@
-import { ContractManifestModel } from './manifest';
 import { UInt160 } from '@neo-one/client-common';
+import { ContractManifestModel } from './manifest';
 
 export interface ContractStateModelAdd<TContractManifest extends ContractManifestModel = ContractManifestModel> {
   readonly id: number;

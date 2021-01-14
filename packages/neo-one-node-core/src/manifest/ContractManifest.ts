@@ -8,6 +8,7 @@ import { ContractPermission } from './ContractPermission';
 export class ContractManifest extends ContractManifestModel<ContractABI, ContractGroup, ContractPermission> {
   public static parseBytes(bytes: Buffer) {
     const reader = new BinaryReader(bytes);
+
     return this.deserializeJSON(JSON.parse(reader.readVarString(this.maxLength)));
   }
 
@@ -39,15 +40,7 @@ export class ContractManifest extends ContractManifestModel<ContractABI, Contrac
     return this.sizeInternal();
   }
 
-  public canCall(manifest: ContractManifest, method: string) {
-    return this.permissions.some((permission) => permission.isAllowed(manifest, method));
-  }
-
   public isValid(hash: UInt160) {
-    if (!this.abi.hash.equals(hash)) {
-      return false;
-    }
-
     return this.groups.every((group) => group.isValid(hash));
   }
 }
