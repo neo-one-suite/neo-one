@@ -1,12 +1,15 @@
 import {
   AttributeTypeModel,
   common,
+  crypto,
   InvalidFormatError,
   IOHelper,
   JSONHelper,
   MAX_TRANSACTION_SIZE,
   MAX_VALID_UNTIL_BLOCK_INCREMENT,
+  multiSignatureContractCost,
   scriptHashToAddress,
+  signatureContractCost,
   TransactionJSON,
   TransactionModel,
   TransactionModelAdd,
@@ -26,7 +29,7 @@ import {
 import { Signer } from '../Signer';
 import { TransactionVerificationContext } from '../TransactionVerificationContext';
 import { BinaryReader, utils } from '../utils';
-import { Verifiable, VerifyOptions } from '../Verifiable';
+import { maxVerificationGas, Verifiable, VerifyOptions } from '../Verifiable';
 import { Witness } from '../Witness';
 import { Attribute, deserializeAttribute } from './attributes';
 
@@ -174,20 +177,19 @@ export class Transaction
       IOHelper.sizeOfArray(this.witnesses, (witness) => witness.size),
   );
 
-  public async verifyForEachBlock(
+  public async verifyStateDependent(
     verifyOptions: VerifyOptions,
     transactionContext?: TransactionVerificationContext,
   ): Promise<VerifyResultModel> {
-    const { storage, native } = verifyOptions;
+    const { storage, native, verifyWitness, vm } = verifyOptions;
     const { index } = await storage.blockHashIndex.get();
-    if (this.validUntilBlock < index || this.validUntilBlock > index + MAX_VALID_UNTIL_BLOCK_INCREMENT) {
+    if (this.validUntilBlock <= index || this.validUntilBlock > index + MAX_VALID_UNTIL_BLOCK_INCREMENT) {
       return VerifyResultModel.Expired;
     }
 
     const hashes = this.getScriptHashesForVerifying();
-    const setHashes = new Set(hashes);
-    const blockedAccounts = await native.Policy.getBlockedAccounts(storage);
-    if (blockedAccounts.some((account) => setHashes.has(account))) {
+    const blocked = await Promise.all(hashes.map(async (hash) => native.Policy.isBlocked(storage, hash)));
+    if (blocked.some((bool) => bool)) {
       return VerifyResultModel.PolicyFail;
     }
 
@@ -212,19 +214,62 @@ export class Transaction
       return VerifyResultModel.Invalid;
     }
 
-    const verifyHashes = await Promise.all(
-      hashes.map(async (hash, idx) => {
-        if (this.witnesses[idx].verification.length > 0) {
-          return true;
+    const [feePerByte, execFeeFactor] = await Promise.all([
+      native.Policy.getFeePerByte(storage),
+      native.Policy.getExecFeeFactor(storage),
+    ]);
+
+    let netFee = this.networkFee.sub(feePerByte.muln(this.size));
+    // tslint:disable-next-line: no-loop-statement
+    for (let i = 0; i < hashes.length; i += 1) {
+      const witness = this.witnesses[i];
+      const multiSigResult = crypto.isMultiSigContractWithResult(witness.verification);
+      if (multiSigResult.result) {
+        const { m, n } = multiSigResult;
+        netFee = netFee.sub(new BN(multiSignatureContractCost(m, n).toString(), 10).muln(execFeeFactor));
+      } else if (crypto.isSignatureContract(witness.verification)) {
+        netFee = netFee.sub(new BN(signatureContractCost.toString(), 10).muln(execFeeFactor));
+      } else {
+        const { result, gas } = await verifyWitness(vm, this, storage, native, hashes[i], witness, netFee);
+        if (!result) {
+          return VerifyResultModel.InsufficientFunds;
         }
-        const state = await storage.contracts.tryGet(hash);
+        netFee = netFee.sub(gas);
+      }
+      if (netFee.ltn(0)) {
+        return VerifyResultModel.InsufficientFunds;
+      }
+    }
 
-        return state !== undefined;
-      }),
-    );
+    return VerifyResultModel.Succeed;
+  }
 
-    if (verifyHashes.some((value) => !value)) {
+  public async verifyStateIndependent(verifyOptions: VerifyOptions) {
+    const { storage, native, verifyWitness, vm } = verifyOptions;
+    if (this.size > MAX_TRANSACTION_SIZE) {
       return VerifyResultModel.Invalid;
+    }
+    const hashes = this.getScriptHashesForVerifying();
+    if (hashes.length !== this.witnesses.length) {
+      return VerifyResultModel.Invalid;
+    }
+
+    // tslint:disable-next-line: no-loop-statement
+    for (let i = 0; i < hashes.length; i += 1) {
+      if (crypto.isStandardContract(this.witnesses[i].verification)) {
+        const { result } = await verifyWitness(
+          vm,
+          this,
+          storage,
+          native,
+          hashes[i],
+          this.witnesses[i],
+          maxVerificationGas,
+        );
+        if (!result) {
+          return VerifyResultModel.Invalid;
+        }
+      }
     }
 
     return VerifyResultModel.Succeed;
@@ -234,26 +279,12 @@ export class Transaction
     verifyOptions: VerifyOptions,
     verifyContext?: TransactionVerificationContext,
   ): Promise<VerifyResultModel> {
-    const { native, storage, verifyWitnesses, vm } = verifyOptions;
-    const result = await this.verifyForEachBlock(verifyOptions, verifyContext);
-    if (result !== VerifyResultModel.Succeed) {
-      return result;
-    }
-    if (this.size > MAX_TRANSACTION_SIZE) {
-      return VerifyResultModel.Invalid;
-    }
-    const feePerByte = await native.Policy.getFeePerByte(storage);
-    const netFee = this.networkFee.sub(feePerByte.muln(this.size));
-    if (netFee.ltn(0)) {
-      return VerifyResultModel.InsufficientFunds;
+    const independentResult = await this.verifyStateIndependent(verifyOptions);
+    if (independentResult !== VerifyResultModel.Succeed) {
+      return independentResult;
     }
 
-    const witnessVerify = await verifyWitnesses(vm, this, storage, native, netFee);
-    if (!witnessVerify) {
-      return VerifyResultModel.Invalid;
-    }
-
-    return VerifyResultModel.Succeed;
+    return this.verifyStateDependent(verifyOptions, verifyContext);
   }
 
   public serializeJSON(): TransactionJSON {

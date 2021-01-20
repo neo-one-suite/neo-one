@@ -32,6 +32,19 @@ import {
   VersionPayload,
 } from './payload';
 
+const tryCompression = ({ command }: MessageValue) => {
+  return (
+    command === Command.Block ||
+    command === Command.Consensus ||
+    command === Command.Transaction ||
+    command === Command.Headers ||
+    command === Command.Addr ||
+    command === Command.MerkleBlock ||
+    command === Command.FilterLoad ||
+    command === Command.FilterAdd
+  );
+};
+
 export type MessageValue =
   | { readonly command: Command.Addr; readonly payload: AddrPayload }
   | { readonly command: Command.Block; readonly payload: Block }
@@ -188,7 +201,7 @@ export class Message implements SerializableWire {
   public static create(value: MessageValue): Message {
     // tslint:disable-next-line: no-any
     const payloadBuffer = (value as any)?.payload?.serializeWire() ?? Buffer.alloc(0);
-    if (payloadBuffer.length > compressionMinSize) {
+    if (tryCompression(value) && payloadBuffer.length > compressionMinSize) {
       const compressed = lz4Helper.compress(payloadBuffer);
       if (compressed.length < payloadBuffer.length - compressionThreshold) {
         return new Message({

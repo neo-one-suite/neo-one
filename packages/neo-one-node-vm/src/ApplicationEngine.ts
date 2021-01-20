@@ -1,14 +1,15 @@
-import { TriggerType, VMState, common } from '@neo-one/client-common';
+import { common, TriggerType, VMState } from '@neo-one/client-common';
 import {
   CallFlags,
+  LoadContractOptions,
+  LoadScriptOptions,
   SerializableContainer,
   serializeScriptContainer,
   SnapshotName,
-  LoadScriptOptions,
 } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
-import { parseStackItems, convertLog } from './converters';
+import { convertLog, parseStackItems } from './converters';
 import { EngineMethods } from './Methods';
 import { DispatcherFunc } from './types';
 
@@ -110,6 +111,18 @@ export class ApplicationEngine {
         flags,
         scriptHash: scriptHash ? common.uInt160ToHex(scriptHash) : undefined,
         initialPosition,
+      },
+    });
+  }
+
+  public loadContract({ hash, method, flags, packParameters = false }: LoadContractOptions) {
+    return this.dispatch({
+      method: 'loadcontract',
+      args: {
+        hash,
+        method,
+        flags,
+        packParameters,
       },
     });
   }

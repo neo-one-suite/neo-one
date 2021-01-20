@@ -10,8 +10,8 @@ import {
   Hash256String,
   HeaderJSON,
   InvocationDataJSON,
-  Nep5BalancesJSON,
-  Nep5TransfersJSON,
+  Nep17BalancesJSON,
+  Nep17TransfersJSON,
   NetworkSettingsJSON,
   Peer,
   PrivateNetworkSettings,
@@ -47,23 +47,23 @@ export class JSONRPCClient {
     );
   }
 
-  public async getNep5Balances(address: AddressString): Promise<Nep5BalancesJSON> {
+  public async getNep17Balances(address: AddressString): Promise<Nep17BalancesJSON> {
     return this.withInstance(async (provider) =>
       provider.request({
-        method: 'getnep5balances',
+        method: 'getnep17balances',
         params: [addressToScriptHash(address)],
       }),
     );
   }
 
-  public async getNep5Transfers(
+  public async getNep17Transfers(
     address: AddressString,
     startTime?: number,
     endTime?: number,
-  ): Promise<Nep5TransfersJSON> {
+  ): Promise<Nep17TransfersJSON> {
     return this.withInstance(async (provider) =>
       provider.request({
-        method: 'getnep5transfers',
+        method: 'getnep17transfers',
         params: [addressToScriptHash(address), startTime, endTime],
       }),
     );
@@ -79,6 +79,10 @@ export class JSONRPCClient {
 
   public async getFeePerByte(): Promise<string> {
     return this.withInstance(async (provider) => provider.request({ method: 'getfeeperbyte' }));
+  }
+
+  public async getExecFeeFactor(): Promise<number> {
+    return this.withInstance(async (provider) => provider.request({ method: 'getexecfeefactor' }));
   }
 
   public async getContract(address: AddressString): Promise<ContractJSON> {

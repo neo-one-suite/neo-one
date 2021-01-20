@@ -24,14 +24,13 @@ import {
   Header,
   Mempool,
   NativeContainer,
-  Nep5Balance,
+  Nep17Balance,
   Notification,
   RunEngineOptions,
   Signers,
   Storage,
   Transaction,
   TransactionVerificationContext,
-  VerifyConsensusPayloadOptions,
   VerifyOptions,
   VM,
   Witness,
@@ -47,11 +46,11 @@ import {
   GenesisBlockNotRegisteredError,
   RecoverBlockchainError,
 } from './errors';
-import { getNep5UpdateOptions } from './getNep5UpdateOptions';
+import { getNep17UpdateOptions } from './getNep17UpdateOptions';
 import { HeaderIndexCache } from './HeaderIndexCache';
 import { PersistingBlockchain } from './PersistingBlockchain';
 import { utils } from './utils';
-import { verifyWitnesses } from './verify';
+import { verifyWitness, verifyWitnesses } from './verify';
 
 const logger = createChild(nodeLogger, { service: 'blockchain' });
 
@@ -165,6 +164,7 @@ export class Blockchain {
 
   public readonly deserializeWireContext: DeserializeWireContext;
 
+  public readonly verifyWitness = verifyWitness;
   public readonly verifyWitnesses = verifyWitnesses;
   public readonly settings: BlockchainSettings;
   public readonly onPersistNativeContractScript: Buffer;
@@ -205,7 +205,11 @@ export class Blockchain {
     };
     this.mutableCurrentBlock = options.currentBlock;
     this.onPersist =
-      options.onPersist === undefined ? () => Promise.resolve(this.vm.updateSnapshots()) : options.onPersist;
+      options.onPersist === undefined
+        ? () => {
+            this.vm.updateSnapshots();
+          }
+        : options.onPersist;
     this.start();
   }
 
@@ -243,15 +247,7 @@ export class Blockchain {
       storage: this.storage,
       native: this.native,
       verifyWitnesses: this.verifyWitnesses,
-    };
-  }
-
-  public get verifyConsensusPayloadOptions(): VerifyConsensusPayloadOptions {
-    return {
-      vm: this.vm,
-      storage: this.storage,
-      native: this.native,
-      verifyWitnesses: this.verifyWitnesses,
+      verifyWitness: this.verifyWitness,
       height: this.currentBlockIndex,
     };
   }
@@ -260,16 +256,16 @@ export class Blockchain {
     return this.storage.blocks;
   }
 
-  public get nep5Balances() {
-    return this.storage.nep5Balances;
+  public get nep17Balances() {
+    return this.storage.nep17Balances;
   }
 
-  public get nep5TransfersReceived() {
-    return this.storage.nep5TransfersReceived;
+  public get nep17TransfersReceived() {
+    return this.storage.nep17TransfersReceived;
   }
 
-  public get nep5TransfersSent() {
-    return this.storage.nep5TransfersSent;
+  public get nep17TransfersSent() {
+    return this.storage.nep17TransfersSent;
   }
 
   public get applicationLogs() {
@@ -278,10 +274,6 @@ export class Blockchain {
 
   public get transactions() {
     return this.storage.transactions;
-  }
-
-  public get contracts() {
-    return this.storage.contracts;
   }
 
   public get storages() {
@@ -298,10 +290,6 @@ export class Blockchain {
 
   public get headerHashIndex() {
     return this.storage.headerHashIndex;
-  }
-
-  public get contractID() {
-    return this.storage.contractID;
   }
 
   // public get consensusState() {
@@ -363,20 +351,11 @@ export class Blockchain {
       return VerifyResultModel.AlreadyExists;
     }
 
-    // TODO: to save some compute time we could keep a local cache of the current blocks return values
-    // from native contract calls and pass those in, instead of passing the whole native container.
-    const verifyOptions = {
-      native: this.native,
-      vm: this.vm,
-      storage: this.storage,
-      verifyWitnesses: this.verifyWitnesses,
-    };
-
-    return transaction.verify(verifyOptions, context);
+    return transaction.verify(this.verifyOptions, context);
   }
 
   public async verifyConsensusPayload(payload: ConsensusPayload) {
-    const verification = await payload.verify(this.verifyConsensusPayloadOptions);
+    const verification = await payload.verify(this.verifyOptions);
     if (!verification) {
       throw new ConsensusPayloadVerifyError(payload.hashHex);
     }
@@ -447,7 +426,7 @@ export class Blockchain {
   }
 
   public async getValidators(): Promise<readonly ECPoint[]> {
-    return this.native.NEO.getValidators(this.storage);
+    return this.native.NEO.computeNextBlockValidators(this.storage);
   }
 
   public async getNextBlockValidators(): Promise<readonly ECPoint[]> {
@@ -468,6 +447,10 @@ export class Blockchain {
 
   public async getFeePerByte(): Promise<BN> {
     return this.native.Policy.getFeePerByte(this.storage);
+  }
+
+  public shouldRefreshCommittee(offset = 0): boolean {
+    return (this.currentBlockIndex + offset) % this.settings.committeeMembersCount === 0;
   }
 
   public async persistBlock({
@@ -498,7 +481,7 @@ export class Blockchain {
   }
 
   public async getVerificationCost(contractHash: UInt160, transaction: Transaction) {
-    const contract = await this.contracts.tryGet(contractHash);
+    const contract = await this.native.Management.getContract(this.storage, contractHash);
     if (contract === undefined) {
       return { fee: utils.ZERO, size: 0 };
     }
@@ -547,7 +530,7 @@ export class Blockchain {
           gas,
         },
         (engine) => {
-          engine.loadScript({ script: script, initialPosition: offset });
+          engine.loadScript({ script, initialPosition: offset });
           engine.execute();
 
           return utils.getCallReceipt(engine, container);
@@ -666,32 +649,32 @@ export class Blockchain {
     return [updateBlockHashIndex, updateHeaderHashIndex];
   }
 
-  private updateNep5Balances({
+  private updateNep17Balances({
     applicationsExecuted,
     block,
   }: {
     readonly applicationsExecuted: readonly ApplicationExecuted[];
     readonly block: Block;
   }) {
-    const { assetKeys, transfersSent, transfersReceived } = getNep5UpdateOptions({
+    const { assetKeys, transfersSent, transfersReceived } = getNep17UpdateOptions({
       applicationsExecuted,
       block,
     });
 
-    const nep5BalancePairs = assetKeys.map((key) => {
+    const nep17BalancePairs = assetKeys.map((key) => {
       const script = new ScriptBuilder().emitAppCall(key.assetScriptHash, 'balanceOf', key.userScriptHash).build();
       const callReceipt = this.invokeScript(script);
       const balanceBuffer = callReceipt.stack[0].getInteger().toBuffer();
 
-      return { key, value: new Nep5Balance({ balanceBuffer, lastUpdatedBlock: this.currentBlockIndex }) };
+      return { key, value: new Nep17Balance({ balanceBuffer, lastUpdatedBlock: this.currentBlockIndex }) };
     });
 
-    const nep5BalanceChangeSet: ChangeSet = nep5BalancePairs.map(({ key, value }) => {
+    const nep17BalanceChangeSet: ChangeSet = nep17BalancePairs.map(({ key, value }) => {
       if (value.balance.eqn(0)) {
         return {
           type: 'delete',
           change: {
-            type: 'nep5Balance',
+            type: 'nep17Balance',
             key,
           },
         };
@@ -700,7 +683,7 @@ export class Blockchain {
       return {
         type: 'add',
         change: {
-          type: 'nep5Balance',
+          type: 'nep17Balance',
           key,
           value,
         },
@@ -708,27 +691,27 @@ export class Blockchain {
       };
     });
 
-    const nep5TransfersSentChangeSet: ChangeSet = transfersSent.map(({ key, value }) => ({
+    const nep17TransfersSentChangeSet: ChangeSet = transfersSent.map(({ key, value }) => ({
       type: 'add',
       subType: 'add',
       change: {
-        type: 'nep5TransferSent',
+        type: 'nep17TransferSent',
         key,
         value,
       },
     }));
 
-    const nep5TransfersReceivedChangeSet: ChangeSet = transfersReceived.map(({ key, value }) => ({
+    const nep17TransfersReceivedChangeSet: ChangeSet = transfersReceived.map(({ key, value }) => ({
       type: 'add',
       subType: 'add',
       change: {
-        type: 'nep5TransferReceived',
+        type: 'nep17TransferReceived',
         key,
         value,
       },
     }));
 
-    return nep5BalanceChangeSet.concat(nep5TransfersReceivedChangeSet, nep5TransfersSentChangeSet);
+    return nep17BalanceChangeSet.concat(nep17TransfersReceivedChangeSet, nep17TransfersSentChangeSet);
   }
 
   private updateApplicationLogs({
@@ -789,8 +772,8 @@ export class Blockchain {
     const blockMetadataBatch = this.updateBlockMetadata(block);
     await this.storage.commit(blockMetadataBatch);
 
-    const nep5Updates = this.updateNep5Balances({ applicationsExecuted, block });
-    await this.storage.commit(nep5Updates);
+    const nep17Updates = this.updateNep17Balances({ applicationsExecuted, block });
+    await this.storage.commit(nep17Updates);
 
     const applicationLogUpdates = this.updateApplicationLogs({ applicationsExecuted, block });
     await this.storage.commit(applicationLogUpdates);

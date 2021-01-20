@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Collections.Generic;
 using Neo.Persistence;
 using Microsoft.Extensions.Configuration;
+using Neo.SmartContract.Native;
 
 namespace NEOONE
 {
@@ -124,7 +125,7 @@ namespace NEOONE
 
     private dynamic _test()
     {
-      return this.snapshot.PersistingBlock.Index.ToString();
+      return NativeContract.NEO.Name;
     }
 
     private NEOONE.ReturnHelpers.ProtocolSettingsReturn _getConfig()

@@ -3,20 +3,22 @@ import { NativeContractStorageContext } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import { NativeContract, NativeContractAdd } from './NativeContract';
 
-export interface NEP5NativeContractAdd extends NativeContractAdd {
+export interface NEP17NativeContractAdd extends NativeContractAdd {
   readonly symbol: string;
   readonly decimals: number;
 }
 
-export abstract class NEP5NativeContract extends NativeContract {
+export abstract class NEP17NativeContract extends NativeContract {
   public readonly symbol: string;
   public readonly decimals: number;
   public readonly factor: BN;
 
-  protected readonly totalSupplyPrefix = Buffer.from([11]);
-  protected readonly accountPrefix = Buffer.from([20]);
+  protected readonly basePrefixes = {
+    totalSupply: Buffer.from([11]),
+    account: Buffer.from([20]),
+  };
 
-  public constructor(options: NEP5NativeContractAdd) {
+  public constructor(options: NEP17NativeContractAdd) {
     super(options);
     this.symbol = options.symbol;
     this.decimals = options.decimals;
@@ -24,7 +26,7 @@ export abstract class NEP5NativeContract extends NativeContract {
   }
 
   public async totalSupply({ storages }: NativeContractStorageContext): Promise<BN> {
-    const storage = await storages.tryGet(this.createStorageKey(this.totalSupplyPrefix).toStorageKey());
+    const storage = await storages.tryGet(this.createStorageKey(this.basePrefixes.totalSupply).toStorageKey());
     if (storage === undefined) {
       return new BN(0);
     }
@@ -33,7 +35,9 @@ export abstract class NEP5NativeContract extends NativeContract {
   }
 
   public async balanceOf({ storages }: NativeContractStorageContext, account: UInt160): Promise<BN> {
-    const storage = await storages.tryGet(this.createStorageKey(this.accountPrefix).addBuffer(account).toStorageKey());
+    const storage = await storages.tryGet(
+      this.createStorageKey(this.basePrefixes.totalSupply).addBuffer(account).toStorageKey(),
+    );
     if (storage === undefined) {
       return new BN(0);
     }

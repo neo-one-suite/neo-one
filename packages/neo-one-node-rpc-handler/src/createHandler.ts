@@ -9,7 +9,6 @@ import {
   toVMStateJSON,
   TransactionJSON,
   TransactionReceiptJSON,
-  utils as commonUtils,
   VerboseTransactionJSON,
   VerifyResultModel,
 } from '@neo-one/client-common';
@@ -20,10 +19,9 @@ import {
   CallReceipt,
   getEndpointConfig,
   NativeContainer,
-  Nep5Transfer,
-  Nep5TransferKey,
+  Nep17Transfer,
+  Nep17TransferKey,
   Node,
-  Signer,
   Signers,
   StackItem,
   stackItemToJSON,
@@ -115,9 +113,9 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   sendmany: 'sendmany',
   sendtoaddress: 'sendtoaddress',
 
-  // NEP5
-  getnep5transfers: 'getnep5transfers',
-  getnep5balances: 'getnep5balances',
+  // NEP17
+  getnep17transfers: 'getnep17transfers',
+  getnep17balances: 'getnep17balances',
 
   // TODO: I want to say both of these can be removed since you can make changes to policy contract storage
   updatesettings: 'updatesettings',
@@ -125,6 +123,7 @@ const RPC_METHODS: { readonly [key: string]: string } = {
 
   // NEO•ONE
   getfeeperbyte: 'getfeeperbyte',
+  getexecfeefactor: 'getexecfeefactor',
   getverificationcost: 'getverificationcost',
   relaytransaction: 'relaytransaction',
   getallstorage: 'getallstorage',
@@ -141,7 +140,7 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   INVALID: 'INVALID',
 };
 
-const mapToTransfers = ({ key, value }: { readonly key: Nep5TransferKey; readonly value: Nep5Transfer }) => ({
+const mapToTransfers = ({ key, value }: { readonly key: Nep17TransferKey; readonly value: Nep17Transfer }) => ({
   timestamp: key.timestampMS.toNumber(),
   assethash: common.uInt160ToString(key.assetScriptHash),
   transferaddress: scriptHashToAddress(common.uInt160ToString(value.userScriptHash)),
@@ -306,6 +305,7 @@ export const createHandler = ({
 
     try {
       const stack = stackIn.map((item: StackItem) => stackItemToJSON(item, undefined));
+
       return {
         script: script.toString('hex'),
         state: toVMStateJSON(state),
@@ -415,7 +415,7 @@ export const createHandler = ({
     },
     [RPC_METHODS.getcontractstate]: async (args) => {
       const hash = JSONHelper.readUInt160(args[0]);
-      const contract = await blockchain.contracts.tryGet(hash);
+      const contract = await native.Management.getContract({ storages: blockchain.storages }, hash);
       if (contract === undefined) {
         throw new JSONRPCError(-100, 'Unknown contract');
       }
@@ -463,7 +463,7 @@ export const createHandler = ({
     },
     [RPC_METHODS.getstorage]: async (args) => {
       const hash = JSONHelper.readUInt160(args[0]);
-      const state = await blockchain.contracts.tryGet(hash);
+      const state = await native.Management.getContract({ storages: blockchain.storages }, hash);
       if (state === undefined) {
         return undefined;
       }
@@ -481,7 +481,7 @@ export const createHandler = ({
     },
     [RPC_METHODS.getvalidators]: async () => {
       const [validators, candidates] = await Promise.all([
-        native.NEO.getValidators({ storages: blockchain.storages }),
+        native.NEO.computeNextBlockValidators({ storages: blockchain.storages }),
         native.NEO.getCandidates({ storages: blockchain.storages }),
       ]);
 
@@ -659,8 +659,8 @@ export const createHandler = ({
       throw new JSONRPCError(-101, 'Not implemented');
     },
 
-    // Nep5
-    [RPC_METHODS.getnep5transfers]: async (args) => {
+    // Nep17
+    [RPC_METHODS.getnep17transfers]: async (args) => {
       const addressVersion = blockchain.settings.addressVersion;
       const { address, scriptHash } = getScriptHashAndAddress(args[0], addressVersion);
 
@@ -678,11 +678,11 @@ export const createHandler = ({
       const gte = Buffer.concat([scriptHash, startTimeBytes]);
       const lte = Buffer.concat([scriptHash, endTimeBytes]);
 
-      const sentPromise = blockchain.nep5TransfersSent
+      const sentPromise = blockchain.nep17TransfersSent
         .find$(gte, lte)
         .pipe(take(1000), map(mapToTransfers), toArray())
         .toPromise();
-      const receivedPromise = blockchain.nep5TransfersReceived
+      const receivedPromise = blockchain.nep17TransfersReceived
         .find$(gte, lte)
         .pipe(take(1000), map(mapToTransfers), toArray())
         .toPromise();
@@ -695,13 +695,16 @@ export const createHandler = ({
         address,
       };
     },
-    [RPC_METHODS.getnep5balances]: async (args) => {
+    [RPC_METHODS.getnep17balances]: async (args) => {
       const addressVersion = blockchain.settings.addressVersion;
       const { address, scriptHash } = getScriptHashAndAddress(args[0], addressVersion);
-      const storedBalances = await blockchain.nep5Balances.find$(scriptHash).pipe(toArray()).toPromise();
+      const storedBalances = await blockchain.nep17Balances.find$(scriptHash).pipe(toArray()).toPromise();
       const validBalances = await Promise.all(
         storedBalances.map(async ({ key, value }) => {
-          const assetStillExists = await blockchain.contracts.tryGet(key.assetScriptHash);
+          const assetStillExists = await native.Management.getContract(
+            { storages: blockchain.storages },
+            key.assetScriptHash,
+          );
           if (!assetStillExists) {
             return undefined;
           }
@@ -779,7 +782,7 @@ export const createHandler = ({
       if (hash.equals(NEO) || hash.equals(GAS) || hash.equals(Policy)) {
         throw new Error("Can't get all storage for native contracts.");
       }
-      const contract = await blockchain.contracts.tryGet(hash);
+      const contract = await native.Management.getContract({ storages: blockchain.storages }, hash);
       if (contract === undefined) {
         return [];
       }
@@ -886,6 +889,7 @@ export const createHandler = ({
 
       return feePerByte.toString();
     },
+    [RPC_METHODS.getexecfeefactor]: async () => native.Policy.getExecFeeFactor({ storages: blockchain.storages }),
     [RPC_METHODS.getverificationcost]: async (args) => {
       const hash = JSONHelper.readUInt160(args[0]);
       const transaction = Transaction.deserializeWire({

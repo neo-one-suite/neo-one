@@ -1,7 +1,7 @@
-import { common, UInt160, UInt160Hex } from '@neo-one/client-common';
+import { common, UInt160, UInt160Hex, UInt256Hex } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { NativeContractStorageContext } from './Native';
-import { Transaction } from './transaction';
+import { isOracleResponse, Transaction } from './transaction';
 
 const assertSender = (sender: UInt160 | undefined) => {
   if (sender === undefined) {
@@ -19,13 +19,20 @@ export interface TransactionVerificationContextAdd {
 export class TransactionVerificationContext {
   private readonly getGasBalance: (storage: NativeContractStorageContext, sender: UInt160) => Promise<BN>;
   private readonly mutableSenderFee: Record<UInt160Hex, BN | undefined>;
+  private readonly mutableOracleResponses: Record<string, UInt256Hex | undefined>;
 
   public constructor({ getGasBalance }: TransactionVerificationContextAdd) {
     this.getGasBalance = getGasBalance;
     this.mutableSenderFee = {};
+    this.mutableOracleResponses = {};
   }
 
   public addTransaction(tx: Transaction) {
+    const oracle = tx.getAttribute(isOracleResponse);
+    if (oracle !== undefined) {
+      this.mutableOracleResponses[oracle.id.toString()] = tx.hashHex;
+    }
+
     const key = common.uInt160ToHex(assertSender(tx.sender));
     const maybeFee = this.mutableSenderFee[key] ?? new BN(0);
     this.mutableSenderFee[key] = maybeFee.add(tx.systemFee).add(tx.networkFee);
@@ -37,7 +44,16 @@ export class TransactionVerificationContext {
     const maybeFee = this.mutableSenderFee[common.uInt160ToHex(sender)] ?? new BN(0);
     const totalFee = maybeFee.add(tx.systemFee).add(tx.networkFee);
 
-    return balance.gte(totalFee);
+    if (balance.lt(totalFee)) {
+      return false;
+    }
+
+    const oracle = tx.getAttribute(isOracleResponse);
+    if (oracle !== undefined && this.mutableOracleResponses[oracle.id.toString()] !== undefined) {
+      return false;
+    }
+
+    return true;
   }
 
   public removeTransaction(tx: Transaction) {
@@ -55,6 +71,12 @@ export class TransactionVerificationContext {
       delete this.mutableSenderFee[key];
     } else {
       this.mutableSenderFee[key] = newFee;
+    }
+
+    const oracle = tx.getAttribute(isOracleResponse);
+    if (oracle !== undefined) {
+      // tslint:disable-next-line: no-dynamic-delete
+      delete this.mutableOracleResponses[oracle.id.toString()];
     }
   }
 }

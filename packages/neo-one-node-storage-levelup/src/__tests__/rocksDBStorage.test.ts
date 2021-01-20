@@ -8,7 +8,7 @@ describe('levelUpStorage', () => {
   let storage: Storage;
   beforeEach(async () => {
     const rocks = new RocksDB('/Users/danielbyrne/Desktop/test-location');
-    storage = levelUpStorage({ db: LevelUp(rocks), context: { messageMagic: 1953787457 } });
+    storage = levelUpStorage({ db: LevelUp(rocks), context: { messageMagic: 1953787457, validatorsCount: 7 } });
   });
   test('deleted items are undefined', async () => {
     const hash = common.bufferToUInt160(Buffer.from('3775292229eccdf904f16fff8e83e7cffdc0f0ce', 'hex'));
@@ -16,7 +16,6 @@ describe('levelUpStorage', () => {
     const value = Buffer.from('5f8d70', 'hex');
 
     const firstGet = await storage.storages.tryGet(key);
-    console.log(firstGet);
     expect(firstGet).toEqual(undefined);
 
     const storageItem = new StorageItem({
@@ -31,7 +30,6 @@ describe('levelUpStorage', () => {
 
     await storage.commit([{ type: 'add', change: addChange, subType: 'add' }]);
     const secondGet = await storage.storages.tryGet(key);
-    console.log(secondGet);
     expect(JSON.stringify(secondGet)).toEqual(JSON.stringify(storageItem));
 
     const deleteChange: DeleteChange = {

@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { nep5 } from '@neo-one/client-core';
+import { nep17 } from '@neo-one/client-core';
 import { Box, Button, TextInput } from '@neo-one/react-common';
 import * as React from 'react';
 import { DeveloperToolsContext, useTokens } from './DeveloperToolsContext';
@@ -24,8 +24,8 @@ export function AddToken(props: {}) {
     Promise.resolve()
       .then(async () => {
         const network = client.getCurrentNetwork();
-        const decimals = await nep5.getDecimals(client, { [network]: { address } }, network);
-        const smartContract = nep5.createNEP5SmartContract(client, { [network]: { address } }, decimals);
+        const decimals = await nep17.getDecimals(client, { [network]: { address } }, network);
+        const smartContract = nep17.createNEP17SmartContract(client, { [network]: { address } }, decimals);
         const symbol = await smartContract.symbol({ network });
 
         onChangeTokens(tokens.concat({ network, address, decimals, symbol }));

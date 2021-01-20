@@ -6,6 +6,7 @@ using Neo.IO;
 using Neo.Network.P2P.Payloads;
 using Neo.Persistence;
 using Neo.SmartContract;
+using Neo.SmartContract.Native;
 using Neo.VM;
 using Neo.VM.Types;
 
@@ -66,6 +67,7 @@ namespace NEOONE
       create,
       execute,
       loadscript,
+      loadcontract,
       setinstructionpointer,
       getvmstate,
       getresultstack,
@@ -110,6 +112,14 @@ namespace NEOONE
           }
 
           return this._loadScript(script, flags, scriptHash, initialPosition);
+
+        case EngineMethod.loadcontract:
+          UInt160 contractHash = new UInt160((byte[])args.hash);
+          string contractMethod = (string)args.method;
+          CallFlags contractFlags = (CallFlags)((byte)args.flags);
+          bool packParameters = (bool)args.packParameters;
+
+          return this._loadContract(contractHash, contractMethod, contractFlags, packParameters);
 
         case EngineMethod.getvmstate:
           return this._getVMState();
@@ -166,6 +176,17 @@ namespace NEOONE
     {
       this.isEngineInitialized();
       this.engine.LoadScript(script, flags, hash, initialPosition);
+      return true;
+    }
+
+    private bool _loadContract(UInt160 hash, string method, CallFlags flags, bool packParameters)
+    {
+      this.isEngineInitialized();
+      ContractState cs = NativeContract.Management.GetContract(this.snapshot, hash);
+      if (cs is null) return false;
+
+      this.engine.LoadContract(cs, method, flags, packParameters);
+
       return true;
     }
 

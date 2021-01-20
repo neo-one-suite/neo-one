@@ -1,7 +1,7 @@
 // tslint:disable no-any
 import styled from '@emotion/styled';
 import { Account, UserAccount } from '@neo-one/client-common';
-import { Client, Hash256, nep5 } from '@neo-one/client-core';
+import { Client, Hash256, nep17 } from '@neo-one/client-core';
 import { Box, Select } from '@neo-one/react-common';
 import { PromiseReturnType, utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
@@ -43,7 +43,7 @@ export const makeOption = async ({
       tokens
         .filter((token) => token.network === userAccount.id.network)
         .map<Promise<readonly [string, BigNumber]>>(async (token) => {
-          const smartContract = nep5.createNEP5SmartContract(
+          const smartContract = nep17.createNEP17SmartContract(
             client,
             { [token.network]: { address: token.address } },
             token.decimals,

@@ -59,7 +59,7 @@ export class HeaderIndexCache {
       return this.getHeaderHashIndexFromCurrent(hashListHashIndex);
     }
 
-    const hashListIndex = (index - hashListHashIndex) / 2000;
+    const hashListIndex = index - hashListHashIndex;
     const headerHashList = await this.getHeaderHashList(hashListIndex);
     if (headerHashList === undefined) {
       return undefined;

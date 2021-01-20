@@ -155,6 +155,6 @@ const abi = (decimals: number): ABI => ({
   ],
 });
 
-export const nep5 = {
+export const nep17 = {
   abi,
 };

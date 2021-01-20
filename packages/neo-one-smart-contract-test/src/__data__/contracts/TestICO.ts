@@ -1,7 +1,7 @@
 import { Address, Fixed, Integer, SmartContract } from '@neo-one/smart-contract';
-import { ICO, NEP5Token } from '@neo-one/smart-contract-lib';
+import { ICO, NEP17Token } from '@neo-one/smart-contract-lib';
 
-export class TestICO extends ICO(NEP5Token(SmartContract)) {
+export class TestICO extends ICO(NEP17Token(SmartContract)) {
   public readonly name: string = 'TestToken';
   public readonly decimals: 8 = 8;
   public readonly symbol: string = 'TT';

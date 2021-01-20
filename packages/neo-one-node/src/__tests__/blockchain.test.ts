@@ -1,36 +1,13 @@
-import { common, ScriptBuilder } from '@neo-one/client-common';
 import { Blockchain } from '@neo-one/node-blockchain';
-import { ContractState, StorageItem } from '@neo-one/node-core';
 import { NativeContainer } from '@neo-one/node-native';
 import { test as createTest } from '@neo-one/node-neo-settings';
 import { storage as levelupStorage } from '@neo-one/node-storage-levelup';
 import { blockchainSettingsToProtocolSettings, Dispatcher } from '@neo-one/node-vm';
 import LevelUp from 'levelup';
-import RocksDB from 'rocksdb';
+// tslint:disable-next-line: match-default-export-name
 import Memdown from 'memdown';
+import RocksDB from 'rocksdb';
 import { getData } from '../__data__';
-import { BN } from 'bn.js';
-
-const rawReadStreamPromise = async (db: any, options: { readonly gte: Buffer; readonly lte: Buffer }) =>
-  new Promise((resolve, reject) => {
-    db.createReadStream(options)
-      .on('data', (data: any) => {
-        console.log(common.uInt160ToString(data.key.slice(1)));
-        console.log(
-          JSON.stringify(
-            ContractState.deserializeWire({
-              context: { messageMagic: 1951352142, validatorsCount: 1 },
-              buffer: data.value,
-            }).serializeJSON(),
-            undefined,
-            2,
-          ),
-        );
-      })
-      .on('error', reject)
-      .on('close', resolve)
-      .on('end', resolve);
-  });
 
 describe('Blockchain invocation / storage tests', () => {
   test('Can persist the first 3 blocks with disk storage', async () => {
@@ -86,7 +63,7 @@ describe('VM memory store for testing', () => {
           })
           .on('close', () => resolve(changesInternal))
           .on('end', () => resolve(changesInternal))
-          .on('error', (reason) => reject(reason));
+          .on('error', reject);
       });
 
     const onPersist = async () => {

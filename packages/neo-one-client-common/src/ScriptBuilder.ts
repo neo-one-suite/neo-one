@@ -11,7 +11,7 @@ export class ScriptBuilder extends BaseScriptBuilder {
     super();
 
     this.pushParamCallbacks = {
-      undefined: () => this.emitPush(Buffer.alloc(0, 0)),
+      undefined: () => this.emitOp('PUSHNULL'),
       array: (param) => this.emitPushArray(param),
       map: (param) => this.emitPushMap(param),
       uInt160: (param) => this.emitPushUInt160(common.asUInt160(param)),
@@ -49,10 +49,14 @@ export class ScriptBuilder extends BaseScriptBuilder {
   }
 
   public emitPushArray(params: readonly ScriptBuilderParam[]): this {
+    if (params.length === 0) {
+      return this.emitOp('NEWARRAY0');
+    }
+
     this.emitPushParams(...params);
     this.emitPushParam(params.length);
 
-    return params.length !== 0 ? this.emitOp('PACK') : this.emitOp('NEWARRAY');
+    return this.emitOp('PACK');
   }
 
   // tslint:disable-next-line readonly-array

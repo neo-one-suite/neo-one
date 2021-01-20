@@ -71,6 +71,14 @@ export class TransactionModel<
     this.networkFee = networkFee;
   }
 
+  public getAttributes<T extends TAttribute>(isAttr: (attr: TAttribute) => attr is T): readonly T[] {
+    return this.attributes.filter(isAttr);
+  }
+
+  public getAttribute<T extends TAttribute>(isAttr: (attr: TAttribute) => attr is T): T | undefined {
+    return this.getAttributes(isAttr)[0];
+  }
+
   public getScriptHashesForVerifying(): readonly UInt160[] {
     return this.signers.map((signer) => signer.account);
   }

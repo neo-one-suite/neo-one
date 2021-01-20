@@ -1,4 +1,5 @@
 import { SerializableWire, StorageKey } from '@neo-one/node-core';
+import { BN } from 'bn.js';
 
 export class KeyBuilder {
   private readonly id: number;
@@ -24,6 +25,19 @@ export class KeyBuilder {
     this.mutableBuffer = Buffer.concat([this.mutableBuffer, serialized]);
 
     return this;
+  }
+
+  public addUInt32BE(value: number): this {
+    const buffer = Buffer.alloc(4);
+    buffer.writeUInt32BE(value);
+
+    return this.addBuffer(buffer);
+  }
+
+  public addUInt64LE(value: BN): this {
+    const buffer = value.toArrayLike(Buffer, 'le', 8);
+
+    return this.addBuffer(buffer);
   }
 
   public toSearchPrefix(): Buffer {

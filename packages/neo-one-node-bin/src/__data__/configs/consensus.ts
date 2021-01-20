@@ -1,7 +1,7 @@
 import { createMain, serializeSettings } from '@neo-one/node-neo-settings';
 import { getTestKeys } from '../getTestKeys';
 
-const { standbyValidator, address, privateKeyString } = getTestKeys();
+const { standbyValidator, privateKeyString } = getTestKeys();
 
 export const consensus = (rpcPort: number, path: string) => ({
   path,

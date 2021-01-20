@@ -1,4 +1,4 @@
-import { args as clientArgs, nep5 } from '@neo-one/client-core';
+import { args as clientArgs, nep17 } from '@neo-one/client-core';
 import { data } from '../__data__';
 import * as args from '../args';
 
@@ -129,14 +129,14 @@ describe('arg assertions', () => {
     expect(() => args.assertContractRegister('value', value)).toThrowErrorMatchingSnapshot();
   });
 
-  test('assertABI - nep5', () => {
-    const value = nep5.abi(8);
+  test('assertABI - nep17', () => {
+    const value = nep17.abi(8);
 
     expect(clientArgs.assertContractABIClient('value', value)).toEqual(value);
   });
 
   test('assertContractManifest', () => {
-    const value = nep5.manifest(8);
+    const value = nep17.manifest(8);
 
     expect(clientArgs.assertContractManifest('value', value)).toEqual(value);
   });

@@ -22,10 +22,12 @@ export const createCSharpDispatchInvoke = <Methods extends DefaultMethods>(
   options: EdgeOptions,
 ): DispatcherFunc<Methods> => {
   if (process.env.EDGE_APP_ROOT === undefined) {
+    // tslint:disable-next-line: no-object-mutation
     process.env.EDGE_APP_ROOT = CSHARP_APP_ROOT;
   }
 
   if (process.env.EDGE_USE_CORECLR === undefined) {
+    // tslint:disable-next-line: no-object-mutation
     process.env.EDGE_USE_CORECLR = '1';
   }
 

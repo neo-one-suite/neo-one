@@ -5,6 +5,7 @@ import { randomBytes } from 'crypto';
 import _ from 'lodash';
 import { StackItem } from '../StackItems';
 import { StorageItem } from '../StorageItem';
+import { executionLimits } from '../vm';
 import { BinaryReader } from './BinaryReader';
 import { deserializeStackItem } from './deserializeStackItem';
 
@@ -205,7 +206,7 @@ const wildCardFromJSON = <T>(json: WildcardContainerJSON, selector: (input: stri
 const getInteroperable = <T>(item: StorageItem, fromStackItem: (item: StackItem) => T): T => {
   const buffer = item.value;
   const reader = new BinaryReader(buffer);
-  const deserializedStackItem = deserializeStackItem(reader, 16, 34);
+  const deserializedStackItem = deserializeStackItem(reader, executionLimits.maxStackSize, executionLimits.maxItemSize);
 
   return fromStackItem(deserializedStackItem);
 };

@@ -50,12 +50,6 @@ const getCallReceipt = (engine: ApplicationEngine, container?: Verifiable) => ({
 });
 
 const verifyContract = async (contract: ContractState, vm: VM, transaction: Transaction) => {
-  const verify = contract.manifest.abi.getMethod('verify');
-  if (verify === undefined) {
-    throw new InvalidFormatError(`the smart contract ${contract.scriptHash} does not have a verify method`);
-  }
-
-  const init = contract.manifest.abi.getMethod('_initialize');
   const gas = vm.withApplicationEngine(
     {
       trigger: TriggerType.Verification,
@@ -64,21 +58,24 @@ const verifyContract = async (contract: ContractState, vm: VM, transaction: Tran
       gas: common.TWENTY_FIXED8,
     },
     (engine) => {
-      engine.loadScript({
-        script: contract.script,
+      const loaded = engine.loadContract({
+        hash: contract.hash,
         flags: CallFlags.None,
-        initialPosition: init ? init.offset : verify.offset,
+        method: 'verify',
+        packParameters: true,
       });
 
-      engine.loadScript({ script: Buffer.from([]), flags: CallFlags.None });
-      const result = engine.execute();
+      if (!loaded) {
+        throw new InvalidFormatError(`contract with hash: ${contract.hash} does not have a verify method.`);
+      }
 
+      const result = engine.execute();
       if (result === VMState.FAULT) {
-        throw new ScriptVerifyError(`contract ${contract.scriptHash} returned FAULT state`);
+        throw new ScriptVerifyError(`contract ${contract.hash} returned FAULT state`);
       }
 
       if (engine.resultStack.length !== 1 || !engine.resultStack[0].getBoolean()) {
-        throw new ScriptVerifyError(`contract ${contract.scriptHash} returns false`);
+        throw new ScriptVerifyError(`contract ${contract.hash} returns false`);
       }
 
       return engine.gasConsumed;

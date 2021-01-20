@@ -40,6 +40,7 @@ const convertBlock = (json: BlockJSON, messageMagic: number) =>
             (signer) =>
               new Signer({
                 account: JSONHelper.readUInt160(signer.account),
+                // tslint:disable-next-line: no-any
                 scopes: (signer.scopes as any) === 'FeeOnly' ? WitnessScopeModel.None : toWitnessScope(signer.scopes),
               }),
           ),
@@ -55,6 +56,7 @@ const convertBlock = (json: BlockJSON, messageMagic: number) =>
     messageMagic,
   });
 
+// tslint:disable no-any export-name
 export const getData = (messageMagic: number) => ({
   genesisBlock: convertBlock(genesisJSON as any, messageMagic),
   secondBlock: convertBlock(secondBlockJSON as any, messageMagic),

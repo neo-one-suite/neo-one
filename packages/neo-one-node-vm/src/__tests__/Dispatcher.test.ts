@@ -101,4 +101,8 @@ describe('Dispatcher Tests', () => {
   test('Dispatcher returns config without initializing config', () => {
     expect(dispatcher.getConfig()).toBeDefined();
   });
+
+  test.only('test output only', () => {
+    console.log(dispatcher.test());
+  });
 });
