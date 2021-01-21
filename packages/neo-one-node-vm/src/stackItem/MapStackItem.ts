@@ -11,6 +11,7 @@ import { StackItemBase } from './StackItemBase';
 import { StackItemType } from './StackItemType';
 
 export class MapStackItem extends StackItemBase {
+  public readonly isICollection = true;
   private readonly referenceKeys: Map<string, StackItem>;
   private readonly referenceValues: Map<string, StackItem>;
   private readonly referenceID = getNextID();

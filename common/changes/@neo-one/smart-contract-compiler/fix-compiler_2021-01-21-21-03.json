@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "Serialize and deserialize mapitem keys in compiler.",
+      "type": "minor",
+      "packageName": "@neo-one/smart-contract-compiler"
+    }
+  ],
+  "packageName": "@neo-one/smart-contract-compiler",
+  "email": "spencercorwin@icloud.com"
+}

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "Serialize and deserialize mapitem keys in compiler.",
+      "type": "minor",
+      "packageName": "@neo-one/cli"
+    }
+  ],
+  "packageName": "@neo-one/cli",
+  "email": "spencercorwin@icloud.com"
+}

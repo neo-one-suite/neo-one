@@ -21,10 +21,14 @@ import {
   InsufficientReturnValueError,
   InvalidCheckMultisigArgumentsError,
   InvalidHasKeyIndexError,
+  InvalidHasKeyKeyTypeError,
   InvalidPackCountError,
   InvalidPickItemKeyError,
+  InvalidPickItemKeyTypeError,
   InvalidRemoveIndexError,
+  InvalidRemoveKeyTypeError,
   InvalidSetItemIndexError,
+  InvalidSetItemKeyTypeError,
   InvalidTailCallReturnValueError,
   ItemTooLargeError,
   LeftNegativeError,
@@ -1718,8 +1722,12 @@ const OPCODE_PAIRS = ([
         in: 2,
         out: 1,
         invoke: ({ context, args }) => {
+          const key = args[0];
+          if (key.isICollection) {
+            throw new InvalidPickItemKeyTypeError(context);
+          }
           if (args[1].isArray()) {
-            const index = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
+            const index = vmUtils.toNumber(context, key.asBigIntegerUnsafe());
             const val = args[1].asArray();
             if (index < 0 || index >= val.length) {
               throw new InvalidPickItemKeyError(context, `${index}`, JSON.stringify(args[1].convertJSON()));
@@ -1733,7 +1741,6 @@ const OPCODE_PAIRS = ([
             };
           }
 
-          const key = args[0];
           const value = args[1].asMapStackItem();
           if (!value.has(key)) {
             throw new InvalidPickItemKeyError(context, key.toStructuralKey(), JSON.stringify(args[1].convertJSON()));
@@ -1755,11 +1762,15 @@ const OPCODE_PAIRS = ([
         in: 3,
         invoke: ({ context, args }) => {
           let newItem = args[0];
+          const key = args[1];
+          if (key.isICollection) {
+            throw new InvalidSetItemKeyTypeError(context);
+          }
           if (newItem instanceof StructStackItem) {
             newItem = newItem.clone();
           }
           if (args[2].isArray()) {
-            const index = vmUtils.toNumber(context, args[1].asBigIntegerUnsafe());
+            const index = vmUtils.toNumber(context, key.asBigIntegerUnsafe());
             const mutableValue = args[2].asArray();
             if (index < 0 || index >= mutableValue.length) {
               throw new InvalidSetItemIndexError(context);
@@ -1779,7 +1790,6 @@ const OPCODE_PAIRS = ([
             };
           }
 
-          const key = args[1];
           const value = args[2].asMapStackItem();
           const existingValue = value.has(key) ? value.get(key) : undefined;
           value.set(key, newItem);
@@ -1861,8 +1871,12 @@ const OPCODE_PAIRS = ([
         name: 'REMOVE',
         in: 2,
         invoke: ({ context, args }) => {
+          const key = args[0];
+          if (key.isICollection) {
+            throw new InvalidRemoveKeyTypeError(context);
+          }
           if (args[1].isArray()) {
-            const index = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
+            const index = vmUtils.toNumber(context, key.asBigIntegerUnsafe());
             const mutableValue = args[1].asArray();
             if (index < 0 || index >= mutableValue.length) {
               throw new InvalidRemoveIndexError(context, index);
@@ -1879,7 +1893,6 @@ const OPCODE_PAIRS = ([
             };
           }
 
-          const key = args[0];
           const value = args[1].asMapStackItem();
           if (value.has(key)) {
             const val = value.get(key);
@@ -1909,8 +1922,12 @@ const OPCODE_PAIRS = ([
         in: 2,
         out: 1,
         invoke: ({ context, args }) => {
+          const key = args[0];
+          if (key.isICollection) {
+            throw new InvalidHasKeyKeyTypeError(context);
+          }
           if (args[1].isArray()) {
-            const index = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
+            const index = vmUtils.toNumber(context, key.asBigIntegerUnsafe());
             const val = args[1].asArray();
             if (index < 0) {
               throw new InvalidHasKeyIndexError(context);
@@ -1922,7 +1939,6 @@ const OPCODE_PAIRS = ([
             };
           }
 
-          const key = args[0];
           const value = args[1].asMapStackItem();
 
           return {

@@ -63,3 +63,105 @@ The `Blockchain` value contains several properties pertaining to the current sta
 If you look at the definition file for the standard library, you might notice a property `OpaqueTagSymbol0`, `OpaqueTagSymbol1`, `one0` or `one1` that is present on all types, including global types like `Array` or `Map`. In order to emit the most efficient NEO VM bytecode possible, we have specialized implementations of all of the standard library types. One limitation of this approach, however, is that you must explicitly use the types. For example, you can't pass an `Array` where an `Array`-like but not `Array` interface is expected. Adding the `OpaqueTagSymbol0`, `OpaqueTagSymbol1`, `one0`, or `one1` properties helps enforce this as a static type error, but it does not catch all cases (though we're working on improving this).
 
 As a rule of thumb, don't rely on ["Duck Typing"](https://en.wikipedia.org/wiki/Duck_typing), instead always be explicit about the types you're using.
+
+## JavaScript Semantics
+
+The NEO•ONE compiler is as close to regular TypeScript as possible. But there are a few areas where our compiler does not exactly match normal JavaScript semantics. These areas almost never come up, but could cause strange behavior if you are expecting your Smart Contract code to behave exactly like JavaScript. One of those is when using native `Map`s and `Set`s. In normal JavaScript if you use a structural type as a key in a `Map` or a member in a `Set`, you can only retrieve that key/member later if it's the same reference. Trying to retrieve that key/member with the same value of a different reference will not work in regular JavaScript. But it WILL work in our compiler. The best way to demonstrate this is with examples.
+
+### `Set` Example
+
+This test would pass in regular TS:
+
+```typescript
+const x = new Set<ReadonlyArray<number>>();
+const y = [0];
+const z = [0];
+x.add(y).add(z);
+
+assertEqual(x.has(y), true);
+assertEqual(x.has(z), true);
+assertEqual(x.has([0]), false); // notice difference here
+assertEqual(x.size, 2); // notice difference here
+
+x.delete(y);
+assertEqual(x.delete(z), true); // notice difference here
+assertEqual(x.delete(z), false);
+assertEqual(x.size, 0);
+assertEqual(x.has(y), false);
+assertEqual(x.has(z), false);
+```
+
+But this test will pass in our TS compiler:
+
+```typescript
+const x = new Set<ReadonlyArray<number>>();
+const y = [0];
+const z = [0];
+x.add(y).add(z);
+
+assertEqual(x.has(y), true);
+assertEqual(x.has(z), true);
+assertEqual(x.has([0]), true); // notice difference here
+assertEqual(x.size, 1); // notice difference here
+
+x.delete(y);
+assertEqual(x.delete(z), false); // notice difference here
+assertEqual(x.delete(z), false);
+assertEqual(x.size, 0);
+assertEqual(x.has(y), false);
+assertEqual(x.has(z), false);
+```
+
+### `Map` Example
+
+This test would pass in regular TS:
+
+```typescript
+const x = new Map<ReadonlyArray<number>, string>();
+const y = [0];
+const z = [0];
+x.set(y, 'bar').set(z, 'baz');
+
+assertEqual(x.get(y), 'bar'); // notice difference here
+assertEqual(x.has(y), true);
+assertEqual(x.get(z), 'baz');
+assertEqual(x.has(z), true);
+assertEqual(x.get([0]), undefined); // notice difference here
+assertEqual(x.has([0]), false); // notice difference here
+assertEqual(x.size, 2); // notice difference here
+
+x.delete(y);
+assertEqual(x.delete(z), true); // notice difference here
+assertEqual(x.delete(z), false);
+assertEqual(x.size, 0);
+assertEqual(x.get(y), undefined);
+assertEqual(x.has(y), false);
+assertEqual(x.get(z), undefined);
+assertEqual(x.has(z), false);
+```
+
+But this test will pass in our TS compiler:
+
+```typescript
+const x = new Map<ReadonlyArray<number>, string>();
+const y = [0];
+const z = [0];
+x.set(y, 'bar').set(z, 'baz');
+
+assertEqual(x.get(y), 'baz'); // notice difference here
+assertEqual(x.has(y), true);
+assertEqual(x.get(z), 'baz');
+assertEqual(x.has(z), true);
+assertEqual(x.get([0]), 'baz'); // notice difference here
+assertEqual(x.has([0]), true); // notice difference here
+assertEqual(x.size, 1); // notice difference here
+
+x.delete(y);
+assertEqual(x.delete(z), false); // notice difference here
+assertEqual(x.delete(z), false);
+assertEqual(x.size, 0);
+assertEqual(x.get(y), undefined);
+assertEqual(x.has(y), false);
+assertEqual(x.get(z), undefined);
+assertEqual(x.has(z), false);
+```

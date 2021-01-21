@@ -113,6 +113,7 @@ export class ArgumentsHelper extends Helper<ts.CallExpression | ts.NewExpression
             arg,
             innerOptions,
             sb.helpers.mapReduce({
+              deserializeKey: true,
               each: handleMapLike,
             }),
           );
@@ -140,6 +141,7 @@ export class ArgumentsHelper extends Helper<ts.CallExpression | ts.NewExpression
             arg,
             innerOptions,
             sb.helpers.mapReduce({
+              deserializeKey: true,
               each: handleSetLike,
             }),
           );

@@ -3,9 +3,20 @@ import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
+export interface RawEnumeratorForEachFuncHelperOptions {
+  readonly deserializeKey?: boolean;
+}
+
 // Input: [objectVal, enumerator]
 // Output: []
 export class RawEnumeratorForEachFuncHelper extends Helper {
+  private readonly deserializeKey: boolean;
+
+  public constructor(options: RawEnumeratorForEachFuncHelperOptions) {
+    super();
+    this.deserializeKey = options.deserializeKey ?? false;
+  }
+
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
 
@@ -28,6 +39,10 @@ export class RawEnumeratorForEachFuncHelper extends Helper {
           sb.emitOp(node, 'DUP');
           // [key, enumerator, callable]
           sb.emitSysCall(node, 'Neo.Enumerator.Value');
+          if (this.deserializeKey) {
+            // [key, enumerator, callable]
+            sb.emitSysCall(node, 'Neo.Runtime.Deserialize');
+          }
           // [1, value, enumerator, callable]
           sb.emitPushInt(node, 1);
           // [argsarr, enumerator, callable]

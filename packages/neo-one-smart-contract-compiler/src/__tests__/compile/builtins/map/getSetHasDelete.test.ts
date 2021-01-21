@@ -23,23 +23,23 @@ describe('Map.prototype.get/set/has/delete', () => {
     `);
   });
 
-  test('should respect reference semantics', async () => {
+  test('should NOT respect reference semantics', async () => {
     await helpers.executeString(`
       const x = new Map<ReadonlyArray<number>, string>();
       const y = [0];
       const z = [0];
       x.set(y, 'bar').set(z, 'baz');
 
-      assertEqual(x.get(y), 'bar');
+      assertEqual(x.get(y), 'baz');
       assertEqual(x.has(y), true);
       assertEqual(x.get(z), 'baz');
       assertEqual(x.has(z), true);
-      assertEqual(x.get([0]), undefined);
-      assertEqual(x.has([0]), false);
-      assertEqual(x.size, 2);
+      assertEqual(x.get([0]), 'baz');
+      assertEqual(x.has([0]), true);
+      assertEqual(x.size, 1);
 
       x.delete(y);
-      assertEqual(x.delete(z), true);
+      assertEqual(x.delete(z), false);
       assertEqual(x.delete(z), false);
       assertEqual(x.size, 0);
       assertEqual(x.get(y), undefined);
