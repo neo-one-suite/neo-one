@@ -153,6 +153,8 @@ export class ArrayBindingHelper extends TypedHelper<ts.ArrayBindingPattern> {
         sb.emitOp(element, 'SWAP');
         // [key, val]
         sb.emitSysCall(element, 'Neo.Iterator.Key');
+        // [key, val]
+        sb.emitSysCall(element, 'Neo.Runtime.Deserialize');
         // [2, key, val]
         sb.emitPushInt(element, 2);
         // [arr]
@@ -170,6 +172,7 @@ export class ArrayBindingHelper extends TypedHelper<ts.ArrayBindingPattern> {
           element,
           innerOptions,
           sb.helpers.rawIteratorReduce({
+            deserializeKey: true,
             each: handleMapLike(element),
           }),
         );
@@ -205,6 +208,8 @@ export class ArrayBindingHelper extends TypedHelper<ts.ArrayBindingPattern> {
         sb.emitOp(element, 'DROP');
         // [val]
         sb.emitSysCall(element, 'Neo.Iterator.Key');
+        // [val]
+        sb.emitSysCall(element, 'Neo.Runtime.Deserialize');
       },
       (element, innerOptions) => {
         // [0, iterator]
@@ -216,6 +221,7 @@ export class ArrayBindingHelper extends TypedHelper<ts.ArrayBindingPattern> {
           element,
           innerOptions,
           sb.helpers.rawIteratorReduce({
+            deserializeKey: true,
             each: handleSetLike(element),
           }),
         );

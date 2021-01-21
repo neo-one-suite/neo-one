@@ -37,6 +37,8 @@ export class SetAdd extends BuiltinInstanceMemberCall {
     sb.emitHelper(node, options, sb.helpers.unwrapMap);
     // [valVal, map]
     sb.visit(tsUtils.argumented.getArguments(node)[0], options);
+    // [key, map]
+    sb.emitSysCall(node, 'Neo.Runtime.Serialize');
     // [value, keyVal, map]
     sb.emitPushBoolean(node, true);
     // []

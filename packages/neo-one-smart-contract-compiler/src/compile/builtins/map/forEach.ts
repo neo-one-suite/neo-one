@@ -36,7 +36,7 @@ export class MapForEach extends BuiltinInstanceMemberCall {
     // [objectVal, iterator]
     sb.visit(tsUtils.argumented.getArguments(node)[0], options);
     // []
-    sb.emitHelper(node, options, sb.helpers.rawIteratorForEachFunc);
+    sb.emitHelper(node, options, sb.helpers.rawIteratorForEachFunc({ deserializeKey: true }));
 
     if (optionsIn.pushValue) {
       // [val]

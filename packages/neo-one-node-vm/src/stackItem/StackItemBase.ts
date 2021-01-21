@@ -57,6 +57,7 @@ export interface AsStorageContextStackItemOptions {
 }
 
 export class StackItemBase implements Equatable {
+  public readonly isICollection: boolean = false;
   private mutableCount = 0;
 
   public get referenceCount(): number {
