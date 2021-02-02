@@ -1,15 +1,16 @@
 import {
+  ApplicationLogJSON,
   CallReceiptJSON,
   common,
   crypto,
   JSONHelper,
+  LogJSON,
   RelayTransactionResultJSON,
   scriptHashToAddress,
   toVerifyResultJSON,
   toVMStateJSON,
   TransactionJSON,
   TransactionReceiptJSON,
-  utils as commonUtils,
   VerboseTransactionJSON,
   VerifyResultModel,
 } from '@neo-one/client-common';
@@ -23,13 +24,12 @@ import {
   Nep5Transfer,
   Nep5TransferKey,
   Node,
-  Signer,
   Signers,
   StackItem,
-  stackItemToJSON,
   StorageKey,
   Transaction,
   TransactionState,
+  VMLog,
 } from '@neo-one/node-core';
 import { Labels, utils } from '@neo-one/utils';
 import { BN } from 'bn.js';
@@ -301,17 +301,26 @@ export const createHandler = ({
     }
   };
 
+  const vmLogToJson = (log: VMLog): LogJSON => ({
+    containerhash: log.containerHash ? common.uInt256ToString(log.containerHash) : undefined,
+    callingscripthash: common.uInt160ToString(log.callingScriptHash),
+    message: log.message,
+    // position: log.position,
+  });
+
   const getInvokeResult = (script: Buffer, receipt: CallReceipt): CallReceiptJSON => {
-    const { stack: stackIn, state, notifications, gasConsumed } = receipt;
+    const { stack: stackIn, state, notifications, gasConsumed, logs } = receipt;
 
     try {
-      const stack = stackIn.map((item: StackItem) => stackItemToJSON(item, undefined));
+      const stack = stackIn.map((item: StackItem) => item.toContractParameter().serializeJSON());
+
       return {
         script: script.toString('hex'),
         state: toVMStateJSON(state),
         stack,
         gasconsumed: gasConsumed.toString(),
         notifications: notifications.map((n) => n.serializeJSON()),
+        logs: logs.map(vmLogToJson),
       };
     } catch {
       return {
@@ -320,6 +329,7 @@ export const createHandler = ({
         stack: 'error: recursive reference',
         gasconsumed: gasConsumed.toString(),
         notifications: notifications.map((n) => n.serializeJSON()),
+        logs: logs.map(vmLogToJson),
       };
     }
   };
@@ -605,7 +615,7 @@ export const createHandler = ({
     [RPC_METHODS.listplugins]: async () => {
       throw new JSONRPCError(-101, 'Not implemented');
     },
-    [RPC_METHODS.getapplicationlog]: async (args) => {
+    [RPC_METHODS.getapplicationlog]: async (args): Promise<ApplicationLogJSON> => {
       const hash = common.stringToUInt256(args[0]);
       const value = await blockchain.applicationLogs.tryGet(hash);
       if (value === undefined) {
@@ -621,6 +631,7 @@ export const createHandler = ({
         gasconsumed,
         stack,
         notifications,
+        logs: [], // TODO: implement
       };
     },
 
@@ -842,7 +853,6 @@ export const createHandler = ({
     [RPC_METHODS.getinvocationdata]: async (_args) => {
       throw new JSONRPCError(-101, 'Not implemented');
       // const transactionState = await blockchain.transactions.get(JSONHelper.readUInt256(args[0]));
-      // // TODO: check serializeJSON() method. Doesn't include `data`
       // const result = transactionState.transaction.serializeJSONWithInvocationData();
 
       // if (result.data === undefined) {

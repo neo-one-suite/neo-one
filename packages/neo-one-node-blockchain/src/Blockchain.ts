@@ -27,6 +27,7 @@ import {
   Nep5Balance,
   Notification,
   RunEngineOptions,
+  SerializeJSONContext,
   Signers,
   Storage,
   Transaction,
@@ -200,7 +201,7 @@ export class Blockchain {
       validatorsCount: this.settings.validatorsCount,
     };
     this.mutableCurrentBlock = options.currentBlock;
-    this.onPersist = options.onPersist === undefined ? this.vm.updateSnapshots : options.onPersist;
+    this.onPersist = options.onPersist === undefined ? () => this.vm.updateSnapshots() : options.onPersist;
     this.start();
   }
 
@@ -303,7 +304,7 @@ export class Blockchain {
   //   return this.storage.consensusState;
   // }
 
-  public get serializeJSONContext() {
+  public get serializeJSONContext(): SerializeJSONContext {
     return {
       addressVersion: this.settings.addressVersion,
       messageMagic: this.settings.messageMagic,

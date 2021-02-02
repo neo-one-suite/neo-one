@@ -1,4 +1,4 @@
-import { nep5 } from '../__data__';
+import { nep17 } from '../__data__';
 import { genFiles } from '../genFiles';
 
 describe('genFiles', () => {
@@ -9,9 +9,9 @@ describe('genFiles', () => {
         contractPath: '/foo/bar/one/contracts/Token.ts',
         createContractPath: '/foo/bar/one/generated/Token/contract.js',
         typesPath: '/foo/bar/one/generated/Token/types.js',
-        abiPath: '/foo/bar/one/generated/Token/abi.js',
+        manifestPath: '/foo/bar/one/generated/Token/manifest.js',
         sourceMapsPath: '/foo/bar/one/generated/sourceMaps.js',
-        abi: nep5.abi(4),
+        manifest: nep17.manifest(4),
         networksDefinition: {
           main: {
             address: 'iamahash',

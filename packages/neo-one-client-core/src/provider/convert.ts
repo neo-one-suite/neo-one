@@ -1,16 +1,17 @@
 import {
-  ActionJSON,
+  // ActionJSON,
   CallReceiptJSON,
   common,
   ContractParameter,
   ContractParameterJSON,
-  InvocationResultJSON,
+  // InvocationResultJSON,
   JSONHelper,
-  NewRawNotification,
+  LogJSON,
   NotificationJSON,
-  RawAction,
+  // RawAction,
   RawCallReceipt,
-  RawInvocationResult,
+  RawLog,
+  RawNotification,
   RawStackItem,
   scriptHashToAddress,
   StackItemJSON,
@@ -24,8 +25,19 @@ export function convertCallReceipt(receipt: CallReceiptJSON): RawCallReceipt {
     script: JSONHelper.readBuffer(receipt.script),
     state: receipt.state,
     gasConsumed: common.fixedToDecimal(new BN(receipt.gasconsumed), 0),
-    stack: typeof receipt.stack === 'string' ? receipt.stack : receipt.stack.map(convertStackItem),
+    stack: typeof receipt.stack === 'string' ? receipt.stack : receipt.stack.map(convertContractParameter),
     notifications: receipt.notifications.map(convertNotification),
+    logs: receipt.logs.map(convertLog),
+  };
+}
+
+export function convertLog(log: LogJSON): RawLog {
+  return {
+    type: 'Log',
+    containerHash: log.containerhash ? common.stringToUInt256(log.containerhash) : undefined,
+    callingScriptHash: common.stringToUInt160(log.callingscripthash),
+    message: log.message,
+    // position: log.position,
   };
 }
 
@@ -59,71 +71,71 @@ export function convertStackItem(item: StackItemJSON): RawStackItem {
   }
 }
 
-export function convertNotification(notification: NotificationJSON): NewRawNotification {
-  return {
-    scriptHash: common.stringToUInt160(notification.scripthash),
-    eventName: notification.eventname,
-    state: typeof notification.state === 'string' ? notification.state : notification.state.map(convertStackItem),
-  };
-}
-
-export function convertAction(
-  blockHash: string,
-  blockIndex: number,
-  transactionHash: string,
-  transactionIndex: number,
-  index: number,
-  action: ActionJSON,
-): RawAction {
-  if (action.type === 'Log') {
-    return {
-      type: 'Log',
-      version: action.version,
-      blockIndex,
-      blockHash,
-      transactionIndex,
-      transactionHash,
-      index,
-      globalIndex: JSONHelper.readUInt64(action.index),
-      address: scriptHashToAddress(action.scriptHash),
-      message: action.message,
-    };
-  }
-
+export function convertNotification(notification: NotificationJSON): RawNotification {
   return {
     type: 'Notification',
-    version: action.version,
-    blockIndex,
-    blockHash,
-    transactionIndex,
-    transactionHash,
-    index,
-    globalIndex: JSONHelper.readUInt64(action.index),
-    address: scriptHashToAddress(action.scriptHash),
-    args: convertContractParameters(action.args),
+    scriptHash: common.stringToUInt160(notification.scripthash),
+    eventName: notification.eventname,
+    state: typeof notification.state === 'string' ? notification.state : convertContractParameters(notification.state),
   };
 }
 
-export function convertInvocationResult(result: InvocationResultJSON): RawInvocationResult {
-  if (result.state === 'FAULT') {
-    return {
-      state: 'FAULT',
-      gasConsumed: new BigNumber(result.gas_consumed),
-      gasCost: new BigNumber(result.gas_cost),
-      stack: convertContractParameters(result.stack),
-      message: result.message,
-      script: result.script,
-    };
-  }
+// TODO: delete or re-implement
+// export function convertAction(
+//   blockHash: string,
+//   blockIndex: number,
+//   transactionHash: string,
+//   transactionIndex: number,
+//   index: number,
+//   action: ActionJSON,
+// ): RawAction {
+//   if (action.type === 'Log') {
+//     return {
+//       type: 'Log',
+//       version: action.version,
+//       blockIndex,
+//       blockHash,
+//       transactionIndex,
+//       transactionHash,
+//       index,
+//       globalIndex: JSONHelper.readUInt64(action.index),
+//       address: scriptHashToAddress(action.scriptHash),
+//       message: action.message,
+//     };
+//   }
 
-  return {
-    state: 'HALT',
-    gasConsumed: new BigNumber(result.gas_consumed),
-    gasCost: new BigNumber(result.gas_cost),
-    stack: convertContractParameters(result.stack),
-    script: result.script,
-  };
-}
+//   return {
+//     type: 'Notification',
+//     version: action.version,
+//     blockIndex,
+//     blockHash,
+//     transactionIndex,
+//     transactionHash,
+//     index,
+//     globalIndex: JSONHelper.readUInt64(action.index),
+//     address: scriptHashToAddress(action.scriptHash),
+//     args: convertContractParameters(action.args),
+//   };
+// }
+
+// export function convertInvocationResult(result: InvocationResultJSON): RawInvocationResult {
+//   if (result.state === 'FAULT') {
+//     return {
+//       state: 'FAULT',
+//       gasConsumed: new BigNumber(result.gas_consumed),
+//       stack: convertContractParameters(result.stack),
+//       message: result.message,
+//       script: result.script,
+//     };
+//   }
+
+//   return {
+//     state: 'HALT',
+//     gasConsumed: new BigNumber(result.gas_consumed),
+//     stack: convertContractParameters(result.stack),
+//     script: result.script,
+//   };
+// }
 
 export function convertContractParameters(parameters: readonly ContractParameterJSON[]): readonly ContractParameter[] {
   return parameters.map(convertContractParameter);
@@ -135,13 +147,11 @@ export function convertContractParameter(parameter: ContractParameterJSON): Cont
       return {
         type: 'Any',
         value: undefined,
-        name: parameter.name,
       };
     case 'Array':
       return {
         type: 'Array',
         value: convertContractParameters(parameter.value),
-        name: parameter.name,
       };
     case 'Boolean':
       return parameter;
@@ -149,13 +159,11 @@ export function convertContractParameter(parameter: ContractParameterJSON): Cont
       return {
         type: 'Buffer',
         value: parameter.value,
-        name: parameter.name,
       };
     case 'Hash160':
       return {
         type: 'Hash160',
         value: scriptHashToAddress(parameter.value),
-        name: parameter.name,
       };
     case 'Hash256':
       return parameter;
@@ -163,7 +171,6 @@ export function convertContractParameter(parameter: ContractParameterJSON): Cont
       return {
         type: 'Integer',
         value: new BN(parameter.value, 10),
-        name: parameter.name,
       };
     case 'InteropInterface':
       return parameter;
@@ -174,7 +181,6 @@ export function convertContractParameter(parameter: ContractParameterJSON): Cont
           convertContractParameter(key),
           convertContractParameter(val),
         ]),
-        name: parameter.name,
       };
     case 'PublicKey':
       return parameter;

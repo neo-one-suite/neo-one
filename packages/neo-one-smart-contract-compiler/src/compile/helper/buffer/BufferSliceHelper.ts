@@ -93,7 +93,7 @@ export class BufferSliceHelper extends Helper {
             // [start, end, start, end, buffer]
             sb.emitOp(node, 'OVER');
             // [end <= start, start, end, buffer]
-            sb.emitOp(node, 'LTE');
+            sb.emitOp(node, 'LE');
           },
           whenTrue: () => {
             // [end, buffer]
@@ -195,7 +195,7 @@ export class BufferSliceHelper extends Helper {
                   // [0, right, buffer, right]
                   sb.emitPushInt(node, 0);
                   // [right < 0, buffer, right]
-                  sb.emitOp(node, 'LTE');
+                  sb.emitOp(node, 'LE');
                 },
                 whenTrue: () => {
                   // [right]

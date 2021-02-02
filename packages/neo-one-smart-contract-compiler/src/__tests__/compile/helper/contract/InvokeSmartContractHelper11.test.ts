@@ -3,12 +3,11 @@ import BigNumber from 'bignumber.js';
 import { helpers, keys } from '../../../../__data__';
 
 const properties = `
-public readonly properties = {
-  codeVersion: '1.0',
-  author: 'dicarlo2',
-  email: 'alex.dicarlo@neotracker.io',
-  description: 'The TestSmartContract',
-};
+  public readonly properties = {
+    groups: [],
+    permissions: [],
+    trusts: "*",
+  };
 `;
 
 describe('InvokeSmartContractHelper', () => {

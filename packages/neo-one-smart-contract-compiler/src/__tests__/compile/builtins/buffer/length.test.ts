@@ -23,7 +23,7 @@ describe('Buffer.prototype.length', () => {
   });
 
   test('cannot set the length of a buffer', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = Buffer.from('3030', 'hex');
       x.length = 4;
@@ -33,7 +33,7 @@ describe('Buffer.prototype.length', () => {
   });
 
   test('cannot set the "length" of a buffer', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x: { length: number } | Buffer = Buffer.from('3030', 'hex') as { length: number } | Buffer;
       const a = 'length';

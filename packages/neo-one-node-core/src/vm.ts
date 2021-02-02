@@ -1,4 +1,4 @@
-import { TriggerType, UInt256, VMState, Log, UInt160 } from '@neo-one/client-common';
+import { TriggerType, UInt160, UInt256, VMState } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { Block } from './Block';
 import { CallFlags } from './CallFlags';
@@ -11,7 +11,8 @@ export interface VMLog {
   readonly containerHash?: UInt256;
   readonly callingScriptHash: UInt160;
   readonly message: string;
-  readonly position: number;
+  // TODO: remove?
+  // readonly position: number;
 }
 
 export interface CallReceipt {
@@ -91,5 +92,5 @@ export interface VM {
   readonly withSnapshots: <T = void>(
     func: (snapshots: { readonly main: SnapshotHandler; readonly clone: Omit<SnapshotHandler, 'clone'> }) => T,
   ) => T;
-  readonly updateStore: (storage: ReadonlyArray<{ key: Buffer; value: Buffer }>) => void;
+  readonly updateStore: (storage: ReadonlyArray<{ readonly key: Buffer; readonly value: Buffer }>) => void;
 }

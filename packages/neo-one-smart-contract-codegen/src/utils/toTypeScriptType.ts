@@ -20,6 +20,7 @@ export const toTypeScriptType = (
     case 'Boolean':
       return addOptions('boolean');
     case 'Address':
+    case 'Hash160':
       return addOptions('AddressString');
     case 'Hash256':
       return addOptions('Hash256String');
@@ -44,6 +45,8 @@ export const toTypeScriptType = (
         )
         .join('\n')}
     }`);
+    case 'Any':
+      return 'any';
     case 'Void':
       return 'undefined';
     case 'Integer':

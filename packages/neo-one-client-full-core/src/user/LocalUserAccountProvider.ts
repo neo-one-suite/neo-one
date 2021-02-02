@@ -2,24 +2,27 @@ import {
   ABIParameter,
   ABIReturn,
   BufferString,
-  Contract,
+  common,
   ContractManifestClient,
   ContractParameterTypeModel,
+  ContractPermissionDescriptor,
   crypto,
+  ECPoint,
+  InvocationResultError,
+  InvocationResultSuccess,
   NetworkSettings,
   NetworkType,
   Param,
-  RawInvocationData,
+  RawApplicationLogData,
   RawInvokeReceipt,
-  RawTransactionResultError,
-  RawTransactionResultSuccess,
   ScriptBuilder,
+  scriptHashToAddress,
   SourceMaps,
   TransactionOptions,
   TransactionResult,
-  TransactionResultError,
-  TransactionResultSuccess,
+  UInt160,
   UserAccountID,
+  Wildcard,
 } from '@neo-one/client-common';
 import {
   convertParams,
@@ -61,6 +64,7 @@ const toContractParameterType = (parameter: ABIReturn | ABIParameter): ContractP
     case 'Integer':
       return ContractParameterTypeModel.Integer;
     case 'Hash160':
+    case 'Address':
       return ContractParameterTypeModel.Hash160;
     case 'Hash256':
       return ContractParameterTypeModel.Hash256;
@@ -87,9 +91,9 @@ const toContractParameterType = (parameter: ABIReturn | ABIParameter): ContractP
   }
 };
 
-const contractRegisterToContractModel = (contractIn: ContractRegister): ContractStateModel => {
+export const contractRegisterToContractModel = (contractIn: ContractRegister): ContractStateModel => {
   const abi = new ContractABIModel({
-    hash: contractIn.manifest.abi.hash,
+    hash: common.stringToUInt160(contractIn.manifest.abi.hash),
     methods: contractIn.manifest.abi.methods.map(
       (methodIn) =>
         new ContractMethodDescriptorModel({
@@ -118,9 +122,36 @@ const contractRegisterToContractModel = (contractIn: ContractRegister): Contract
         }),
     ),
   });
+  const getPermission = ({ hash, group }: ContractPermissionDescriptor): UInt160 | ECPoint | Wildcard => {
+    if (hash !== undefined && group !== undefined) {
+      throw new Error('Hash and group should not both be defined.');
+    }
+
+    if (hash !== undefined) {
+      if (!common.isUInt160(hash)) {
+        throw new Error('Invalid UInt160');
+      }
+
+      return common.stringToUInt160(hash);
+    }
+
+    if (group !== undefined) {
+      if (!common.isECPoint(group)) {
+        throw new Error('Invalid ECPoint');
+      }
+
+      return common.stringToECPoint(group);
+    }
+
+    return '*';
+  };
   const manifest = new ContractManifestModel({
     groups: contractIn.manifest.groups.map(
-      (group) => new ContractGroupModel({ publicKey: group.publicKey, signature: Buffer.from(group.signature, 'hex') }),
+      (group) =>
+        new ContractGroupModel({
+          publicKey: common.stringToECPoint(group.publicKey),
+          signature: Buffer.from(group.signature, 'hex'),
+        }),
     ),
     features: getContractProperties({
       hasStorage: contractIn.manifest.features.storage,
@@ -131,18 +162,18 @@ const contractRegisterToContractModel = (contractIn: ContractRegister): Contract
     permissions: contractIn.manifest.permissions.map(
       (perm) =>
         new ContractPermissionModel({
-          contract: new ContractPermissionDescriptorModel(perm.contract),
+          contract: new ContractPermissionDescriptorModel({ hashOrGroup: getPermission(perm.contract) }),
           methods: perm.methods,
         }),
     ),
-    trusts: contractIn.manifest.trusts,
+    trusts: contractIn.manifest.trusts === '*' ? '*' : contractIn.manifest.trusts.map(common.stringToUInt160),
     safeMethods: contractIn.manifest.safeMethods,
     extra: contractIn.manifest.extra,
   });
 
   return new ContractStateModel({
     script: Buffer.from(contractIn.script, 'hex'),
-    id: contractIn.id,
+    id: Math.floor(Math.random() * 1000000), // TODO: fix
     manifest,
   });
 };
@@ -213,9 +244,10 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<RawInvokeReceipt>> {
     const { from } = this.getTransactionOptions(options);
+    const bufferScript = Buffer.from(script, 'hex');
 
     return this.invokeRaw({
-      invokeMethodOptionsOrScript: Buffer.from(script, 'hex'),
+      invokeMethodOptionsOrScript: bufferScript,
       options,
       transfers: options.transfers === undefined ? [] : options.transfers.map((transfer) => ({ ...transfer, from })),
       onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
@@ -226,8 +258,12 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         transactionHash: receipt.transactionHash,
         globalIndex: receipt.globalIndex,
         confirmations: receipt.confirmations,
-        result: data.result,
-        actions: data.actions,
+        stack: typeof data.stack === 'string' ? [] : data.stack, // TODO: fix
+        state: data.vmState as 'HALT' | 'FAULT', // TODO: fix
+        script: bufferScript,
+        gasConsumed: data.gasConsumed,
+        logs: data.logs,
+        notifications: data.notifications,
       }),
       method: 'execute',
       sourceMaps,
@@ -248,23 +284,25 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     const { from } = this.getTransactionOptions(options);
     emit(sb, from);
 
+    const script = sb.build();
+
     return this.invokeRaw({
-      invokeMethodOptionsOrScript: sb.build(),
+      invokeMethodOptionsOrScript: script,
       options,
       onConfirm: async ({ receipt, data }): Promise<PublishReceipt> => {
         let result;
-        if (data.result.state === 'FAULT') {
-          result = await this.getInvocationResultError(data, data.result, sourceMaps);
+        // tslint:disable-next-line: prefer-switch
+        if (data.vmState === 'FAULT') {
+          result = await this.getInvocationResultError(data, sourceMaps);
+        } else if (data.vmState === 'NONE' || data.vmState === 'BREAK') {
+          throw new Error(`Something went wrong. Expected VM state HALT or FAULT. Got: ${data.vmState}`);
         } else {
-          const createdContract = data.contracts[0] as Contract | undefined;
-          if (createdContract === undefined) {
-            /* istanbul ignore next */
-            throw new InvalidTransactionError(
-              'Something went wrong! Expected a contract to have been created, but none was found',
-            );
-          }
+          const address = scriptHashToAddress(
+            common.uInt160ToString(crypto.toScriptHash(Buffer.from(contractIn.script, 'hex'))),
+          );
+          const contractOut = await this.provider.getContract(from.network, address);
 
-          result = await this.getInvocationResultSuccess(data, data.result, createdContract, sourceMaps);
+          result = await this.getInvocationResultSuccess(data, contractOut, sourceMaps);
         }
 
         return {
@@ -284,41 +322,46 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   }
 
   protected async getInvocationResultError(
-    data: RawInvocationData,
-    result: RawTransactionResultError,
+    data: RawApplicationLogData,
     sourceMaps: SourceMaps = {},
-  ): Promise<TransactionResultError> {
+  ): Promise<InvocationResultError> {
     const message = await processActionsAndMessage({
-      actions: data.actions,
-      message: result.message,
+      actions: [...data.logs, ...data.notifications],
       sourceMaps,
     });
 
+    // TODO: fix vm states
+    // tslint:disable-next-line: prefer-switch
+    if (data.vmState === 'HALT' || data.vmState === 'BREAK' || data.vmState === 'NONE') {
+      throw new Error(`Expected FAULT state. Got: ${data.vmState}`);
+    }
+
     return {
-      state: result.state,
-      gasConsumed: result.gasConsumed,
-      gasCost: result.gasCost,
-      script: result.script,
+      state: data.vmState,
+      gasConsumed: data.gasConsumed,
       message,
     };
   }
 
   protected async getInvocationResultSuccess<T>(
-    data: RawInvocationData,
-    result: RawTransactionResultSuccess,
+    data: RawApplicationLogData,
     value: T,
     sourceMaps: SourceMaps = {},
-  ): Promise<TransactionResultSuccess<T>> {
+  ): Promise<InvocationResultSuccess<T>> {
     await processConsoleLogMessages({
-      actions: data.actions,
+      actions: [...data.logs, ...data.notifications],
       sourceMaps,
     });
 
+    // TODO: fix vm states
+    // tslint:disable-next-line: prefer-switch
+    if (data.vmState === 'FAULT' || data.vmState === 'BREAK' || data.vmState === 'NONE') {
+      throw new Error(`Expected HALT state. Got: ${data.vmState}`);
+    }
+
     return {
-      state: result.state,
-      gasConsumed: result.gasConsumed,
-      gasCost: result.gasCost,
-      script: result.script,
+      state: data.vmState,
+      gasConsumed: data.gasConsumed,
       value,
     };
   }

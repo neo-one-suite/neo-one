@@ -44,24 +44,24 @@ exports[`crypto hash256 cannot be referenced 1`] = `
 "
 `;
 
-exports[`crypto sha1 cannot be referenced - object literal 1`] = `
+exports[`crypto ripemd160 cannot be referenced - object literal 1`] = `
 "snippetCode.ts (4,15): Builtin properties cannot be referenced
 
       2 |       import { crypto } from '@neo-one/smart-contract';
       3 | 
-    > 4 |       const { sha1 } = crypto;
+    > 4 |       const { ripemd160 } = crypto;
         |               ^
       5 |     
 "
 `;
 
-exports[`crypto sha1 cannot be referenced 1`] = `
-"snippetCode.ts (4,27): Builtin properties cannot be referenced
+exports[`crypto ripemd160 cannot be referenced 1`] = `
+"snippetCode.ts (4,32): Builtin properties cannot be referenced
 
       2 |       import { crypto } from '@neo-one/smart-contract';
       3 | 
-    > 4 |       const sha1 = crypto.sha1;
-        |                           ^
+    > 4 |       const ripemd160 = crypto.ripemd160;
+        |                                ^
       5 |     
 "
 `;

@@ -1,3 +1,4 @@
+import { common, ContractGroup, ContractPermission, WildcardContainer } from '@neo-one/client-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ContractProperties, ContractPropertyName, DEFAULT_CONTRACT_PROPERTIES } from '../constants';
@@ -22,6 +23,12 @@ export const getContractProperties = (context: Context, smartContract: ts.ClassD
     .find((symbol) => tsUtils.symbol.getName(symbol) === ContractPropertyName.properties);
 
   if (properties === undefined) {
+    context.reportWarning(
+      smartContract,
+      DiagnosticCode.InvalidContractProperties,
+      DiagnosticMessage.InvalidContractPropertiesWarning,
+    );
+
     return defaultContractProperties;
   }
 
@@ -56,7 +63,11 @@ export const getContractProperties = (context: Context, smartContract: ts.ClassD
     return defaultContractProperties;
   }
 
-  const contract: { [key: string]: string } = {};
+  const contract: {
+    trusts?: WildcardContainer<string>;
+    permissions?: readonly ContractPermission[];
+    groups?: readonly ContractGroup[];
+  } = {};
   // tslint:disable-next-line no-loop-statement
   for (const property of tsUtils.object_.getProperties(initializer)) {
     if (!ts.isPropertyAssignment(property)) {
@@ -71,18 +82,355 @@ export const getContractProperties = (context: Context, smartContract: ts.ClassD
 
     const key = tsUtils.node.getName(property);
     const value = tsUtils.initializer.getInitializer(property);
-    if (!ts.isLiteralExpression(value)) {
-      context.reportError(
-        value,
-        DiagnosticCode.InvalidContractProperties,
-        DiagnosticMessage.InvalidContractPropertiesInitializer,
-      );
 
-      return defaultContractProperties;
+    if (key === 'groups') {
+      const groupsArray = tsUtils.initializer.getInitializerOrThrow(value.parent);
+      if (!ts.isArrayLiteralExpression(groupsArray)) {
+        context.reportError(
+          groupsArray,
+          DiagnosticCode.InvalidContractProperties,
+          DiagnosticMessage.InvalidContractPropertyGroups,
+        );
+
+        continue;
+      }
+
+      const elements = tsUtils.expression.getElements(groupsArray);
+      const finalGroupsArray: ContractGroup[] = [];
+
+      elements.forEach((elem) => {
+        if (!ts.isObjectLiteralExpression(elem)) {
+          context.reportError(
+            elem,
+            DiagnosticCode.InvalidContractProperties,
+            DiagnosticMessage.InvalidContractPropertyGroups,
+          );
+
+          return;
+        }
+
+        const newObjToPush: { [key: string]: string } = {};
+        // tslint:disable-next-line: no-loop-statement
+        for (const innerProperty of tsUtils.object_.getProperties(elem)) {
+          if (!ts.isPropertyAssignment(innerProperty)) {
+            context.reportError(
+              innerProperty,
+              DiagnosticCode.InvalidContractProperties,
+              DiagnosticMessage.InvalidContractPropertyGroups,
+            );
+
+            continue;
+          }
+
+          const innerKey = tsUtils.node.getName(innerProperty);
+          const innerValue = tsUtils.initializer.getInitializer(innerProperty);
+          if (!ts.isLiteralExpression(innerValue)) {
+            context.reportError(
+              innerValue,
+              DiagnosticCode.InvalidContractProperties,
+              DiagnosticMessage.InvalidContractPropertyGroups,
+            );
+
+            continue;
+          }
+
+          const stringValue = tsUtils.literal.getLiteralValue(innerValue);
+
+          if (innerKey === 'publicKey') {
+            try {
+              common.stringToECPoint(stringValue);
+            } catch {
+              context.reportError(
+                innerValue,
+                DiagnosticCode.InvalidContractProperties,
+                DiagnosticMessage.InvalidContractPropertyGroups,
+              );
+
+              continue;
+            }
+          }
+
+          // tslint:disable-next-line: no-object-mutation
+          newObjToPush[innerKey] = stringValue;
+        }
+
+        // tslint:disable-next-line: no-array-mutation
+        finalGroupsArray.push((newObjToPush as unknown) as ContractGroup);
+      });
+
+      // tslint:disable-next-line: no-object-mutation
+      contract.groups = finalGroupsArray;
     }
 
-    // tslint:disable-next-line no-object-mutation
-    contract[key] = tsUtils.literal.getLiteralValue(value);
+    if (key === 'permissions') {
+      const permissionsArray = tsUtils.initializer.getInitializerOrThrow(value.parent);
+      if (!ts.isArrayLiteralExpression(permissionsArray)) {
+        context.reportError(
+          permissionsArray,
+          DiagnosticCode.InvalidContractProperties,
+          DiagnosticMessage.InvalidContractPropertyPermissions,
+        );
+
+        continue;
+      }
+
+      const elements = tsUtils.expression.getElements(permissionsArray);
+      const finalPermissionsArray: ContractPermission[] = [];
+
+      elements.forEach((elem) => {
+        if (!ts.isObjectLiteralExpression(elem)) {
+          context.reportError(
+            elem,
+            DiagnosticCode.InvalidContractProperties,
+            DiagnosticMessage.InvalidContractPropertyPermissions,
+          );
+
+          return;
+        }
+
+        const permissionObject: {
+          contract?: { hash?: string; group?: string };
+          methods?: WildcardContainer<string>;
+        } = {
+          contract: undefined,
+          methods: undefined,
+        };
+        // tslint:disable-next-line: no-loop-statement
+        for (const innerProperty of tsUtils.object_.getProperties(elem)) {
+          if (!ts.isPropertyAssignment(innerProperty)) {
+            context.reportError(
+              innerProperty,
+              DiagnosticCode.InvalidContractProperties,
+              DiagnosticMessage.InvalidContractPropertyPermissions,
+            );
+
+            continue;
+          }
+
+          const innerKey = tsUtils.node.getName(innerProperty);
+          const innerValue = tsUtils.initializer.getInitializer(innerProperty);
+
+          if (
+            !ts.isLiteralExpression(innerValue) &&
+            !ts.isObjectLiteralExpression(innerValue) &&
+            !ts.isArrayLiteralExpression(innerValue)
+          ) {
+            context.reportError(
+              innerValue,
+              DiagnosticCode.InvalidContractProperties,
+              DiagnosticMessage.InvalidContractPropertyPermissions,
+            );
+
+            continue;
+          }
+
+          const innerMethodsArray: string[] = [];
+
+          if (innerKey === 'methods') {
+            if (!ts.isLiteralExpression(innerValue) && !ts.isArrayLiteralExpression(innerValue)) {
+              context.reportError(
+                innerValue,
+                DiagnosticCode.InvalidContractProperties,
+                DiagnosticMessage.InvalidContractPropertyPermissions,
+              );
+
+              return;
+            }
+
+            if (ts.isLiteralExpression(innerValue)) {
+              const stringValue = tsUtils.literal.getLiteralValue(innerValue);
+              if (stringValue !== '*') {
+                context.reportError(
+                  innerValue,
+                  DiagnosticCode.InvalidContractProperties,
+                  DiagnosticMessage.InvalidContractPropertyPermissions,
+                );
+
+                return;
+              }
+
+              // tslint:disable-next-line: no-object-mutation
+              permissionObject.methods = stringValue;
+
+              continue;
+            }
+
+            if (ts.isArrayLiteralExpression(innerValue)) {
+              const arrayElements = tsUtils.expression.getElements(innerValue);
+
+              arrayElements.forEach((methodElem) => {
+                if (!ts.isLiteralExpression(methodElem)) {
+                  context.reportError(
+                    methodElem,
+                    DiagnosticCode.InvalidContractProperties,
+                    DiagnosticMessage.InvalidContractPropertyPermissions,
+                  );
+
+                  return;
+                }
+
+                const literalString = tsUtils.literal.getLiteralValue(methodElem);
+
+                // tslint:disable-next-line: no-array-mutation
+                innerMethodsArray.push(literalString);
+              });
+
+              // tslint:disable-next-line: no-object-mutation
+              permissionObject.methods = innerMethodsArray;
+            }
+          }
+
+          const innerContractObject: { hash?: string; group?: string } = { hash: undefined, group: undefined };
+
+          if (innerKey === 'contract') {
+            if (!ts.isObjectLiteralExpression(innerValue)) {
+              context.reportError(
+                innerValue,
+                DiagnosticCode.InvalidContractProperties,
+                DiagnosticMessage.InvalidContractPropertyPermissions,
+              );
+
+              return;
+            }
+
+            // tslint:disable-next-line: no-loop-statement
+            for (const innerInnerProp of tsUtils.object_.getProperties(innerValue)) {
+              if (!ts.isPropertyAssignment(innerInnerProp)) {
+                context.reportError(
+                  innerInnerProp,
+                  DiagnosticCode.InvalidContractProperties,
+                  DiagnosticMessage.InvalidContractPropertyPermissions,
+                );
+
+                continue;
+              }
+
+              const contractKey = tsUtils.node.getName(innerInnerProp);
+              const contractValue = tsUtils.initializer.getInitializer(innerInnerProp);
+              if (!ts.isLiteralExpression(contractValue)) {
+                context.reportError(
+                  contractValue,
+                  DiagnosticCode.InvalidContractProperties,
+                  DiagnosticMessage.InvalidContractPropertyPermissions,
+                );
+
+                return;
+              }
+
+              const contractValueString = tsUtils.literal.getLiteralValue(contractValue);
+
+              if (contractKey === 'hash') {
+                try {
+                  common.stringToUInt160(contractValueString);
+                } catch {
+                  context.reportError(
+                    contractValue,
+                    DiagnosticCode.InvalidContractProperties,
+                    DiagnosticMessage.InvalidContractPropertyPermissions,
+                  );
+
+                  return;
+                }
+
+                // tslint:disable-next-line: no-object-mutation
+                innerContractObject.hash = contractValueString;
+              }
+
+              if (contractKey === 'group') {
+                try {
+                  common.stringToECPoint(contractValueString);
+                } catch {
+                  context.reportError(
+                    contractValue,
+                    DiagnosticCode.InvalidContractProperties,
+                    DiagnosticMessage.InvalidContractPropertyPermissions,
+                  );
+
+                  return;
+                }
+
+                // tslint:disable-next-line: no-object-mutation
+                innerContractObject.group = contractValueString;
+              }
+            }
+
+            // tslint:disable-next-line: no-object-mutation
+            permissionObject.contract = innerContractObject;
+          }
+        }
+
+        // tslint:disable-next-line: no-array-mutation
+        finalPermissionsArray.push((permissionObject as unknown) as ContractPermission);
+      });
+
+      // tslint:disable-next-line: no-object-mutation
+      contract.permissions = finalPermissionsArray;
+    }
+
+    if (key === 'trusts') {
+      const trustsArray = tsUtils.initializer.getInitializerOrThrow(value.parent);
+      if (ts.isLiteralExpression(trustsArray)) {
+        const trustsString = tsUtils.literal.getLiteralValue(trustsArray);
+        if (trustsString !== '*') {
+          context.reportError(
+            trustsArray,
+            DiagnosticCode.InvalidContractProperties,
+            DiagnosticMessage.InvalidContractPropertyTrusts,
+          );
+
+          continue;
+        }
+
+        // tslint:disable-next-line: no-object-mutation
+        contract.trusts = trustsString;
+
+        continue;
+      }
+
+      if (!ts.isArrayLiteralExpression(trustsArray)) {
+        context.reportError(
+          trustsArray,
+          DiagnosticCode.InvalidContractProperties,
+          DiagnosticMessage.InvalidContractPropertyTrusts,
+        );
+
+        continue;
+      }
+
+      const elements = tsUtils.expression.getElements(trustsArray);
+      const finalTrustsArray: string[] = [];
+
+      elements.forEach((elem) => {
+        if (!ts.isLiteralExpression(elem)) {
+          context.reportError(
+            elem,
+            DiagnosticCode.InvalidContractProperties,
+            DiagnosticMessage.InvalidContractPropertyTrusts,
+          );
+
+          return;
+        }
+
+        const literalString = tsUtils.literal.getLiteralValue(elem);
+
+        try {
+          common.stringToUInt160(literalString);
+          // tslint:disable-next-line: no-array-mutation
+          finalTrustsArray.push(literalString);
+        } catch {
+          context.reportError(
+            elem,
+            DiagnosticCode.InvalidContractProperties,
+            DiagnosticMessage.InvalidContractPropertyTrusts,
+          );
+
+          return;
+        }
+      });
+
+      // tslint:disable-next-line: no-object-mutation
+      contract.trusts = finalTrustsArray;
+    }
   }
 
   return {

@@ -34,7 +34,7 @@ export class ArrayEntries extends BuiltinInstanceMemberCall {
     // [arr]
     sb.emitHelper(node, options, sb.helpers.unwrapArray);
     // [iterator]
-    sb.emitSysCall(node, 'Neo.Iterator.Create');
+    sb.emitSysCall(node, 'System.Iterator.Create');
     // [val]
     sb.emitHelper(
       node,

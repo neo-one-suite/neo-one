@@ -81,12 +81,13 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
       // [map]
       sb.emitHelper(expression, innerOptions, sb.helpers.unwrapMap);
       // [iterator]
-      sb.emitSysCall(expression, 'Neo.Iterator.Create');
+      sb.emitSysCall(expression, 'System.Iterator.Create');
       // []
       sb.emitHelper(
         node,
         innerOptions,
         sb.helpers.rawIteratorForEach({
+          deserializeKey: true,
           each: (innerInnerOptionsIn) => {
             const innerInnerOptions = sb.pushValueOptions(innerInnerOptionsIn);
             // [2, key, val]
@@ -127,9 +128,9 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
       // [map]
       sb.emitHelper(expression, innerOptions, sb.helpers.unwrapSet);
       // [iterator]
-      sb.emitSysCall(expression, 'Neo.Iterator.Create');
+      sb.emitSysCall(expression, 'System.Iterator.Create');
       // []
-      sb.emitHelper(node, innerOptions, sb.helpers.rawIteratorForEachKey({ each }));
+      sb.emitHelper(node, innerOptions, sb.helpers.rawIteratorForEachKey({ each, deserializeKey: true }));
     };
 
     const handleSetStorage = (innerOptions: VisitOptions) => {
@@ -227,13 +228,8 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
         iterable: handleIterable,
         iterableIterator: handleIterableIterator,
         transaction: handleOther,
-        output: handleOther,
         attribute: handleOther,
-        input: handleOther,
-        account: handleOther,
-        asset: handleOther,
         contract: handleOther,
-        header: handleOther,
         block: handleOther,
       }),
     );

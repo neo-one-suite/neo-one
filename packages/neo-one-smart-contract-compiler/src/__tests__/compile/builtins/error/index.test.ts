@@ -2,7 +2,7 @@ import { helpers } from '../../../../__data__';
 
 describe('Error', () => {
   test('cannot be implemented', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       class MyError implements Error {
         public readonly message: string = 'foo';
@@ -13,7 +13,7 @@ describe('Error', () => {
   });
 
   test('cannot be extended', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       class MyError extends Error {
         public readonly message: string = 'foo';
@@ -24,7 +24,7 @@ describe('Error', () => {
   });
 
   test('cannot be mixin extended complex', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const foo = (value: typeof Error) => {
         class MyMyError extends value {}
@@ -41,7 +41,7 @@ describe('Error', () => {
   });
 
   test.skip('cannot be mixin extended complex', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const foo = (value: typeof Error) => {
         class MyMyError extends value {}

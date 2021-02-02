@@ -33,7 +33,7 @@ describe('Buffer.from', () => {
   });
 
   test('cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const keys = Buffer.from;
     `,
@@ -42,7 +42,7 @@ describe('Buffer.from', () => {
   });
 
   test('cannot be element referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const keys = Buffer['from'];
     `,
@@ -51,7 +51,7 @@ describe('Buffer.from', () => {
   });
 
   test('non-string is unsupported', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       Buffer.from([]);
     `,

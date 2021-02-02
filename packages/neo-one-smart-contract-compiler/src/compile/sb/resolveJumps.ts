@@ -1,10 +1,10 @@
 import ts from 'typescript';
-import { Call, Jmp, Jump, Line } from '../pc';
+import { Call, Jmp, Jump, JumpOp, Line } from '../pc';
 import { KnownProgramCounter } from '../pc/KnownProgramCounter';
 import { Bytecode, SingleBytecode, Tags } from './ScriptBuilder';
 
-// const MAX_JUMP = 32767;
-const MAX_JUMP = 32000;
+// const MAX_JUMP = 2147483647; // (2^32) - 1
+const MAX_JUMP = 2147483000;
 
 abstract class CodePoint {
   public abstract readonly length: number;
@@ -55,10 +55,10 @@ abstract class CodePoint {
 }
 
 class JumpCodePoint extends CodePoint {
-  public readonly length = 3;
+  public readonly length = 5;
   private mutableTarget: CodePoint | undefined;
 
-  public constructor(node: ts.Node, tags: Tags, public readonly type: 'JMP' | 'JMPIF' | 'JMPIFNOT' | 'CALL') {
+  public constructor(node: ts.Node, tags: Tags, public readonly type: JumpOp) {
     super(node, tags);
   }
 
@@ -258,7 +258,7 @@ const getBytecode = (first: CodePoint): Bytecode => {
   while (current !== undefined) {
     if (current instanceof JumpCodePoint) {
       const pc = getTargetPC(current, current.target);
-      if (current.type === 'CALL') {
+      if (current.type === 'CALL_L') {
         mutableOut.push([current.node, current.tags, new Call(pc)]);
       } else {
         mutableOut.push([current.node, current.tags, new Jmp(current.type, pc)]);
@@ -267,22 +267,22 @@ const getBytecode = (first: CodePoint): Bytecode => {
       mutableOut.push([current.node, current.tags, current.value]);
     } else if (current instanceof JumpStationCodePoint) {
       const target = current.target;
-      const reverseTarget = new Jmp('JMP', getTargetPC(current, current.reverseTarget));
+      const reverseTarget = new Jmp('JMP_L', getTargetPC(current, current.reverseTarget));
       if (target === undefined) {
         mutableOut.push([
           current.node,
           current.tags,
-          new Jmp('JMP', new KnownProgramCounter(current.pc + current.length)),
+          new Jmp('JMP_L', new KnownProgramCounter(current.pc + current.length)),
         ]);
         mutableOut.push([current.node, current.tags, reverseTarget]);
       } else {
         mutableOut.push([
           current.node,
           current.tags,
-          new Jmp('JMP', new KnownProgramCounter(current.pc + current.length)),
+          new Jmp('JMP_L', new KnownProgramCounter(current.pc + current.length)),
         ]);
         mutableOut.push([current.node, current.tags, reverseTarget]);
-        mutableOut.push([current.node, current.tags, new Jmp('JMP', getTargetPC(current, target))]);
+        mutableOut.push([current.node, current.tags, new Jmp('JMP_L', getTargetPC(current, target))]);
       }
     } else if (current instanceof LineCodePoint) {
       mutableOut.push([current.node, current.tags, new Line()]);
@@ -297,7 +297,7 @@ const getBytecode = (first: CodePoint): Bytecode => {
 
 export const resolveJumps = (bytecode: Bytecode, maxOffset: number = MAX_JUMP): Bytecode => {
   const length = bytecode.reduce<number>(
-    (acc, value) => (value instanceof Jump ? acc + 3 : value instanceof Line ? acc + 5 : acc + value.length),
+    (acc, value) => (value instanceof Jump ? acc + 5 : value instanceof Line ? acc + 5 : acc + value.length),
     0,
   );
   if (length < MAX_JUMP) {

@@ -14,8 +14,10 @@ class CryptoValue extends BuiltinValueObject {
   public readonly type = 'CryptoConstructor';
 }
 
-class HashOp extends BuiltinMemberCall {
-  public constructor(private readonly op: 'SHA1' | 'SHA256' | 'HASH160' | 'HASH256') {
+type hashSysCall = 'Neo.Crypto.RIPEMD160' | 'Neo.Crypto.SHA256';
+
+class HashSysCall extends BuiltinMemberCall {
+  public constructor(private readonly firstHash: hashSysCall, private readonly secondHash?: hashSysCall) {
     super();
   }
   public emitCall(
@@ -69,18 +71,16 @@ class HashOp extends BuiltinMemberCall {
         iterable: throwTypeError,
         iterableIterator: throwTypeError,
         transaction: throwTypeError,
-        output: throwTypeError,
         attribute: throwTypeError,
-        input: throwTypeError,
-        account: throwTypeError,
-        asset: throwTypeError,
         contract: throwTypeError,
-        header: throwTypeError,
         block: throwTypeError,
       }),
     );
     // [buffer]
-    sb.emitOp(node, this.op);
+    sb.emitSysCall(node, this.firstHash);
+    if (this.secondHash !== undefined) {
+      sb.emitSysCall(node, this.secondHash);
+    }
     // [val]
     sb.emitHelper(node, optionsIn, sb.helpers.wrapBuffer);
   }
@@ -89,9 +89,13 @@ class HashOp extends BuiltinMemberCall {
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {
   builtins.addContractInterface('CryptoConstructor', new CryptoInterface());
-  builtins.addContractMember('CryptoConstructor', 'sha1', new HashOp('SHA1'));
-  builtins.addContractMember('CryptoConstructor', 'sha256', new HashOp('SHA256'));
-  builtins.addContractMember('CryptoConstructor', 'hash160', new HashOp('HASH160'));
-  builtins.addContractMember('CryptoConstructor', 'hash256', new HashOp('HASH256'));
+  builtins.addContractMember('CryptoConstructor', 'ripemd160', new HashSysCall('Neo.Crypto.RIPEMD160'));
+  builtins.addContractMember('CryptoConstructor', 'sha256', new HashSysCall('Neo.Crypto.SHA256'));
+  builtins.addContractMember(
+    'CryptoConstructor',
+    'hash160',
+    new HashSysCall('Neo.Crypto.SHA256', 'Neo.Crypto.RIPEMD160'),
+  );
+  builtins.addContractMember('CryptoConstructor', 'hash256', new HashSysCall('Neo.Crypto.SHA256', 'Neo.Crypto.SHA256'));
   builtins.addContractValue('crypto', new CryptoValue());
 };

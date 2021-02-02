@@ -1,36 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ContractInfoProcessor @claim with @constant 1`] = `
-"snippetCode.ts (15,9): SmartContract methods marked with @send, @sendUnsafe, @receive or @claim cannot be @constant.
-
-      13 | 
-      14 |         @claim
-    > 15 |         @constant
-         |         ^
-      16 |         public verify(): boolean {
-      17 |           return true;
-      18 |         }
-"
-`;
-
 exports[`ContractInfoProcessor @receive with @constant 1`] = `
 "snippetCode.ts (15,9): SmartContract methods marked with @send, @sendUnsafe, @receive or @claim cannot be @constant.
 
       13 | 
       14 |         @receive
-    > 15 |         @constant
-         |         ^
-      16 |         public verify(): boolean {
-      17 |           return true;
-      18 |         }
-"
-`;
-
-exports[`ContractInfoProcessor @sendUnsafe with @constant 1`] = `
-"snippetCode.ts (15,9): SmartContract methods marked with @send, @sendUnsafe, @receive or @claim cannot be @constant.
-
-      13 | 
-      14 |         @sendUnsafe
     > 15 |         @constant
          |         ^
       16 |         public verify(): boolean {
@@ -48,33 +22,7 @@ exports[`ContractInfoProcessor abstract smart contracts 1`] = `
         |       ^
       5 |         
       6 | public readonly properties = {
-      7 |   codeVersion: '1.0',
-"
-`;
-
-exports[`ContractInfoProcessor invalid @claim method with ForwardValue 1`] = `
-"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @sendUnsafe, @receive or @claim.
-
-      13 | 
-      14 |         @claim
-    > 15 |         public foo(value: ForwardValue): void {
-         |                    ^
-      16 |         }
-      17 |       }
-      18 |     
-"
-`;
-
-exports[`ContractInfoProcessor invalid @claim method with ForwardedValue 1`] = `
-"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @sendUnsafe, @receive or @claim.
-
-      13 | 
-      14 |         @claim
-    > 15 |         public foo(value: ForwardedValue<number>): void {
-         |                    ^
-      16 |         }
-      17 |       }
-      18 |     
+      7 |   trusts: '*',
 "
 `;
 
@@ -104,315 +52,289 @@ exports[`ContractInfoProcessor invalid @receive method with ForwardedValue 1`] =
 "
 `;
 
-exports[`ContractInfoProcessor invalid @sendUnsafe method with ForwardValue 1`] = `
-"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @sendUnsafe, @receive or @claim.
-
-      13 | 
-      14 |         @sendUnsafe
-    > 15 |         public foo(value: ForwardValue): boolean {
-         |                    ^
-      16 |           return true;
-      17 |         }
-      18 |       }
-"
-`;
-
-exports[`ContractInfoProcessor invalid @sendUnsafe method with ForwardedValue 1`] = `
-"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @sendUnsafe, @receive or @claim.
-
-      13 | 
-      14 |         @sendUnsafe
-    > 15 |         public foo(value: ForwardedValue<number>): boolean {
-         |                    ^
-      16 |           return true;
-      17 |         }
-      18 |       }
-"
-`;
-
 exports[`ContractInfoProcessor invalid property function not readonly 1`] = `
-"snippetCode.ts (13,9): Invalid SmartContract storage type. See https://neo-one.io/docs/properties-and-storage#Storage-Types for valid storage types.
+"snippetCode.ts (12,9): Invalid SmartContract storage type. See https://neo-one.io/docs/properties-and-storage#Storage-Types for valid storage types.
 
-      11 | };
-      12 | 
-    > 13 |         private foo = () => {
+      10 | };
+      11 | 
+    > 12 |         private foo = () => {
          |         ^
+      13 |           // do nothing
+      14 |         }
+      15 |       }
+"
+`;
+
+exports[`ContractInfoProcessor invalid property function set in constructor 1`] = `
+"snippetCode.ts (12,9): Invalid SmartContract storage type. See https://neo-one.io/docs/properties-and-storage#Storage-Types for valid storage types.
+
+      10 | };
+      11 | 
+    > 12 |         private readonly foo: () => void;
+         |         ^
+      13 | 
+      14 |         public constructor() {
+      15 |           super();
+"
+`;
+
+exports[`ContractInfoProcessor invalid storage structured array type 1`] = `
+"snippetCode.ts (14,9): Invalid SmartContract storage type. See https://neo-one.io/docs/properties-and-storage#Storage-Types for valid storage types.
+
+      12 | };
+      13 | 
+    > 14 |         private readonly foo: Array<Foo> = [new Foo()];
+         |         ^
+      15 |       }
+      16 |     
+"
+`;
+
+exports[`ContractInfoProcessor invalid storage structured map type 1`] = `
+"snippetCode.ts (14,9): Invalid SmartContract storage type. See https://neo-one.io/docs/properties-and-storage#Storage-Types for valid storage types.
+
+      12 | };
+      13 | 
+    > 14 |         private readonly foo: Array<Map<string, Foo>> = [new Map<string, Foo>().set('foo', new Foo())];
+         |         ^
+      15 |       }
+      16 |     
+"
+`;
+
+exports[`ContractInfoProcessor invalid storage structured set type 1`] = `
+"snippetCode.ts (14,9): Invalid SmartContract storage type. See https://neo-one.io/docs/properties-and-storage#Storage-Types for valid storage types.
+
+      12 | };
+      13 | 
+    > 14 |         private readonly foo: Set<Map<string, Foo>> = new Set([new Map<string, Foo>().set('foo', new Foo())]);
+         |         ^
+      15 |       }
+      16 |     
+"
+`;
+
+exports[`ContractInfoProcessor invalid storage type 1`] = `
+"snippetCode.ts (14,9): Invalid SmartContract storage type. See https://neo-one.io/docs/properties-and-storage#Storage-Types for valid storage types.
+
+      12 | };
+      13 | 
+    > 14 |         private readonly foo: Foo = new Foo();
+         |         ^
+      15 |       }
+      16 |     
+"
+`;
+
+exports[`ContractInfoProcessor multiple smart contracts 1`] = `
+"snippetCode.ts (14,7): Multiple exported SmartContracts in one file is not supported.
+
+      12 |       }
+      13 | 
+    > 14 |       export class TestSmartContract2 extends SmartContract {
+         |       ^
+      15 |         
+      16 | public readonly properties = {
+      17 |   trusts: '*',
+"
+`;
+
+exports[`ContractInfoProcessor new SmartContract() 1`] = `
+"snippetCode.ts (14,7): Cannot construct a SmartContract
+
+      12 |       }
+      13 | 
+    > 14 |       new TestSmartContract();
+         |       ^
+      15 |     
+"
+`;
+
+exports[`ContractInfoProcessor no computed methods 1`] = `
+"snippetCode.ts (12,16): SmartContracts cannot have computed methods or properties.
+
+      10 | };
+      11 | 
+    > 12 |         public ['foo'](): string {
+         |                ^
+      13 |           return 'foo';
+      14 |         }
+      15 |       }
+"
+`;
+
+exports[`ContractInfoProcessor no computed properties 1`] = `
+"snippetCode.ts (12,25): SmartContracts cannot have computed methods or properties.
+
+      10 | };
+      11 | 
+    > 12 |         public readonly ['foo']: string = 'foo';
+         |                         ^
+      13 |       }
+      14 |     
+"
+`;
+
+exports[`ContractInfoProcessor no deploy method 1`] = `
+"snippetCode.ts (13,16): deploy is a reserved method name in SmartContracts.
+
+      11 | 
+      12 | 
+    > 13 |         public deploy(): void {
+         |                ^
       14 |           // do nothing
       15 |         }
       16 |       }
 "
 `;
 
-exports[`ContractInfoProcessor invalid property function set in constructor 1`] = `
-"snippetCode.ts (13,9): Invalid SmartContract storage type. See https://neo-one.io/docs/properties-and-storage#Storage-Types for valid storage types.
-
-      11 | };
-      12 | 
-    > 13 |         private readonly foo: () => void;
-         |         ^
-      14 | 
-      15 |         public constructor() {
-      16 |           super();
-"
-`;
-
-exports[`ContractInfoProcessor invalid storage structured array type 1`] = `
-"snippetCode.ts (15,9): Invalid SmartContract storage type. See https://neo-one.io/docs/properties-and-storage#Storage-Types for valid storage types.
-
-      13 | };
-      14 | 
-    > 15 |         private readonly foo: Array<Foo> = [new Foo()];
-         |         ^
-      16 |       }
-      17 |     
-"
-`;
-
-exports[`ContractInfoProcessor invalid storage structured map type 1`] = `
-"snippetCode.ts (15,9): Invalid SmartContract storage type. See https://neo-one.io/docs/properties-and-storage#Storage-Types for valid storage types.
-
-      13 | };
-      14 | 
-    > 15 |         private readonly foo: Array<Map<string, Foo>> = [new Map<string, Foo>().set('foo', new Foo())];
-         |         ^
-      16 |       }
-      17 |     
-"
-`;
-
-exports[`ContractInfoProcessor invalid storage structured set type 1`] = `
-"snippetCode.ts (15,9): Invalid SmartContract storage type. See https://neo-one.io/docs/properties-and-storage#Storage-Types for valid storage types.
-
-      13 | };
-      14 | 
-    > 15 |         private readonly foo: Set<Map<string, Foo>> = new Set([new Map<string, Foo>().set('foo', new Foo())]);
-         |         ^
-      16 |       }
-      17 |     
-"
-`;
-
-exports[`ContractInfoProcessor invalid storage type 1`] = `
-"snippetCode.ts (15,9): Invalid SmartContract storage type. See https://neo-one.io/docs/properties-and-storage#Storage-Types for valid storage types.
-
-      13 | };
-      14 | 
-    > 15 |         private readonly foo: Foo = new Foo();
-         |         ^
-      16 |       }
-      17 |     
-"
-`;
-
-exports[`ContractInfoProcessor multiple smart contracts 1`] = `
-"snippetCode.ts (15,7): Multiple exported SmartContracts in one file is not supported.
-
-      13 |       }
-      14 | 
-    > 15 |       export class TestSmartContract2 extends SmartContract {
-         |       ^
-      16 |         
-      17 | public readonly properties = {
-      18 |   codeVersion: '1.0',
-"
-`;
-
-exports[`ContractInfoProcessor new SmartContract() 1`] = `
-"snippetCode.ts (15,7): Cannot construct a SmartContract
-
-      13 |       }
-      14 | 
-    > 15 |       new TestSmartContract();
-         |       ^
-      16 |     
-"
-`;
-
-exports[`ContractInfoProcessor no computed methods 1`] = `
-"snippetCode.ts (13,16): SmartContracts cannot have computed methods or properties.
-
-      11 | };
-      12 | 
-    > 13 |         public ['foo'](): string {
-         |                ^
-      14 |           return 'foo';
-      15 |         }
-      16 |       }
-"
-`;
-
-exports[`ContractInfoProcessor no computed properties 1`] = `
-"snippetCode.ts (13,25): SmartContracts cannot have computed methods or properties.
-
-      11 | };
-      12 | 
-    > 13 |         public readonly ['foo']: string = 'foo';
-         |                         ^
-      14 |       }
-      15 |     
-"
-`;
-
-exports[`ContractInfoProcessor no deploy method 1`] = `
-"snippetCode.ts (14,16): deploy is a reserved method name in SmartContracts.
-
-      12 | 
-      13 | 
-    > 14 |         public deploy(): void {
-         |                ^
-      15 |           // do nothing
-      16 |         }
-      17 |       }
-"
-`;
-
 exports[`ContractInfoProcessor no get accessor method decorators 1`] = `
-"snippetCode.ts (19,9): Custom decorators are not supported
+"snippetCode.ts (18,9): Custom decorators are not supported
 
-      17 |         private x: string = 'foo';
-      18 | 
-    > 19 |         @dec
+      16 |         private x: string = 'foo';
+      17 | 
+    > 18 |         @dec
          |         ^
-      20 |         public get foo(): string {
-      21 |           return this.x;
-      22 |         }
+      19 |         public get foo(): string {
+      20 |           return this.x;
+      21 |         }
 "
 `;
 
 exports[`ContractInfoProcessor no method decorators 1`] = `
-"snippetCode.ts (18,9): Custom decorators are not supported
+"snippetCode.ts (17,9): Custom decorators are not supported
 
+      15 | 
       16 | 
-      17 | 
-    > 18 |         @dec
+    > 17 |         @dec
          |         ^
-      19 |         public foo() {
-      20 |           return 'foo';
-      21 |         }
+      18 |         public foo() {
+      19 |           return 'foo';
+      20 |         }
 "
 `;
 
 exports[`ContractInfoProcessor no method parameter decorators 1`] = `
-"snippetCode.ts (18,20): Custom decorators are not supported
+"snippetCode.ts (17,20): Custom decorators are not supported
 
+      15 | 
       16 | 
-      17 | 
-    > 18 |         public foo(@dec value: string) {
+    > 17 |         public foo(@dec value: string) {
          |                    ^
-      19 |           return 'foo';
-      20 |         }
-      21 |       }
+      18 |           return 'foo';
+      19 |         }
+      20 |       }
 "
 `;
 
 exports[`ContractInfoProcessor no set accessor method decorators 1`] = `
-"snippetCode.ts (23,9): Custom decorators are not supported
+"snippetCode.ts (22,9): Custom decorators are not supported
 
-      21 |         }
-      22 | 
-    > 23 |         @dec
+      20 |         }
+      21 | 
+    > 22 |         @dec
          |         ^
-      24 |         public set foo(value: string) {
-      25 |           this.x = value;
-      26 |         }
+      23 |         public set foo(value: string) {
+      24 |           this.x = value;
+      25 |         }
 "
 `;
 
 exports[`ContractInfoProcessor no set accessor parameter decorators 1`] = `
-"snippetCode.ts (23,24): Custom decorators are not supported
+"snippetCode.ts (22,24): Custom decorators are not supported
 
-      21 |         }
-      22 | 
-    > 23 |         public set foo(@dec value: string) {
+      20 |         }
+      21 | 
+    > 22 |         public set foo(@dec value: string) {
          |                        ^
-      24 |           this.x = value;
-      25 |         }
-      26 |       }
+      23 |           this.x = value;
+      24 |         }
+      25 |       }
 "
 `;
 
 exports[`ContractInfoProcessor no static methods 1`] = `
-"snippetCode.ts (13,16): SmartContracts cannot have static methods or properties.
+"snippetCode.ts (12,16): SmartContracts cannot have static methods or properties.
 
-      11 | };
-      12 | 
-    > 13 |         public static foo() {
+      10 | };
+      11 | 
+    > 12 |         public static foo() {
          |                ^
-      14 |           return 'foo';
-      15 |         }
-      16 |       }
+      13 |           return 'foo';
+      14 |         }
+      15 |       }
 "
 `;
 
 exports[`ContractInfoProcessor no static properties 1`] = `
-"snippetCode.ts (13,16): SmartContracts cannot have static methods or properties.
+"snippetCode.ts (12,16): SmartContracts cannot have static methods or properties.
 
-      11 | };
-      12 | 
-    > 13 |         public static readonly foo = 'foo';
+      10 | };
+      11 | 
+    > 12 |         public static readonly foo = 'foo';
          |                ^
-      14 |       }
-      15 |     
+      13 |       }
+      14 |     
 "
 `;
 
 exports[`ContractInfoProcessor no symbol properties 1`] = `
-"snippetCode.ts (13,25): SmartContracts cannot have computed methods or properties.
+"snippetCode.ts (12,25): SmartContracts cannot have computed methods or properties.
 
-      11 | };
-      12 | 
-    > 13 |         public readonly [Symbol.iterator]: string = 'foo';
+      10 | };
+      11 | 
+    > 12 |         public readonly [Symbol.iterator]: string = 'foo';
          |                         ^
-      14 |       }
-      15 |     
+      13 |       }
+      14 |     
 "
 `;
 
 exports[`ContractInfoProcessor structured storage private modifiable 1`] = `
-"snippetCode.ts (13,9): Persistent storage classes may only be used as SmartContract private or protected readonly properties with a property initializer.
+"snippetCode.ts (12,9): Persistent storage classes may only be used as SmartContract private or protected readonly properties with a property initializer.
 
-      11 | };
-      12 | 
-    > 13 |         private foo = MapStorage.for<string, string>();
+      10 | };
+      11 | 
+    > 12 |         private foo = MapStorage.for<string, string>();
          |         ^
-      14 |       }
-      15 |     
+      13 |       }
+      14 |     
 "
 `;
 
 exports[`ContractInfoProcessor structured storage protected abstract 1`] = `
-"snippetCode.ts (13,9): Persistent storage classes may only be used as SmartContract private or protected readonly properties with a property initializer.
+"snippetCode.ts (12,9): Persistent storage classes may only be used as SmartContract private or protected readonly properties with a property initializer.
 
-      11 | };
-      12 | 
-    > 13 |         protected abstract readonly foo: MapStorage<string, string>;
+      10 | };
+      11 | 
+    > 12 |         protected abstract readonly foo: MapStorage<string, string>;
          |         ^
-      14 |       }
-      15 |     
+      13 |       }
+      14 |     
 "
 `;
 
 exports[`ContractInfoProcessor structured storage set in constructor 1`] = `
-"snippetCode.ts (13,9): Persistent storage classes may only be used as SmartContract private or protected readonly properties with a property initializer.
+"snippetCode.ts (12,9): Persistent storage classes may only be used as SmartContract private or protected readonly properties with a property initializer.
 
-      11 | };
-      12 | 
-    > 13 |         private readonly foo: MapStorage<string, string>;
+      10 | };
+      11 | 
+    > 12 |         private readonly foo: MapStorage<string, string>;
          |         ^
-      14 |         public constructor() {
-      15 |           super();
-      16 |           this.foo = MapStorage.for<string, string>();
+      13 |         public constructor() {
+      14 |           super();
+      15 |           this.foo = MapStorage.for<string, string>();
 "
 `;
 
 exports[`ContractInfoProcessor structured storage set public 1`] = `
-"snippetCode.ts (13,9): Persistent storage classes may only be used as SmartContract private or protected readonly properties with a property initializer.
+"snippetCode.ts (12,9): Persistent storage classes may only be used as SmartContract private or protected readonly properties with a property initializer.
 
-      11 | };
-      12 | 
-    > 13 |         public readonly foo = MapStorage.for<string, string>();
+      10 | };
+      11 | 
+    > 12 |         public readonly foo = MapStorage.for<string, string>();
          |         ^
-      14 |       }
-      15 |     
+      13 |       }
+      14 |     
 "
 `;

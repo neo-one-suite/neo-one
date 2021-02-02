@@ -88,7 +88,7 @@ describe('Set.prototype[Symbol.iterator]', () => {
   });
 
   test('cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = new Set<number>();
       const y = x[Symbol.iterator];

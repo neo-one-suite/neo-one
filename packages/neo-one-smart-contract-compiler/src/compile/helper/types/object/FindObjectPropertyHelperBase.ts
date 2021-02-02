@@ -1,3 +1,4 @@
+import { StackItemType } from '@neo-one/client-common';
 import ts from 'typescript';
 
 import { ScriptBuilder } from '../../../sb';
@@ -31,6 +32,8 @@ export class FindObjectPropertyHelperBase extends Helper {
       return;
     }
 
+    // [prop, objectVal]
+    sb.emitOp(node, 'CONVERT', Buffer.from([StackItemType.ByteString]));
     // [objectVal, prop]
     sb.emitOp(node, 'SWAP');
 

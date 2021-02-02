@@ -1,23 +1,18 @@
 import {
-  AddressString,
-  addressToScriptHash,
   Attribute,
   common,
   crypto,
   ECDsaVerifyPrice,
   getOpCodePrice,
   GetOptions,
-  InvalidFormatError,
   IOHelper,
   NetworkType,
   Op,
-  Param,
-  RawAction,
   RelayTransactionResult,
   ScriptBuilder,
-  ScriptBuilderParam,
   SignerModel,
   SourceMaps,
+  toVerifyResultJSON,
   Transaction,
   TransactionModel,
   TransactionReceipt,
@@ -33,7 +28,6 @@ import {
   WitnessScopeModel,
 } from '@neo-one/client-common';
 import { processActionsAndMessage } from '@neo-one/client-switch';
-import { utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { Observable } from 'rxjs';
 import { InsufficientNetworkFeeError, InvokeError, UnknownAccountError } from '../errors';
@@ -238,10 +232,14 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     return gas;
   }
 
-  protected async sendTransaction<TTransaction extends Transaction, T extends TransactionReceipt = TransactionReceipt>({
+  protected async sendTransaction<T extends TransactionReceipt = TransactionReceipt>({
     transaction: transactionUnsigned,
     from,
     onConfirm,
+    // tslint:disable-next-line: no-unused
+    networkFee,
+    // tslint:disable-next-line: no-unused
+    sourceMaps,
   }: {
     readonly transaction: TransactionModel;
     readonly from: UserAccountID;
@@ -251,7 +249,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     }) => Promise<T>;
     readonly networkFee?: BigNumber;
     readonly sourceMaps?: SourceMaps;
-  }): Promise<TransactionResult<T, TTransaction>> {
+  }): Promise<TransactionResult<T>> {
     return this.capture(
       async () => {
         const signature = await this.keystore.sign({
@@ -261,63 +259,41 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
 
         const userAccount = this.getUserAccount(from);
 
-        // TODO: we check multisig for the private net 1-validator case
-        // really we need add support for them across the board
-        let witness: WitnessModel | undefined;
-        if (crypto.isSignatureContract(userAccount.contract.script)) {
-          witness = crypto.createWitnessForSignature(
-            Buffer.from(signature, 'hex'),
-            common.stringToECPoint(userAccount.publicKey),
-            WitnessModel,
-          );
-        } else if (crypto.isMultiSigContract(userAccount.contract.script)) {
+        let witness: WitnessModel;
+        if (crypto.isMultiSigContract(userAccount.contract.script)) {
           witness = crypto.createMultiSignatureWitness(
             1,
             [common.stringToECPoint(userAccount.publicKey)],
             { [userAccount.publicKey]: Buffer.from(signature, 'hex') },
             WitnessModel,
           );
+        } else {
+          witness = crypto.createWitnessForSignature(
+            Buffer.from(signature, 'hex'),
+            common.stringToECPoint(userAccount.publicKey),
+            WitnessModel,
+          );
         }
 
-        if (witness === undefined) {
-          throw new InvalidFormatError();
-        }
-
-        const fullTransaction = this.addWitness({
-          transaction: transactionUnsigned,
-          witness,
-        });
-
-        const result = await this.provider.relayTransaction(from.network, fullTransaction);
-
-        // TODO: we'll have to add back checks here since this links back to sourcemappings
-        // For now we can just check if it succeeded;
-
-        // const failures =
-        //   result.verifyResult === undefined
-        //     ? []
-        //     : result.verifyResult.verifications.filter(({ failureMessage }) => failureMessage !== undefined);
-        // if (failures.length > 0) {
-        //   const message = await processActionsAndMessage({
-        //     actions: failures.reduce<readonly RawAction[]>((acc, { actions }) => acc.concat(actions), []),
-        //     message: failures
-        //       .map(({ failureMessage }) => failureMessage)
-        //       .filter(commonUtils.notNull)
-        //       .join(' '),
-        //     sourceMaps,
-        //   });
-
-        //   throw new InvokeError(message);
-        // }
+        const result = await this.provider.relayTransaction(
+          from.network,
+          // TODO: addWitness possibly needs to be fixed/reverted
+          this.addWitness({
+            transaction: transactionUnsigned,
+            witness,
+          }),
+        );
 
         if (result.verifyResult !== undefined && result.verifyResult !== VerifyResultModel.Succeed) {
-          throw new InvokeError(`Transaction failed to verify with result: ${VerifyResultModel[result.verifyResult]}`);
+          throw new InvokeError(
+            `Transaction failed to verify with result: ${toVerifyResultJSON(result.verifyResult)}.`,
+          );
         }
 
         const { transaction } = result;
 
         return {
-          transaction: transaction as TTransaction,
+          transaction,
           // tslint:disable-next-line no-unnecessary-type-annotation
           confirmed: async (optionsIn: GetOptions = {}): Promise<T> => {
             const options = {
@@ -336,72 +312,15 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     );
   }
 
-  protected async executeInvokeClaim({
-    contract,
-    unclaimedAmount,
-    attributes,
-    method,
-    params,
-    paramsZipped, // TODO: see old executeInvokeClaim
-    from,
-    sourceMaps,
-    networkFee,
-  }: {
-    readonly contract: AddressString;
-    readonly unclaimedAmount: BigNumber;
-    readonly attributes: readonly Attribute[];
-    readonly method: string;
-    readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
-    readonly paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>;
-    readonly from: UserAccountID;
-    readonly sourceMaps?: SourceMaps;
-    readonly networkFee?: BigNumber;
-  }): Promise<TransactionResult> {
-    const script = new ScriptBuilder()
-      // TODO: check that this is correct script for claiming gas?
-      .emitAppCall(common.nativeHashes.GAS, 'transfer', [
-        addressToScriptHash(contract), // check this is correct address
-        common.nativeHashes.GAS,
-        unclaimedAmount.toString(),
-      ])
-      .build();
-
-    const [{ gas }, { count, messageMagic }] = await Promise.all([
-      this.getSystemFee({ from, script, attributes }),
-      this.getCountAndMagic(from),
-    ]);
-
-    const transaction = new TransactionModel({
-      systemFee: utils.bigNumberToBN(gas, 8),
-      networkFee: utils.bigNumberToBN(networkFee ? networkFee : new BigNumber(0), 8), // TODO: check. should it be optional param or no?
-      // Since the contract address is an input, we must add a witness for it.
-      witnesses: this.getInvokeScripts(method, params, true),
-      script,
-      attributes: this.convertAttributes(attributes),
-      validUntilBlock: count + 240,
-      messageMagic,
-    });
-
-    return this.sendTransaction<Transaction>({
-      from,
-      transaction,
-      onConfirm: async ({ receipt }) => receipt,
-      sourceMaps,
-    });
-  }
-
   protected async executeTransfer(
     transfers: readonly Transfer[],
     from: UserAccountID,
     attributes: readonly Attribute[],
     maxNetworkFee: BigNumber,
     maxSystemFee: BigNumber,
-    validBlockCount: number = TransactionModel.maxValidBlockIncrement,
+    validBlockCount: number,
   ): Promise<TransactionResult> {
     const sb = new ScriptBuilder();
-    if (transfers.length > 1) {
-      throw new Error('temporary');
-    }
 
     const { addressVersion, blockCount, messageMagic } = await this.provider.getNetworkSettings(from.network);
 
@@ -462,7 +381,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
       messageMagic,
     });
 
-    return this.sendTransaction<Transaction>({
+    return this.sendTransaction({
       from,
       transaction,
       onConfirm: async ({ receipt }) => receipt,
@@ -485,36 +404,74 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     return this.executeTransfer([transfer], from, attributes, maxNetworkFee, maxSystemFee, validBlockCount);
   }
 
-  // TODO: see invokeScript and invokeFunction in neo-modules
   private async executeInvoke<T extends TransactionReceipt>({
     script,
     from,
     attributes,
-    systemFee,
-    networkFee,
+    maxSystemFee,
+    maxNetworkFee,
+    validBlockCount,
     witnesses,
     onConfirm,
     sourceMaps,
   }: ExecuteInvokeScriptOptions<T>): Promise<TransactionResult<T>> {
-    const { count, messageMagic } = await this.getCountAndMagic(from);
-    const invokeTransaction = new TransactionModel({
-      systemFee: utils.bigNumberToBN(systemFee, 8), // TODO: check
-      networkFee: utils.bigNumberToBN(networkFee ? networkFee : new BigNumber(0), 8), // TODO: check. should it be optional param or no?
-      attributes: this.convertAttributes(attributes),
+    const { blockCount, messageMagic, addressVersion } = await this.provider.getNetworkSettings(from.network);
+
+    const signer = new SignerModel({
+      account: crypto.addressToScriptHash({ address: from.address, addressVersion }),
+      scopes: WitnessScopeModel.Global,
+    });
+
+    const nonce = utils.randomUShort();
+    const validUntilBlock = blockCount + validBlockCount;
+
+    const feelessTransaction = new TransactionModel({
+      version: 0,
+      nonce,
       script,
+      validUntilBlock,
+      signers: [signer],
       witnesses,
-      validUntilBlock: count + 240,
+      attributes: this.convertAttributes(attributes),
+      systemFee: utils.bigNumberToBN(utils.ZERO_BIG_NUMBER, 8),
+      networkFee: utils.bigNumberToBN(utils.ZERO_BIG_NUMBER, 8),
+      messageMagic,
+    });
+
+    const [systemFee, networkFee] = await Promise.all([
+      this.getSystemFee({
+        network: from.network,
+        transaction: feelessTransaction,
+        maxFee: maxSystemFee,
+      }),
+      this.getNetworkFee({
+        network: from.network,
+        transaction: feelessTransaction,
+        maxFee: maxNetworkFee,
+      }),
+    ]);
+
+    const transaction = new TransactionModel({
+      version: 0,
+      nonce,
+      script,
+      validUntilBlock,
+      signers: [signer],
+      witnesses,
+      attributes: this.convertAttributes(attributes),
+      systemFee: utils.bigNumberToBN(systemFee, 0),
+      networkFee: utils.bigNumberToBN(networkFee, 0),
       messageMagic,
     });
 
     try {
-      return this.sendTransaction<Transaction, T>({
+      return this.sendTransaction({
         from,
-        transaction: invokeTransaction,
-        onConfirm: async ({ transaction, receipt }) => {
-          const data = await this.provider.getApplicationLogData(from.network, transaction.hash);
+        transaction,
+        onConfirm: async ({ transaction: transactionIn, receipt }) => {
+          const data = await this.provider.getApplicationLogData(from.network, transactionIn.hash);
 
-          return onConfirm({ transaction, receipt, data });
+          return onConfirm({ transaction: transactionIn, receipt, data });
         },
         sourceMaps,
       });

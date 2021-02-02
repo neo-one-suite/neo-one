@@ -8,7 +8,6 @@ import { isBoolean } from '../boolean';
 import { isBuffer } from '../buffer';
 import { isError } from '../error';
 import { isForwardValue } from '../forwardValue';
-import { isInput } from '../input';
 import { isIterable } from '../iterable';
 import { isIterableIterator } from '../iterableIterator';
 import { isIteratorResult } from '../iteratorResult';
@@ -16,7 +15,6 @@ import { isMap } from '../map';
 import { isMapStorage } from '../mapStorage';
 import { isNull } from '../null';
 import { isNumber } from '../number';
-import { isOutput } from '../output';
 import { isSet } from '../set';
 import { isSetStorage } from '../setStorage';
 import { isString } from '../string';
@@ -52,6 +50,4 @@ export const isObject = (context: Context, node: ts.Node, type: ts.Type): boolea
   !isIterable(context, node, type) &&
   !isIterableIterator(context, node, type) &&
   !isTransaction(context, node, type) &&
-  !isOutput(context, node, type) &&
-  !isAttribute(context, node, type) &&
-  !isInput(context, node, type);
+  !isAttribute(context, node, type);

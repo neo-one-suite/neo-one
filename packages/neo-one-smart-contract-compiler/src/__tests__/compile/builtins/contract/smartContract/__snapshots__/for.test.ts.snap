@@ -9,7 +9,7 @@ exports[`SmartContract.for reports error on any parameter 1`] = `
         |           ^
       6 |         }
       7 | 
-      8 |         const sc = SmartContract.for<Foo>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
+      8 |         const sc = SmartContract.for<Foo>(Address.from('NNWAo5vdVJz1oyCuNiaTBA3amBHnWCF4Yk'));
 "
 `;
 
@@ -18,7 +18,7 @@ exports[`SmartContract.for reports error on any properties 1`] = `
 
        6 |         }
        7 | 
-    >  8 |         const sc = SmartContract.for<Foo>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
+    >  8 |         const sc = SmartContract.for<Foo>(Address.from('NNWAo5vdVJz1oyCuNiaTBA3amBHnWCF4Yk'));
          |                    ^
        9 |         sc.bar(0);
       10 |       
@@ -34,7 +34,7 @@ exports[`SmartContract.for reports error on any return 1`] = `
         |           ^
       6 |         }
       7 | 
-      8 |         const sc = SmartContract.for<Foo>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
+      8 |         const sc = SmartContract.for<Foo>(Address.from('NNWAo5vdVJz1oyCuNiaTBA3amBHnWCF4Yk'));
 "
 `;
 
@@ -43,7 +43,7 @@ exports[`SmartContract.for reports error on any smart contract type 1`] = `
 
       2 |         import { Address, SmartContract } from '@neo-one/smart-contract';
       3 | 
-    > 4 |         const sc = SmartContract.for<any>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
+    > 4 |         const sc = SmartContract.for<any>(Address.from('NNWAo5vdVJz1oyCuNiaTBA3amBHnWCF4Yk'));
         |                    ^
       5 |         sc.bar(0);
       6 |       
@@ -55,7 +55,7 @@ exports[`SmartContract.for reports error on invalid argument return - Object 1`]
 
       10 |         }
       11 | 
-    > 12 |         SmartContract.for<Foo>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
+    > 12 |         SmartContract.for<Foo>(Address.from('NNWAo5vdVJz1oyCuNiaTBA3amBHnWCF4Yk'));
          |                                ^
       13 |       
 "
@@ -70,7 +70,7 @@ exports[`SmartContract.for reports error on invalid argument return - union stri
         |           ^
       6 |         }
       7 | 
-      8 |         const sc = SmartContract.for<Foo>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
+      8 |         const sc = SmartContract.for<Foo>(Address.from('NNWAo5vdVJz1oyCuNiaTBA3amBHnWCF4Yk'));
 "
 `;
 
@@ -79,7 +79,7 @@ exports[`SmartContract.for reports error on invalid argument values - Object 1`]
 
       10 |         }
       11 | 
-    > 12 |         SmartContract.for<Foo>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
+    > 12 |         SmartContract.for<Foo>(Address.from('NNWAo5vdVJz1oyCuNiaTBA3amBHnWCF4Yk'));
          |                                ^
       13 |       
 "
@@ -90,7 +90,7 @@ exports[`SmartContract.for reports error on invalid argument values - optional O
 
       10 |         }
       11 | 
-    > 12 |         SmartContract.for<Foo>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
+    > 12 |         SmartContract.for<Foo>(Address.from('NNWAo5vdVJz1oyCuNiaTBA3amBHnWCF4Yk'));
          |                                ^
       13 |       
 "
@@ -105,7 +105,7 @@ exports[`SmartContract.for reports error on missing return 1`] = `
         |           ^
       6 |         }
       7 | 
-      8 |         const sc = SmartContract.for<Foo>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
+      8 |         const sc = SmartContract.for<Foo>(Address.from('NNWAo5vdVJz1oyCuNiaTBA3amBHnWCF4Yk'));
 "
 `;
 

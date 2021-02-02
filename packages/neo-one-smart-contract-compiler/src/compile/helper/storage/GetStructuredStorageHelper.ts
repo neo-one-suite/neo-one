@@ -26,7 +26,7 @@ export class GetStructuredStorageHelper extends KeyStructuredStorageBaseHelper {
         },
         handleDefined: () => {
           // [arr]
-          sb.emitSysCall(node, 'Neo.Runtime.Deserialize');
+          sb.emitSysCall(node, 'System.Binary.Deserialize');
           // [1, arr]
           sb.emitPushInt(node, 1);
           // [val]

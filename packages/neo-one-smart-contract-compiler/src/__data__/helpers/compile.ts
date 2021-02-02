@@ -12,8 +12,8 @@ type ExpectOptions =
   | { readonly type: 'error'; readonly code?: DiagnosticCode }
   | { readonly type: 'warning'; readonly code?: DiagnosticCode };
 
-const compile = (context: Context, sourceFile: ts.SourceFile, options: ExpectOptions) => {
-  compileScript({ context, sourceFile });
+const compile = async (context: Context, sourceFile: ts.SourceFile, options: ExpectOptions) => {
+  await compileScript({ context, sourceFile });
 
   const expectDiagnostic = (category: ts.DiagnosticCategory) => {
     const diag = context.diagnostics.find(
@@ -36,13 +36,13 @@ const compile = (context: Context, sourceFile: ts.SourceFile, options: ExpectOpt
   }
 };
 
-export const compileString = (code: string, options: ExpectOptions): void => {
+export const compileString = async (code: string, options: ExpectOptions): Promise<void> => {
   const { context, sourceFile } = createContextForSnippet(code, createCompilerHost());
 
-  compile(context, sourceFile, options);
+  await compile(context, sourceFile, options);
 };
 
-export const compileSnippet = (snippetPath: string, options: ExpectOptions): void => {
+export const compileSnippet = async (snippetPath: string, options: ExpectOptions): Promise<void> => {
   const dir = pathResolve(
     appRootDir.get(),
     'packages',
@@ -54,5 +54,5 @@ export const compileSnippet = (snippetPath: string, options: ExpectOptions): voi
   const context = createContextForPath(snippetPath, createCompilerHost());
   const sourceFile = tsUtils.file.getSourceFileOrThrow(context.program, pathResolve(dir, snippetPath));
 
-  compile(context, sourceFile, options);
+  await compile(context, sourceFile, options);
 };

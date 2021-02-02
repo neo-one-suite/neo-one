@@ -64,7 +64,7 @@ export class AssertEqual extends BuiltinCall {
           // []
           sb.emitHelper(node, options, sb.helpers.consoleLog);
           // []
-          sb.emitOp(received, 'THROW');
+          sb.emitOp(received, 'ABORT');
         },
       }),
     );

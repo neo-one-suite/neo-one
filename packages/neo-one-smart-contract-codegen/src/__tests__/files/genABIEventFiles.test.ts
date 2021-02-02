@@ -6,6 +6,6 @@ describe('ABIEvent Tests', () => {
     if (abi.events === undefined) {
       throw new Error('it should be defined');
     }
-    testUtils.testABI(abi, abi.events[0].name);
+    testUtils.testContractManifestClient(abi, abi.events[0].name);
   });
 });

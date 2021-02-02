@@ -23,7 +23,7 @@ describe('Buffer.prototype.equals', () => {
   });
 
   test('cannot be set', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = Buffer.from('5946158ab93f5f4fd6ba230f1c6c235117eec5f83e65275ac6f93ada9ca60477', 'hex');
       x.equals = (otherBuffer: Buffer) => true;
@@ -33,7 +33,7 @@ describe('Buffer.prototype.equals', () => {
   });
 
   test('cannot be "set"', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = Buffer.from('5946158ab93f5f4fd6ba230f1c6c235117eec5f83e65275ac6f93ada9ca60477', 'hex');
       x['equals'] = (otherBuffer: Buffer) => true;
@@ -43,7 +43,7 @@ describe('Buffer.prototype.equals', () => {
   });
 
   test('cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = Buffer.from('5946158ab93f5f4fd6ba230f1c6c235117eec5f83e65275ac6f93ada9ca60477', 'hex');
       const y = x.equals;

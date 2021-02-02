@@ -78,7 +78,7 @@ export class ResolvedScope implements Scope {
       }
     } else {
       // [scope, val]
-      this.loadScope(sb, node, scopeLength, scopePosition);
+      this.loadScope(sb, node, options, scopeLength, scopePosition);
       // [position, scope, val]
       sb.emitPushInt(node, position);
       // [val, position, scope]
@@ -103,7 +103,7 @@ export class ResolvedScope implements Scope {
       }
     } else {
       // [scope]
-      this.loadScope(sb, node, scopeLength, scopePosition);
+      this.loadScope(sb, node, options, scopeLength, scopePosition);
       // [position, scope]
       sb.emitPushInt(node, position);
       // [val]
@@ -111,9 +111,9 @@ export class ResolvedScope implements Scope {
     }
   }
 
-  public getThis(sb: ScriptBuilder, node: ts.Node, _options: VisitOptions): void {
+  public getThis(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [[scopes, this]]
-    this.loadAll(sb, node);
+    this.loadAll(sb, node, options);
     // [1, [scopes, this]]
     sb.emitPushInt(node, 1);
     // [this]
@@ -123,7 +123,7 @@ export class ResolvedScope implements Scope {
   public getGlobal(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (this.parent === undefined) {
       // [[scopes, this, global]]
-      this.loadAll(sb, node);
+      this.loadAll(sb, node, options);
       // [2, [scopes, this, global]]
       sb.emitPushInt(node, 2);
       // [this]
@@ -136,7 +136,7 @@ export class ResolvedScope implements Scope {
   public setGlobal(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (this.parent === undefined) {
       // [[scopes, this, global], val]
-      this.loadAll(sb, node);
+      this.loadAll(sb, node, options);
       // [[scopes, this, global], val, [scopes, this, global]]
       sb.emitOp(node, 'TUCK');
       // [val, [scopes, this, global], val, [scopes, this, global]]
@@ -159,8 +159,8 @@ export class ResolvedScope implements Scope {
     }
   }
 
-  public pushAll(sb: ScriptBuilder, node: ts.Node, _options: VisitOptions): void {
-    sb.emitOp(node, 'DUPFROMALTSTACK');
+  public pushAll(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
+    sb.emitHelper(node, options, sb.helpers.dupScope);
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, func: (options: VisitOptions) => void): void {
@@ -193,10 +193,10 @@ export class ResolvedScope implements Scope {
       // [[scopes, this, global], [scopes, this, global]]
       sb.emitOp(node, 'DUP');
       // [[scopes, this, global]]
-      sb.emitOp(node, 'TOALTSTACK');
+      sb.emitHelper(node, options, sb.helpers.pushScope);
     } else {
       // [[scopes, this]]
-      sb.emitOp(node, 'DUPFROMALTSTACK');
+      sb.emitHelper(node, options, sb.helpers.dupScope);
     }
     // [0, [scopes, this]]
     sb.emitPushInt(node, 0);
@@ -236,12 +236,12 @@ export class ResolvedScope implements Scope {
 
     if (this.parent === undefined) {
       // [[scopes, undefined]]
-      sb.emitOp(node, 'FROMALTSTACK');
+      sb.emitHelper(node, options, sb.helpers.popScope);
       // []
       sb.emitOp(node, 'DROP');
     } else {
       // [[scopes, undefined]]
-      sb.emitOp(node, 'DUPFROMALTSTACK');
+      sb.emitHelper(node, options, sb.helpers.dupScope);
       // [0, [scopes, undefined]]
       sb.emitPushInt(node, 0);
       // [scopes]
@@ -249,7 +249,7 @@ export class ResolvedScope implements Scope {
       // [scopes, scopes]
       sb.emitOp(node, 'DUP');
       // [size, scopes]
-      sb.emitOp(node, 'ARRAYSIZE');
+      sb.emitOp(node, 'SIZE');
       // [size - 1, scopes]
       sb.emitOp(node, 'DEC');
       // []
@@ -270,7 +270,7 @@ export class ResolvedScope implements Scope {
       sb.emitOp(node, 'DUP');
       sb.emitPushInt(node, completion);
       sb.emitOp(node, 'NUMEQUAL');
-      sb.emitJmp(node, 'JMPIF', pc);
+      sb.emitJmp(node, 'JMPIF_L', pc);
     }
   }
 
@@ -286,9 +286,15 @@ export class ResolvedScope implements Scope {
     return this.uniqueVariables.get(name);
   }
 
-  private loadScope(sb: ScriptBuilder, node: ts.Node, scopeLength: number, scopePosition: number): void {
-    this.loadAll(sb, node);
-    // [0,[scopes, this]]
+  private loadScope(
+    sb: ScriptBuilder,
+    node: ts.Node,
+    options: VisitOptions,
+    scopeLength: number,
+    scopePosition: number,
+  ): void {
+    this.loadAll(sb, node, options);
+    // [0, [scopes, this]]
     sb.emitPushInt(node, 0);
     // [scopes]
     sb.emitOp(node, 'PICKITEM');
@@ -298,8 +304,8 @@ export class ResolvedScope implements Scope {
     sb.emitOp(node, 'PICKITEM');
   }
 
-  private loadAll(sb: ScriptBuilder, node: ts.Node): void {
+  private loadAll(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [[scopes, this]]
-    sb.emitOp(node, 'DUPFROMALTSTACK');
+    sb.emitHelper(node, options, sb.helpers.dupScope);
   }
 }

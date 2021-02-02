@@ -9,6 +9,7 @@ import { isAddress, isHash256, isPublicKey } from './buffer';
 import { isOnlyMap } from './map';
 
 export interface WrapValRecursiveHelperOptions {
+  readonly serializeFinalVal?: boolean;
   readonly checkValue?: boolean;
   readonly type: ts.Type | undefined;
   readonly optional?: boolean;
@@ -17,6 +18,7 @@ export interface WrapValRecursiveHelperOptions {
 // Input: [val]
 // Output: [value]
 export class WrapValRecursiveHelper extends Helper {
+  private readonly serializeFinalVal: boolean;
   private readonly checkValue: boolean;
   private readonly type: ts.Type | undefined;
   private readonly optional?: boolean;
@@ -26,6 +28,7 @@ export class WrapValRecursiveHelper extends Helper {
     this.checkValue = options.checkValue === undefined ? false : options.checkValue;
     this.type = options.type;
     this.optional = options.optional;
+    this.serializeFinalVal = options.serializeFinalVal ?? false;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
@@ -45,6 +48,9 @@ export class WrapValRecursiveHelper extends Helper {
       }
 
       body(innerOptions);
+      if (this.serializeFinalVal) {
+        sb.emitSysCall(node, 'System.Binary.Serialize');
+      }
     };
 
     const handleUndefined = createHandleValue(false, (innerOptions) => {
@@ -243,6 +249,7 @@ export class WrapValRecursiveHelper extends Helper {
                   node,
                   innerInnerOptions,
                   sb.helpers.wrapValRecursive({
+                    serializeFinalVal: true,
                     checkValue: this.checkValue,
                     type: keyType,
                   }),
@@ -289,26 +296,11 @@ export class WrapValRecursiveHelper extends Helper {
         transaction: createHandleValue(true, (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.wrapTransaction);
         }),
-        output: createHandleValue(true, (innerOptions) => {
-          sb.emitHelper(node, innerOptions, sb.helpers.wrapOutput);
-        }),
         attribute: createHandleValue(true, (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.wrapAttribute);
         }),
-        input: createHandleValue(true, (innerOptions) => {
-          sb.emitHelper(node, innerOptions, sb.helpers.wrapInput);
-        }),
-        account: createHandleValue(true, (innerOptions) => {
-          sb.emitHelper(node, innerOptions, sb.helpers.wrapAccount);
-        }),
-        asset: createHandleValue(true, (innerOptions) => {
-          sb.emitHelper(node, innerOptions, sb.helpers.wrapAsset);
-        }),
         contract: createHandleValue(true, (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.wrapContract);
-        }),
-        header: createHandleValue(true, (innerOptions) => {
-          sb.emitHelper(node, innerOptions, sb.helpers.wrapHeader);
         }),
         block: createHandleValue(true, (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.wrapBlock);

@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`NEOONEProvider getBlockCount - unknown network 1`] = `[Error [UNKNOWN_NETWORK]: Unknown network unknown]`;

@@ -1,5 +1,6 @@
+import { StackItemType } from '@neo-one/client-common';
+import { ByteArrayContractParameter, ContractParameter } from '../contractParameter';
 import { StackItemBase } from './StackItemBase';
-import { StackItemType } from './StackItemType';
 
 export class BufferStackItem extends StackItemBase {
   public readonly innerBuffer: Buffer;
@@ -20,5 +21,9 @@ export class BufferStackItem extends StackItemBase {
 
   public getBuffer() {
     return this.innerBuffer;
+  }
+
+  public toContractParameter(_seen: Set<StackItemBase> = new Set()): ContractParameter {
+    return new ByteArrayContractParameter(this.innerBuffer);
   }
 }

@@ -120,7 +120,7 @@ describe('Buffer.prototype.slice', () => {
   });
 
   test('cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = ${helpers.getBuffer(buffer)};
       const y = x.slice;

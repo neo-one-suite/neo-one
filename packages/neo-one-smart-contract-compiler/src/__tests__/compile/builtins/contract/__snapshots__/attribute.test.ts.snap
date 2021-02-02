@@ -2,7 +2,7 @@
 
 exports[`Attribute cannot be implemented 1`] = `
 "snippetCode.ts (4,13): Class 'MyAttribute' incorrectly implements interface 'AttributeBase'.
-  Type 'MyAttribute' is missing the following properties from type 'AttributeBase': usage, data, [OpaqueTagSymbol0]
+  Type 'MyAttribute' is missing the following properties from type 'AttributeBase': usage, [OpaqueTagSymbol0]
 
       2 |       import { AttributeBase } from '@neo-one/smart-contract';
       3 | 

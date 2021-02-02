@@ -100,6 +100,7 @@ export class ContractManifestModel<
   }
 
   public serializeWireBase(writer: BinaryWriter): void {
-    writer.writeVarString(JSON.stringify(this.serializeJSON()));
+    // TODO: fix this. or bring up with Neo team
+    writer.writeVarStringWithoutVar(JSON.stringify(this.serializeJSON()));
   }
 }

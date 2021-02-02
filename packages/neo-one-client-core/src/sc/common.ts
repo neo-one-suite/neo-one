@@ -16,10 +16,10 @@ import {
   Log,
   Param,
   RawAction,
+  RawCallReceipt,
   RawInvocationResult,
   Return,
   ScriptBuilderParam,
-  smartContractConverters,
   SourceMaps,
 } from '@neo-one/client-common';
 import { processActionsAndMessage, processConsoleLogMessages } from '@neo-one/client-switch';
@@ -228,31 +228,34 @@ export const convertAction = ({
     return action;
   }
 
-  const { args } = action;
-  if (args.length === 0) {
+  const { state, eventName: event } = action;
+  if (state.length === 0) {
     throw new InvalidEventError('Notification had no arguments');
   }
 
-  const event = smartContractConverters.toString(args[0]);
+  if (typeof state === 'string') {
+    throw new InvalidEventError(`Notification serialization failed: ${state}`);
+  }
+
   const eventSpec = events[event];
   if (eventSpec === undefined) {
     return event;
   }
 
   return {
-    version: action.version,
-    blockIndex: action.blockIndex,
-    blockHash: action.blockHash,
-    transactionIndex: action.transactionIndex,
-    transactionHash: action.transactionHash,
-    index: action.index,
-    globalIndex: action.globalIndex,
-    address: action.address,
+    // version: action.version,
+    // blockIndex: action.blockIndex,
+    // blockHash: action.blockHash,
+    // transactionIndex: action.transactionIndex,
+    // transactionHash: action.transactionHash,
+    // index: action.index,
+    // globalIndex: action.globalIndex,
+    // address: action.address,
     type: 'Event',
     name: event,
     parameters: getParametersObject({
       abiParameters: eventSpec.parameters,
-      parameters: args.slice(1),
+      parameters: state.slice(1),
     }),
   };
 };
@@ -268,20 +271,17 @@ export const convertInvocationResult = async ({
   readonly actions: readonly RawAction[];
   readonly sourceMaps?: SourceMaps;
 }): Promise<InvocationResult<Return | undefined>> => {
-  const { gasConsumed, gasCost, script } = result;
+  const { gasConsumed } = result;
   if (result.state === 'FAULT') {
     const message = await processActionsAndMessage({
       actions,
-      message: result.message,
       sourceMaps,
     });
 
     return {
       state: result.state,
       gasConsumed,
-      gasCost,
       message,
-      script,
     };
   }
 
@@ -293,21 +293,60 @@ export const convertInvocationResult = async ({
     parameter: contractParameter,
   });
 
-  return { state: result.state, gasConsumed, gasCost, value, script };
+  return { state: result.state, gasConsumed, value };
+};
+
+export const convertCallReceipt = async ({
+  returnType,
+  receipt,
+  sourceMaps,
+}: {
+  readonly returnType: ABIReturn;
+  readonly receipt: RawCallReceipt;
+  readonly sourceMaps?: SourceMaps;
+}): Promise<InvocationResult<Return | undefined>> => {
+  const actions = [...receipt.logs, ...receipt.notifications];
+  const { gasConsumed } = receipt;
+  if (receipt.state === 'FAULT') {
+    const message = await processActionsAndMessage({
+      actions,
+      sourceMaps,
+    });
+
+    return {
+      state: receipt.state,
+      gasConsumed,
+      message,
+    };
+  }
+
+  await processConsoleLogMessages({ actions, sourceMaps });
+
+  if (typeof receipt.stack === 'string') {
+    throw new Error(receipt.stack);
+  }
+  if (receipt.state === 'NONE' || receipt.state === 'BREAK') {
+    throw new Error('Should never return NONE or BREAK');
+  }
+  const contractParameter = receipt.stack[0];
+  const value = convertContractParameter({
+    type: returnType,
+    parameter: contractParameter,
+  });
+
+  return { state: receipt.state, gasConsumed, value };
 };
 
 export const convertCallResult = async ({
   returnType,
-  result: resultIn,
-  actions,
+  receipt,
   sourceMaps,
 }: {
   readonly returnType: ABIReturn;
-  readonly result: RawInvocationResult;
-  readonly actions: readonly RawAction[];
+  readonly receipt: RawCallReceipt;
   readonly sourceMaps?: SourceMaps;
 }): Promise<Return | undefined> => {
-  const result = await convertInvocationResult({ returnType, result: resultIn, actions, sourceMaps });
+  const result = await convertCallReceipt({ returnType, receipt, sourceMaps });
   if (result.state === 'FAULT') {
     throw new InvocationCallError(result.message);
   }

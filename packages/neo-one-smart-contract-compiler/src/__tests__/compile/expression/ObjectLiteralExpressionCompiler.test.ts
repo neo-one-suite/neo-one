@@ -119,7 +119,7 @@ describe('ObjectLiteralExpressionCompiler', () => {
   });
 
   test('object with spread override errors', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const y = {
         a: 0,
@@ -141,7 +141,7 @@ describe('ObjectLiteralExpressionCompiler', () => {
   });
 
   test('private field identifier fails outside class', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const y = {
         a: 0,

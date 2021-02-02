@@ -1,5 +1,5 @@
-import { RawAction, smartContractConverters as converters } from '@neo-one/client-common';
-// import { BinaryReader, deserializeStackItem, StackItem } from '@neo-one/node-core';
+import { common, RawAction, scriptHashToAddress, smartContractConverters as converters } from '@neo-one/client-common';
+import { assertArrayLikeStackItem, BinaryReader, deserializeStackItem, StackItem } from '@neo-one/node-core';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import { SourceMaps } from '../common';
@@ -54,9 +54,11 @@ const inspect = (value: any, wrapString = false): any => {
   return wrapString ? JSON.stringify(value) : value;
 };
 
+const getArray = (stackItem: StackItem): readonly StackItem[] => assertArrayLikeStackItem(stackItem).array;
+
 // tslint:disable-next-line no-any
 const extractValueFromStackItem = (stackItem: StackItem): any => {
-  const type = stackItem.getArray()[0].getInteger().toNumber();
+  const type = getArray(stackItem)[0].getInteger().toNumber();
 
   switch (type) {
     case 1:
@@ -65,35 +67,32 @@ const extractValueFromStackItem = (stackItem: StackItem): any => {
       // tslint:disable-next-line no-null-keyword
       return null;
     case 3:
-      return stackItem.getArray()[1].getBoolean();
+      return getArray(stackItem)[1].getBoolean();
     case 4:
-      return stackItem.getArray()[1].getString();
+      return getArray(stackItem)[1].getString();
     case 5:
-      return `Symbol(${stackItem.getArray()[1].getString()})`;
+      return `Symbol(${getArray(stackItem)[1].getString()})`;
     case 6:
-      return stackItem.getArray()[1].getInteger().toString(10);
+      return getArray(stackItem)[1].getInteger().toString(10);
     case 7:
       return _.fromPairs(
         utils.zip(
-          stackItem.getArray()[1].getArray()[0].getArray().map(extractValueFromStackItem),
-          stackItem.getArray()[1].getArray()[1].getArray().map(extractValueFromStackItem),
+          getArray(getArray(getArray(stackItem)[1])[0]).map(extractValueFromStackItem),
+          getArray(getArray(getArray(stackItem)[1])[1]).map(extractValueFromStackItem),
         ),
       );
     case 8:
-      return stackItem.getArray()[1].getArray().map(extractValueFromStackItem);
+      return getArray(getArray(stackItem)[1]).map(extractValueFromStackItem);
     case 9:
-      return stackItem.getArray()[1].getBuffer().toString('hex');
+      return getArray(stackItem)[1].getBuffer().toString('hex');
     case 10:
       // tslint:disable-next-line no-any
       return new Map<any, any>(
-        stackItem
-          .getArray()[1]
-          .getArray()
-          // tslint:disable-next-line no-any
-          .map<any>((value: any) => value.getArray().map(extractValueFromStackItem)),
+        // tslint:disable-next-line no-any
+        getArray(getArray(stackItem)[1]).map<any>((value: any) => getArray(value).map(extractValueFromStackItem)),
       );
     case 11:
-      return new Set(stackItem.getArray()[1].getArray().map(extractValueFromStackItem));
+      return new Set(getArray(getArray(stackItem)[1]).map(extractValueFromStackItem));
     default:
       return `<unknown type ${type}>`;
   }
@@ -106,7 +105,7 @@ const extractMessageFromStackItem = (stackItem: StackItem): string => {
 };
 
 const extractMessage = (value: Buffer): string => {
-  const stackItems = deserializeStackItem(new BinaryReader(value), 16, 34).getArray()[1].getArray();
+  const stackItems = getArray(getArray(deserializeStackItem(new BinaryReader(value), 16, 34))[1]);
 
   const messages = stackItems.map(extractMessageFromStackItem);
 
@@ -118,17 +117,21 @@ const extractLog = (action: RawAction): ConsoleLog | undefined => {
     return undefined;
   }
 
-  const args = action.args;
+  const address = scriptHashToAddress(common.uInt160ToString(action.scriptHash));
+  const args = action.state;
   try {
-    const event = converters.toString(args[0]);
+    const event = action.eventName;
     if (event !== 'console.log') {
       return undefined;
+    }
+    if (typeof args === 'string') {
+      return { address, line: -1, message: args };
     }
 
     const line = converters.toInteger(args[1], { type: 'Integer', decimals: 0 }).toNumber();
     const message = extractMessage(Buffer.from(converters.toBuffer(args[2]), 'hex'));
 
-    return { address: action.address, line, message };
+    return { address, line, message };
   } catch {
     return undefined;
   }
@@ -136,6 +139,11 @@ const extractLog = (action: RawAction): ConsoleLog | undefined => {
 
 const extractConsoleLogs = (actions: readonly RawAction[]): readonly ConsoleLog[] => {
   const mutableLogs: ConsoleLog[] = [];
+  // TODO: this should be removed when we're more confident in our types
+  // tslint:disable-next-line: strict-type-predicates
+  if (actions === undefined) {
+    return mutableLogs;
+  }
   // tslint:disable-next-line no-loop-statement
   for (const action of actions) {
     const log = extractLog(action);

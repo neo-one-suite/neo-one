@@ -1,4 +1,4 @@
-import { Attribute, paramTo, TransactionOptions, Transfer } from '@neo-one/client-common';
+import { Attribute, paramTo, toJSONAttributeType, TransactionOptions, Transfer } from '@neo-one/client-common';
 import { Print } from '../common';
 import { Action, MigrationParam } from './types';
 
@@ -25,9 +25,7 @@ const paramToString = (paramIn: MigrationParam): string => {
   });
 };
 
-const attributeToString = (attribute: Attribute) =>
-  `  - Usage: ${attribute.usage}
-     Data: ${attribute.data}`;
+const attributeToString = (attribute: Attribute) => `  - Type: ${toJSONAttributeType(attribute.type)}`;
 
 const transferToString = (transfer: Transfer) => `  Amount: ${transfer.amount.toString(10)}
   Asset: ${transfer.asset}
@@ -46,14 +44,14 @@ ${options.attributes.map(attributeToString).join('\n')}`;
 From: ${options.from}`;
   }
 
-  if (options.networkFee !== undefined) {
+  if (options.maxNetworkFee !== undefined) {
     str += `
-Network Fee: ${options.networkFee.toString(10)}`;
+Network Fee: ${options.maxNetworkFee.toString(10)}`;
   }
 
-  if (options.systemFee !== undefined) {
+  if (options.maxSystemFee !== undefined) {
     str += `
-System Fee: ${options.systemFee.toString(10)}`;
+System Fee: ${options.maxSystemFee.toString(10)}`;
   }
 
   return str;
@@ -66,8 +64,8 @@ export const printAction = (action: Action, print: Print) => {
     action.options !== undefined &&
     (action.options.attributes !== undefined ||
       action.options.from !== undefined ||
-      action.options.networkFee !== undefined ||
-      action.options.systemFee !== undefined)
+      action.options.maxNetworkFee !== undefined ||
+      action.options.maxSystemFee !== undefined)
   ) {
     rest += `
 Transaction Options:${transactionOptionsToString(action.options)}`;

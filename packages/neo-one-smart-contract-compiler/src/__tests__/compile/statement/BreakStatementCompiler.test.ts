@@ -79,7 +79,7 @@ describe('BreakStatementCompiler', () => {
   });
 
   test('break label', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       let result = 0;
       foo:

@@ -21,5 +21,21 @@ export const assertStackItemType = (value: number): StackItemType => {
     return value;
   }
 
-  throw new InvalidFormatError(`expected StackItemType, found: ${value}`);
+  throw new InvalidFormatError(`Expected StackItemType, found: ${value}`);
 };
+
+export type StackItemTypeJSON = keyof typeof StackItemType;
+
+export const isStackItemTypeJSON = (type: string): type is StackItemTypeJSON =>
+  // tslint:disable-next-line: strict-type-predicates no-any
+  StackItemType[type as any] !== undefined;
+
+export const assertStackItemTypeJSON = (type: string): StackItemTypeJSON => {
+  if (isStackItemTypeJSON(type)) {
+    return type;
+  }
+
+  throw new InvalidFormatError();
+};
+
+export const toStackItemTypeJSON = (type: StackItemType) => assertStackItemTypeJSON(StackItemType[type]);

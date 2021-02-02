@@ -4,6 +4,14 @@ import { ArrayStoragePop } from '../../../../compile/builtins/contract/arrayStor
 import { ArrayStoragePush } from '../../../../compile/builtins/contract/arrayStorage/push';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
 
+const properties = `
+  public readonly properties = {
+    groups: [],
+    permissions: [],
+    trusts: "*",
+  };
+`;
+
 describe('ArrayStorage', () => {
   test('length, push, pop, index', async () => {
     const node = await helpers.startNode();
@@ -60,12 +68,8 @@ describe('ArrayStorage', () => {
       }
 
       export class StorageContract extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'StorageContract',
-        };
+        ${properties}
+
         private readonly storage = ArrayStorage.for<string>();
 
         public run(): void {
@@ -113,12 +117,7 @@ describe('ArrayStorage', () => {
       }
 
       export class StorageContract extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'StorageContract',
-        };
+        ${properties}
         private readonly storage = ArrayStorage.for<string>();
 
         public run(): void {
@@ -166,12 +165,7 @@ describe('ArrayStorage', () => {
       }
 
       export class StorageContract extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'StorageContract',
-        };
+        ${properties}
         private readonly storage = ArrayStorage.for<string>();
 
         public run(): void {
@@ -219,12 +213,7 @@ describe('ArrayStorage', () => {
       }
 
       export class StorageContract extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'StorageContract',
-        };
+        ${properties}
         private readonly storage = ArrayStorage.for<string>();
 
         public run(): void {
@@ -272,12 +261,7 @@ describe('ArrayStorage', () => {
       }
 
       export class StorageContract extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'StorageContract',
-        };
+        ${properties}
         private readonly storage = ArrayStorage.for<string>();
 
         public run(): void {
@@ -325,12 +309,7 @@ describe('ArrayStorage', () => {
       }
 
       export class StorageContract extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'StorageContract',
-        };
+        ${properties}
         private readonly storage = ArrayStorage.for<string>();
 
         public run(): void {
@@ -357,12 +336,7 @@ describe('ArrayStorage', () => {
       import { ArrayStorage, SmartContract } from '@neo-one/smart-contract';
 
       export class StorageContract extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'StorageContract',
-        };
+        ${properties}
         private readonly prefix = ArrayStorage.for<string>();
 
         public setupStorage(): void {
@@ -475,8 +449,8 @@ describe('ArrayStorage', () => {
     expect(new ArrayStoragePop().canCall()).toEqual(true);
   });
 
-  test('invalid create', () => {
-    helpers.compileString(
+  test('invalid create', async () => {
+    await helpers.compileString(
       `
       import { ArrayStorage } from '@neo-one/smart-contract';
 
@@ -486,8 +460,8 @@ describe('ArrayStorage', () => {
     );
   });
 
-  test('invalid create - class', () => {
-    helpers.compileString(
+  test('invalid create - class', async () => {
+    await helpers.compileString(
       `
       import { ArrayStorage } from '@neo-one/smart-contract';
 
@@ -499,8 +473,8 @@ describe('ArrayStorage', () => {
     );
   });
 
-  test('invalid reference', () => {
-    helpers.compileString(
+  test('invalid reference', async () => {
+    await helpers.compileString(
       `
       import { ArrayStorage } from '@neo-one/smart-contract';
 
@@ -510,8 +484,8 @@ describe('ArrayStorage', () => {
     );
   });
 
-  test('invalid "reference"', () => {
-    helpers.compileString(
+  test('invalid "reference"', async () => {
+    await helpers.compileString(
       `
       import { ArrayStorage } from '@neo-one/smart-contract';
 
@@ -521,8 +495,8 @@ describe('ArrayStorage', () => {
     );
   });
 
-  test('invalid reference - object', () => {
-    helpers.compileString(
+  test('invalid reference - object', async () => {
+    await helpers.compileString(
       `
       import { ArrayStorage } from '@neo-one/smart-contract';
 

@@ -12,9 +12,9 @@ export class IterStorageHelper extends Helper {
     // [keyBuffer, keyBuffer]
     sb.emitOp(node, 'DUP');
     // [context, keyBuffer, keyBuffer]
-    sb.emitSysCall(node, 'Neo.Storage.GetReadOnlyContext');
+    sb.emitSysCall(node, 'System.Storage.GetReadOnlyContext');
     // [iterator, keyBuffer]
-    sb.emitSysCall(node, 'Neo.Storage.Find');
+    sb.emitSysCall(node, 'System.Storage.Find');
     // [keyBuffer, iterator]
     sb.emitOp(node, 'SWAP');
     const key = sb.scope.addUnique();
@@ -44,8 +44,8 @@ export class IterStorageHelper extends Helper {
       }),
     );
     // [iterator, iterator]
-    sb.emitSysCall(node, 'Neo.Iterator.Create');
+    sb.emitSysCall(node, 'System.Iterator.Create');
     // [iterator]
-    sb.emitSysCall(node, 'Neo.Iterator.Concat');
+    sb.emitSysCall(node, 'System.Iterator.Concat');
   }
 }

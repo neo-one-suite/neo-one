@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "Update for Preview3, primarily in compiler, client, and CLI.",
+      "type": "patch",
+      "packageName": "@neo-one/node-blockchain"
+    }
+  ],
+  "packageName": "@neo-one/node-blockchain",
+  "email": "spencercorwin@icloud.com"
+}

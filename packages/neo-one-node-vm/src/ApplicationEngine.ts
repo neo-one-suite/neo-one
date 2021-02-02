@@ -2,7 +2,7 @@ import { TriggerType, VMState } from '@neo-one/client-common';
 import { CallFlags, SerializableContainer, serializeScriptContainer, SnapshotName } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
-import { parseStackItems, convertLog } from './converters';
+import { convertLog, parseStackItems } from './converters';
 import { EngineMethods } from './Methods';
 import { DispatcherFunc } from './types';
 

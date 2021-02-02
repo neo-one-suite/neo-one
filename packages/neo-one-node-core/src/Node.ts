@@ -1,7 +1,6 @@
 import { VerifyResultModel } from '@neo-one/client-common';
 import { Block } from './Block';
 import { Blockchain } from './Blockchain';
-import { ContractParametersContext } from './ContractParametersContext';
 import { Endpoint } from './network';
 import { ConsensusPayload } from './payload';
 import { Transaction } from './transaction';

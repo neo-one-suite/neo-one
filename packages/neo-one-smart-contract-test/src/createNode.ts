@@ -1,6 +1,6 @@
 import { common, crypto } from '@neo-one/client-common';
 import { FullNode } from '@neo-one/node';
-import { createMain } from '@neo-one/node-neo-settings';
+import { createPriv } from '@neo-one/node-neo-settings';
 import { constants } from '@neo-one/utils';
 import _ from 'lodash';
 import MemDown from 'memdown';
@@ -14,8 +14,8 @@ export const createNode = async () => {
 
   const node = new FullNode({
     options: {
-      blockchain: createMain({
-        privateNet: true,
+      blockchain: createPriv({
+        // privateNet: true, // TODO: fix here
         standbyValidators: [constants.PRIVATE_NET_PUBLIC_KEY],
         extraCommitteeMembers: [],
       }),

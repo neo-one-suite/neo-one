@@ -5,7 +5,7 @@ export interface ContractPaths {
   readonly sourceMap: RawSourceMap;
   readonly contractPath: string;
   readonly createContractPath: string;
-  readonly abiPath: string;
+  readonly manifestPath: string;
   readonly typesPath: string;
 }
 

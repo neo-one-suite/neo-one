@@ -22,12 +22,11 @@ import {
   ContractMethodDescriptorJSON,
   ContractParameterDefinition,
   ContractParameterDefinitionJSON,
-  ContractParameterType,
+  ContractParameterDefinitionType,
   ContractParameterTypeJSON,
   ContractPermission,
   ContractPermissionJSON,
   DeveloperProvider,
-  FeelessTransactionModel,
   GetOptions,
   Hash256String,
   IterOptions,
@@ -54,9 +53,9 @@ import {
   TransactionModel,
   TransactionReceipt,
   TransactionReceiptJSON,
+  UInt160Hex,
   VerifyResultJSON,
   VerifyResultModel,
-  UInt160Hex,
 } from '@neo-one/client-common';
 import { utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
@@ -66,7 +65,7 @@ import BigNumber from 'bignumber.js';
 import debug from 'debug';
 import { AsyncBlockIterator } from '../AsyncBlockIterator';
 import { clientUtils } from '../clientUtils';
-import { convertCallReceipt, convertNotification, convertStackItem } from './convert';
+import { convertCallReceipt, convertLog, convertNotification, convertStackItem } from './convert';
 import { JSONRPCClient } from './JSONRPCClient';
 import { JSONRPCHTTPProvider } from './JSONRPCHTTPProvider';
 import { JSONRPCProvider, JSONRPCProviderManager } from './JSONRPCProvider';
@@ -405,22 +404,22 @@ export class NEOONEDataProvider implements DeveloperProvider {
   private convertContractABI(abi: ContractABIJSON): ContractABI {
     return {
       hash: abi.hash,
-      methods: abi.methods.map(this.convertContractMethodDescriptor),
-      events: abi.events.map(this.convertContractEventDescriptor),
+      methods: abi.methods.map(this.convertContractMethodDescriptor.bind(this)),
+      events: abi.events.map(this.convertContractEventDescriptor.bind(this)),
     };
   }
 
   private convertContractEventDescriptor(event: ContractEventDescriptorJSON): ContractEventDescriptor {
     return {
       name: event.name,
-      parameters: event.parameters.map(this.convertContractParameterDefinition),
+      parameters: event.parameters.map(this.convertContractParameterDefinition.bind(this)),
     };
   }
 
   private convertContractMethodDescriptor(method: ContractMethodDescriptorJSON): ContractMethodDescriptor {
     return {
       name: method.name,
-      parameters: method.parameters.map(this.convertContractParameterDefinition),
+      parameters: method.parameters.map(this.convertContractParameterDefinition.bind(this)),
       returnType: this.convertContractParameterType(method.returntype),
       offset: method.offset,
     };
@@ -433,7 +432,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     };
   }
 
-  private convertContractParameterType(param: ContractParameterTypeJSON): ContractParameterType {
+  private convertContractParameterType(param: ContractParameterTypeJSON): ContractParameterDefinitionType {
     switch (param) {
       case 'Any':
         return 'Any';
@@ -476,6 +475,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
       gasConsumed: new BigNumber(data.gasconsumed),
       stack: typeof data.stack === 'string' ? data.stack : data.stack.map(convertStackItem),
       notifications: data.notifications.map(convertNotification),
+      logs: data.logs.map(convertLog),
     };
   }
 

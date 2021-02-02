@@ -23,7 +23,7 @@ export class SmartContractDestroy extends BuiltinInstanceMemberCall {
       sb.emitOp(node, 'DROP');
     }
 
-    sb.emitSysCall(node, 'Neo.Contract.Destroy');
+    sb.emitSysCall(node, 'System.Contract.Destroy');
 
     if (optionsIn.pushValue) {
       // [val]

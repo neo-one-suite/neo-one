@@ -4,6 +4,7 @@ import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 export interface CreateEnumeratorIterableIteratorHelperOptions {
+  readonly deserializeKey?: boolean;
   readonly mapValue?: (options: VisitOptions) => void;
 }
 
@@ -14,11 +15,13 @@ const doNothing = () => {
 // Input: [enumerator]
 // Output: [val]
 export class CreateEnumeratorIterableIteratorHelper extends Helper {
+  private readonly deserializeKey: boolean;
   private readonly mapValue: (options: VisitOptions) => void;
 
   public constructor(options: CreateEnumeratorIterableIteratorHelperOptions) {
     super();
     this.mapValue = options.mapValue === undefined ? doNothing : options.mapValue;
+    this.deserializeKey = options.deserializeKey ?? false;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
@@ -28,7 +31,11 @@ export class CreateEnumeratorIterableIteratorHelper extends Helper {
       sb.helpers.createIterableIteratorBase({
         handleNext: (innerOptions) => {
           // [value]
-          sb.emitSysCall(node, 'Neo.Enumerator.Value');
+          sb.emitSysCall(node, 'System.Enumerator.Value');
+          if (this.deserializeKey) {
+            // [value]
+            sb.emitSysCall(node, 'System.Binary.Deserialize');
+          }
           // [val]
           this.mapValue(innerOptions);
         },

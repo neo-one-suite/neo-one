@@ -6,16 +6,19 @@ import { Helper } from '../Helper';
 import { isOnlyMap } from './map';
 
 export interface UnwrapValRecursiveHelperOptions {
+  readonly deserializeBeforeUnwrap?: boolean;
   readonly type: ts.Type | undefined;
 }
 
 // Input: [val]
 // Output: [value]
 export class UnwrapValRecursiveHelper extends Helper {
+  private readonly deserializeBeforeUnwrap: boolean;
   private readonly type: ts.Type | undefined;
   public constructor(options: UnwrapValRecursiveHelperOptions) {
     super();
     this.type = options.type;
+    this.deserializeBeforeUnwrap = options.deserializeBeforeUnwrap ?? false;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
@@ -29,6 +32,9 @@ export class UnwrapValRecursiveHelper extends Helper {
 
     const type = tsUtils.type_.getNonNullableType(this.type);
 
+    if (this.deserializeBeforeUnwrap) {
+      sb.emitSysCall(node, 'System.Binary.Deserialize');
+    }
     sb.emitHelper(
       node,
       options,
@@ -122,7 +128,11 @@ export class UnwrapValRecursiveHelper extends Helper {
                     localValueType === undefined ? undefined : sb.context.analysis.getNotAnyType(node, localValueType);
                 }
 
-                sb.emitHelper(node, innerInnerOptions, sb.helpers.unwrapValRecursive({ type: keyType }));
+                sb.emitHelper(
+                  node,
+                  innerInnerOptions,
+                  sb.helpers.unwrapValRecursive({ deserializeBeforeUnwrap: true, type: keyType }),
+                );
                 sb.emitOp(node, 'SWAP');
                 sb.emitHelper(node, innerInnerOptions, sb.helpers.unwrapValRecursive({ type: valueType }));
                 sb.emitOp(node, 'SWAP');
@@ -164,26 +174,11 @@ export class UnwrapValRecursiveHelper extends Helper {
         transaction: (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.unwrapTransaction);
         },
-        output: (innerOptions) => {
-          sb.emitHelper(node, innerOptions, sb.helpers.unwrapOutput);
-        },
         attribute: (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.unwrapAttribute);
         },
-        input: (innerOptions) => {
-          sb.emitHelper(node, innerOptions, sb.helpers.unwrapInput);
-        },
-        account: (innerOptions) => {
-          sb.emitHelper(node, innerOptions, sb.helpers.unwrapAccount);
-        },
-        asset: (innerOptions) => {
-          sb.emitHelper(node, innerOptions, sb.helpers.unwrapAsset);
-        },
         contract: (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.unwrapContract);
-        },
-        header: (innerOptions) => {
-          sb.emitHelper(node, innerOptions, sb.helpers.unwrapHeader);
         },
         block: (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.unwrapBlock);

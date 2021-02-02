@@ -11,10 +11,10 @@ export const getClients = async ({ privateKey, dataProvider }: Options) => {
   const masterWalletName = 'master';
 
   const keystore = new LocalKeyStore(new LocalMemoryStore());
-  const masterWallet = await keystore.addUserAccount({
+  const masterWallet = await keystore.addMultiSigUserAccount({
     network: networkName,
     name: masterWalletName,
-    privateKey,
+    privateKeys: [privateKey],
   });
 
   const provider = new NEOONEProvider([dataProvider]);

@@ -5,10 +5,9 @@ import { helpers } from '../../../../__data__';
 
 const properties = `
 public readonly properties = {
-  codeVersion: '1.0',
-  author: 'dicarlo2',
-  email: 'alex.dicarlo@neotracker.io',
-  description: 'The TestSmartContract',
+  groups: [],
+  permissions: [],
+  trusts: "*",
 };
 `;
 
@@ -340,12 +339,8 @@ describe('InvokeSmartContractHelper', () => {
       }
 
       export class Token extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'NEO•ONE Token',
-        };
+        ${properties}
+
         public readonly name = 'One';
         public readonly symbol = 'ONE';
         public readonly decimals = 8;
@@ -422,12 +417,8 @@ describe('InvokeSmartContractHelper', () => {
       );
 
       export class Escrow extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'Escrow account',
-        };
+        ${properties}
+
         private readonly balances = MapStorage.for<[Address, Address, Address], Fixed<8>>();
 
         @constant

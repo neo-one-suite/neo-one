@@ -30,7 +30,7 @@ describe('Array.prototype.forEach', () => {
   });
 
   test('cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = [0, 1, 2];
       const y = x.forEach;
@@ -40,7 +40,7 @@ describe('Array.prototype.forEach', () => {
   });
 
   test('cannot be "referenced"', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = [0, 1, 2];
       const y = x['forEach'];

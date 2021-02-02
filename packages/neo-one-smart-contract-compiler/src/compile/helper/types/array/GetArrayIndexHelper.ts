@@ -21,7 +21,7 @@ export class GetArrayIndexHelper extends Helper {
     // [arr, indexNumber, arr]
     sb.emitOp(node, 'TUCK');
     // [size, indexNumber, arr]
-    sb.emitOp(node, 'ARRAYSIZE');
+    sb.emitOp(node, 'SIZE');
     // [indexNumber, size, indexNumber, arr]
     sb.emitOp(node, 'OVER');
 

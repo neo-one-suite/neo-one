@@ -8,7 +8,7 @@ import { findContracts } from '../build';
 import { Print } from '../common';
 
 const compile = async (filePath: string, name: string, linked: LinkedContracts, sourceMaps: SourceMaps) => {
-  const contract = compileContract(filePath, name, createCompilerHost(), linked);
+  const contract = await compileContract(filePath, name, createCompilerHost(), linked);
   if (contract.diagnostics.some((diagnostic) => diagnostic.category === DiagnosticCategory.Error)) {
     throw new Error('Compilation error.');
   }

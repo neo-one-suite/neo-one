@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "Update for Preview3, primarily in compiler, client, and CLI.",
+      "type": "patch",
+      "packageName": "@neo-one/client-full-core"
+    }
+  ],
+  "packageName": "@neo-one/client-full-core",
+  "email": "spencercorwin@icloud.com"
+}

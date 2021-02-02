@@ -119,7 +119,7 @@ describe('Array.prototype.slice', () => {
   });
 
   test('cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = [1, 2, 3, 4];
       const y = x.slice;

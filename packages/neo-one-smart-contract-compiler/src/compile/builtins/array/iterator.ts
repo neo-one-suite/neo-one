@@ -34,7 +34,7 @@ export class ArrayIterator extends BuiltinInstanceMemberCall {
     // [arr]
     sb.emitHelper(node, options, sb.helpers.unwrapArray);
     // [iterator]
-    sb.emitSysCall(node, 'Neo.Enumerator.Create');
+    sb.emitSysCall(node, 'System.Enumerator.Create');
     // [val]
     sb.emitHelper(node, options, sb.helpers.createEnumeratorIterableIterator({}));
   }

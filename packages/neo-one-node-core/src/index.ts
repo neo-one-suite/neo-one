@@ -41,3 +41,5 @@ export * from './Nep5Transfer';
 export * from './Nep5BalanceKey';
 export * from './Nep5TransferKey';
 export * from './ApplicationLog';
+export * from './disassembleByteCode';
+export * from './contractParameter';

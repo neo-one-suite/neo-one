@@ -1,8 +1,16 @@
 import { helpers, keys } from '../../../../../__data__';
 
+const properties = `
+  public readonly properties = {
+    groups: [],
+    permissions: [],
+    trusts: "*",
+  };
+`;
+
 describe('SmartContract.for', () => {
   test('reports error on invalid argument values - Object', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
         import { Address, SmartContract } from '@neo-one/smart-contract';
 
@@ -21,7 +29,7 @@ describe('SmartContract.for', () => {
   });
 
   test('reports error on invalid argument values - optional Object', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
         import { Address, SmartContract } from '@neo-one/smart-contract';
 
@@ -40,7 +48,7 @@ describe('SmartContract.for', () => {
   });
 
   test('reports error on invalid argument return - Object', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
         import { Address, SmartContract } from '@neo-one/smart-contract';
 
@@ -59,7 +67,7 @@ describe('SmartContract.for', () => {
   });
 
   test('reports error on invalid argument return - union string | number', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
         import { Address, SmartContract } from '@neo-one/smart-contract';
 
@@ -75,7 +83,7 @@ describe('SmartContract.for', () => {
   });
 
   test('reports error on multiple call signatures', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
         import { Address, SmartContract } from '@neo-one/smart-contract';
 
@@ -92,7 +100,7 @@ describe('SmartContract.for', () => {
   });
 
   test('reports error on any parameter', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
         import { Address, SmartContract } from '@neo-one/smart-contract';
 
@@ -108,7 +116,7 @@ describe('SmartContract.for', () => {
   });
 
   test('reports error on any return', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
         import { Address, SmartContract } from '@neo-one/smart-contract';
 
@@ -124,7 +132,7 @@ describe('SmartContract.for', () => {
   });
 
   test('reports error on missing return', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
         import { Address, SmartContract } from '@neo-one/smart-contract';
 
@@ -140,7 +148,7 @@ describe('SmartContract.for', () => {
   });
 
   test('reports error on any smart contract type', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
         import { Address, SmartContract } from '@neo-one/smart-contract';
 
@@ -152,7 +160,7 @@ describe('SmartContract.for', () => {
   });
 
   test('reports error on any properties', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
         import { Address, SmartContract } from '@neo-one/smart-contract';
 
@@ -173,12 +181,7 @@ describe('SmartContract.for', () => {
       import { SmartContract } from '@neo-one/smart-contract';
 
       export class Dynamic extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'Foo',
-        };
+        ${properties}
 
         public run(value: number): string {
           assertEqual(value, 10);
@@ -196,12 +199,7 @@ describe('SmartContract.for', () => {
       }
 
       export class DynamicCall extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'Foo',
-        };
+        ${properties}
 
         public run(value: Address): string {
           const contract = SmartContract.for<Contract>(value);

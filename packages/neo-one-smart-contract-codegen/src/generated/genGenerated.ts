@@ -35,7 +35,11 @@ ${createExport(generatedPath, contractsPath)}${
     framework === 'vue' ? createNewLineExport(generatedPath, vuePath) : ''
   }
 ${createExport(generatedPath, clientPath)}
-${_.flatMap(contractsPaths, ({ createContractPath, typesPath, abiPath }) => [createContractPath, typesPath, abiPath])
+${_.flatMap(contractsPaths, ({ createContractPath, typesPath, manifestPath }) => [
+  createContractPath,
+  typesPath,
+  manifestPath,
+])
   .map((importPath) => createExport(generatedPath, importPath))
   .join('\n')}
 `,
@@ -44,7 +48,7 @@ ${framework === 'react' ? createNewLineExport(generatedPath, reactPath) : ''}${
     framework === 'angular' ? createNewLineExport(generatedPath, angularPath) : ''
   }${framework === 'vue' ? createNewLineExport(generatedPath, vuePath) : ''}
 ${createExport(generatedPath, clientPath)}
-${_.flatMap(contractsPaths, ({ createContractPath, abiPath }) => [createContractPath, abiPath])
+${_.flatMap(contractsPaths, ({ createContractPath, manifestPath }) => [createContractPath, manifestPath])
   .map((importPath) => createExport(generatedPath, importPath))
   .join('\n')}
 `,

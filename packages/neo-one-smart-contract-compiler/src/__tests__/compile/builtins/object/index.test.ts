@@ -9,7 +9,7 @@ describe('Object', () => {
   });
 
   test('cannot be extended', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       class MyObject extends Object {
       }
@@ -19,7 +19,7 @@ describe('Object', () => {
   });
 
   test('cannot match shape and pass to function', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const Obj = {
         keys: (o: {}): string[] => [],

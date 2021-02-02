@@ -1,15 +1,4 @@
-import {
-  AddressString,
-  addressToScriptHash,
-  BufferString,
-  common,
-  NetworkType,
-  ScriptBuilder,
-  ScriptBuilderParam,
-  UInt160Hex,
-} from '@neo-one/client-common';
-import sp from 'synchronized-promise';
-import { LocalKeyStore } from './user';
+import { common, ScriptBuilder, ScriptBuilderParam, UInt160Hex } from '@neo-one/client-common';
 
 const getInvokeMethodInvocationScript = ({
   method,
@@ -38,17 +27,6 @@ const getInvokeMethodScript = ({
 
   return sb.build();
 };
-
-export const addLocalKeysSync = (
-  wallets: ReadonlyArray<{
-    readonly network: NetworkType;
-    readonly privateKey?: BufferString;
-    readonly name?: string;
-    readonly password?: string;
-    readonly nep2?: string;
-  }>,
-  keyStore: LocalKeyStore,
-) => sp(async () => Promise.all(wallets.map((wallet) => keyStore.addUserAccount(wallet))))();
 
 export const clientUtils = {
   getInvokeMethodInvocationScript,

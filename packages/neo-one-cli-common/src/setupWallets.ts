@@ -128,6 +128,10 @@ export const setupWallets = async (
   ) {
     const result = await client.transfer(
       WALLETS.reduce<readonly Transfer[]>((acc, wallet) => acc.concat(createWalletTransfers(wallet)), []),
+      {
+        maxNetworkFee: new BigNumber(-1),
+        maxSystemFee: new BigNumber(-1),
+      },
     );
     await Promise.all([result.confirmed(), developerClient.runConsensusNow()]);
   }

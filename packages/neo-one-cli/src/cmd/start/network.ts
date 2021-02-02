@@ -1,7 +1,7 @@
-import { common, crypto } from '@neo-one/client-common';
+import { common } from '@neo-one/client-common';
 import { cliLogger } from '@neo-one/logger';
 import { FullNode } from '@neo-one/node';
-import { createMain } from '@neo-one/node-neo-settings';
+import { createPriv } from '@neo-one/node-neo-settings';
 import yargs from 'yargs';
 import { getPrimaryKeys, isRunning, start } from '../../common';
 import { writePidFile } from './writePidFile';
@@ -23,10 +23,10 @@ export const handler = () => {
     const fullNode = new FullNode({
       options: {
         path: config.network.path,
-        blockchain: createMain({
+        blockchain: createPriv({
           standbyValidators: [common.ecPointToString(publicKey)],
           extraCommitteeMembers: [],
-          privateNet: true,
+          // privateNet: true,
         }),
         node: {
           consensus: {

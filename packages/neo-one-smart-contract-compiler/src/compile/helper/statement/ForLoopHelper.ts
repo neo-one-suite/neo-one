@@ -36,7 +36,7 @@ export class ForLoopHelper extends Helper {
       }
 
       if (!loopPC.getFirst().equals(loopPC.getCurrent())) {
-        sb.emitJmp(node, 'JMPIFNOT', loopPC.getLast());
+        sb.emitJmp(node, 'JMPIFNOT_L', loopPC.getLast());
       }
 
       sb.withProgramCounter((finallyPC) => {
@@ -54,7 +54,7 @@ export class ForLoopHelper extends Helper {
           this.incrementor();
         }
 
-        sb.emitJmp(node, 'JMP', loopPC.getFirst());
+        sb.emitJmp(node, 'JMP_L', loopPC.getFirst());
       });
 
       // Drop finally completion
@@ -119,7 +119,7 @@ export class ForLoopHelper extends Helper {
             if (this.incrementor !== undefined) {
               this.incrementor();
             }
-            sb.emitJmp(node, 'JMP', loopPC.getFirst());
+            sb.emitJmp(node, 'JMP_L', loopPC.getFirst());
           },
         ),
       );

@@ -5,7 +5,7 @@ import {
   WALLETS as WALLETS_BASE,
 } from '@neo-one/cli-common';
 import { common, crypto, privateKeyToAddress, wifToPrivateKey } from '@neo-one/client-common';
-import { NEOONEDataProvider } from '@neo-one/client-core';
+import { Hash160, NEOONEDataProvider } from '@neo-one/client-core';
 import { constants } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { getPrimaryKeys } from '../common';
@@ -18,8 +18,8 @@ const hasBalance = async (provider: NEOONEDataProvider, wallet: BootstrapWallet)
   const account = await provider.getAccount(privateKeyToAddress(privateKey));
 
   return (
-    (account.balances[common.NEO_ASSET_HASH] as BigNumber | undefined) !== undefined ||
-    (account.balances[common.GAS_ASSET_HASH] as BigNumber | undefined)
+    (account.balances[Hash160.NEO] as BigNumber | undefined) !== undefined ||
+    (account.balances[Hash160.GAS] as BigNumber | undefined)
   );
 };
 

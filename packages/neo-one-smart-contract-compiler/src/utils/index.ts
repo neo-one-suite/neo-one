@@ -8,3 +8,4 @@ export * from './nodeKey';
 export * from './throwOnDiagnosticErrorOrWarning';
 export * from './toABIReturn';
 export * from './typeKey';
+export * from './processMethods';

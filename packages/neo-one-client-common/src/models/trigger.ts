@@ -1,8 +1,8 @@
 import { InvalidFormatError } from '../common';
 
 export enum TriggerType {
-  Verification = 0x20,
   System = 0x01,
+  Verification = 0x20,
   Application = 0x40,
 }
 

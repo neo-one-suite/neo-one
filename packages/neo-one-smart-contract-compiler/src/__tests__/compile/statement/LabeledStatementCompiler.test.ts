@@ -2,7 +2,7 @@ import { helpers } from '../../../__data__';
 
 describe('LabeledStatementCompiler', () => {
   test('simple', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       loop1:
       for (let i = 0; i < 3; i++) {

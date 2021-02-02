@@ -2,7 +2,7 @@ import { helpers } from '../../../../__data__';
 
 describe('RegExp', () => {
   test('cannot be implemented', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       class MyRegExp implements RegExp {
       }
@@ -12,7 +12,7 @@ describe('RegExp', () => {
   });
 
   test('cannot be extended', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       class MyRegExp extends RegExp {
       }

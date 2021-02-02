@@ -1,3 +1,4 @@
+import { StackItemType } from '@neo-one/client-common';
 import ts from 'typescript';
 import { StructuredStorageSlots } from '../../constants';
 import { ScriptBuilder } from '../../sb';
@@ -36,11 +37,13 @@ export class GetKeyStructuredStorageHelper extends KeyStructuredStorageBaseHelpe
           // [val, prefix]
           sb.emitOp(node, 'SWAP');
           // [buffer, prefix]
-          sb.emitSysCall(node, 'Neo.Runtime.Serialize');
+          sb.emitSysCall(node, 'System.Binary.Serialize');
           // [prefix]
           sb.emitOp(node, 'CAT');
         },
       }),
     );
+    // [bytestring]
+    sb.emitOp(node, 'CONVERT', Buffer.from([StackItemType.ByteString]));
   }
 }

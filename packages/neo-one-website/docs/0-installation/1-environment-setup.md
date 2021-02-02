@@ -31,6 +31,8 @@ This page describes how to setup NEO•ONE using `yarn` or `npm`.
 
 **Once you have a project setup**, the next step is to add NEO•ONE to it. NEO•ONE is organized into multiple individual packages. Use as much or as little as you like. Each package may be installed using either [yarn](https://yarnpkg.com/) (`yarn add <package name>`) or [npm](https://www.npmjs.com/) (`npm install <package name>`). Each package has the form `@neo-one/<name>`, for example, `@neo-one/client`.
 
+Make sure to install the correct versions of these packages. If you are working on Neo2 then make sure you are installing NEO•ONE packages at version 2.x.x or lower. Version 3.0.0 or higher will be for Neo3.
+
 Install all the neo-one packages with yarn by running:
 
 ```bash

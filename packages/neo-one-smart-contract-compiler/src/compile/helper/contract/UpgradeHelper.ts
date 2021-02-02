@@ -47,7 +47,7 @@ export class UpgradeHelper extends Helper {
           // [...args]
           sb.emitOp(node, 'DROP');
           // [contract]
-          sb.emitSysCall(node, 'Neo.Contract.Migrate');
+          sb.emitSysCall(node, 'System.Contract.Update');
           // []
           sb.emitOp(node, 'DROP');
           // [boolean]

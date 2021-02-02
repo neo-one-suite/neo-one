@@ -53,21 +53,12 @@ import {
 } from './completionRecord';
 import {
   ApplicationMatchesVerificationHelper,
-  CompleteSendHelper,
   DeployHelper,
   DeployHelperOptions,
-  DidReceiveAssetsHelper,
-  DidReceiveNonClaimAssetsHelper,
-  DidSendAssetsHelper,
-  GetOutputAssetValueMapHelper,
   GetSmartContractPropertyHelper,
   GetSmartContractPropertyHelperOptions,
   HandleNormalHelper,
   HandleNormalHelperOptions,
-  HandleReceiveHelper,
-  HandleSendHelper,
-  HandleSendHelperOptions,
-  HandleSendUnsafeHelper,
   InvocationIsCallerHelper,
   InvokeSmartContractHelper,
   InvokeSmartContractHelperOptions,
@@ -77,15 +68,10 @@ import {
   IsClaimedTransactionHelper,
   IsDeployedHelper,
   IsProcessedTransactionHelper,
-  MergeAssetValueMapsHelper,
-  MergeAssetValueMapsHelperOptions,
-  RefundAssetsHelper,
   SetDeployedHelper,
-  SetProcessedTransactionHelper,
   UpgradeHelper,
   UpgradeHelperOptions,
 } from './contract';
-import { HandleSendUnsafeReceiveHelperBaseOptions } from './contract/HandleSendUnsafeReceiveHelperBase';
 import { ThrowTypeErrorHelper } from './error';
 import {
   ArgumentsHelper,
@@ -142,6 +128,7 @@ import {
   RawEnumeratorFindHelper,
   RawEnumeratorFindHelperOptions,
   RawEnumeratorForEachFuncHelper,
+  RawEnumeratorForEachFuncHelperOptions,
   RawEnumeratorForEachHelper,
   RawEnumeratorForEachHelperOptions,
   RawEnumeratorReduceHelper,
@@ -158,6 +145,7 @@ import {
   RawIteratorForEachFuncBaseHelperOptions,
   RawIteratorForEachFuncHelper,
   RawIteratorForEachHelper,
+  RawIteratorForEachHelperFuncOptions,
   RawIteratorForEachHelperOptions,
   RawIteratorForEachKeyHelper,
   RawIteratorForEachKeyHelperOptions,
@@ -205,6 +193,7 @@ import {
   LessThanHelper,
   LessThanHelperOptions,
 } from './relational';
+import { DupScopeHelper, PopScopeHelper, PushScopeHelper } from './scope';
 import {
   Case,
   CaseHelper,
@@ -314,7 +303,6 @@ import {
   IsBufferHelper,
   IsErrorHelper,
   IsForwardValueHelper,
-  IsInputHelper,
   IsIterableHelper,
   IsIterableIteratorHelper,
   IsIteratorResultHelper,
@@ -324,7 +312,6 @@ import {
   IsNullOrUndefinedHelper,
   IsNumberHelper,
   IsObjectHelper,
-  IsOutputHelper,
   IsSetHelper,
   IsSetStorageHelper,
   IsStringHelper,
@@ -363,14 +350,12 @@ import {
   UnwrapBufferHelper,
   UnwrapErrorHelper,
   UnwrapForwardValueHelper,
-  UnwrapInputHelper,
   UnwrapIterableIteratorHelper,
   UnwrapIteratorResultHelper,
   UnwrapMapHelper,
   UnwrapMapStorageHelper,
   UnwrapNumberHelper,
   UnwrapObjectHelper,
-  UnwrapOutputHelper,
   UnwrapSetHelper,
   UnwrapSetStorageHelper,
   UnwrapStringHelper,
@@ -389,7 +374,6 @@ import {
   WrapBufferHelper,
   WrapErrorHelper,
   WrapForwardValueHelper,
-  WrapInputHelper,
   WrapIterableIteratorHelper,
   WrapIteratorResultHelper,
   WrapMapHelper,
@@ -397,7 +381,6 @@ import {
   WrapNullHelper,
   WrapNumberHelper,
   WrapObjectHelper,
-  WrapOutputHelper,
   WrapSetHelper,
   WrapSetStorageHelper,
   WrapStringHelper,
@@ -409,18 +392,11 @@ import {
   WrapValRecursiveHelper,
   WrapValRecursiveHelperOptions,
 } from './types';
-import { IsAccountHelper, UnwrapAccountHelper, WrapAccountHelper } from './types/account';
-import { IsAssetHelper, UnwrapAssetHelper, WrapAssetHelper } from './types/asset';
 import { IsBlockHelper, UnwrapBlockHelper, WrapBlockHelper } from './types/block';
 import { IsContractHelper, UnwrapContractHelper, WrapContractHelper } from './types/contract';
-import { IsHeaderHelper, UnwrapHeaderHelper, WrapHeaderHelper } from './types/header';
 
 export interface Helpers {
   readonly mutableCache: { [K in string]?: Helper };
-  // account
-  readonly isAccount: IsAccountHelper;
-  readonly wrapAccount: WrapAccountHelper;
-  readonly unwrapAccount: UnwrapAccountHelper;
 
   // arr
   readonly arrClone: ArrCloneHelper;
@@ -443,11 +419,6 @@ export interface Helpers {
   readonly arrToString: (options: ArrToStringHelperOptions) => ArrToStringHelper;
   readonly extendArr: ExtendArrHelper;
 
-  // asset
-  readonly isAsset: IsAssetHelper;
-  readonly wrapAsset: WrapAssetHelper;
-  readonly unwrapAsset: UnwrapAssetHelper;
-
   // bind
   readonly arrayBinding: (options: ArrayBindingHelperOptions) => ArrayBindingHelper;
   readonly objectBinding: (options: ObjectBindingHelperOptions) => ObjectBindingHelper;
@@ -468,31 +439,20 @@ export interface Helpers {
   readonly createClass: (options: CreateClassHelperOptions) => CreateClassHelper;
 
   // contract
-  readonly didReceiveAssets: DidReceiveAssetsHelper;
-  readonly didReceiveNonClaimAssets: DidReceiveNonClaimAssetsHelper;
-  readonly didSendAssets: DidSendAssetsHelper;
   readonly invokeSmartContract: (options: InvokeSmartContractHelperOptions) => InvokeSmartContractHelper;
   readonly invokeSmartContractMethod: (
     options: InvokeSmartContractMethodHelperOptions,
   ) => InvokeSmartContractMethodHelper;
-  readonly getOutputAssetValueMap: GetOutputAssetValueMapHelper;
   readonly invocationIsCaller: InvocationIsCallerHelper;
   readonly isCaller: IsCallerHelper;
   readonly isProcessedTransaction: IsProcessedTransactionHelper;
-  readonly refundAssets: RefundAssetsHelper;
-  readonly mergeAssetValueMaps: (options: MergeAssetValueMapsHelperOptions) => MergeAssetValueMapsHelper;
   readonly getSmartContractProperty: (options: GetSmartContractPropertyHelperOptions) => GetSmartContractPropertyHelper;
   readonly isDeployed: IsDeployedHelper;
   readonly setDeployed: SetDeployedHelper;
   readonly isClaimedTransaction: IsClaimedTransactionHelper;
-  readonly setProcessedTransaction: SetProcessedTransactionHelper;
-  readonly completeSend: CompleteSendHelper;
   readonly deploy: (options: DeployHelperOptions) => DeployHelper;
   readonly upgrade: (options: UpgradeHelperOptions) => UpgradeHelper;
   readonly handleNormal: (options: HandleNormalHelperOptions) => HandleNormalHelper;
-  readonly handleSend: (options: HandleSendHelperOptions) => HandleSendHelper;
-  readonly handleReceive: (options: HandleSendUnsafeReceiveHelperBaseOptions) => HandleReceiveHelper;
-  readonly handleSendUnsafe: (options: HandleSendUnsafeReceiveHelperBaseOptions) => HandleSendUnsafeHelper;
   readonly applicationMatchesVerification: ApplicationMatchesVerificationHelper;
 
   // types/contract
@@ -513,6 +473,10 @@ export interface Helpers {
   readonly equalsEquals: (options: EqualsEqualsHelperOptions) => EqualsEqualsHelper;
   readonly lessThan: (options: LessThanHelperOptions) => LessThanHelper;
   readonly processStatements: (options: ProcessStatementsHelperOptions) => ProcessStatementsHelper;
+
+  readonly dupScope: DupScopeHelper;
+  readonly popScope: PopScopeHelper;
+  readonly pushScope: PushScopeHelper;
 
   readonly args: ArgumentsHelper;
   readonly bindFunctionThis: (options: BindFunctionThisHelperOptions) => BindFunctionThisHelper;
@@ -605,11 +569,6 @@ export interface Helpers {
   readonly findObjectProperty: (options: FindObjectPropertyHelperOptions) => FindObjectPropertyHelper;
   readonly findObjectPropertyBase: (options: FindObjectPropertyHelperBaseOptions) => FindObjectPropertyHelperBase;
 
-  // header
-  readonly isHeader: IsHeaderHelper;
-  readonly wrapHeader: WrapHeaderHelper;
-  readonly unwrapHeader: UnwrapHeaderHelper;
-
   // iterableIterator
   readonly iterableIteratorForEach: (options: IterableIteratorForEachHelperOptions) => IterableIteratorForEachHelper;
   readonly iterableIteratorReduce: (options: IterableIteratorReduceHelperOptions) => IterableIteratorReduceHelper;
@@ -631,11 +590,11 @@ export interface Helpers {
   readonly rawIteratorForEach: (options: RawIteratorForEachHelperOptions) => RawIteratorForEachHelper;
   readonly rawIteratorForEachKey: (options: RawIteratorForEachKeyHelperOptions) => RawIteratorForEachKeyHelper;
   readonly rawIteratorForEachBase: (options: RawIteratorForEachBaseHelperOptions) => RawIteratorForEachBaseHelper;
-  readonly rawIteratorForEachFunc: RawIteratorForEachFuncHelper;
+  readonly rawIteratorForEachFunc: (options: RawIteratorForEachHelperFuncOptions) => RawIteratorForEachFuncHelper;
   readonly rawIteratorForEachFuncBase: (
     options: RawIteratorForEachFuncBaseHelperOptions,
   ) => RawIteratorForEachFuncBaseHelper;
-  readonly rawEnumeratorForEachFunc: RawEnumeratorForEachFuncHelper;
+  readonly rawEnumeratorForEachFunc: (options: RawEnumeratorForEachFuncHelperOptions) => RawEnumeratorForEachFuncHelper;
   readonly rawEnumeratorForEach: (options: RawEnumeratorForEachHelperOptions) => RawEnumeratorForEachHelper;
   readonly rawEnumeratorFilter: (options: RawEnumeratorFilterHelperOptions) => RawEnumeratorFilterHelper;
   readonly rawEnumeratorFind: (options: RawEnumeratorFindHelperOptions) => RawEnumeratorFindHelper;
@@ -775,11 +734,6 @@ export interface Helpers {
   readonly unwrapForwardValue: UnwrapForwardValueHelper;
   readonly isForwardValue: IsForwardValueHelper;
 
-  // types/input
-  readonly wrapInput: WrapInputHelper;
-  readonly unwrapInput: UnwrapInputHelper;
-  readonly isInput: IsInputHelper;
-
   // types/iterable
   readonly isIterable: IsIterableHelper;
 
@@ -802,11 +756,6 @@ export interface Helpers {
   readonly wrapMapStorage: WrapMapStorageHelper;
   readonly unwrapMapStorage: UnwrapMapStorageHelper;
   readonly isMapStorage: IsMapStorageHelper;
-
-  // types/output
-  readonly wrapOutput: WrapOutputHelper;
-  readonly unwrapOutput: UnwrapOutputHelper;
-  readonly isOutput: IsOutputHelper;
 
   // types/set
   readonly wrapSet: WrapSetHelper;
@@ -870,11 +819,6 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
   return {
     mutableCache,
 
-    // account
-    isAccount: new IsAccountHelper(),
-    wrapAccount: new WrapAccountHelper(),
-    unwrapAccount: new UnwrapAccountHelper(),
-
     // arr
     arrClone: new ArrCloneHelper(),
     arrConcat: new ArrConcatHelper(),
@@ -896,11 +840,6 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     arrToString: (options) => new ArrToStringHelper(options),
     extendArr: new ExtendArrHelper(),
 
-    // asset
-    isAsset: new IsAssetHelper(),
-    wrapAsset: new WrapAssetHelper(),
-    unwrapAsset: new UnwrapAssetHelper(),
-
     // bind
     arrayBinding: (options) => new ArrayBindingHelper(options),
     objectBinding: (options) => new ObjectBindingHelper(options),
@@ -921,29 +860,18 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     createClass: (options) => new CreateClassHelper(options),
 
     // contract
-    didReceiveAssets: new DidReceiveAssetsHelper(),
-    didReceiveNonClaimAssets: new DidReceiveNonClaimAssetsHelper(),
-    didSendAssets: new DidSendAssetsHelper(),
     invokeSmartContract: (options) => new InvokeSmartContractHelper(options),
     invokeSmartContractMethod: (options) => new InvokeSmartContractMethodHelper(options),
-    getOutputAssetValueMap: new GetOutputAssetValueMapHelper(),
     invocationIsCaller: new InvocationIsCallerHelper(),
     isCaller: new IsCallerHelper(),
     isProcessedTransaction: new IsProcessedTransactionHelper(),
-    refundAssets: new RefundAssetsHelper(),
-    mergeAssetValueMaps: (options) => new MergeAssetValueMapsHelper(options),
     getSmartContractProperty: (options) => new GetSmartContractPropertyHelper(options),
     isDeployed: new IsDeployedHelper(),
     setDeployed: new SetDeployedHelper(),
     isClaimedTransaction: new IsClaimedTransactionHelper(),
-    setProcessedTransaction: new SetProcessedTransactionHelper(),
-    completeSend: new CompleteSendHelper(),
     deploy: (options) => new DeployHelper(options),
     upgrade: (options) => new UpgradeHelper(options),
     handleNormal: memoizedUnique(HandleNormalHelper),
-    handleSend: (options) => new HandleSendHelper(options),
-    handleReceive: (options) => new HandleReceiveHelper(options),
-    handleSendUnsafe: (options) => new HandleSendUnsafeHelper(options),
     applicationMatchesVerification: new ApplicationMatchesVerificationHelper(),
 
     // types/contract
@@ -964,6 +892,10 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     equalsEquals: (options) => new EqualsEqualsHelper(options),
     lessThan: (options) => new LessThanHelper(options),
     processStatements: (options) => new ProcessStatementsHelper(options),
+
+    dupScope: new DupScopeHelper(),
+    popScope: new PopScopeHelper(),
+    pushScope: new PushScopeHelper(),
 
     args: new ArgumentsHelper(),
     bindFunctionThis: (options) => new BindFunctionThisHelper(options),
@@ -1052,11 +984,6 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     findObjectProperty: (options) => new FindObjectPropertyHelper(options),
     findObjectPropertyBase: (options) => new FindObjectPropertyHelperBase(options),
 
-    // header
-    isHeader: new IsHeaderHelper(),
-    wrapHeader: new WrapHeaderHelper(),
-    unwrapHeader: new UnwrapHeaderHelper(),
-
     // iterableIterator
     iterableIteratorForEach: (options) => new IterableIteratorForEachHelper(options),
     iterableIteratorReduce: (options) => new IterableIteratorReduceHelper(options),
@@ -1072,9 +999,9 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     rawIteratorForEach: (options) => new RawIteratorForEachHelper(options),
     rawIteratorForEachKey: (options) => new RawIteratorForEachKeyHelper(options),
     rawIteratorForEachBase: (options) => new RawIteratorForEachBaseHelper(options),
-    rawIteratorForEachFunc: new RawIteratorForEachFuncHelper(),
+    rawIteratorForEachFunc: (options) => new RawIteratorForEachFuncHelper(options),
     rawIteratorForEachFuncBase: (options) => new RawIteratorForEachFuncBaseHelper(options),
-    rawEnumeratorForEachFunc: new RawEnumeratorForEachFuncHelper(),
+    rawEnumeratorForEachFunc: (options) => new RawEnumeratorForEachFuncHelper(options),
     rawEnumeratorForEach: (options) => new RawEnumeratorForEachHelper(options),
     rawEnumeratorFilter: (options) => new RawEnumeratorFilterHelper(options),
     rawEnumeratorFind: (options) => new RawEnumeratorFindHelper(options),
@@ -1191,11 +1118,6 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     unwrapForwardValue: new UnwrapForwardValueHelper(),
     isForwardValue: new IsForwardValueHelper(),
 
-    // types/input
-    wrapInput: new WrapInputHelper(),
-    unwrapInput: new UnwrapInputHelper(),
-    isInput: new IsInputHelper(),
-
     // types/iterable
     isIterable: new IsIterableHelper(),
 
@@ -1218,11 +1140,6 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     wrapMapStorage: new WrapMapStorageHelper(),
     unwrapMapStorage: new UnwrapMapStorageHelper(),
     isMapStorage: new IsMapStorageHelper(),
-
-    // types/output
-    wrapOutput: new WrapOutputHelper(),
-    unwrapOutput: new UnwrapOutputHelper(),
-    isOutput: new IsOutputHelper(),
 
     // types/set
     wrapSet: new WrapSetHelper(),

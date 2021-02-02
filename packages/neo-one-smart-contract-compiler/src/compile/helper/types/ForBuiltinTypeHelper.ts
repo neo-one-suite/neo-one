@@ -5,10 +5,8 @@ import { Types } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
-import { hasAccount } from './account';
 import { hasArray } from './array';
 import { hasArrayStorage } from './arrayStorage';
-import { hasAsset } from './asset';
 import { hasAttribute } from './attribute';
 import { hasBlock } from './block';
 import { hasBoolean } from './boolean';
@@ -16,8 +14,6 @@ import { hasBuffer } from './buffer';
 import { hasContract } from './contract';
 import { hasError } from './error';
 import { hasForwardValue } from './forwardValue';
-import { hasHeader } from './header';
-import { hasInput } from './input';
 import { hasIterable } from './iterable';
 import { hasIterableIterator } from './iterableIterator';
 import { hasIteratorResult } from './iteratorResult';
@@ -26,7 +22,6 @@ import { hasMapStorage } from './mapStorage';
 import { hasNull } from './null';
 import { hasNumber } from './number';
 import { hasObject } from './object';
-import { hasOutput } from './output';
 import { hasSet } from './set';
 import { hasSetStorage } from './setStorage';
 import { hasString } from './string';
@@ -62,13 +57,8 @@ export interface ForBuiltinTypeHelperOptions {
   readonly iterable: ProcessType;
   readonly iterableIterator: ProcessType;
   readonly transaction: ProcessType;
-  readonly output: ProcessType;
   readonly attribute: ProcessType;
-  readonly input: ProcessType;
-  readonly account: ProcessType;
-  readonly asset: ProcessType;
   readonly contract: ProcessType;
-  readonly header: ProcessType;
   readonly block: ProcessType;
   readonly forwardValue: ProcessType;
 }
@@ -101,13 +91,8 @@ export class ForBuiltinTypeHelper extends Helper {
   private readonly iterable: ProcessType;
   private readonly iterableIterator: ProcessType;
   private readonly transaction: ProcessType;
-  private readonly output: ProcessType;
   private readonly attribute: ProcessType;
-  private readonly input: ProcessType;
-  private readonly account: ProcessType;
-  private readonly asset: ProcessType;
   private readonly contract: ProcessType;
-  private readonly header: ProcessType;
   private readonly block: ProcessType;
   private readonly forwardValue: ProcessType;
 
@@ -137,13 +122,8 @@ export class ForBuiltinTypeHelper extends Helper {
     iterable,
     iterableIterator,
     transaction,
-    output,
     attribute,
-    input,
-    account,
-    asset,
     contract,
-    header,
     block,
     forwardValue,
   }: ForBuiltinTypeHelperOptions) {
@@ -173,13 +153,8 @@ export class ForBuiltinTypeHelper extends Helper {
     this.iterable = iterable;
     this.iterableIterator = iterableIterator;
     this.transaction = transaction;
-    this.output = output;
     this.attribute = attribute;
-    this.input = input;
-    this.account = account;
-    this.asset = asset;
     this.contract = contract;
-    this.header = header;
     this.block = block;
     this.forwardValue = forwardValue;
   }
@@ -333,13 +308,6 @@ export class ForBuiltinTypeHelper extends Helper {
             process: this.transaction,
           },
           {
-            hasType: (type) => hasOutput(sb.context, node, type),
-            isRuntimeType: (innerOptions) => {
-              sb.emitHelper(node, innerOptions, sb.helpers.isOutput);
-            },
-            process: this.output,
-          },
-          {
             hasType: (type) => hasAttribute(sb.context, node, type),
             isRuntimeType: (innerOptions) => {
               sb.emitHelper(node, innerOptions, sb.helpers.isAttribute);
@@ -347,39 +315,11 @@ export class ForBuiltinTypeHelper extends Helper {
             process: this.attribute,
           },
           {
-            hasType: (type) => hasInput(sb.context, node, type),
-            isRuntimeType: (innerOptions) => {
-              sb.emitHelper(node, innerOptions, sb.helpers.isInput);
-            },
-            process: this.input,
-          },
-          {
-            hasType: (type) => hasAccount(sb.context, node, type),
-            isRuntimeType: (innerOptions) => {
-              sb.emitHelper(node, innerOptions, sb.helpers.isAccount);
-            },
-            process: this.account,
-          },
-          {
-            hasType: (type) => hasAsset(sb.context, node, type),
-            isRuntimeType: (innerOptions) => {
-              sb.emitHelper(node, innerOptions, sb.helpers.isAsset);
-            },
-            process: this.asset,
-          },
-          {
             hasType: (type) => hasContract(sb.context, node, type),
             isRuntimeType: (innerOptions) => {
               sb.emitHelper(node, innerOptions, sb.helpers.isContract);
             },
             process: this.contract,
-          },
-          {
-            hasType: (type) => hasHeader(sb.context, node, type),
-            isRuntimeType: (innerOptions) => {
-              sb.emitHelper(node, innerOptions, sb.helpers.isHeader);
-            },
-            process: this.header,
           },
           {
             hasType: (type) => hasBlock(sb.context, node, type),
@@ -470,26 +410,11 @@ export class ForBuiltinTypeHelper extends Helper {
       case Types.Transaction:
         this.transaction(options);
         break;
-      case Types.Output:
-        this.output(options);
-        break;
       case Types.Attribute:
         this.attribute(options);
         break;
-      case Types.Input:
-        this.input(options);
-        break;
-      case Types.Account:
-        this.account(options);
-        break;
-      case Types.Asset:
-        this.asset(options);
-        break;
       case Types.Contract:
         this.contract(options);
-        break;
-      case Types.Header:
-        this.header(options);
         break;
       case Types.Block:
         this.block(options);

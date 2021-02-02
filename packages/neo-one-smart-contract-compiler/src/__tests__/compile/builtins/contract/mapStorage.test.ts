@@ -1,6 +1,13 @@
-import { common } from '@neo-one/client-common';
-import { helpers, keys } from '../../../../__data__';
+import { hashes, helpers, keys } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
+
+const properties = `
+  public readonly properties = {
+    groups: [],
+    permissions: [],
+    trusts: "*",
+  };
+`;
 
 describe('MapStorage', () => {
   test('get, set, delete, has', async () => {
@@ -48,12 +55,8 @@ describe('MapStorage', () => {
       }
 
       export class StorageContract extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'StorageContract',
-        };
+        ${properties}
+
         private readonly storage = MapStorage.for<string, number>();
 
         public run(): void {
@@ -160,12 +163,8 @@ describe('MapStorage', () => {
       }
 
       export class StorageContract extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'StorageContract',
-        };
+        ${properties}
+
         private readonly storage = MapStorage.for<number, number>();
 
         public run(): void {
@@ -185,14 +184,14 @@ describe('MapStorage', () => {
     `);
   });
 
-  test('multi-tier', async () => {
+  test.only('multi-tier', async () => {
     const node = await helpers.startNode();
 
     const contract = await node.addContract(`
       import { MapStorage, SmartContract, Address, Hash256 } from '@neo-one/smart-contract';
 
       const addressA = Address.from('${keys[0].address}');
-      const hashA = Hash256.from('${common.NEO_ASSET_HASH}');
+      const hashA = Hash256.from('${hashes.OLD_NEO_ASSET_HASH}');
       const keyA = 'keyA';
       const valueA = 1;
       const valueB = 2;
@@ -264,12 +263,8 @@ describe('MapStorage', () => {
       }
 
       export class StorageContract extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'StorageContract',
-        };
+        ${properties}
+
         private readonly storage = MapStorage.for<[Address, Hash256, string], number>();
 
         public run(): void {
@@ -298,8 +293,8 @@ describe('MapStorage', () => {
 
       const addressA = Address.from('${keys[0].address}');
       const addressB = Address.from('${keys[1].address}');
-      const hashA = Hash256.from('${common.NEO_ASSET_HASH}');
-      const hashB = Hash256.from('${common.GAS_ASSET_HASH}');
+      const hashA = Hash256.from('${hashes.OLD_NEO_ASSET_HASH}');
+      const hashB = Hash256.from('${hashes.OLD_GAS_ASSET_HASH}');
       const keyA = 'keyA';
       const keyB = 'keyB';
       const keyC = 'keyC';
@@ -385,12 +380,8 @@ describe('MapStorage', () => {
       }
 
       export class StorageContract extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'StorageContract',
-        };
+        ${properties}
+
         private readonly storage = MapStorage.for<[Address, Hash256, string], number>();
 
         public run(): void {
@@ -422,8 +413,8 @@ describe('MapStorage', () => {
 
       const addressA = Address.from('${keys[0].address}');
       const addressB = Address.from('${keys[1].address}');
-      const hashA = Hash256.from('${common.NEO_ASSET_HASH}');
-      const hashB = Hash256.from('${common.GAS_ASSET_HASH}');
+      const hashA = Hash256.from('${hashes.OLD_NEO_ASSET_HASH}');
+      const hashB = Hash256.from('${hashes.OLD_GAS_ASSET_HASH}');
       const keyA = 'keyA';
       const keyB = 'keyB';
       const keyC = 'keyC';
@@ -528,12 +519,8 @@ describe('MapStorage', () => {
       }
 
       export class StorageContract extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'StorageContract',
-        };
+        ${properties}
+
         private readonly storage = MapStorage.for<[Address, Hash256, string], number>();
 
         public run(): void {
@@ -566,8 +553,8 @@ describe('MapStorage', () => {
 
       const addressA = Address.from('${keys[0].address}');
       const addressB = Address.from('${keys[1].address}');
-      const hashA = Hash256.from('${common.NEO_ASSET_HASH}');
-      const hashB = Hash256.from('${common.GAS_ASSET_HASH}');
+      const hashA = Hash256.from('${hashes.OLD_NEO_ASSET_HASH}');
+      const hashB = Hash256.from('${hashes.OLD_GAS_ASSET_HASH}');
       const keyA = 'keyA';
       const keyB = 'keyB';
       const keyC = 'keyC';
@@ -726,12 +713,8 @@ describe('MapStorage', () => {
       }
 
       export class StorageContract extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'StorageContract',
-        };
+        ${properties}
+
         private readonly storage = MapStorage.for<[Address, Hash256, string], number>();
 
         public run(): void {
@@ -799,8 +782,8 @@ describe('MapStorage', () => {
     `);
   });
 
-  test('invalid object value - method', () => {
-    helpers.compileString(
+  test('invalid object value - method', async () => {
+    await helpers.compileString(
       `
       import { SmartContract, MapStorage } from '@neo-one/smart-contract';
 
@@ -822,8 +805,8 @@ describe('MapStorage', () => {
     );
   });
 
-  test('invalid create', () => {
-    helpers.compileString(
+  test('invalid create', async () => {
+    await helpers.compileString(
       `
       import { MapStorage } from '@neo-one/smart-contract';
 
@@ -833,8 +816,8 @@ describe('MapStorage', () => {
     );
   });
 
-  test('invalid reference', () => {
-    helpers.compileString(
+  test('invalid reference', async () => {
+    await helpers.compileString(
       `
       import { MapStorage } from '@neo-one/smart-contract';
 
@@ -844,8 +827,8 @@ describe('MapStorage', () => {
     );
   });
 
-  test('invalid "reference"', () => {
-    helpers.compileString(
+  test('invalid "reference"', async () => {
+    await helpers.compileString(
       `
       import { MapStorage } from '@neo-one/smart-contract';
 
@@ -855,8 +838,8 @@ describe('MapStorage', () => {
     );
   });
 
-  test('invalid reference - object', () => {
-    helpers.compileString(
+  test('invalid reference - object', async () => {
+    await helpers.compileString(
       `
       import { MapStorage } from '@neo-one/smart-contract';
 

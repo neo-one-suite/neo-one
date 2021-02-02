@@ -1,4 +1,11 @@
-import { InvalidFormatError, JSONHelper, PrimitiveStackItemJSON, StackItemJSON } from '@neo-one/client-common';
+import {
+  InvalidFormatError,
+  isStackItemType,
+  JSONHelper,
+  PrimitiveStackItemJSON,
+  StackItemJSON,
+  StackItemType,
+} from '@neo-one/client-common';
 import { InvalidPrimitiveStackItemError, InvalidStackItemError, InvalidStackItemTypeError } from '../errors';
 import { ArrayStackItem } from './ArrayStackItem';
 import { BooleanStackItem } from './BooleanStackItem';
@@ -9,7 +16,6 @@ import { InteropInterface } from './InteropInterface';
 import { MapStackItem } from './MapStackItem';
 import { NullStackItem } from './NullStackItem';
 import { PointerStackItem } from './PointerStackItem';
-import { isStackItemType, StackItemType } from './StackItemType';
 import { StructStackItem } from './StructStackItem';
 
 export type PrimitiveStackItem = BooleanStackItem | IntegerStackItem | ByteStringStackItem;
@@ -132,6 +138,7 @@ export const assertPrimitiveStackItem = (item: any): PrimitiveStackItem => {
   throw new InvalidPrimitiveStackItemError();
 };
 
+// TODO: this can/should probably be deleted so it can't be confused with ContractParameter/ContractParameterJSON
 export const stackItemToJSON = (item: StackItem, context?: Set<StackItem>): StackItemJSON => {
   switch (item.type) {
     case StackItemType.Array:

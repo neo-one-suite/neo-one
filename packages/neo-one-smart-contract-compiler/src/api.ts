@@ -11,14 +11,14 @@ export const getSemanticDiagnostics = (
   host: CompilerHost,
 ): ReadonlyArray<ts.Diagnostic> => getSemanticDiagnosticsBase({ filePath, languageService, host });
 
-export const compileContract = (
+export const compileContract = async (
   filePath: string,
   _contractName: string,
   host: CompilerHost,
   linked: LinkedContracts = {},
   ignoreWarnings = false,
-): CompileContractResult => {
-  const result = compileContractBase({ filePath, host, linked });
+): Promise<CompileContractResult> => {
+  const result = await compileContractBase({ filePath, host, linked });
 
   throwOnDiagnosticErrorOrWarning(result.diagnostics, ignoreWarnings);
 

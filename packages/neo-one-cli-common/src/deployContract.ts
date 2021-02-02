@@ -2,7 +2,7 @@ import { AddressString, common, ContractManifestClient, crypto, SourceMaps } fro
 import { NEOONEDataProvider } from '@neo-one/client-core';
 import { ContractRegister } from '@neo-one/client-full-core';
 import { constants } from '@neo-one/utils';
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'bignumber.js';
 import { getClients } from './getClients';
 
 export const deployContract = async (
@@ -18,17 +18,23 @@ export const deployContract = async (
   try {
     const existing = await client.read(provider.network).getContract(common.uInt160ToString(hash));
 
-    return common.uInt160ToString(existing.manifest.hash);
+    return common.uInt160ToString(existing.hash);
   } catch {
     // do nothing
   }
 
-  const result = await client.publishAndDeploy(contract, manifest, [], { systemFee: new BigNumber(-1) }, sourceMaps);
+  const result = await client.publishAndDeploy(
+    contract,
+    manifest,
+    ['deploy', []], // TODO: for now this has to be ['deploy', []] ?
+    { maxSystemFee: new BigNumber(-1), maxNetworkFee: new BigNumber(-1) },
+    sourceMaps,
+  );
   const [receipt] = await Promise.all([result.confirmed(), developerClient.runConsensusNow()]);
 
   if (receipt.result.state === 'FAULT') {
     throw new Error(receipt.result.message);
   }
 
-  return common.uInt160ToString(receipt.result.value.manifest.hash);
+  return common.uInt160ToString(receipt.result.value.manifest.abi.hash);
 };

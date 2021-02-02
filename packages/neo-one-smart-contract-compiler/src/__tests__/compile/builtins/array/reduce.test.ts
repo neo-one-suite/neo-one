@@ -36,7 +36,7 @@ describe('Array.prototype.reduce', () => {
   });
 
   test('cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = [0, 1, 2];
       const y = x.reduce;
@@ -46,7 +46,7 @@ describe('Array.prototype.reduce', () => {
   });
 
   test('cannot be set', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = [0, 1, 2];
       x.reduce = () => 0;
@@ -56,7 +56,7 @@ describe('Array.prototype.reduce', () => {
   });
 
   test('cannot be "set"', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = [0, 1, 2];
       x['reduce'] = () => 0;

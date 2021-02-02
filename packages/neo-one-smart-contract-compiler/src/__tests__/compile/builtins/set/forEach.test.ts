@@ -25,7 +25,7 @@ describe('Set.prototype.forEach', () => {
   });
 
   test('cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = new Set<number>();
       const y = x.forEach;
@@ -35,7 +35,7 @@ describe('Set.prototype.forEach', () => {
   });
 
   test('cannot be "referenced"', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = new Set<number>();
       const y = x['forEach'];

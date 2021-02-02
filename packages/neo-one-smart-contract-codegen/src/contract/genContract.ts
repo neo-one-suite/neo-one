@@ -1,6 +1,6 @@
 import { SmartContractNetworksDefinition } from '@neo-one/client-common';
 import stringify from 'safe-stable-stringify';
-import { getABIName } from '../abi';
+import { getManifestName } from '../manifest';
 import { getSmartContractName } from '../types';
 import { getRelativeImport } from '../utils';
 import { getCreateSmartContractName } from './getCreateSmartContractName';
@@ -10,29 +10,29 @@ export const genContract = ({
   createContractPath,
   typesPath,
   sourceMapsPath,
-  abiPath,
+  manifestPath,
   networksDefinition,
 }: {
   readonly name: string;
   readonly createContractPath: string;
   readonly typesPath: string;
-  readonly abiPath: string;
+  readonly manifestPath: string;
   readonly sourceMapsPath: string;
   readonly networksDefinition: SmartContractNetworksDefinition;
 }) => {
   const relativeTypes = getRelativeImport(createContractPath, typesPath);
   const smartContract = getSmartContractName(name);
-  const relativeABI = getRelativeImport(createContractPath, abiPath);
+  const relativeManifest = getRelativeImport(createContractPath, manifestPath);
   const relativeSourceMaps = getRelativeImport(createContractPath, sourceMapsPath);
-  const abiName = getABIName(name);
+  const manifestName = getManifestName(name);
 
   return {
-    js: `import { ${abiName} } from '${relativeABI}';
+    js: `import { ${manifestName} } from '${relativeManifest}';
 import { sourceMaps } from '${relativeSourceMaps}';
 
 const definition = {
   networks: ${stringify(networksDefinition, undefined, 2)},
-  abi: ${abiName},
+  manifest: ${manifestName},
   sourceMaps,
 };
 
@@ -43,12 +43,12 @@ export const ${getCreateSmartContractName(name)} = (
     ts: `
 import { Client } from '@neo-one/client';
 import { ${smartContract} } from '${relativeTypes}';
-import { ${abiName} } from '${relativeABI}';
+import { ${manifestName} } from '${relativeManifest}';
 import { sourceMaps } from '${relativeSourceMaps}';
 
 const definition = {
   networks: ${stringify(networksDefinition, undefined, 2)},
-  abi: ${abiName},
+  manifest: ${manifestName},
   sourceMaps,
 };
 

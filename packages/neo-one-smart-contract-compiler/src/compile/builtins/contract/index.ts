@@ -1,9 +1,6 @@
 import { Builtins } from '../Builtins';
-import { add as addAccount } from './account';
 import { add as addAddress } from './address';
 import { add as addArrayStorage } from './arrayStorage';
-import { add as addAsset } from './asset';
-import { add as addAssetType } from './assetType';
 import { add as addAttribute } from './attribute';
 import { add as addAttributeUsage } from './attributeUsage';
 import { add as addBlock } from './block';
@@ -15,26 +12,17 @@ import { add as addDeclareEvent } from './declareEvent';
 import { add as addDeploy } from './deploy';
 import { add as addForwardValue } from './forwardValue';
 import { add as addHash256 } from './hash256';
-import { add as addHeader } from './header';
-import { add as addInput } from './input';
 import { add as addLinkedSmartContract } from './linkedSmartContract';
 import { add as addMapStorage } from './mapStorage';
-import { add as addOutput } from './output';
 import { add as addPublicKey } from './publicKey';
 import { add as addSetStorage } from './setStorage';
 import { add as addSmartContract } from './smartContract';
 import { add as addTransaction } from './transaction';
-import { add as addTransactionType } from './transactionType';
 
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {
-  addAccount(builtins);
   addAddress(builtins);
   addArrayStorage(builtins);
-  addAsset(builtins);
-  addAssetType(builtins);
-  addAttribute(builtins);
-  addAttributeUsage(builtins);
   addBlock(builtins);
   addBlockchain(builtins);
   addContract(builtins);
@@ -44,14 +32,14 @@ export const add = (builtins: Builtins): void => {
   addDeploy(builtins);
   addForwardValue(builtins);
   addHash256(builtins);
-  addHeader(builtins);
-  addInput(builtins);
   addLinkedSmartContract(builtins);
   addMapStorage(builtins);
-  addOutput(builtins);
   addPublicKey(builtins);
   addSetStorage(builtins);
   addSmartContract(builtins);
   addTransaction(builtins);
-  addTransactionType(builtins);
+
+  // void calls saved for later implementations
+  addAttribute(builtins);
+  addAttributeUsage(builtins);
 };

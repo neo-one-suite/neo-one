@@ -1,4 +1,4 @@
-import { ABIFunction, ABIParameter } from '@neo-one/client-common';
+import { ABIParameter, ContractMethodDescriptorClient } from '@neo-one/client-common';
 import { genFunctionParameters } from './genFunctionParameters';
 import { getEventName } from './getEventName';
 
@@ -8,7 +8,7 @@ export interface GenForwardArgsFunctionOptions {
 
 export const genForwardArgsFunction = (
   name: string,
-  abi: ABIFunction,
+  abi: ContractMethodDescriptorClient,
   parameters: ReadonlyArray<ABIParameter>,
   options: GenForwardArgsFunctionOptions,
 ): string =>

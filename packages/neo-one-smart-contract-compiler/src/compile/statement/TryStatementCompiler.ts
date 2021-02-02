@@ -31,7 +31,7 @@ export class TryStatementCompiler extends NodeCompiler<ts.TryStatement> {
         pcOptions = finallyBlock === undefined ? pcOptions : sb.finallyPCOptions(pcOptions, finallyPC.getLast());
         sb.visit(tsUtils.statement.getTryBlock(node), pcOptions);
         pushFinally();
-        sb.emitJmp(node, 'JMP', finallyPC.getLast());
+        sb.emitJmp(node, 'JMP_L', finallyPC.getLast());
       });
 
       const finallyOptions = finallyBlock === undefined ? options : sb.finallyPCOptions(options, finallyPC.getLast());

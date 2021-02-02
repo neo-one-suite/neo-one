@@ -91,6 +91,7 @@ export function createDeserializeWire<T>(deserializeWireBase: DeserializeWireBas
 // TODO: what did all of these `TransactionData` helpers do? How should we re implement?
 export interface SerializeJSONContext {
   readonly addressVersion: number;
+  readonly messageMagic: number;
 }
 
 export type SerializeJSON<TJSON> = (context: SerializeJSONContext) => TJSON | Promise<TJSON>;

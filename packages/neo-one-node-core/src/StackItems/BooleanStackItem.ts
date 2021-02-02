@@ -1,7 +1,9 @@
+import { StackItemType } from '@neo-one/client-common';
 import { BN } from 'bn.js';
+import { BooleanContractParameter, ContractParameter } from '../contractParameter';
 import { PrimitiveStackItemBase } from './PrimitiveStackItemBase';
+import { StackItemBase } from './StackItemBase';
 import { isBooleanStackItem, StackItem } from './StackItems';
-import { StackItemType } from './StackItemType';
 
 export class BooleanStackItem extends PrimitiveStackItemBase {
   private static readonly TRUE = Buffer.from([0x01]);
@@ -32,5 +34,9 @@ export class BooleanStackItem extends PrimitiveStackItemBase {
 
   public getInteger() {
     return this.value ? new BN(1) : new BN(0);
+  }
+
+  public toContractParameter(_seen: Set<StackItemBase> = new Set()): ContractParameter {
+    return new BooleanContractParameter(this.value);
   }
 }

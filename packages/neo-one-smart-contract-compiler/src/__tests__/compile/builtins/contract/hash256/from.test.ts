@@ -1,20 +1,19 @@
-import { common } from '@neo-one/client-common';
-import { helpers } from '../../../../../__data__';
+import { hashes, helpers } from '../../../../../__data__';
 import { DiagnosticCode } from '../../../../../DiagnosticCode';
 
 describe('Hash256.from', () => {
   test('should return an address from literal hash', async () => {
     await helpers.executeString(`
       import { Hash256 } from '@neo-one/smart-contract';
-      Hash256.from('${common.NEO_ASSET_HASH}');
-      const x = Hash256.from('${common.NEO_ASSET_HASH}');
+      Hash256.from('${hashes.OLD_NEO_ASSET_HASH}');
+      const x = Hash256.from('${hashes.OLD_NEO_ASSET_HASH}');
 
       assertEqual(x.equals(x), true);
     `);
   });
 
   test('Reports error on invalid hash256', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { Hash256 } from '@neo-one/smart-contract';
       const keys = Hash256.from('abc');
@@ -24,7 +23,7 @@ describe('Hash256.from', () => {
   });
 
   test('cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { Hash256 } from '@neo-one/smart-contract';
       const keys = Hash256.from;
@@ -34,7 +33,7 @@ describe('Hash256.from', () => {
   });
 
   test('cannot be referenced - object literal', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { Hash256 } from '@neo-one/smart-contract';
       const { from } = Hash256;
@@ -44,7 +43,7 @@ describe('Hash256.from', () => {
   });
 
   test('cannot be element referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { Hash256 } from '@neo-one/smart-contract';
       const keys = Hash256['from'];

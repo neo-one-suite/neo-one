@@ -50,7 +50,7 @@ export class FindObjectPropertyHelper extends Helper {
             sb.helpers.if({
               condition: () => {
                 // [size, propVal]
-                sb.emitOp(node, 'ARRAYSIZE');
+                sb.emitOp(node, 'SIZE');
                 // [2, size, propVal]
                 sb.emitPushInt(node, 2);
                 // [size === 2, propVal]

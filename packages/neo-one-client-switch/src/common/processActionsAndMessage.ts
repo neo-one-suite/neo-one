@@ -10,7 +10,7 @@ export interface SourceMaps {
 
 export interface ProcessActionsAndMessageOptions {
   readonly actions: readonly RawAction[];
-  readonly message: string;
+  readonly message?: string;
   readonly sourceMaps?: SourceMaps;
 }
 
@@ -22,8 +22,8 @@ export const processActionsAndMessage = async ({
   const [message] = await Promise.all([
     processError({
       ...extractErrorTrace(actions),
-      message: messageIn,
       sourceMaps,
+      message: messageIn ?? 'Something went wrong',
     }),
     processConsoleLogMessages({ actions, sourceMaps }),
   ]);

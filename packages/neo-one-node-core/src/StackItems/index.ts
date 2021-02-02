@@ -1,4 +1,3 @@
-export * from './StackItemType';
 export * from './ArrayStackItem';
 export * from './BooleanStackItem';
 export * from './BufferStackItem';
@@ -8,7 +7,6 @@ export * from './InteropInterface';
 export * from './MapStackItem';
 export * from './NullStackItem';
 export * from './PointerStackItem';
-export * from './StackItems';
-export * from './StackItems';
-export * from './StackItemType';
 export * from './StructStackItem';
+export * from './StackItems';
+export * from './errors';

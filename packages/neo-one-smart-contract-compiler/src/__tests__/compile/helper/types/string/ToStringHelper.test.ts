@@ -98,7 +98,7 @@ describe('ToStringHelper', () => {
   });
 
   test('symbol', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       '' + Symbol.for('a');
     `,

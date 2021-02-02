@@ -29,7 +29,7 @@ describe('Set.prototype.size', () => {
   });
 
   test('cannot set the size of an set', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = new Set<string>();
       x.size = 4;
@@ -39,7 +39,7 @@ describe('Set.prototype.size', () => {
   });
 
   test('cannot set the "size" of an set', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x: { size: number } | Set<string> = new Set<string>() as { size: number } | Set<string>;
       const a = 'size';

@@ -1,4 +1,3 @@
-import { ABI } from '@neo-one/client-common';
 import { ContractRegister } from '@neo-one/client-full-core';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
@@ -34,7 +33,6 @@ export interface VisitOptions {
 
 export interface Features {
   readonly storage: boolean;
-  readonly dynamicInvoke: boolean;
 }
 export interface ScriptBuilderResult {
   readonly code: Buffer;
@@ -43,7 +41,6 @@ export interface ScriptBuilderResult {
 }
 export interface CompileResult {
   readonly contract: ContractRegister;
-  readonly abi: ABI;
   readonly context: Context;
   readonly sourceMap: Promise<RawSourceMap>;
   readonly debugInfo: DebugInfo;

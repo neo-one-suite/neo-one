@@ -106,7 +106,7 @@ describe('ClassDeclarationCompiler', () => {
   });
 
   test('basic class with ECMAScript private member, inaccessible', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       class Foo {
         #x: string = 'bar';
@@ -124,7 +124,7 @@ describe('ClassDeclarationCompiler', () => {
   });
 
   test('ECMAScript private member, no public modifier allowed', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       class Foo {
         public #x: string = 'bar';
@@ -135,7 +135,7 @@ describe('ClassDeclarationCompiler', () => {
   });
 
   test('ECMAScript private member, no private modifier allowed', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       class Foo {
         private #x: string = 'bar';
@@ -536,7 +536,7 @@ describe('ClassDeclarationCompiler', () => {
   });
 
   test('decorators', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       function verify(target: any, propertyKey: string, descriptor: any): void {
         throw new Error('This should be transpiled.');

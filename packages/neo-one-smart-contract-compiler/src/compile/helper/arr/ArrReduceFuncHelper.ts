@@ -16,7 +16,7 @@ export class ArrReduceFuncHelper extends Helper {
     // [arr, arr, callable, accum]
     sb.emitOp(node, 'DUP');
     // [size, arr, callable, accum]
-    sb.emitOp(node, 'ARRAYSIZE');
+    sb.emitOp(node, 'SIZE');
     // [idx, size, arr, callable, accum]
     sb.emitPushInt(node, 0);
     sb.emitHelper(
@@ -67,10 +67,10 @@ export class ArrReduceFuncHelper extends Helper {
           sb.emitHelper(node, sb.pushValueOptions(innerOptions), sb.helpers.call);
           // [5, accum, idx, size, arr, callable]
           sb.emitPushInt(node, 5);
-          // [accum, idx, size, arr, callable, accum]
-          sb.emitOp(node, 'XTUCK');
+          // [callable, arr, size, idx, accum]
+          sb.emitOp(node, 'REVERSEN');
           // [idx, size, arr, callable, accum]
-          sb.emitOp(node, 'DROP');
+          sb.emitOp(node, 'REVERSE4');
         },
         incrementor: () => {
           // [idx, size, arr, callable, accum]

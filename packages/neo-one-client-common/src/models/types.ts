@@ -9,71 +9,66 @@ import { VerifyResultModel } from './VerifyResultModel';
 import { VMState, VMStateJSON } from './vm';
 import { WitnessScopeModel } from './WitnessScopeModel';
 
-export interface ContractParameterDefinitionJSON {
-  readonly type: keyof typeof ContractParameterTypeModel;
-  readonly name: string;
-}
-
-export interface AnyContractParameterJSON extends ContractParameterDefinitionJSON {
+export interface AnyContractParameterJSON {
   readonly type: 'Any';
   readonly value: undefined;
 }
 
-export interface ArrayContractParameterJSON extends ContractParameterDefinitionJSON {
+export interface ArrayContractParameterJSON {
   readonly type: 'Array';
   readonly value: readonly ContractParameterJSON[];
 }
 
-export interface BooleanContractParameterJSON extends ContractParameterDefinitionJSON {
+export interface BooleanContractParameterJSON {
   readonly type: 'Boolean';
   readonly value: boolean;
 }
 
-export interface ByteArrayContractParameterJSON extends ContractParameterDefinitionJSON {
+export interface ByteArrayContractParameterJSON {
   readonly type: 'ByteArray';
   readonly value: string;
 }
 
-export interface Hash160ContractParameterJSON extends ContractParameterDefinitionJSON {
+export interface Hash160ContractParameterJSON {
   readonly type: 'Hash160';
   readonly value: string;
 }
 
-export interface Hash256ContractParameterJSON extends ContractParameterDefinitionJSON {
+export interface Hash256ContractParameterJSON {
   readonly type: 'Hash256';
   readonly value: string;
 }
 
-export interface IntegerContractParameterJSON extends ContractParameterDefinitionJSON {
+export interface IntegerContractParameterJSON {
   readonly type: 'Integer';
   readonly value: string;
 }
 
-export interface InteropInterfaceContractParameterJSON extends ContractParameterDefinitionJSON {
+export interface InteropInterfaceContractParameterJSON {
   readonly type: 'InteropInterface';
 }
 
-export interface MapContractParameterJSON extends ContractParameterDefinitionJSON {
+export interface MapContractParameterJSON {
   readonly type: 'Map';
   readonly value: ReadonlyArray<readonly [ContractParameterJSON, ContractParameterJSON]>;
 }
 
-export interface PublicKeyContractParameterJSON extends ContractParameterDefinitionJSON {
+export interface PublicKeyContractParameterJSON {
   readonly type: 'PublicKey';
   readonly value: string;
 }
 
-export interface SignatureContractParameterJSON extends ContractParameterDefinitionJSON {
+export interface SignatureContractParameterJSON {
   readonly type: 'Signature';
   readonly value: string;
 }
 
-export interface StringContractParameterJSON extends ContractParameterDefinitionJSON {
+export interface StringContractParameterJSON {
   readonly type: 'String';
   readonly value: string;
 }
 
-export interface VoidContractParameterJSON extends ContractParameterDefinitionJSON {
+export interface VoidContractParameterJSON {
   readonly type: 'Void';
 }
 
@@ -94,12 +89,62 @@ export type ContractParameterJSON =
 
 export type ContractParameterTypeJSON = keyof typeof ContractParameterTypeModel;
 
+export interface AnyStackItemJSON {
+  readonly type: 'Any';
+  readonly value: undefined;
+}
+
+export interface PointerStackItemJSON {
+  readonly type: 'Pointer';
+  readonly value: number;
+}
+
+export interface BooleanStackItemJSON {
+  readonly type: 'Boolean';
+  readonly value: boolean;
+}
+
+export interface IntegerStackItemJSON {
+  readonly type: 'Integer';
+  readonly value: string;
+}
+
+export interface ByteStringStackItemJSON {
+  readonly type: 'ByteString';
+  readonly value: string;
+}
+
+export interface BufferStackItemJSON {
+  readonly type: 'Buffer';
+  readonly value: string;
+}
+
+export interface ArrayStackItemJSON {
+  readonly type: 'Array';
+  readonly value: readonly StackItemJSON[];
+}
+
+export interface MapStackItemJSON {
+  readonly type: 'Map';
+  readonly value: ReadonlyArray<{ readonly key: PrimitiveStackItemJSON; readonly value: StackItemJSON }>;
+}
+
+export type PrimitiveStackItemJSON = BooleanStackItemJSON | IntegerStackItemJSON | ByteStringStackItemJSON;
+
+export type StackItemJSON =
+  | AnyStackItemJSON
+  | PointerStackItemJSON
+  | PrimitiveStackItemJSON
+  | BufferStackItemJSON
+  | ArrayStackItemJSON
+  | MapStackItemJSON;
+
 export type WitnessScopeJSON = keyof typeof WitnessScopeModel;
 
+// TODO: delete
 export interface TransactionResultErrorJSON {
   readonly state: 'FAULT';
   readonly gas_consumed: string;
-  readonly gas_cost: string;
   readonly stack: readonly ContractParameterJSON[];
   readonly script: string;
   readonly message: string;
@@ -108,7 +153,6 @@ export interface TransactionResultErrorJSON {
 export interface TransactionResultSuccessJSON {
   readonly state: 'HALT';
   readonly gas_consumed: string;
-  readonly gas_cost: string; // TODO: not sure if this is redundant or not
   readonly stack: readonly ContractParameterJSON[];
   readonly script: string;
 }
@@ -204,10 +248,8 @@ export type AttributeTypeJSON = keyof typeof AttributeTypeModel;
 
 export type VerifyResultJSON = keyof typeof VerifyResultModel;
 
-// TODO: what extra invocation data are we going to include now?
 export interface InvocationDataJSON {
   readonly result: InvocationResultJSON;
-  // readonly asset?: AssetJSON;
   readonly contracts: readonly ContractJSON[];
   readonly deletedContractHashes: readonly string[];
   readonly migratedContractHashes: ReadonlyArray<readonly [string, string]>;
@@ -220,60 +262,6 @@ export interface UnclaimedGASJSON {
   readonly unclaimed: string;
   readonly address: string;
 }
-
-export interface StackItemJSONBase {
-  readonly type: StackItemJSON['type'];
-}
-
-export interface AnyStackItemJSON extends StackItemJSONBase {
-  readonly type: 'Any';
-  readonly value: undefined;
-}
-
-export interface PointerStackItemJSON extends StackItemJSONBase {
-  readonly type: 'Pointer';
-  readonly value: number;
-}
-
-export interface BooleanStackItemJSON extends StackItemJSONBase {
-  readonly type: 'Boolean';
-  readonly value: boolean;
-}
-
-export interface IntegerStackItemJSON extends StackItemJSONBase {
-  readonly type: 'Integer';
-  readonly value: string;
-}
-
-export interface ByteStringStackItemJSON extends StackItemJSONBase {
-  readonly type: 'ByteString';
-  readonly value: string;
-}
-
-export interface BufferStackItemJSON extends StackItemJSONBase {
-  readonly type: 'Buffer';
-  readonly value: string;
-}
-
-export interface ArrayStackItemJSON extends StackItemJSONBase {
-  readonly type: 'Array';
-  readonly value: readonly StackItemJSON[];
-}
-
-export interface MapStackItemJSON extends StackItemJSONBase {
-  readonly type: 'Map';
-  readonly value: ReadonlyArray<{ readonly key: PrimitiveStackItemJSON; readonly value: StackItemJSON }>;
-}
-
-export type PrimitiveStackItemJSON = BooleanStackItemJSON | IntegerStackItemJSON | ByteStringStackItemJSON;
-
-export type StackItemJSON =
-  | AnyStackItemJSON
-  | PointerStackItemJSON
-  | PrimitiveStackItemJSON
-  | BufferStackItemJSON
-  | ArrayStackItemJSON
-  | MapStackItemJSON;
 
 export interface ExecutionResultJSON {
   readonly trigger: keyof typeof TriggerType;
@@ -291,6 +279,7 @@ export interface ApplicationLogJSON {
   readonly gasconsumed: string;
   readonly stack: readonly StackItemJSON[] | string;
   readonly notifications: readonly NotificationJSON[];
+  readonly logs: readonly LogJSON[];
 }
 
 export interface AccountContractJSON {
@@ -365,7 +354,10 @@ export interface ContractGroupJSON {
   readonly signature: string;
 }
 
-export type ContractPermissionDescriptorJSON = string;
+export interface ContractPermissionDescriptorJSON {
+  readonly hash?: string;
+  readonly group?: string;
+}
 
 export interface ContractPermissionJSON {
   readonly contract: ContractPermissionDescriptorJSON;
@@ -471,26 +463,26 @@ export interface NetworkSettingsJSON {
   readonly memorypoolmaxtransactions: number;
 }
 
-// export interface CallReceiptJSON {
-//   readonly result: InvocationResultJSON;
-//   readonly actions: readonly ActionJSON[];
-// }
-
 export interface NotificationJSON {
   readonly scripthash: string;
   readonly eventname: string;
-  readonly state: readonly StackItemJSON[] | string;
+  readonly state: readonly ContractParameterJSON[] | string;
 }
 
 export interface LogJSON {
+  readonly containerhash?: string;
+  readonly callingscripthash: string;
   readonly message: string;
+  // readonly position: number;
 }
+
 export interface CallReceiptJSON {
   readonly script: string;
   readonly state: keyof typeof VMState;
   readonly gasconsumed: string;
-  readonly stack: readonly StackItemJSON[] | string;
+  readonly stack: readonly ContractParameterJSON[] | string;
   readonly notifications: readonly NotificationJSON[];
+  readonly logs: readonly LogJSON[];
 }
 
 export interface VerifyScriptResultJSON {

@@ -30,16 +30,16 @@ export class IfHelper extends Helper {
         throw new Error('If statement must have a true or false value');
       }
       sb.withProgramCounter((endPC) => {
-        sb.emitJmp(node, 'JMPIF', endPC.getLast());
+        sb.emitJmp(node, 'JMPIF_L', endPC.getLast());
         whenFalse();
       });
     } else {
       sb.withProgramCounter((whenFalsePC) => {
         sb.withProgramCounter((whenTruePC) => {
-          sb.emitJmp(node, 'JMPIFNOT', whenTruePC.getLast());
+          sb.emitJmp(node, 'JMPIFNOT_L', whenTruePC.getLast());
           whenTrue();
           if (this.whenFalse !== undefined) {
-            sb.emitJmp(node, 'JMP', whenFalsePC.getLast());
+            sb.emitJmp(node, 'JMP_L', whenFalsePC.getLast());
           }
         });
 

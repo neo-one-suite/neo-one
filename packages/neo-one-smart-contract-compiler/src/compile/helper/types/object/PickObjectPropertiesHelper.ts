@@ -22,10 +22,14 @@ export class PickObjectPropertiesHelper extends Helper {
     sb.emitHelper(node, options, sb.helpers.pickPropertyObjectProperties);
     // [outputObjectVal, outputObjectVal, symbolArr, objectVal]
     sb.emitOp(node, 'DUP');
-    // [3, outputObjectVal, outputObjectVal, symbolArr, objectVal]
+    // [symbolArr, outputObjectVal, outputObjectVal, objectVal]
+    sb.emitOp(node, 'ROT');
+    // [outputObjectVal, symbolArr, outputObjectVal, objectVal]
+    sb.emitOp(node, 'ROT');
+    // [3, outputObjectVal, symbolArr, outputObjectVal, objectVal]
     sb.emitPushInt(node, 3);
     // [objectVal, outputObjectVal, symbolArr, outputObjectVal]
-    sb.emitOp(node, 'XSWAP');
+    sb.emitOp(node, 'ROLL');
     // [symbolArr, objectVal, outputObjectVal, outputObjectVal]
     sb.emitOp(node, 'ROT');
     // [outputObjectVal]

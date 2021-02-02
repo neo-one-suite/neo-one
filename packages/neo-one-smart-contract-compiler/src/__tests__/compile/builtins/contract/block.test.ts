@@ -2,13 +2,13 @@ import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Block', () => {
-  test('properties', async () => {
+  test.only('properties', async () => {
     const node = await helpers.startNode();
     const block = await node.readClient.getBlock(0);
     await node.executeString(`
-      import { Block, Header, Hash256, Address } from '@neo-one/smart-contract';
+      import { Block, Hash256, Address } from '@neo-one/smart-contract';
 
-      const genesisHash = Hash256.from('${block.hash}')
+      const genesisHash = Hash256.from('${block.hash}');
       Block.for(0);
       Block.for(genesisHash);
       let block = Block.for(0);
@@ -20,19 +20,13 @@ describe('Block', () => {
       assertEqual(block.index, ${block.index});
       assertEqual(block.time, ${block.time});
       assertEqual(block.nextConsensus, Address.from('${block.nextConsensus}'));
-      assertEqual(block.transactions.length, 5);
-      assertEqual(block.transactions[0].hash, Hash256.from('${block.transactions[0].hash}'));
-      assertEqual(block.transactions[1].hash, Hash256.from('${block.transactions[1].hash}'));
-      assertEqual(block.transactions[2].hash, Hash256.from('${block.transactions[2].hash}'));
-      assertEqual(block.transactions[3].hash, Hash256.from('${block.transactions[3].hash}'));
-      assertEqual(block.transactions[4].hash, Hash256.from('${block.transactions[4].hash}'));
-      assertEqual(block instanceof Header, false);
+      assertEqual(block.transactionsLength, 5);
       assertEqual(block instanceof Block, true);
     `);
   });
 
   test('cannot be implemented', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { Block } from '@neo-one/smart-contract';
 
@@ -43,8 +37,8 @@ describe('Block', () => {
     );
   });
 
-  test('invalid reference', () => {
-    helpers.compileString(
+  test('invalid reference', async () => {
+    await helpers.compileString(
       `
       import { Block } from '@neo-one/smart-contract';
 
@@ -54,8 +48,8 @@ describe('Block', () => {
     );
   });
 
-  test('invalid "reference"', () => {
-    helpers.compileString(
+  test('invalid "reference"', async () => {
+    await helpers.compileString(
       `
       import { Block } from '@neo-one/smart-contract';
 
@@ -65,8 +59,8 @@ describe('Block', () => {
     );
   });
 
-  test('invalid reference - object', () => {
-    helpers.compileString(
+  test('invalid reference - object', async () => {
+    await helpers.compileString(
       `
       import { Block } from '@neo-one/smart-contract';
 

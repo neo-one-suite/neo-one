@@ -18,7 +18,7 @@ export class ReturnHelper extends Helper {
       sb.emitPushInt(node, constants.NORMAL_COMPLETION);
       // [finally, normal, val]
       sb.emitPushInt(node, constants.FINALLY_COMPLETION);
-      sb.emitJmp(node, 'JMP', finallyPC);
+      sb.emitJmp(node, 'JMP_L', finallyPC);
     }
   }
 }

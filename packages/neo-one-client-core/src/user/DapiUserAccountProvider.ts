@@ -29,7 +29,6 @@ import {
   TxHashAttribute,
 } from './Dapi';
 import {
-  ExecuteInvokeClaimOptions,
   ExecuteInvokeMethodOptions,
   ExecuteInvokeScriptOptions,
   Provider,
@@ -220,10 +219,6 @@ export class DapiUserAccountProvider<TProvider extends Provider>
     throw new NotImplementedError('executeInvokeScript');
   }
 
-  protected async executeInvokeClaim(_options: ExecuteInvokeClaimOptions): Promise<TransactionResult> {
-    throw new NotImplementedError('executeInvokeClaim');
-  }
-
   protected async executeInvokeMethod<T extends TransactionReceipt>({
     invokeMethodOptions,
     from,
@@ -250,7 +245,7 @@ export class DapiUserAccountProvider<TProvider extends Provider>
       confirmed: async () => {
         const [receipt, data] = await Promise.all([
           this.provider.getTransactionReceipt(from.network, txid),
-          this.provider.getInvocationData(from.network, txid),
+          this.provider.getApplicationLogData(from.network, txid),
         ]);
 
         return onConfirm({ transaction, receipt, data });
@@ -300,7 +295,7 @@ export class DapiUserAccountProvider<TProvider extends Provider>
     readonly address: AddressString;
     readonly label?: string;
   }) {
-    const userAccount = {
+    const userAccount: UserAccount = {
       id: {
         address,
         network,

@@ -54,13 +54,8 @@ export class ToObjectHelper extends TypedHelper {
         iterable: emptyObject,
         iterableIterator: emptyObject,
         transaction: emptyObject,
-        output: emptyObject,
         attribute: emptyObject,
-        input: emptyObject,
-        account: emptyObject,
-        asset: emptyObject,
         contract: emptyObject,
-        header: emptyObject,
         block: emptyObject,
       }),
     );

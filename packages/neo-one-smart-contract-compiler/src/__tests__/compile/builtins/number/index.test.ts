@@ -2,7 +2,7 @@ import { helpers } from '../../../../__data__';
 
 describe('Number', () => {
   test('cannot be implemented', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       class MyNumber implements Number {
       }
@@ -12,7 +12,7 @@ describe('Number', () => {
   });
 
   test('cannot be extended', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       class MyNumber extends Number {
       }

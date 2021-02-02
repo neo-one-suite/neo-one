@@ -49,13 +49,8 @@ export class IsNullOrUndefinedHelper extends TypedHelper {
         iterable: pushFalse,
         iterableIterator: pushFalse,
         transaction: pushFalse,
-        output: pushFalse,
         attribute: pushFalse,
-        input: pushFalse,
-        account: pushFalse,
-        asset: pushFalse,
         contract: pushFalse,
-        header: pushFalse,
         block: pushFalse,
       }),
     );

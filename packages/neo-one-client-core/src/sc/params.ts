@@ -27,6 +27,10 @@ export const params = {
   Any: (_name: string, _param: Param, _parameter: AnyABI): ScriptBuilderParam | undefined => undefined,
   String: (name: string, param: Param, parameter: StringABI): ScriptBuilderParam | undefined =>
     parameter.optional && param === undefined ? undefined : args.assertString(name, param),
+  Address: (name: string, param: Param, parameter: Hash160ABI): ScriptBuilderParam | undefined =>
+    parameter.optional && param === undefined
+      ? undefined
+      : common.stringToUInt160(addressToScriptHash(args.assertAddress(name, param))),
   Hash160: (name: string, param: Param, parameter: Hash160ABI): ScriptBuilderParam | undefined =>
     parameter.optional && param === undefined
       ? undefined

@@ -1,11 +1,10 @@
-import { InvalidFormatError } from '@neo-one/client-common';
+import { assertStackItemType, InvalidFormatError, StackItemType } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import {
   ArrayStackItem,
   assertPrimitiveStackItem,
   assertStackItem,
-  assertStackItemType,
   BooleanStackItem,
   BufferStackItem,
   ByteStringStackItem,
@@ -14,7 +13,6 @@ import {
   NullStackItem,
   PrimitiveStackItem,
   StackItem,
-  StackItemType,
   StructStackItem,
 } from '../StackItems';
 import { BinaryReader } from './BinaryReader';
@@ -62,8 +60,7 @@ export const deserializeStackItem = (reader: BinaryReader, maxArraySize: number,
         break;
 
       case StackItemType.Buffer:
-        const size = reader.readVarUIntLE(maxItemSize).toNumber();
-        deserialized.unshift(new BufferStackItem(reader.readVarBytesLE(size)));
+        deserialized.unshift(new BufferStackItem(reader.readVarBytesLE(maxItemSize)));
         break;
 
       case StackItemType.Array:

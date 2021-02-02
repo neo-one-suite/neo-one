@@ -24,7 +24,7 @@ export class RawEnumeratorEveryHelper extends Helper {
       sb.helpers.rawIteratorEveryBase({
         each: (innerOptions) => {
           // [value]
-          sb.emitSysCall(node, 'Neo.Enumerator.Value');
+          sb.emitSysCall(node, 'System.Enumerator.Value');
           // [result]
           this.each(innerOptions);
         },

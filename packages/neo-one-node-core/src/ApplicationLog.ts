@@ -72,6 +72,7 @@ export class ApplicationLog implements SerializableWire {
       gasconsumed: this.gasConsumed.toString(),
       stack,
       notifications: this.notifications.map((n) => n.serializeJSON()),
+      logs: [], // TODO: implement this
     };
   }
 

@@ -1,4 +1,4 @@
-import { Op } from '@neo-one/client-common';
+import { getSysCallHash, Op } from '@neo-one/client-common';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -11,46 +11,50 @@ export class ApplicationMatchesVerificationHelper extends Helper {
     const options = sb.pushValueOptions(optionsIn);
 
     // [transaction]
-    sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+    sb.emitSysCall(node, 'System.Runtime.GetScriptContainer');
+    // [7, transaction]
+    sb.emitPushInt(node, 7);
     // [buffer]
-    sb.emitSysCall(node, 'Neo.InvocationTransaction.GetScript');
+    sb.emitOp(node, 'PICKITEM');
     // [buffer, buffer]
     sb.emitOp(node, 'DUP');
-    // [21, buffer, buffer]
-    sb.emitPushInt(node, 21);
-    // [21, buffer, 21, buffer]
+    // [25, buffer, buffer]
+    sb.emitPushInt(node, 25);
+    // [25, buffer, 25, buffer]
     sb.emitOp(node, 'TUCK');
-    // [appCallHash, 21, buffer]
+    // [appCallHash, 25, buffer]
     sb.emitOp(node, 'RIGHT');
-    // [appCall, appCallHash, 21, buffer]
-    sb.emitPushBuffer(node, Buffer.from([Op.APPCALL]));
-    // [hash, appCall, appCallHash, 21, buffer]
-    sb.emitSysCall(node, 'System.ExecutionEngine.GetExecutingScriptHash');
-    // [appCallHash, appCallHash, 21, buffer]
+    // [appCall, appCallHash, 25, buffer]
+    sb.emitPushBuffer(node, Buffer.concat([Buffer.from([Op.SYSCALL]), getSysCallHash('System.Contract.Call')]));
+    // [hash, appCall, appCallHash, 25, buffer]
+    sb.emitSysCall(node, 'System.Runtime.GetExecutingScriptHash');
+    // [appCallHash, appCallHash, 25, buffer]
     sb.emitOp(node, 'CAT');
     sb.emitHelper(
       node,
       options,
       sb.helpers.if({
         condition: () => {
-          // [boolean, 21, buffer]
+          // [boolean, 25, buffer]
           sb.emitOp(node, 'EQUAL');
         },
         whenTrue: () => {
-          // [buffer, 21, buffer]
+          // [buffer, 25, buffer]
           sb.emitOp(node, 'OVER');
-          // [size, 21, buffer]
+          // [size, 25, buffer]
           sb.emitOp(node, 'SIZE');
-          // [21, size, buffer]
+          // [25, size, buffer]
           sb.emitOp(node, 'SWAP');
-          // [size - 21, buffer]
+          // [size - 25, buffer]
           sb.emitOp(node, 'SUB');
           // [argsBuffer]
           sb.emitOp(node, 'LEFT');
           // [argsHash]
-          sb.emitOp(node, 'HASH160');
+          sb.emitSysCall(node, 'Neo.Crypto.SHA256');
+          // [argsHash]
+          sb.emitSysCall(node, 'Neo.Crypto.RIPEMD160');
           // [entryHash, argsHash]
-          sb.emitSysCall(node, 'System.ExecutionEngine.GetEntryScriptHash');
+          sb.emitSysCall(node, 'System.Runtime.GetEntryScriptHash');
           // [boolean]
           sb.emitOp(node, 'EQUAL');
         },

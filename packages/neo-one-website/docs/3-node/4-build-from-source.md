@@ -63,10 +63,10 @@ can be run using
 node neo-one-node --config /path/to/config.json
 ```
 
-individual options can also be layered on top of our configuration
+Individual options can also be layered on top of our configuration:
 
 ```bash
 node neo-one-node --config /path/to/config.json --environment.logger.level=trace
 ```
 
-Finally you have the option of adding a `.neo-onerc` app configuration file anywhere in the app directory (recommended at `/neo-one/`) to apply you configuration by default; See [rc](https://github.com/dominictarr/rc#rc).
+Finally you have the option of adding a `.neo-onerc` app configuration file anywhere in the app directory (recommended at `/neo-one/`) to apply your configuration by default. See [rc](https://github.com/dominictarr/rc#rc) for more information on `rc` files.

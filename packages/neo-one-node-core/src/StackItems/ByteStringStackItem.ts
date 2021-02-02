@@ -1,9 +1,11 @@
+import { StackItemType } from '@neo-one/client-common';
 import { BN } from 'bn.js';
+import { ByteArrayContractParameter, ContractParameter } from '../contractParameter';
 import { InvalidIntegerStackItemError } from '../errors';
 import { IntegerStackItem } from './IntegerStackItem';
 import { PrimitiveStackItemBase } from './PrimitiveStackItemBase';
+import { StackItemBase } from './StackItemBase';
 import { isByteStringStackItem, StackItem } from './StackItems';
-import { StackItemType } from './StackItemType';
 
 export class ByteStringStackItem extends PrimitiveStackItemBase {
   public static readonly empty = new ByteStringStackItem(Buffer.from([]));
@@ -39,5 +41,9 @@ export class ByteStringStackItem extends PrimitiveStackItemBase {
     }
 
     return new BN(this.getBuffer(), 'le');
+  }
+
+  public toContractParameter(_seen: Set<StackItemBase> = new Set()): ContractParameter {
+    return new ByteArrayContractParameter(this.memory);
   }
 }

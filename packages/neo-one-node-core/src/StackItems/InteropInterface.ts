@@ -1,6 +1,6 @@
+import { StackItemType } from '@neo-one/client-common';
 import { InvalidInteropInterfaceValueError, InvalidStackItemCastError } from '../errors';
 import { StackItemBase } from './StackItemBase';
-import { StackItemType } from './StackItemType';
 
 // tslint:disable: no-any
 export class InteropInterface extends StackItemBase {

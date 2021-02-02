@@ -1,8 +1,8 @@
-import { nep5 } from '@neo-one/client-core';
-import { genABI } from '../../abi';
+import { nep17 } from '@neo-one/client-core';
+import { genManifest } from '../../manifest';
 
-describe('genABI', () => {
-  test('NEP5', () => {
-    expect(genABI('Token', nep5.abi(4))).toMatchSnapshot();
+describe('genManifest', () => {
+  test('NEP17', () => {
+    expect(genManifest('Token', nep17.manifest(4))).toMatchSnapshot();
   });
 });

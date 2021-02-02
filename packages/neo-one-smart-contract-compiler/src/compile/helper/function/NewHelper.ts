@@ -26,10 +26,12 @@ export class NewHelper extends Helper {
       // [thisVal, objectVal, thisVal]
       sb.emitOp(node, 'TUCK');
     } else {
-      // [3, thisVal, objectVal, argsarr]
-      sb.emitPushInt(node, 3);
+      // [thisVal, thisVal, objectVal, argsarr]
+      sb.emitOp(node, 'DUP');
+      // [argsarr, objectVal, thisVal, thisVal]
+      sb.emitOp(node, 'REVERSE4');
       // [thisVal, objectVal, argsarr, thisVal]
-      sb.emitOp(node, 'XTUCK');
+      sb.emitOp(node, 'REVERSE3');
     }
     // [thisVal, objectVal, thisVal, ?argsarr, thisVal]
     sb.emitOp(node, 'TUCK');

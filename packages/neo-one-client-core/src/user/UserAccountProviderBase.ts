@@ -5,7 +5,7 @@ import {
   Attribute,
   AttributeModel,
   Block,
-  common,
+  Contract,
   ForwardValue,
   GetOptions,
   Hash256String,
@@ -17,7 +17,6 @@ import {
   ParamJSON,
   RawApplicationLogData,
   RawCallReceipt,
-  RawInvocationData,
   RawInvokeReceipt,
   ScriptBuilderParam,
   SourceMaps,
@@ -27,31 +26,26 @@ import {
   TransactionReceipt,
   TransactionResult,
   Transfer,
+  UInt160Hex,
   UserAccount,
   UserAccountID,
   utils,
   Witness,
   WitnessModel,
-  UInt160Hex,
 } from '@neo-one/client-common';
+import { processConsoleLogMessages } from '@neo-one/client-switch';
 import { Labels, utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import debug from 'debug';
 import { Observable } from 'rxjs';
 import { clientUtils } from '../clientUtils';
-import {
-  InsufficientSystemFeeError,
-  InvokeError,
-  NoAccountError,
-  NothingToClaimError,
-  NotImplementedError,
-} from '../errors';
+import { InsufficientSystemFeeError, InvokeError, NoAccountError, NotImplementedError } from '../errors';
 import { converters } from './converters';
 
 const logger = debug('NEOONE:LocalUserAccountProvider');
 
 export interface InvokeMethodOptions {
-  readonly contract: AddressString;
+  readonly scriptHash: UInt160Hex;
   readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
   readonly invokeMethod: string;
 }
@@ -61,31 +55,28 @@ export interface InvokeRawOptions<T extends TransactionReceipt> {
   readonly transfers?: readonly FullTransfer[];
   readonly options?: TransactionOptions;
   readonly verify?: boolean;
-  // TODO: fix onConfirm type. return type from node is no longer valid
   readonly onConfirm: (options: {
     readonly transaction: Transaction;
-    readonly data: RawInvocationData;
+    readonly data: RawApplicationLogData;
     readonly receipt: TransactionReceipt;
   }) => Promise<T> | T;
   readonly method: string;
   readonly witnesses?: readonly WitnessModel[];
   readonly labels?: Record<string, string>;
   readonly sourceMaps?: SourceMaps;
-  readonly networkFee?: BigNumber;
 }
 
 export interface ExecuteInvokeScriptOptions<T extends TransactionReceipt> {
   readonly script: Buffer;
   readonly from: UserAccountID;
   readonly attributes: readonly Attribute[];
-  readonly systemFee: BigNumber; // TODO: is this name change appropriate (from "gas" to "systemFee")?
-  readonly networkFee?: BigNumber; // TODO: is this addition appropriate?
+  readonly maxSystemFee: BigNumber;
+  readonly maxNetworkFee: BigNumber;
+  readonly validBlockCount: number;
   readonly witnesses: readonly WitnessModel[];
-  readonly verify: boolean;
-  // TODO: fix onConfirm type. return type from node is no longer valid
   readonly onConfirm: (options: {
     readonly transaction: Transaction;
-    readonly data: RawInvocationData;
+    readonly data: RawApplicationLogData;
     readonly receipt: TransactionReceipt;
   }) => Promise<T> | T;
   readonly sourceMaps?: SourceMaps;
@@ -93,17 +84,6 @@ export interface ExecuteInvokeScriptOptions<T extends TransactionReceipt> {
 
 export interface ExecuteInvokeMethodOptions<T extends TransactionReceipt> extends ExecuteInvokeScriptOptions<T> {
   readonly invokeMethodOptions: InvokeMethodOptions;
-}
-
-export interface ExecuteInvokeClaimOptions {
-  readonly contract: AddressString;
-  readonly unclaimedAmount: BigNumber;
-  readonly attributes: readonly Attribute[];
-  readonly method: string;
-  readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
-  readonly paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>;
-  readonly from: UserAccountID;
-  readonly sourceMaps?: SourceMaps;
 }
 
 export interface Provider {
@@ -130,6 +110,7 @@ export interface Provider {
   readonly getTransaction: (network: NetworkType, hash: Hash256String) => Promise<Transaction>;
   readonly iterBlocks: (network: NetworkType, options?: IterOptions) => AsyncIterable<Block>;
   readonly getAccount: (network: NetworkType, address: AddressString) => Promise<Account>;
+  readonly getContract: (network: NetworkType, address: AddressString) => Promise<Contract>;
   readonly getVerificationCost: (
     network: NetworkType,
     hash: UInt160Hex,
@@ -231,7 +212,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
 
     return this.invokeRaw({
       invokeMethodOptionsOrScript: {
-        contract,
+        scriptHash: addressToScriptHash(contract),
         invokeMethod: method,
         params,
       },
@@ -253,7 +234,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
           ),
         ),
       },
-      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
+      onConfirm: ({ receipt, data, transaction }): RawInvokeReceipt => ({
         blockIndex: receipt.blockIndex,
         blockHash: receipt.blockHash,
         blockTime: receipt.blockTime,
@@ -261,9 +242,14 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
         transactionHash: receipt.transactionHash,
         globalIndex: receipt.globalIndex,
         confirmations: receipt.confirmations,
-        result: data.result,
-        actions: data.actions,
+        state: data.vmState,
+        stack: typeof data.stack === 'string' ? [] : data.stack, // TODO: fix
+        gasConsumed: data.gasConsumed,
+        script: Buffer.from(transaction.script, 'hex'),
+        logs: data.logs,
+        notifications: data.notifications,
       }),
+      // TODO: what to do here? Related to attaching transfers to method invocation
       witnesses: this.getInvokeScripts(
         method,
         params,
@@ -275,191 +261,6 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
       },
       sourceMaps,
     });
-  }
-
-  // TODO?
-  public async invokeSend(
-    contract: AddressString,
-    method: string,
-    paramsIn: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-    transfer: Transfer,
-    options: TransactionOptions = {},
-    sourceMaps: SourceMaps = {},
-  ): Promise<TransactionResult<RawInvokeReceipt>> {
-    const transactionOptions = this.getTransactionOptions(options);
-    const { from, attributes } = transactionOptions;
-
-    const contractID: UserAccountID = {
-      address: contract,
-      network: from.network,
-    };
-
-    const params = paramsIn.concat([common.stringToUInt160(addressToScriptHash(transfer.to))]);
-
-    return this.invokeRaw({
-      invokeMethodOptionsOrScript: {
-        contract,
-        invokeMethod: method,
-        params,
-      },
-      options: {
-        ...transactionOptions,
-        attributes: attributes.concat(this.getInvokeAttributes(contract, method, paramsZipped, false, from.address)),
-      },
-      // TODO: fix onConfirm
-      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
-        blockIndex: receipt.blockIndex,
-        blockHash: receipt.blockHash,
-        blockTime: receipt.blockTime,
-        transactionIndex: receipt.transactionIndex,
-        transactionHash: receipt.transactionHash,
-        globalIndex: receipt.globalIndex,
-        confirmations: receipt.confirmations,
-        result: data.result,
-        actions: data.actions,
-      }),
-      witnesses: this.getInvokeScripts(method, params, true),
-      transfers: [
-        {
-          ...transfer,
-          to: contract,
-          from: contractID,
-        },
-      ],
-      method: 'invokeSend',
-      labels: {
-        [Labels.INVOKE_METHOD]: method,
-      },
-      sourceMaps,
-    });
-  }
-
-  // TODO: finalize after compiler (need to open issue)
-  public async invokeCompleteSend(
-    contract: AddressString,
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-    hash: Hash256String,
-    options: TransactionOptions = {},
-    sourceMaps: SourceMaps = {},
-  ): Promise<TransactionResult<RawInvokeReceipt>> {
-    const transactionOptions = this.getTransactionOptions(options);
-    const { from, attributes } = transactionOptions;
-
-    const sendTransaction = await this.provider.getTransaction(from.network, hash);
-
-    return this.invokeRaw({
-      invokeMethodOptionsOrScript: {
-        contract,
-        invokeMethod: method,
-        params,
-      },
-      options: {
-        ...transactionOptions,
-        attributes: attributes.concat(this.getInvokeAttributes(contract, method, paramsZipped, false, from.address)),
-      },
-      // TODO: fix onConfirm
-      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
-        blockIndex: receipt.blockIndex,
-        blockHash: receipt.blockHash,
-        blockTime: receipt.blockTime,
-        transactionIndex: receipt.transactionIndex,
-        transactionHash: receipt.transactionHash,
-        globalIndex: receipt.globalIndex,
-        confirmations: receipt.confirmations,
-        result: data.result,
-        actions: data.actions,
-      }),
-      witnesses: this.getInvokeScripts(method, params, true),
-      method: 'invokeCompleteSend',
-      labels: {
-        [Labels.INVOKE_METHOD]: method,
-      },
-      sourceMaps,
-    });
-  }
-
-  // TODO: finalize after compiler (need to open issue)
-  public async invokeRefundAssets(
-    contract: AddressString,
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-    hash: Hash256String,
-    options: TransactionOptions = {},
-    sourceMaps: SourceMaps = {},
-  ): Promise<TransactionResult<RawInvokeReceipt>> {
-    const transactionOptions = this.getTransactionOptions(options);
-    const { from, attributes } = transactionOptions;
-
-    const refundTransaction = await this.provider.getTransaction(from.network, hash);
-
-    return this.invokeRaw({
-      invokeMethodOptionsOrScript: {
-        contract,
-        invokeMethod: method,
-        params,
-      },
-      options: {
-        ...transactionOptions,
-        attributes: attributes.concat(this.getInvokeAttributes(contract, method, paramsZipped, false, from.address)),
-      },
-      // TODO: fix onConfirm
-      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
-        blockIndex: receipt.blockIndex,
-        blockHash: receipt.blockHash,
-        blockTime: receipt.blockTime,
-        transactionIndex: receipt.transactionIndex,
-        transactionHash: receipt.transactionHash,
-        globalIndex: receipt.globalIndex,
-        confirmations: receipt.confirmations,
-        result: data.result,
-        actions: data.actions,
-      }),
-      witnesses: this.getInvokeScripts(method, params, true),
-      method: 'invokeRefundAssets',
-      labels: {
-        [Labels.INVOKE_METHOD]: method,
-      },
-      sourceMaps,
-    });
-  }
-
-  public async invokeClaim(
-    contract: AddressString,
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-    options: TransactionOptions = {},
-    sourceMaps: SourceMaps = {},
-  ): Promise<TransactionResult> {
-    const { from, attributes } = this.getTransactionOptions(options);
-
-    return this.capture(
-      async () => {
-        const unclaimedAmount = await this.provider.getUnclaimed(from.network, contract);
-
-        if (unclaimedAmount.lte(new BigNumber(0))) {
-          throw new NothingToClaimError(from);
-        }
-
-        return this.executeInvokeClaim({
-          contract,
-          unclaimedAmount,
-          attributes,
-          from,
-          method,
-          params,
-          paramsZipped,
-          sourceMaps,
-        });
-      },
-      {
-        name: 'neo_invoke_claim',
-      },
-    );
   }
 
   public async call(
@@ -481,6 +282,9 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     readonly maxFee: BigNumber;
   }): Promise<BigNumber> {
     const callReceipt = await this.provider.testTransaction(network, transaction);
+
+    await processConsoleLogMessages({ actions: [...callReceipt.logs, ...callReceipt.notifications] });
+
     if (callReceipt.state === 'FAULT') {
       throw new InvokeError(callReceipt.state);
     }
@@ -556,7 +360,6 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     readonly transaction: TransactionModel;
     readonly witness: WitnessModel;
   }): TransactionModel {
-    // TODO: what kind of sorting needs to be done with the existing witnesses?
     return transaction.clone({ witnesses: [witness] });
   }
 
@@ -640,8 +443,6 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     options: ExecuteInvokeScriptOptions<T>,
   ): Promise<TransactionResult<T>>;
 
-  protected abstract async executeInvokeClaim(options: ExecuteInvokeClaimOptions): Promise<TransactionResult>;
-
   protected abstract async executeTransfer(
     transfers: readonly Transfer[],
     from: UserAccountID,
@@ -664,37 +465,27 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     options = {},
     onConfirm,
     method,
-    verify = true,
     witnesses = [],
     labels = {},
     sourceMaps,
-    networkFee,
+    transfers = [],
   }: InvokeRawOptions<T>) {
-    const { from, attributes: attributesIn } = this.getTransactionOptions(options);
+    const { from, attributes, maxSystemFee, maxNetworkFee, validBlockCount } = this.getTransactionOptions(options);
+
+    // TODO: need to pass transfers into here to they are include in the script. must be in front of the actual method call?
+    // Or are they included as "witnesses" which used to be called scripts?
     const { script, invokeMethodOptions } = this.getScriptAndInvokeMethodOptions(invokeMethodOptionsOrScript);
 
     return this.capture(
-      async () => {
-        const { gas: systemFee, attributes } = await this.getSystemFee({
-          script,
-          network: from.network,
-          attributes: attributesIn,
-          witnesses,
-        });
-
-        // TODO: do we need to use networkFee.plus(gas)?
-        // where does network fee come in? Note that Spencer just added "networkFee" in here. see how it was used before
-        // Need to finalize executeInvoke method in LUAP first to know what needs to be passed in here
-        // and ultimately what needs to be passed into invokeRaw
-
-        return invokeMethodOptions === undefined
+      async () =>
+        invokeMethodOptions === undefined
           ? this.executeInvokeScript({
               script,
               from,
               attributes,
-              systemFee,
-              networkFee,
-              verify,
+              maxSystemFee,
+              maxNetworkFee,
+              validBlockCount,
               witnesses,
               onConfirm,
               sourceMaps,
@@ -704,14 +495,13 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
               invokeMethodOptions,
               from,
               attributes,
-              systemFee,
-              networkFee,
-              verify,
+              maxSystemFee,
+              maxNetworkFee,
+              validBlockCount,
               witnesses,
               onConfirm,
               sourceMaps,
-            });
-      },
+            }),
       {
         name: 'neo_invoke_raw',
         invoke: true,
@@ -732,9 +522,9 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
       script = invokeMethodOptionsOrScript;
     } else {
       invokeMethodOptions = invokeMethodOptionsOrScript;
-      const { contract, invokeMethod, params } = invokeMethodOptions;
+      const { scriptHash, invokeMethod, params } = invokeMethodOptions;
       script = clientUtils.getInvokeMethodScript({
-        address: contract,
+        scriptHash,
         method: invokeMethod,
         params,
       });
