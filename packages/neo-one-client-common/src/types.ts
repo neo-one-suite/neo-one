@@ -123,7 +123,7 @@ export interface Witness {
 }
 
 /**
- * TODO: document this
+ * `Signer` is the description of an `Address` and `WitnessScope` that "signs" a transaction.
  */
 export interface Signer {
   /**
@@ -146,7 +146,6 @@ export interface Signer {
 
 /**
  * Interface for `Transaction`s
- * TODO: should some of these be optional now?
  */
 export interface Transaction {
   /**
@@ -197,14 +196,6 @@ export interface Transaction {
    * `Witness`es to the `Transaction`, i.e. the `Address`es that have signed the `Transaction`.
    */
   readonly witnesses: readonly Witness[];
-}
-
-// For Neo node returns
-export interface VerboseTransaction extends Transaction {
-  readonly blockHash: UInt256;
-  readonly confirmations: number;
-  readonly blockTime: BigNumber;
-  readonly state: VMState;
 }
 
 /**
@@ -263,17 +254,9 @@ export interface Header {
   readonly size: number;
 }
 
-export interface HeaderVerbose extends Header {
-  readonly confirmations: number;
-  readonly nextblockhash: Hash256String;
-}
-
-/**
- * TODO: document
- */
 export interface ConsensusData {
   /**
-   * TODO: document
+   * Primary index of the `ConsensusData`.
    */
   readonly primaryIndex: number;
   /**
@@ -330,14 +313,11 @@ export interface TransactionReceipt {
 /**
  * The result of a successful relay of a `Transaction`.
  */
-export interface TransactionResult<
-  TTransactionReceipt extends TransactionReceipt = TransactionReceipt,
-  TTransaction extends Transaction = Transaction
-> {
+export interface TransactionResult<TTransactionReceipt extends TransactionReceipt = TransactionReceipt> {
   /**
    * `Transaction` that was relayed.
    */
-  readonly transaction: TTransaction;
+  readonly transaction: Transaction;
   /**
    * Waits for the `Transaction` to be confirmed on the blockchain.
    *
@@ -348,43 +328,33 @@ export interface TransactionResult<
 }
 
 /**
- * Common `InvocationResult` and `RawInvocationResult` properties.
+ * Result of a successful invocation.
  */
-export interface RawTransactionResultBase {
+export interface InvocationResultSuccess<TValue> {
   /**
-   * GAS consumed by the operation. This is the total GAS consumed after the free GAS is subtracted.
+   * GAS consumed by the operation.
    */
   readonly gasConsumed: BigNumber;
   /**
-   * The total GAS cost before subtracting the free GAS.
-   */
-  readonly gasCost: BigNumber;
-  /**
-   * Script run by the invocation.
-   */
-  readonly script: BufferString;
-}
-
-/**
- * Result of a successful transaction.
- */
-export interface TransactionResultSuccess<TValue> extends RawTransactionResultBase {
-  /**
-   * Indicates a successful transaction.
+   * Indicates a successful invocation.
    */
   readonly state: 'HALT';
   /**
-   * The return value of the transaction.
+   * The return value of the invocation.
    */
   readonly value: TValue;
 }
 
 /**
- * Result of a failed transaction.
+ * Result of a failed invocation.
  */
-export interface TransactionResultError extends RawTransactionResultBase {
+export interface InvocationResultError {
   /**
-   * Indicates a failed transaction.
+   * GAS consumed by the operation.
+   */
+  readonly gasConsumed: BigNumber;
+  /**
+   * Indicates a failed invocation.
    */
   readonly state: 'FAULT';
   /**
@@ -394,10 +364,9 @@ export interface TransactionResultError extends RawTransactionResultBase {
 }
 
 /**
- * Either a successful or error result, `TransactionResultSuccess` and `TransactionResultError`, respectively.
+ * Either a successful or error result, `InvocationResultSuccess` and `InvocationResultError`, respectively.
  */
-export type InvocationResult<TValue> = TransactionResultSuccess<TValue> | TransactionResultError;
-
+export type InvocationResult<TValue> = InvocationResultSuccess<TValue> | InvocationResultError;
 /**
  * The receipt for a smart contract method invocation.
  */
@@ -416,7 +385,7 @@ export interface InvokeReceipt<TReturn extends Return = Return, TEvent extends E
    */
   readonly logs: readonly Log[];
   /**
-   * The original, unprocessed, raw invoke receipt. The `RawInvokeReceipt` is transformed into this object (the `InvokeReceipt`) using the `ABI` to parse out the `Event`s and `InvocationResult`.
+   * The original, unprocessed, raw invoke receipt. The `RawInvokeReceipt` is transformed into this object (the `InvokeReceipt`) using the `ContractABI` to parse out the `Event`s and `InvocationResult`.
    */
   readonly raw: RawInvokeReceipt;
 }
@@ -562,64 +531,9 @@ export interface UserAccountProvider {
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     verify: boolean,
-    options?: InvokeSendUnsafeReceiveTransactionOptions,
-    sourceMaps?: SourceMaps,
-  ) => Promise<TransactionResult<RawInvokeReceipt>>;
-  /**
-   * Relays a transaction that is the first step of a two-step send process. The `Transfer`'s `to` property represents the ultimate destination of the funds, but this transaction will be constructed such that those funds are marked for transfer, not actually transferred.
-   *
-   * Otherwise, parameters are the same as `invoke`.
-   */
-  readonly invokeSend: (
-    contract: AddressString,
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-    transfer: Transfer,
     options?: TransactionOptions,
     sourceMaps?: SourceMaps,
   ) => Promise<TransactionResult<RawInvokeReceipt>>;
-  /**
-   * Relays a transaction that is the second step of a two-step send process. The `hash` is the transaction hash of the first step in the process and is used to determine the amount to transfer to the `from` address.
-   *
-   * Otherwise, parameters are the same as `invoke`.
-   */
-  readonly invokeCompleteSend: (
-    contract: AddressString,
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-    hash: Hash256String,
-    options?: TransactionOptions,
-    sourceMaps?: SourceMaps,
-  ) => Promise<TransactionResult<RawInvokeReceipt>>;
-  /**
-   * Refunds native assets that were not processed by the contract. The `hash` is the transaction hash that should be refunded and is used to construct the transfers for this transaction.
-   *
-   * Otherwise, parameters are the same as `invoke`.
-   */
-  readonly invokeRefundAssets: (
-    contract: AddressString,
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-    hash: Hash256String,
-    options?: TransactionOptions,
-    sourceMaps?: SourceMaps,
-  ) => Promise<TransactionResult<RawInvokeReceipt>>;
-  /**
-   * Claims GAS. Currently only supports claiming all unclaimed GAS to the contract address.
-   *
-   * Otherwise, parameters are the same as `invoke`.
-   */
-  readonly invokeClaim: (
-    contract: AddressString,
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-    options?: TransactionOptions,
-    sourceMaps?: SourceMaps,
-  ) => Promise<TransactionResult>;
   /**
    * Invokes the constant `method` on `contract` with `params` on `network`.
    */
@@ -724,7 +638,7 @@ export interface EventParameters {
 /**
  * Structured data emitted by a smart contract during a method invocation. Typically emitted in response to state changes within the contract and to notify contract listeners of an action happening within the contract.
  */
-export interface Event<TName extends string = string, TEventParameters = EventParameters> extends RawActionBase {
+export interface Event<TName extends string = string, TEventParameters = EventParameters> {
   /**
    * `type` differentiates the `Event` object from other `Action` objects, i.e. `Log`.
    */
@@ -747,7 +661,7 @@ export interface Event<TName extends string = string, TEventParameters = EventPa
 /**
  * Unstructured string emitted by a smart contract during a method invocation.
  */
-export interface Log extends RawActionBase {
+export interface Log {
   /**
    * `type` differentiates the `Log` object from other `Action` objects, i.e. `Event`.
    */
@@ -861,15 +775,21 @@ export interface TransactionOptions {
    */
   attributes?: readonly Attribute[];
   /**
-   * An optional network fee to include with the transaction.
+   * A maximum network fee to include with the transaction. Note that this is a maximum, the client APIs will automatically calculate and add a system fee to the transaction up to the value specified here.
+   *
+   * Leaving `maxNetworkFee` `undefined` is equivalent to `new BigNumber(0)`, i.e. no network fee.
+   *
+   * A `maxNetworkFee` of `-1`, i.e. `new BigNumber(-1)` indicates no limit on the fee. This is typically used only during development.
+   *
+   * Network fee is a required fee that depends on the size of the transaction.
    */
   maxNetworkFee?: BigNumber;
   /**
    * A maximum system fee to include with the transaction. Note that this is a maximum, the client APIs will automatically calculate and add a system fee to the transaction up to the value specified here.
    *
-   * Leaving `systemFee` `undefined` is equivalent to `new BigNumber(0)`, i.e. no system fee.
+   * Leaving `maxSystemFee` `undefined` is equivalent to `new BigNumber(0)`, i.e. no system fee.
    *
-   * A `systemFee` of `-1`, i.e. `new BigNumber(-1)` indicates no limit on the fee. This is typically used only during development.
+   * A `maxSystemFee` of `-1`, i.e. `new BigNumber(-1)` indicates no limit on the fee. This is typically used only during development.
    */
   maxSystemFee?: BigNumber;
   /**
@@ -971,6 +891,18 @@ export interface Hash160ABIReturn extends ABIReturnBase {
    * `type` differentiates the `Hash160ABIReturn` object from other `ABIReturn` objects.
    */
   readonly type: 'Hash160';
+}
+/**
+ * `Address` return type.
+ *
+ * @see ABIReturn
+ * @see AddressString
+ */
+export interface AddressABIReturn extends ABIReturnBase {
+  /**
+   * `type` differentiates the `AddressABIReturn` object from other `ABIReturn` objects.
+   */
+  readonly type: 'Address';
 }
 /**
  * `Array` return type.
@@ -1172,6 +1104,14 @@ export interface AnyABIParameter extends ABIParameterBase, AnyABIReturn {}
  */
 export interface Hash160ABIParameter extends ABIParameterBase, Hash160ABIReturn {}
 /**
+ * `Address` parameter type.
+ *
+ * @see ABIParameter
+ * @see AddressABIReturn
+ * @see AddressString
+ */
+export interface AddressABIParameter extends ABIParameterBase, AddressABIReturn {}
+/**
  * `Array` parameter type.
  *
  * @see ABIParameter
@@ -1262,13 +1202,14 @@ export interface StringABIParameter extends ABIParameterBase, StringABIReturn {}
 export interface VoidABIParameter extends ABIParameterBase, VoidABIReturn {}
 
 /**
- * Return type specification of a function in the `ABI` of a smart contract.
+ * Return type specification of a function in the `ContractABI` of a smart contract.
  */
 export type ABIReturn =
   | AnyABIReturn
   | SignatureABIReturn
   | BooleanABIReturn
   | Hash160ABIReturn
+  | AddressABIReturn
   | Hash256ABIReturn
   | BufferABIReturn
   | PublicKeyABIReturn
@@ -1280,13 +1221,14 @@ export type ABIReturn =
   | IntegerABIReturn
   | ForwardValueABIReturn;
 /**
- * Parameter specification of a function or event in the `ABI` of a smart contract.
+ * Parameter specification of a function or event in the `ContractABI` of a smart contract.
  */
 export type ABIParameter =
   | AnyABIParameter
   | SignatureABIParameter
   | BooleanABIParameter
   | Hash160ABIParameter
+  | AddressABIParameter
   | Hash256ABIParameter
   | BufferABIParameter
   | PublicKeyABIParameter
@@ -1304,6 +1246,7 @@ export type MapABI = MapABIParameter | MapABIReturn;
 export type ObjectABI = ObjectABIParameter | ObjectABIReturn;
 export type SignatureABI = SignatureABIParameter | SignatureABIReturn;
 export type BooleanABI = BooleanABIParameter | BooleanABIReturn;
+export type AddressABI = AddressABIParameter | AddressABIReturn;
 export type Hash160ABI = Hash160ABIParameter | Hash160ABIReturn;
 export type Hash256ABI = Hash256ABIParameter | Hash256ABIReturn;
 export type BufferABI = BufferABIParameter | BufferABIReturn;
@@ -1314,7 +1257,225 @@ export type IntegerABI = IntegerABIParameter | IntegerABIReturn;
 export type ForwardValueABI = ForwardValueABIParameter | ForwardValueABIReturn;
 
 /**
- * Method specification in the `ABI` of a smart contract generated by the NEO•ONE compiler and
+ * Describes the details of a contract parameter.
+ */
+export interface ContractParameterDefinitionBase {
+  /**
+   * The type of the contract parameter. @see `ContractParameterType` for information on possible contract parameter types.
+   */
+  readonly type: ContractParameterDefinition['type'];
+  /**
+   * The name of the contract parameter.
+   */
+  readonly name: string;
+}
+
+/**
+ * Contract parameter for an `Any`.
+ *
+ * @see ContractParameterDefinition
+ */
+export interface AnyContractParameterDefinition extends ContractParameterDefinitionBase {
+  /**
+   * `type` distinguishes `AnyContractParemeter` from other `ContractParameterDefinition` object types.
+   */
+  readonly type: 'Any';
+}
+/**
+ * Contract parameter for a `Signature`.
+ *
+ * @see ContractParameterDefinition
+ * @see SignatureString
+ */
+export interface SignatureContractParameterDefinition extends ContractParameterDefinitionBase {
+  /**
+   * `type` distinguishes `SignatureContractParameter` from other `ContractParameterDefinition` object types.
+   */
+  readonly type: 'Signature';
+}
+
+/**
+ * Contract parameter for a `boolean`.
+ *
+ * @see ContractParameterDefinition
+ */
+export interface BooleanContractParameterDefinition extends ContractParameterDefinitionBase {
+  /**
+   * `type` distinguishes `BooleanContractParameter` from other `ContractParameterDefinition` object types.
+   */
+  readonly type: 'Boolean';
+}
+
+/**
+ * Contract parameter for a `BN`.
+ *
+ * Note that unlike most of the client APIs, we use a `BN` instead of a `BigNumber` here to indicate that this is an integer value.
+ * For example, an `IntegerContractParameter` that represents a NEO value of 10 would be a `new BN(10_00000000)`.
+ *
+ * @see ContractParameterDefinition
+ */
+export interface IntegerContractParameterDefinition extends ContractParameterDefinitionBase {
+  /**
+   * `type` distinguishes `IntegerContractParameter` from other `ContractParameterDefinition` object types.
+   */
+  readonly type: 'Integer';
+}
+
+/**
+ * Contract parameter for a `Hash160`.
+ *
+ * @see ContractParameterDefinition
+ * @see UInt160
+ */
+export interface Hash160ContractParameterDefinition extends ContractParameterDefinitionBase {
+  /**
+   * `type` distinguishes `Hash160ContractParameter` from other `ContractParameterDefinition` object types.
+   */
+  readonly type: 'Hash160';
+}
+
+/**
+ * Contract parameter for an `Address`.
+ *
+ * @see ContractParameterDefinition
+ * @see UInt160
+ */
+export interface AddressContractParameterDefinition extends ContractParameterDefinitionBase {
+  /**
+   * `type` distinguishes `AddressContractParameter` from other `ContractParameterDefinition` object types.
+   */
+  readonly type: 'Address';
+}
+
+/**
+ * Contract parameter for a `Hash256`.
+ *
+ * @see ContractParameterDefinition
+ * @see Hash256String
+ */
+export interface Hash256ContractParameterDefinition extends ContractParameterDefinitionBase {
+  /**
+   * `type` distinguishes `Hash256ContractParameter` from other `ContractParameterDefinition` object types.
+   */
+  readonly type: 'Hash256';
+}
+
+/**
+ * Contract parameter for a `Buffer`.
+ *
+ * @see ContractParameterDefinition
+ * @see BufferString
+ */
+export interface BufferContractParameterDefinition extends ContractParameterDefinitionBase {
+  /**
+   * `type` distinguishes `BufferContractParameter` from other `ContractParameterDefinition` object types.
+   */
+  readonly type: 'Buffer';
+}
+
+/**
+ * Contract parameter for a `PublicKey`.
+ *
+ * @see ContractParameterDefinition
+ * @see PublicKeyString
+ */
+export interface PublicKeyContractParameterDefinition extends ContractParameterDefinitionBase {
+  /**
+   * `type` distinguishes `PublicKeyContractParameter` from other `ContractParameterDefinition` object types.
+   */
+  readonly type: 'PublicKey';
+}
+
+/**
+ * Contract parameter for a `string`.
+ *
+ * @see ContractParameterDefinition
+ */
+export interface StringContractParameterDefinition extends ContractParameterDefinitionBase {
+  /**
+   * `type` distinguishes `StringContractParameter` from other `ContractParameterDefinition` object types.
+   */
+  readonly type: 'String';
+}
+
+/**
+ * Contract parameter for an `Array`.
+ *
+ * @see ContractParameterDefinition
+ */
+export interface ArrayContractParameterDefinition extends ContractParameterDefinitionBase {
+  /**
+   * `type` distinguishes `ArrayContractParameter` from other `ContractParameterDefinition` object types.
+   */
+  readonly type: 'Array';
+}
+
+/**
+ * Contract parameter for a `Map`.
+ *
+ * @see ContractParameterDefinition
+ */
+export interface MapContractParameterDefinition extends ContractParameterDefinitionBase {
+  /**
+   * `type` distinguishes `MapContractParameter` from other `ContractParameterDefinition` object types.
+   */
+  readonly type: 'Map';
+}
+
+/**
+ * Contract parameter for anything other than the other valid contract parameters.
+ *
+ * Examples include the `Block` builtin. If these builtins remain on the stack after invocation, for example, as a return value, then they will be serialized as this empty interface.
+ *
+ * @see ContractParameterDefinition
+ */
+export interface InteropInterfaceContractParameterDefinition extends ContractParameterDefinitionBase {
+  /**
+   * `type` distinguishes `InteropInterfaceContractParameter` from other `ContractParameterDefinition` object types.
+   */
+  readonly type: 'InteropInterface';
+}
+
+/**
+ * Contract parameter for `void`.
+ *
+ * @see ContractParameterDefinition
+ */
+export interface VoidContractParameterDefinition extends ContractParameterDefinitionBase {
+  /**
+   * `type` distinguishes `VoidContractParameter` from other `ContractParameterDefinition` object types.
+   */
+  readonly type: 'Void';
+}
+
+/**
+ * Describes the parameters that a contract method expects as arguments.
+ */
+export type ContractParameterDefinition =
+  | AnyContractParameterDefinition
+  | SignatureContractParameterDefinition
+  | BooleanContractParameterDefinition
+  | IntegerContractParameterDefinition
+  | Hash160ContractParameterDefinition
+  | AddressContractParameterDefinition
+  | Hash256ContractParameterDefinition
+  | BufferContractParameterDefinition
+  | PublicKeyContractParameterDefinition
+  | StringContractParameterDefinition
+  | ArrayContractParameterDefinition
+  | MapContractParameterDefinition
+  | InteropInterfaceContractParameterDefinition
+  | VoidContractParameterDefinition;
+
+/**
+ * All of the possible `type`s that a `ContractParameterDefinition` may have.
+ * Can be either: `Any`, `Boolean`, `Integer`, `Buffer`, `String`, `Hash160`, `Hash256`, `PublicKey`, `Signature`,
+ * `Array`, `Map`, `InteropInterface`, or `Void`.
+ */
+export type ContractParameterDefinitionType = ContractParameterDefinition['type'];
+
+/**
+ * Method specification in the `ContractABI` of a smart contract generated by the NEO•ONE compiler and
  * for use in Client APIs. `ContractMethodDescriptClient` provides extra information for use in
  * the NEO•ONE Client.
  */
@@ -1325,20 +1486,14 @@ export interface ContractMethodDescriptorClient {
   readonly name: string;
   /**
    * Parameters of the method.
-   * TODO: describe
    */
   readonly parameters?: readonly ABIParameter[];
   /**
    * Return type of the method.
-   * TODO: describe
    */
   readonly returnType: ABIReturn;
   /**
-   * flags this as a safe method callable by any source.
-   */
-  readonly safe: boolean;
-  /**
-   * TODO: fill out description here
+   * Used to set the instruction pointer before executing the method.
    */
   readonly offset: number;
   /**
@@ -1346,33 +1501,17 @@ export interface ContractMethodDescriptorClient {
    */
   readonly constant?: boolean;
   /**
-   * `true` if the function is used for sending native assets with a two-phase send.
+   * `true` if the function is "safe" to be called by any other contract
    */
-  readonly send?: boolean;
+  readonly safe?: boolean; // TODO: this might need to be required
   /**
-   * `true` if the function is used for sending native assets.
-   */
-  readonly sendUnsafe?: boolean;
-  /**
-   * `true` if the function is used for receiving native assets.
+   * `true` if the function is marked for receiving tokens.
    */
   readonly receive?: boolean;
-  /**
-   * `true` if the function is used for claiming GAS.
-   */
-  readonly claim?: boolean;
-  /**
-   * `true` if the function is used for refunding native assets.
-   */
-  readonly refundAssets?: boolean;
-  /**
-   * `true` if the function is used for the second phase of a send.
-   */
-  readonly completeSend?: boolean;
 }
 
 /**
- * Method specification in the `ABI` of a smart contract.
+ * Method specification in the `ContractABI` of a smart contract.
  */
 export interface ContractMethodDescriptor {
   /**
@@ -1388,15 +1527,14 @@ export interface ContractMethodDescriptor {
    */
   readonly returnType: ContractParameterType;
   /**
-   * TODO: fill out description here
+   * Used to set the instruction pointer before executing the method.
    */
   readonly offset: number;
 }
 
 /**
- * Event specification in the `ABI` of a smart contract generated by the NEO•ONE compiler
+ * Event specification in the `ContractABIClient` of a smart contract generated by the NEO•ONE compiler
  * for use with NEO•ONE Client APIs.
- * TODO: describe
  */
 export interface ContractEventDescriptorClient {
   /**
@@ -1405,13 +1543,12 @@ export interface ContractEventDescriptorClient {
   readonly name: string;
   /**
    * Parameters of the event.
-   * TODO: describe
    */
   readonly parameters: readonly ABIParameter[];
 }
 
 /**
- * Event specification in the `ABI` of a smart contract.
+ * Event specification in the `ContractABI` of a smart contract.
  */
 export interface ContractEventDescriptor {
   /**
@@ -1425,8 +1562,7 @@ export interface ContractEventDescriptor {
 }
 
 /**
- * TODO: describe
- * Full specification of the functions and events of a smart contract. Used by the client APIs to generate the smart contract interface.
+ * Full specification of the methods and events of a smart contract. Used by the client APIs to generate the smart contract interface.
  *
  * See the [Smart Contract APIs](https://neo-one.io/docs/smart-contract-apis) chapter of the main guide for more information.
  */
@@ -1436,12 +1572,10 @@ export interface ContractABIClient {
    */
   readonly hash: UInt160Hex;
   /**
-   * TODO: describe
    * Specification of the smart contract methods.
    */
   readonly methods: readonly ContractMethodDescriptorClient[];
   /**
-   * TODO: describe
    * Specification of the smart contract events.
    */
   readonly events: readonly ContractEventDescriptorClient[];
@@ -1468,7 +1602,7 @@ export interface ContractABI {
 }
 
 /**
- * A ContractGroup represents a set of mutually trusted contracts. A contract will allow any contract in the same
+ * A `ContractGroup` represents a set of mutually trusted contracts. A contract will allow any contract in the same
  * group to invoke it, and the user interface will not give any warnings. A group is identified by a public key
  * and must be accompanied by a signature for the contract hash to prove the contract is included in the group.
  */
@@ -1490,7 +1624,16 @@ export type WildcardContainer<T> = readonly T[] | Wildcard;
  * If it specifies a contract hash, then that contract will be invoked. If it specifies the public key of a group,
  * then any contract in that group will be invoked. If it specifies a wildcard, then any contract will be invoked.
  */
-export type ContractPermissionDescriptor = UInt160Hex | PublicKeyString | Wildcard;
+export interface ContractPermissionDescriptor {
+  /**
+   * If defined then this permission descriptor is for a contract.
+   */
+  readonly hash?: UInt160Hex;
+  /**
+   * If defined then this permission descriptor is for a contract group.
+   */
+  readonly group?: PublicKeyString;
+}
 
 /**
  * Describes which contracts may be invoked and which methods are called.
@@ -1518,7 +1661,7 @@ export interface ContractManifestClient {
    */
   readonly hash: UInt160Hex;
   /**
-   * Set of mutually trusted contracts.
+   * A group represents a set of mutually trusted contracts. A contract will trust and allow any contract in the same group to invoke it, and the user interface will not give any warnings.
    */
   readonly groups: readonly ContractGroup[];
   /**
@@ -1526,17 +1669,17 @@ export interface ContractManifestClient {
    */
   readonly supportedStandards: readonly string[];
   /**
-   * TODO: description
    * Full specification of the functions and events of a smart contract. Used by the Client APIs
    * to generate the smart contract interface.
    */
   readonly abi: ContractABIClient;
   /**
-   * Describes which contracts may be invoked and which methods are called.
+   * The permissions field is an array containing a set of `ContractPermission` objects. It describes which contracts may be invoked and which methods are called.
    */
   readonly permissions: readonly ContractPermission[];
   /**
-   * The trusts field is an array containing a set of contract hashes or group of public keys.
+   * The trusts field is an array containing a set of contract hashes or group public keys. It can also be assigned with a wildcard *. If it is a wildcard *, then it means that it trusts any contract.
+   * If a contract is trusted, the user interface will not give any warnings when called by the contract.
    */
   readonly trusts: WildcardContainer<UInt160Hex>;
   /**
@@ -1551,7 +1694,7 @@ export interface ContractManifestClient {
  */
 export interface ContractManifest {
   /**
-   * Set of mutually trusted contracts.
+   * A group represents a set of mutually trusted contracts. A contract will trust and allow any contract in the same group to invoke it, and the user interface will not give any warnings.
    */
   readonly groups: readonly ContractGroup[];
   /**
@@ -1564,11 +1707,12 @@ export interface ContractManifest {
    */
   readonly abi: ContractABI;
   /**
-   * Describes which contracts may be invoked and which methods are called.
+   * The permissions field is an array containing a set of `ContractPermission` objects. It describes which contracts may be invoked and which methods are called.
    */
   readonly permissions: readonly ContractPermission[];
   /**
-   * The trusts field is an array containing a set of contract hashes or group of public keys.
+   * The trusts field is an array containing a set of contract hashes or group public keys. It can also be assigned with a wildcard *. If it is a wildcard *, then it means that it trusts any contract.
+   * If a contract is trusted, the user interface will not give any warnings when called by the contract.
    */
   readonly trusts: WildcardContainer<UInt160Hex>;
   /**
@@ -1596,7 +1740,7 @@ export interface ScriptBuilderParamObject {
   readonly [key: string]: ScriptBuilderParam;
 }
 /**
- * `Param` is converted internally via the `ABI` definition into a `ScriptBuilderParam` which is used to actually invoke the method on the smart contract.
+ * `Param` is converted internally via the `ContractABI` definition into a `ScriptBuilderParam` which is used to actually invoke the method on the smart contract.
  */
 export type ScriptBuilderParam =
   | undefined
@@ -1706,25 +1850,11 @@ export interface Contract {
 /* BEGIN LOW-LEVEL API */
 
 /**
- * Describes the details of a contract parameter.
- */
-export interface ContractParameterDefinition {
-  /**
-   * The type of the contract parameter. See `ContractParameterType` for information on possible contract parameter types.
-   */
-  readonly type: ContractParameter['type'];
-  // /**
-  //  * The name of the contract parameter.
-  //  */
-  readonly name: string;
-}
-
-/**
  * Invocation stack item for an `Any`.
  *
  * @see ContractParameter
  */
-export interface AnyContractParameter extends ContractParameterDefinition {
+export interface AnyContractParameter {
   /**
    * `type` distinguishes `AnyContractParemeter` from other `ContractParameter` object types.
    */
@@ -1740,7 +1870,7 @@ export interface AnyContractParameter extends ContractParameterDefinition {
  * @see ContractParameter
  * @see SignatureString
  */
-export interface SignatureContractParameter extends ContractParameterDefinition {
+export interface SignatureContractParameter {
   /**
    * `type` distinguishes `SignatureContractParameter` from other `ContractParameter` object types.
    */
@@ -1756,7 +1886,7 @@ export interface SignatureContractParameter extends ContractParameterDefinition 
  *
  * @see ContractParameter
  */
-export interface BooleanContractParameter extends ContractParameterDefinition {
+export interface BooleanContractParameter {
   /**
    * `type` distinguishes `BooleanContractParameter` from other `ContractParameter` object types.
    */
@@ -1775,7 +1905,7 @@ export interface BooleanContractParameter extends ContractParameterDefinition {
  *
  * @see ContractParameter
  */
-export interface IntegerContractParameter extends ContractParameterDefinition {
+export interface IntegerContractParameter {
   /**
    * `type` distinguishes `IntegerContractParameter` from other `ContractParameter` object types.
    */
@@ -1787,12 +1917,29 @@ export interface IntegerContractParameter extends ContractParameterDefinition {
 }
 
 /**
+ * Invocation stack item for an `Address`.
+ *
+ * @see ContractParameter
+ * @see UInt160
+ */
+export interface AddressContractParameter {
+  /**
+   * `type` distinguishes `AddressContractParameter` from other `ContractParameter` object types.
+   */
+  readonly type: 'Address';
+  /**
+   * NEO address in base58 encoded string format.
+   */
+  readonly value: AddressString;
+}
+
+/**
  * Invocation stack item for a `Hash160`.
  *
  * @see ContractParameter
  * @see UInt160
  */
-export interface Hash160ContractParameter extends ContractParameterDefinition {
+export interface Hash160ContractParameter {
   /**
    * `type` distinguishes `Hash160ContractParameter` from other `ContractParameter` object types.
    */
@@ -1809,7 +1956,7 @@ export interface Hash160ContractParameter extends ContractParameterDefinition {
  * @see ContractParameter
  * @see Hash256String
  */
-export interface Hash256ContractParameter extends ContractParameterDefinition {
+export interface Hash256ContractParameter {
   /**
    * `type` distinguishes `Hash256ContractParameter` from other `ContractParameter` object types.
    */
@@ -1826,7 +1973,7 @@ export interface Hash256ContractParameter extends ContractParameterDefinition {
  * @see ContractParameter
  * @see BufferString
  */
-export interface BufferContractParameter extends ContractParameterDefinition {
+export interface BufferContractParameter {
   /**
    * `type` distinguishes `BufferContractParameter` from other `ContractParameter` object types.
    */
@@ -1843,7 +1990,7 @@ export interface BufferContractParameter extends ContractParameterDefinition {
  * @see ContractParameter
  * @see PublicKeyString
  */
-export interface PublicKeyContractParameter extends ContractParameterDefinition {
+export interface PublicKeyContractParameter {
   /**
    * `type` distinguishes `PublicKeyContractParameter` from other `ContractParameter` object types.
    */
@@ -1859,7 +2006,7 @@ export interface PublicKeyContractParameter extends ContractParameterDefinition 
  *
  * @see ContractParameter
  */
-export interface StringContractParameter extends ContractParameterDefinition {
+export interface StringContractParameter {
   /**
    * `type` distinguishes `StringContractParameter` from other `ContractParameter` object types.
    */
@@ -1875,7 +2022,7 @@ export interface StringContractParameter extends ContractParameterDefinition {
  *
  * @see ContractParameter
  */
-export interface ArrayContractParameter extends ContractParameterDefinition {
+export interface ArrayContractParameter {
   /**
    * `type` distinguishes `ArrayContractParameter` from other `ContractParameter` object types.
    */
@@ -1891,7 +2038,7 @@ export interface ArrayContractParameter extends ContractParameterDefinition {
  *
  * @see ContractParameter
  */
-export interface MapContractParameter extends ContractParameterDefinition {
+export interface MapContractParameter {
   /**
    * `type` distinguishes `MapContractParameter` from other `ContractParameter` object types.
    */
@@ -1909,7 +2056,7 @@ export interface MapContractParameter extends ContractParameterDefinition {
  *
  * @see ContractParameter
  */
-export interface InteropInterfaceContractParameter extends ContractParameterDefinition {
+export interface InteropInterfaceContractParameter {
   /**
    * `type` distinguishes `InteropInterfaceContractParameter` from other `ContractParameter` object types.
    */
@@ -1921,7 +2068,7 @@ export interface InteropInterfaceContractParameter extends ContractParameterDefi
  *
  * @see ContractParameter
  */
-export interface VoidContractParameter extends ContractParameterDefinition {
+export interface VoidContractParameter {
   /**
    * `type` distinguishes `VoidContractParameter` from other `ContractParameter` object types.
    */
@@ -1938,6 +2085,7 @@ export type ContractParameter =
   | SignatureContractParameter
   | BooleanContractParameter
   | IntegerContractParameter
+  | AddressContractParameter
   | Hash160ContractParameter
   | Hash256ContractParameter
   | BufferContractParameter
@@ -1950,53 +2098,26 @@ export type ContractParameter =
 
 /**
  * All of the possible `type`s that a `ContractParameter` may have.
- * Can be either: `Any`, `Boolean`, `Integer`, `ByteArray`, `String`, `Hash160`, `Hash256`, `PublicKey`, `Signature`,
+ * Can be either: `Any`, `Boolean`, `Integer`, `Buffer`, `String`, `Hash160`, `Hash256`, `PublicKey`, `Signature`,
  * `Array`, `Map`, `InteropInterface`, or `Void`.
  */
 export type ContractParameterType = ContractParameter['type'];
 
-/**
- * Raw result of a successful invocation.
- *
- * Low-level API for advanced usage only.
- */
-export interface RawTransactionResultSuccess extends RawTransactionResultBase {
+// TODO: fix this
+export interface RawInvocationResult {
   /**
-   * Indicates a successful invocation.
+   * Result of transaction execution.
    */
-  readonly state: 'HALT';
-  /**
-   * The state of the NEO VM after execution. Typically has one `ContractParameter` which is the return value of the method invoked.
-   */
-  readonly stack: readonly ContractParameter[];
-}
-
-/**
- * Raw result of a failed invocation.
- *
- * Low-level API for advanced usage only.
- */
-export interface RawTransactionResultError extends RawTransactionResultBase {
-  /**
-   * Indicates a failed invocation.
-   */
-  readonly state: 'FAULT';
+  readonly state: 'FAULT' | 'HALT';
   /**
    * The state of the NEO VM after execution. Typically has one `ContractParameter` which is the return value of the method invoked.
    */
   readonly stack: readonly ContractParameter[];
   /**
-   * A descriptive message indicating why the invocation failed.
+   * Total GAS consumed by the operation.
    */
-  readonly message: string;
+  readonly gasConsumed: BigNumber;
 }
-
-/**
- * Raw result of an invocation.
- *
- * Low-level API for advanced usage only.
- */
-export type RawInvocationResult = RawTransactionResultSuccess | RawTransactionResultError;
 
 /**
  * Base properties of `Event`s and `Log`s as well as their raw counterparts, `RawNotification` and `RawLog`, respectively.
@@ -2034,38 +2155,6 @@ export interface RawActionBase {
    * Address of the smart contract that this action occurred in.
    */
   readonly address: AddressString;
-}
-
-/**
- * Raw notification emitted during an invocation. This is the unprocessed counterpart to an `Event`.
- *
- * Low-level API for advanced usage only.
- */
-export interface RawNotification extends RawActionBase {
-  /**
-   * `type` differentiates the `RawNotification` object from other `RawAction` objects, i.e. `RawLog`.
-   */
-  readonly type: 'Notification';
-  /**
-   * The raw arguments of the notifications. These are processed into the `parameters` parameter of the `Event` object using the `ABI`.
-   */
-  readonly args: readonly ContractParameter[];
-}
-
-/**
- * Raw log emitted during an invocation.
- *
- * Low-level API for advanced usage only.
- */
-export interface RawLog extends RawActionBase {
-  /**
-   * `type` differentiates the `RawLog` object from other `RawAction` objects, i.e. `RawNotification`.
-   */
-  readonly type: 'Log';
-  /**
-   * The raw message. This is unprocessed in the `message`.
-   */
-  readonly message: string;
 }
 
 /**
@@ -2151,8 +2240,23 @@ export interface RawCallReceipt {
   readonly state: keyof typeof VMState;
   readonly script: Buffer;
   readonly gasConsumed: BigNumber;
-  readonly stack: readonly RawStackItem[] | string;
-  readonly notifications: readonly NewRawNotification[];
+  readonly stack: readonly ContractParameter[] | string;
+  readonly notifications: readonly RawNotification[];
+  readonly logs: readonly RawLog[];
+}
+
+/**
+ * Raw receipt of an invocation.
+ *
+ * Low-level API for advanced usage only.
+ */
+export interface RawInvokeReceipt extends TransactionReceipt {
+  readonly state: keyof typeof VMState;
+  readonly script: Buffer;
+  readonly gasConsumed: BigNumber;
+  readonly stack: readonly ContractParameter[] | string;
+  readonly notifications: readonly RawNotification[];
+  readonly logs: readonly RawLog[];
 }
 
 /**
@@ -2219,20 +2323,49 @@ export interface RawMapStackItem extends RawStackItemBase {
  *
  * Low-level API for advanced usage only.
  */
-export interface NewRawNotification {
+export interface RawNotification {
+  /**
+   * `type` differentiates the `RawNotification` object from other `RawAction` objects, i.e. `RawLog`.
+   */
+  readonly type: 'Notification';
+  /**
+   * The script hash of the contract that created the notification.
+   */
   readonly scriptHash: UInt160;
+  /**
+   * The event name of the notification.
+   */
   readonly eventName: string;
-  readonly state: readonly RawStackItem[] | string;
+  /**
+   * The raw arguments of the notification.
+   */
+  readonly state: readonly ContractParameter[] | string;
 }
 
 /**
- * Raw receipt of an invocation.
+ * Raw log emitted from VM execution.
  *
  * Low-level API for advanced usage only.
  */
-export interface RawInvokeReceipt extends TransactionReceipt {
-  readonly result: RawInvocationResult;
-  readonly actions: readonly RawAction[];
+export interface RawLog {
+  /**
+   * `type` differentiates the `RawLog` object from other `RawAction` objects, i.e. `RawNotification`.
+   */
+  readonly type: 'Log';
+  /**
+   * The hash of the container that emitted the log.
+   */
+  readonly containerHash?: UInt256;
+  /**
+   * The script hash of the transaction that called the invocation that emitted the log.
+   */
+  readonly callingScriptHash: UInt160;
+  /**
+   * The raw message. This is unprocessed in the `message`.
+   */
+  readonly message: string;
+  // TODO: implement
+  // readonly position: number;
 }
 
 /**
@@ -2286,17 +2419,7 @@ export interface VerifyScriptResult {
 }
 
 /**
- * Interface which describes the result of verification invocation.
- */
-export interface VerifyTransactionResult {
-  /**
-   * All verifications that happened during the relay of the `Transaction`.
-   */
-  readonly verifications: readonly VerifyScriptResult[];
-}
-
-/**
- * Raw result of relaying a `Transaction`. Further consumed and processed by `LocalUserAccountProvider` and `ABI`.
+ * Raw result of relaying a `Transaction`. Further consumed and processed by `LocalUserAccountProvider` and `ContractABI`.
  */
 export interface RelayTransactionResult {
   /**
@@ -2307,36 +2430,6 @@ export interface RelayTransactionResult {
    * Verification result.
    */
   readonly verifyResult?: VerifyResultModel;
-}
-
-/**
- * Additional raw data that is typically processed by an `ABI` for the client APIs.
- */
-export interface RawInvocationData {
-  /**
-   * `Contract`s created by the invocation.
-   */
-  readonly contracts: readonly Contract[];
-  /**
-   * `Contract`s deleted by the invocation.
-   */
-  readonly deletedContractAddresses: readonly AddressString[];
-  /**
-   * `Contract`s migrated (upgraded) by the invocation.
-   */
-  readonly migratedContractAddresses: ReadonlyArray<readonly [AddressString, AddressString]>;
-  /**
-   * Raw result of an invocation.
-   */
-  readonly result: RawInvocationResult;
-  /**
-   * Raw actions emitted by the invocation.
-   */
-  readonly actions: readonly RawAction[];
-  /**
-   * Storage changes that occurred during this invocation
-   */
-  readonly storageChanges: readonly RawStorageChange[];
 }
 
 /**
@@ -2366,7 +2459,11 @@ export interface RawApplicationLogData {
   /**
    * The `Notification`s that came from the `Transaction`'s script execution.
    */
-  readonly notifications: readonly NewRawNotification[];
+  readonly notifications: readonly RawNotification[];
+  /**
+   * The `Log`s that came from the `Transaction`'s script execution.
+   */
+  readonly logs: readonly RawLog[];
 }
 
 export interface ParamJSONArray extends ReadonlyArray<ParamJSON> {}

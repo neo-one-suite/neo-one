@@ -23,7 +23,7 @@ export class ArrMapHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (this.withIndex) {
       // [iterator]
-      sb.emitSysCall(node, 'Neo.Iterator.Create');
+      sb.emitSysCall(node, 'System.Iterator.Create');
       // [0, iterator]
       sb.emitPushInt(node, 0);
       // [accum, iterator]
@@ -54,7 +54,7 @@ export class ArrMapHelper extends Helper {
       );
     } else {
       // [enumerator]
-      sb.emitSysCall(node, 'Neo.Enumerator.Create');
+      sb.emitSysCall(node, 'System.Enumerator.Create');
       // [0, enumerator]
       sb.emitPushInt(node, 0);
       // [accum, enumerator]

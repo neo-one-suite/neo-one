@@ -1,43 +1,37 @@
 /// <reference types="@reactivex/ix-es2015-cjs" />
 import {
   ABIParameter,
-  Action,
+  // Action,
   AddressString,
-  ContractEventDescriptorClient,
+  // ContractEventDescriptorClient,
   ContractMethodDescriptorClient,
-  Event,
+  // Event,
   ForwardOptions,
   GetOptions,
   Hash256String,
   InvokeReceipt,
   InvokeSendUnsafeReceiveTransactionOptions,
-  Log,
+  // Log,
   NetworkType,
   Param,
-  RawAction,
+  // RawAction,
   RawInvokeReceipt,
   Return,
   ScriptBuilderParam,
   SmartContractDefinition,
-  SmartContractIterOptions,
+  // SmartContractIterOptions,
   SmartContractNetworkDefinition,
   TransactionResult,
   Transfer,
 } from '@neo-one/client-common';
-import { utils } from '@neo-one/utils';
-import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
-import { filter } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/filter';
-import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
+// import { utils } from '@neo-one/utils';
+// import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
+// import { filter } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/filter';
+// import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
 import * as argAssertions from '../args';
 import { Client } from '../Client';
-import {
-  CannotSendFromContractError,
-  CannotSendToContractError,
-  HashArgumentExpectedError,
-  NoContractDeployedError,
-  TransferArgumentExpectedError,
-} from '../errors';
-import { events as traceEvents } from '../trace';
+import { CannotSendToContractError, NoContractDeployedError } from '../errors';
+// import { events as traceEvents } from '../trace';
 import { SmartContractAny } from '../types';
 import * as common from './common';
 
@@ -54,16 +48,10 @@ interface ParamAndOptionsResults {
 export const getParamAndOptionsResults = ({
   parameters,
   args,
-  send,
-  completeSend,
-  refundAssets,
 }: {
   readonly parameters: readonly ABIParameter[];
   // tslint:disable-next-line no-any
   readonly args: readonly any[];
-  readonly send: boolean;
-  readonly completeSend: boolean;
-  readonly refundAssets: boolean;
 }): ParamAndOptionsResults => {
   const hasRest = parameters.length > 0 && parameters[parameters.length - 1].rest;
   const hasForwardValueOptions = hasRest && parameters[parameters.length - 1].type === 'ForwardValue';
@@ -84,7 +72,8 @@ export const getParamAndOptionsResults = ({
         };
       }
 
-      if (acc.transfer === undefined && send) {
+      // TODO: this block can almost definitely be removed. also remove transfer return likely
+      if (acc.transfer === undefined) {
         try {
           const maybeTransfer = argAssertions.assertTransfer('transfer', right);
 
@@ -97,7 +86,8 @@ export const getParamAndOptionsResults = ({
         }
       }
 
-      if (acc.hash === undefined && (completeSend || refundAssets)) {
+      // TODO: this block can almost definitely be removed. also remove hash return likely
+      if (acc.hash === undefined) {
         try {
           const maybeHash = argAssertions.assertHash256('hash', right);
 
@@ -129,22 +119,14 @@ export const getParamsAndOptions = ({
   definition: { networks },
   parameters,
   args,
-  sendUnsafe,
   receive,
-  send,
-  completeSend,
-  refundAssets,
   client,
 }: {
   readonly definition: SmartContractDefinition;
   readonly parameters: readonly ABIParameter[];
   // tslint:disable-next-line no-any
   readonly args: readonly any[];
-  readonly sendUnsafe: boolean;
   readonly receive: boolean;
-  readonly send: boolean;
-  readonly completeSend: boolean;
-  readonly refundAssets: boolean;
   readonly client: Client;
 }): {
   readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
@@ -159,17 +141,7 @@ export const getParamsAndOptions = ({
   const { requiredArgs, forwardOptions, options: optionsIn, transfer, hash } = getParamAndOptionsResults({
     parameters,
     args,
-    send,
-    completeSend,
-    refundAssets,
   });
-
-  if (transfer === undefined && send) {
-    throw new TransferArgumentExpectedError();
-  }
-  if (hash === undefined && (completeSend || refundAssets)) {
-    throw new HashArgumentExpectedError();
-  }
 
   const currentAccount = client.getCurrentUserAccount();
   const options =
@@ -191,9 +163,6 @@ export const getParamsAndOptions = ({
   const contractNetwork = networks[network] as SmartContractNetworkDefinition | undefined;
   if (contractNetwork === undefined) {
     throw new NoContractDeployedError(network);
-  }
-  if (options.sendFrom !== undefined && !sendUnsafe) {
-    throw new CannotSendFromContractError(contractNetwork.address);
   }
   if (options.sendTo !== undefined && !receive) {
     throw new CannotSendToContractError(contractNetwork.address);
@@ -220,7 +189,7 @@ export const getParamsAndOptions = ({
 const createCall = ({
   definition,
   client,
-  func: { name, parameters = [], returnType },
+  func: { name, parameters = [], returnType, receive = false },
 }: {
   readonly definition: SmartContractDefinition;
   readonly client: Client;
@@ -231,20 +200,16 @@ const createCall = ({
     definition,
     parameters,
     args,
-    sendUnsafe: false,
-    receive: false,
-    send: false,
-    completeSend: false,
-    refundAssets: false,
+    receive,
     client,
   });
 
-  const receipt = await client.__call(network, address, name, params);
+  // TODO: this needs to be reverted when we change how we call contracts
+  const receipt = await client.__call(network, address, name, [name, [...params]]);
 
   return common.convertCallResult({
     returnType,
-    result: receipt.result,
-    actions: receipt.actions,
+    receipt,
     sourceMaps: definition.sourceMaps,
   });
 };
@@ -252,17 +217,7 @@ const createCall = ({
 const createInvoke = ({
   definition,
   client,
-  func: {
-    name,
-    parameters = [],
-    returnType,
-    send = false,
-    refundAssets = false,
-    completeSend = false,
-    sendUnsafe = false,
-    receive = false,
-    claim = false,
-  },
+  func: { name, parameters = [], returnType, receive = false },
 }: {
   readonly definition: SmartContractDefinition;
   readonly client: Client;
@@ -272,71 +227,24 @@ const createInvoke = ({
     // tslint:disable-next-line no-any
     ...args: any[]
   ): Promise<TransactionResult<InvokeReceipt> | TransactionResult> => {
-    const { params, paramsZipped, options, forwardOptions, address, transfer, hash } = getParamsAndOptions({
+    const { params, paramsZipped, options, forwardOptions, address } = getParamsAndOptions({
       definition,
       parameters,
       args,
-      sendUnsafe,
       receive,
-      send,
-      completeSend,
-      refundAssets,
       client,
     });
 
-    if (claim) {
-      return client.__invokeClaim(address, name, params, paramsZipped, options, definition.sourceMaps);
-    }
-
-    let result: TransactionResult<RawInvokeReceipt>;
-    if (send) {
-      /* istanbul ignore next */
-      if (transfer === undefined) {
-        throw new Error('Something went wrong.');
-      }
-
-      result = await client.__invokeSend(address, name, params, paramsZipped, transfer, options, definition.sourceMaps);
-    } else if (refundAssets) {
-      /* istanbul ignore next */
-      if (hash === undefined) {
-        throw new Error('Something went wrong.');
-      }
-
-      result = await client.__invokeRefundAssets(
-        address,
-        name,
-        params,
-        paramsZipped,
-        hash,
-        options,
-        definition.sourceMaps,
-      );
-    } else if (completeSend) {
-      /* istanbul ignore next */
-      if (hash === undefined) {
-        throw new Error('Something went wrong.');
-      }
-
-      result = await client.__invokeCompleteSend(
-        address,
-        name,
-        params,
-        paramsZipped,
-        hash,
-        options,
-        definition.sourceMaps,
-      );
-    } else {
-      result = await client.__invoke(
-        address,
-        name,
-        params,
-        paramsZipped,
-        sendUnsafe || receive,
-        options,
-        definition.sourceMaps,
-      );
-    }
+    const result: TransactionResult<RawInvokeReceipt> = await client.__invoke(
+      address,
+      name,
+      // TODO: this needs to be reverted when we change how we call contracts
+      [name, [...params]],
+      paramsZipped,
+      receive,
+      options,
+      definition.sourceMaps,
+    );
 
     return {
       transaction: result.transaction,
@@ -345,14 +253,24 @@ const createInvoke = ({
         const { events = [] } = definition.manifest.abi;
         const { events: forwardEvents = [] } = forwardOptions;
         const actions = common.convertActions({
-          actions: receipt.actions,
+          actions: [...receipt.logs, ...receipt.notifications],
           events: events.concat(forwardEvents),
         });
 
+        // TODO: handle this better. or request that this be changed in the VM
+        const receiptStack = typeof receipt.stack === 'string' ? [] : receipt.stack;
+
+        // TODO: change how state is handled
+        const receiptResult = {
+          gasConsumed: receipt.gasConsumed,
+          state: receipt.state as 'HALT' | 'FAULT',
+          stack: receiptStack,
+        };
+
         const invocationResult = await common.convertInvocationResult({
           returnType,
-          result: receipt.result,
-          actions: receipt.actions,
+          result: receiptResult,
+          actions: [...receipt.logs, ...receipt.notifications],
           sourceMaps: definition.sourceMaps,
         });
 
@@ -401,56 +319,57 @@ export const createSmartContract = ({
       abi: { events: abiEvents = [] },
     },
   } = definition;
-  const events = traceEvents.concat(abiEvents).reduce<{ [key: string]: ContractEventDescriptorClient }>(
-    (acc, event) => ({
-      ...acc,
-      [event.name]: event,
-    }),
-    {},
-  );
+  // TODO: reimplement this stuff
+  // const events = traceEvents.concat(abiEvents).reduce<{ [key: string]: ContractEventDescriptorClient }>(
+  //   (acc, event) => ({
+  //     ...acc,
+  //     [event.name]: event,
+  //   }),
+  //   {},
+  // );
 
-  const iterActionsRaw = ({
-    network = client.getCurrentNetwork(),
-    ...iterOptions
-  }: SmartContractIterOptions = {}): AsyncIterable<RawAction> =>
-    AsyncIterableX.from(client.__iterActionsRaw(network, iterOptions)).pipe<RawAction>(
-      filter((action) => action.address === definition.networks[network].address),
-    );
+  // const iterActionsRaw = ({
+  //   network = client.getCurrentNetwork(),
+  //   ...iterOptions
+  // }: SmartContractIterOptions = {}): AsyncIterable<RawAction> =>
+  //   AsyncIterableX.from(client.__iterActionsRaw(network, iterOptions)).pipe<RawAction>(
+  //     filter((action) => action.address === definition.networks[network].address),
+  //   );
 
-  const convertAction = (action: RawAction): Action | undefined => {
-    const converted = common.convertAction({ action, events });
+  // const convertAction = (action: RawAction): Action | undefined => {
+  //   const converted = common.convertAction({ action, events });
 
-    return typeof converted === 'string' ? undefined : converted;
-  };
+  //   return typeof converted === 'string' ? undefined : converted;
+  // };
 
-  const iterActions = (options?: SmartContractIterOptions): AsyncIterable<Action> =>
-    AsyncIterableX.from(iterActionsRaw(options)).pipe(map(convertAction), filter(utils.notNull));
+  // const iterActions = (options?: SmartContractIterOptions): AsyncIterable<Action> =>
+  //   AsyncIterableX.from(iterActionsRaw(options)).pipe(map(convertAction), filter(utils.notNull));
 
-  const iterEvents = (options?: SmartContractIterOptions): AsyncIterable<Event> =>
-    AsyncIterableX.from(iterActions(options)).pipe(
-      map((action) => {
-        if (action.type === 'Log') {
-          return undefined;
-        }
+  // const iterEvents = (options?: SmartContractIterOptions): AsyncIterable<Event> =>
+  //   AsyncIterableX.from(iterActions(options)).pipe(
+  //     map((action) => {
+  //       if (action.type === 'Log') {
+  //         return undefined;
+  //       }
 
-        return action;
-      }),
-      filter(utils.notNull),
-      filter<Event>(Boolean),
-    );
+  //       return action;
+  //     }),
+  //     filter(utils.notNull),
+  //     filter<Event>(Boolean),
+  //   );
 
-  const iterLogs = (options?: SmartContractIterOptions): AsyncIterable<Log> =>
-    AsyncIterableX.from(iterActions(options)).pipe(
-      map((action) => {
-        if (action.type === 'Event') {
-          return undefined;
-        }
+  // const iterLogs = (options?: SmartContractIterOptions): AsyncIterable<Log> =>
+  //   AsyncIterableX.from(iterActions(options)).pipe(
+  //     map((action) => {
+  //       if (action.type === 'Event') {
+  //         return undefined;
+  //       }
 
-        return action;
-      }),
-      filter(utils.notNull),
-      filter<Log>(Boolean),
-    );
+  //       return action;
+  //     }),
+  //     filter(utils.notNull),
+  //     filter<Log>(Boolean),
+  //   );
 
   return definition.manifest.abi.methods.reduce<SmartContractAny>(
     (acc, func) =>
@@ -471,10 +390,10 @@ export const createSmartContract = ({
       }),
     {
       client,
-      iterEvents,
-      iterLogs,
-      iterActions,
-      convertAction,
+      // iterEvents,
+      // iterLogs,
+      // iterActions,
+      // convertAction,
       definition,
     },
   );

@@ -13,7 +13,7 @@ export class GetArgumentHelper extends Helper {
 
       return;
     }
-    // [argv]
+    // [argv, number]
     sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: GlobalProperty.Arguments }));
     // [number, argv]
     sb.emitOp(node, 'SWAP');

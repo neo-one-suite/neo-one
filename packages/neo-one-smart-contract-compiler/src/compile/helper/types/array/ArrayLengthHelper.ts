@@ -16,6 +16,6 @@ export class ArrayLengthHelper extends Helper {
     // [arr]
     sb.emitHelper(node, options, sb.helpers.unwrapArray);
     // [length]
-    sb.emitOp(node, 'ARRAYSIZE');
+    sb.emitOp(node, 'SIZE');
   }
 }

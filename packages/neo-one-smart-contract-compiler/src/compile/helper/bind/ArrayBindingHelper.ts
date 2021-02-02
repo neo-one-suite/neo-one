@@ -136,23 +136,25 @@ export class ArrayBindingHelper extends TypedHelper<ts.ArrayBindingPattern> {
         // [map]
         sb.emitHelper(node, innerOptions, sb.helpers.unwrapMap);
         // [iterator]
-        sb.emitSysCall(node, 'Neo.Iterator.Create');
+        sb.emitSysCall(node, 'System.Iterator.Create');
       },
       (element, innerOptions) => {
         // [iterator, iterator]
         sb.emitOp(element, 'DUP');
         // [boolean, iterator]
-        sb.emitSysCall(element, 'Neo.Enumerator.Next');
+        sb.emitSysCall(element, 'System.Enumerator.Next');
         // [iterator]
         sb.emitOp(element, 'DROP');
         // [iterator, iterator]
         sb.emitOp(element, 'DUP');
         // [val, iterator]
-        sb.emitSysCall(element, 'Neo.Enumerator.Value');
+        sb.emitSysCall(element, 'System.Enumerator.Value');
         // [iterator, val]
         sb.emitOp(element, 'SWAP');
         // [key, val]
-        sb.emitSysCall(element, 'Neo.Iterator.Key');
+        sb.emitSysCall(element, 'System.Iterator.Key');
+        // [key, val]
+        sb.emitSysCall(element, 'System.Binary.Deserialize');
         // [2, key, val]
         sb.emitPushInt(element, 2);
         // [arr]
@@ -170,6 +172,7 @@ export class ArrayBindingHelper extends TypedHelper<ts.ArrayBindingPattern> {
           element,
           innerOptions,
           sb.helpers.rawIteratorReduce({
+            deserializeKey: true,
             each: handleMapLike(element),
           }),
         );
@@ -194,17 +197,19 @@ export class ArrayBindingHelper extends TypedHelper<ts.ArrayBindingPattern> {
         // [map]
         sb.emitHelper(node, innerOptions, sb.helpers.unwrapSet);
         // [iterator]
-        sb.emitSysCall(node, 'Neo.Iterator.Create');
+        sb.emitSysCall(node, 'System.Iterator.Create');
       },
       (element) => {
         // [iterator, iterator]
         sb.emitOp(element, 'DUP');
         // [boolean, iterator]
-        sb.emitSysCall(element, 'Neo.Enumerator.Next');
+        sb.emitSysCall(element, 'System.Enumerator.Next');
         // [iterator]
         sb.emitOp(element, 'DROP');
         // [val]
-        sb.emitSysCall(element, 'Neo.Iterator.Key');
+        sb.emitSysCall(element, 'System.Iterator.Key');
+        // [val]
+        sb.emitSysCall(element, 'System.Binary.Deserialize');
       },
       (element, innerOptions) => {
         // [0, iterator]
@@ -216,6 +221,7 @@ export class ArrayBindingHelper extends TypedHelper<ts.ArrayBindingPattern> {
           element,
           innerOptions,
           sb.helpers.rawIteratorReduce({
+            deserializeKey: true,
             each: handleSetLike(element),
           }),
         );

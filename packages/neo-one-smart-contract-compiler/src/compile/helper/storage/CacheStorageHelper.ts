@@ -27,7 +27,7 @@ export class CacheStorageHelper extends Helper {
     // [map]
     sb.emitOp(node, 'PICKITEM');
     // [number, map]
-    sb.emitSysCall(node, 'Neo.Runtime.GetTrigger');
+    sb.emitSysCall(node, 'System.Runtime.GetTrigger');
     // [number, number, map]
     sb.emitPushInt(node, 0x10);
     sb.emitHelper(
@@ -46,9 +46,9 @@ export class CacheStorageHelper extends Helper {
             sb.helpers.mapForEach({
               each: () => {
                 // [context, keyBuffer, valBuffer]
-                sb.emitSysCall(node, 'Neo.Storage.GetContext');
+                sb.emitSysCall(node, 'System.Storage.GetContext');
                 // []
-                sb.emitSysCall(node, 'Neo.Storage.Put');
+                sb.emitSysCall(node, 'System.Storage.Put');
               },
             }),
           );

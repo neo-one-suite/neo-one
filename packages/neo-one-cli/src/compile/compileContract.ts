@@ -9,7 +9,7 @@ export const compileContract = async (
   linked: LinkedContracts,
   sourceMaps: SourceMaps,
 ) => {
-  const contract = compileContractInternal(filePath, name, createCompilerHost(), linked);
+  const contract = await compileContractInternal(filePath, name, createCompilerHost(), linked);
   if (contract.diagnostics.some((diagnostic) => diagnostic.category === DiagnosticCategory.Error)) {
     throw new Error('Compilation error.');
   }

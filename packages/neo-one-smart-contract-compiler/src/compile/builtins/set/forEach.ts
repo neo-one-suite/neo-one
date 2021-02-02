@@ -32,13 +32,13 @@ export class SetForEach extends BuiltinInstanceMemberCall {
     // [map]
     sb.emitHelper(node, options, sb.helpers.unwrapMap);
     // [iterator]
-    sb.emitSysCall(node, 'Neo.Iterator.Create');
+    sb.emitSysCall(node, 'System.Iterator.Create');
     // [enumerator]
-    sb.emitSysCall(node, 'Neo.Iterator.Keys');
+    sb.emitSysCall(node, 'System.Iterator.Keys');
     // [objectVal, iterator]
     sb.visit(tsUtils.argumented.getArguments(node)[0], options);
     // []
-    sb.emitHelper(node, sb.noPushValueOptions(options), sb.helpers.rawEnumeratorForEachFunc);
+    sb.emitHelper(node, sb.noPushValueOptions(options), sb.helpers.rawEnumeratorForEachFunc({ deserializeKey: true }));
 
     if (optionsIn.pushValue) {
       // [val]

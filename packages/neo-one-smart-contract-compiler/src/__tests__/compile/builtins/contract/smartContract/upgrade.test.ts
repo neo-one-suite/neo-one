@@ -1,15 +1,12 @@
-import { common, ContractParameterTypeModel as ContractParameterType, crypto } from '@neo-one/client-common';
-import { ContractPropertyStateModel as ContractPropertyState } from '@neo-one/client-full-common';
+import { common, crypto } from '@neo-one/client-common';
+import { contractRegisterToContractModel } from '@neo-one/client-full-core';
 import { helpers } from '../../../../../__data__';
 
 describe('SmartContract#upgrade', () => {
   test('upgrade and destroy', async () => {
     const node = await helpers.startNode();
-    const parameterList = Buffer.from([ContractParameterType.String]);
 
-    const {
-      contract: { script: newContract },
-    } = node.compileScript(`
+    const { contract: contractOut } = await node.compileScript(`
       import { SmartContract } from '@neo-one/smart-contract';
 
       export class Contract extends SmartContract {
@@ -27,7 +24,7 @@ describe('SmartContract#upgrade', () => {
         }
       }
     `);
-    const newContractHash = common.uInt160ToString(crypto.toScriptHash(Buffer.from(newContract, 'hex')));
+    const newContractHash = common.uInt160ToString(crypto.toScriptHash(Buffer.from(contractOut.script, 'hex')));
 
     const contract = await node.addContract(`
       import { SmartContract } from '@neo-one/smart-contract';
@@ -67,15 +64,8 @@ describe('SmartContract#upgrade', () => {
       assertEqual(contract.deploy(), true);
       assertEqual(contract.test(), 10);
       const result = contract.upgrade(
-        ${helpers.getBufferHash(newContract)},
-        ${helpers.getBufferHash(parameterList.toString('hex'))},
-        ${ContractParameterType.ByteArray},
-        ${ContractPropertyState.HasStorageDynamicInvokePayable},
-        "ContractMigrated",
-        "2.0",
-        "me",
-        "me@me.com",
-        "migrated contract"
+        ${helpers.getBufferHash(contractOut.script)},
+        ${helpers.getBufferHash(contractRegisterToContractModel(contractOut).serializeWire().toString('hex'))}
       );
       assertEqual(result, true);
 

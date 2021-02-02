@@ -5,12 +5,10 @@ import {
   AddressString,
   Block,
   GetOptions,
-  Hash256String,
-  InvokeSendUnsafeReceiveTransactionOptions,
-  IterOptions,
+  // IterOptions,
   NetworkType,
   Param,
-  RawAction,
+  // RawAction,
   RawCallReceipt,
   RawInvokeReceipt,
   ScriptBuilderParam,
@@ -27,8 +25,8 @@ import {
   UserAccountProvider,
   UserAccountProviders,
 } from '@neo-one/client-common';
-import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
-import { flatMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatmap';
+// import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
+// import { flatMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatmap';
 import { toObservable } from '@reactivex/ix-es2015-cjs/asynciterable/toobservable';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
@@ -473,22 +471,23 @@ export class Client<
   /**
    * @internal
    */
-  public __iterActionsRaw(network: NetworkType, optionsIn?: IterOptions): AsyncIterable<RawAction> {
-    args.assertString('network', network);
-    const options = args.assertNullableIterOptions('iterOptions', optionsIn);
-    const provider = this.getNetworkProvider(network);
-    if (provider.iterActionsRaw !== undefined) {
-      return provider.iterActionsRaw(network, options);
-    }
+  // TODO: reimplement
+  // public __iterActionsRaw(network: NetworkType, optionsIn?: IterOptions): AsyncIterable<RawAction> {
+  //   args.assertString('network', network);
+  //   const options = args.assertNullableIterOptions('iterOptions', optionsIn);
+  //   const provider = this.getNetworkProvider(network);
+  //   if (provider.iterActionsRaw !== undefined) {
+  //     return provider.iterActionsRaw(network, options);
+  //   }
 
-    return AsyncIterableX.from(provider.iterBlocks(network, options)).pipe<RawAction>(
-      flatMap(async (block) => {
-        const actions = _.flatten(block.transactions.map((transaction) => [...transaction.invocationData.actions]));
+  //   return AsyncIterableX.from(provider.iterBlocks(network, options)).pipe<RawAction>(
+  //     flatMap(async (block) => {
+  //       const actions = _.flatten(block.transactions.map((transaction) => [...transaction.invocationData.actions]));
 
-        return AsyncIterableX.of(...actions);
-      }),
-    );
-  }
+  //       return AsyncIterableX.of(...actions);
+  //     }),
+  //   );
+  // }
 
   /**
    * @internal
@@ -499,7 +498,7 @@ export class Client<
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     verify: boolean,
-    optionsIn?: InvokeSendUnsafeReceiveTransactionOptions,
+    optionsIn?: TransactionOptions,
     sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<RawInvokeReceipt>> {
     args.assertAddress('contract', contract);
@@ -517,120 +516,6 @@ export class Client<
 
     return this.addTransactionHooks(
       this.getProvider(options).invoke(contract, method, params, paramsZipped, verify, options, sourceMaps),
-    );
-  }
-
-  /**
-   * @internal
-   */
-  public async __invokeSend(
-    contract: AddressString,
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-    transfer: Transfer,
-    optionsIn?: TransactionOptions,
-    sourceMaps: SourceMaps = {},
-  ): Promise<TransactionResult<RawInvokeReceipt>> {
-    args.assertAddress('contract', contract);
-    args.assertString('method', method);
-    args.assertArray('params', params).forEach((param) => args.assertNullableScriptBuilderParam('params.param', param));
-    paramsZipped.forEach(([tupleString, tupleParam]) => [
-      args.assertString('tupleString', tupleString),
-      args.assertNullableParam('tupleParam', tupleParam),
-    ]);
-    const options = args.assertTransactionOptions('options', optionsIn);
-    args.assertTransfer('transfer', transfer);
-    args.assertSourceMaps('sourceMaps', sourceMaps);
-    await this.applyBeforeRelayHook(options);
-
-    return this.addTransactionHooks(
-      this.getProvider(options).invokeSend(contract, method, params, paramsZipped, transfer, options, sourceMaps),
-    );
-  }
-
-  /**
-   * @internal
-   */
-  public async __invokeCompleteSend(
-    contract: AddressString,
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-    hash: Hash256String,
-    optionsIn?: TransactionOptions,
-    sourceMaps: SourceMaps = {},
-  ): Promise<TransactionResult<RawInvokeReceipt>> {
-    args.assertAddress('contract', contract);
-    args.assertString('method', method);
-    args.assertArray('params', params).forEach((param) => args.assertNullableScriptBuilderParam('params.param', param));
-    paramsZipped.forEach(([tupleString, tupleParam]) => [
-      args.assertString('tupleString', tupleString),
-      args.assertNullableParam('tupleParam', tupleParam),
-    ]);
-    args.assertHash256('hash', hash);
-    const options = args.assertTransactionOptions('options', optionsIn);
-    args.assertSourceMaps('sourceMaps', sourceMaps);
-    await this.applyBeforeRelayHook(options);
-
-    return this.addTransactionHooks(
-      this.getProvider(options).invokeCompleteSend(contract, method, params, paramsZipped, hash, options, sourceMaps),
-    );
-  }
-
-  /**
-   * @internal
-   */
-  public async __invokeRefundAssets(
-    contract: AddressString,
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-    hash: Hash256String,
-    optionsIn?: TransactionOptions,
-    sourceMaps: SourceMaps = {},
-  ): Promise<TransactionResult<RawInvokeReceipt>> {
-    args.assertAddress('contract', contract);
-    args.assertString('method', method);
-    args.assertArray('params', params).forEach((param) => args.assertNullableScriptBuilderParam('params.param', param));
-    paramsZipped.forEach(([tupleString, tupleParam]) => [
-      args.assertString('tupleString', tupleString),
-      args.assertNullableParam('tupleParam', tupleParam),
-    ]);
-    args.assertHash256('hash', hash);
-    const options = args.assertTransactionOptions('options', optionsIn);
-    args.assertSourceMaps('sourceMaps', sourceMaps);
-    await this.applyBeforeRelayHook(options);
-
-    return this.addTransactionHooks(
-      this.getProvider(options).invokeRefundAssets(contract, method, params, paramsZipped, hash, options, sourceMaps),
-    );
-  }
-
-  /**
-   * @internal
-   */
-  public async __invokeClaim(
-    contract: AddressString,
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-    optionsIn?: TransactionOptions,
-    sourceMaps: SourceMaps = {},
-  ): Promise<TransactionResult> {
-    args.assertAddress('contract', contract);
-    args.assertString('method', method);
-    args.assertArray('params', params).forEach((param) => args.assertNullableScriptBuilderParam('params.param', param));
-    paramsZipped.forEach(([tupleString, tupleParam]) => [
-      args.assertString('tupleString', tupleString),
-      args.assertNullableParam('tupleParam', tupleParam),
-    ]);
-    const options = args.assertTransactionOptions('options', optionsIn);
-    args.assertSourceMaps('sourceMaps', sourceMaps);
-    await this.applyBeforeRelayHook(options);
-
-    return this.addTransactionHooks(
-      this.getProvider(options).invokeClaim(contract, method, params, paramsZipped, options, sourceMaps),
     );
   }
 

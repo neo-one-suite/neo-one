@@ -34,7 +34,7 @@ export class ArrayPop extends BuiltinInstanceMemberCall {
           // [arr, arr]
           sb.emitOp(node, 'DUP');
           // [number, arr]
-          sb.emitOp(node, 'ARRAYSIZE');
+          sb.emitOp(node, 'SIZE');
           // [0, number, arr]
           sb.emitPushInt(node, 0);
           // [boolean, arr]
@@ -50,7 +50,7 @@ export class ArrayPop extends BuiltinInstanceMemberCall {
           // [arr, arr]
           sb.emitOp(node, 'DUP');
           // [size, arr]
-          sb.emitOp(node, 'ARRAYSIZE');
+          sb.emitOp(node, 'SIZE');
           // [size - 1, arr]
           sb.emitOp(node, 'DEC');
           // [arr, size - 1]

@@ -1,3 +1,5 @@
+import { ContractGroup, ContractPermission, WildcardContainer } from '@neo-one/client-common';
+
 export const MAIN_FUNCTION = 'main';
 export const DEPLOY_METHOD = 'deploy';
 export const PROPERTIES_PROPERTY = 'properties';
@@ -9,26 +11,22 @@ export const FINALLY_COMPLETION = 4;
 
 export interface ContractProperties {
   readonly name: string;
-  readonly codeVersion: string;
-  readonly author: string;
-  readonly email: string;
-  readonly description: string;
+  readonly trusts: WildcardContainer<string>;
+  readonly permissions: readonly ContractPermission[];
+  readonly groups: readonly ContractGroup[];
 }
 
 export const DEFAULT_CONTRACT_PROPERTIES = {
   name: '',
-  codeVersion: '1.0',
-  author: '',
-  email: '',
-  description: '',
+  groups: [],
+  permissions: [],
+  trusts: '*' as '*',
 };
 
 export enum Decorator {
   constant = 'constant',
-  send = 'send',
-  sendUnsafe = 'sendUnsafe',
   receive = 'receive',
-  claim = 'claim',
+  safe = 'safe',
 }
 
 // tslint:disable-next-line no-any
@@ -39,12 +37,8 @@ export const DECORATORS_ARRAY = Object.values(Decorator);
 
 export enum ContractPropertyName {
   deploy = 'deploy',
-  processedTransactions = 'processedTransactions',
-  claimedTransactions = 'claimedTransactions',
-  address = 'address',
   properties = 'properties',
-  refundAssets = 'refundAssets',
-  completeSend = 'completeSend',
+  address = 'address',
   deployed = 'deployed',
   approveUpgrade = 'approveUpgrade',
   upgrade = 'upgrade',
@@ -52,16 +46,6 @@ export enum ContractPropertyName {
 }
 
 export const VIRTUAL_PROPERTIES: Set<string> = new Set([ContractPropertyName.deploy]);
-export const RESERVED_PROPERTIES: Set<string> = new Set([
-  ContractPropertyName.refundAssets,
-  ContractPropertyName.completeSend,
-  ContractPropertyName.upgrade,
-  ContractPropertyName.destroy,
-]);
-export const BUILTIN_PROPERTIES: Set<string> = new Set([
-  ContractPropertyName.processedTransactions,
-  ContractPropertyName.claimedTransactions,
-  ContractPropertyName.address,
-  ContractPropertyName.deployed,
-]);
+export const RESERVED_PROPERTIES: Set<string> = new Set([ContractPropertyName.upgrade, ContractPropertyName.destroy]);
+export const BUILTIN_PROPERTIES: Set<string> = new Set([ContractPropertyName.address, ContractPropertyName.deployed]);
 export const IGNORED_PROPERTIES: Set<string> = new Set([ContractPropertyName.properties]);

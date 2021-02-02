@@ -1,8 +1,8 @@
-import { ABIFunction } from '@neo-one/client-common';
+import { ContractMethodDescriptorClient } from '@neo-one/client-common';
 import { toTypeScriptType } from '../utils';
 import { getEventName } from './getEventName';
 
-export const genForwardReturnFunction = (name: string, abi: ABIFunction): string => {
+export const genForwardReturnFunction = (name: string, abi: ContractMethodDescriptorClient): string => {
   const returnType = toTypeScriptType(abi.returnType, { isParameter: false });
 
   return `{

@@ -33,7 +33,7 @@ export class IsCallerHelper extends Helper {
           // [addressBuffer, addressBuffer]
           sb.emitOp(node, 'DUP');
           // [maybeContract, addressBuffer]
-          sb.emitSysCall(node, 'Neo.Blockchain.GetContract');
+          sb.emitSysCall(node, 'System.Blockchain.GetContract');
           sb.emitHelper(
             node,
             options,
@@ -49,7 +49,7 @@ export class IsCallerHelper extends Helper {
               // (this is the first contract called OR we are in verification BECAUSE verification already checks that this is the first contract called).
               whenTrue: () => {
                 // [boolean]
-                sb.emitSysCall(node, 'Neo.Runtime.CheckWitness');
+                sb.emitSysCall(node, 'System.Runtime.CheckWitness');
                 // [boolean, boolean]
                 sb.emitHelper(node, options, sb.helpers.invocationIsCaller);
                 // [boolean]

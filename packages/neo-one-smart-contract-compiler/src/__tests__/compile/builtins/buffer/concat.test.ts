@@ -35,7 +35,7 @@ describe('Buffer.concat', () => {
   });
 
   test('cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const keys = Buffer.concat;
     `,
@@ -44,7 +44,7 @@ describe('Buffer.concat', () => {
   });
 
   test('cannot be set', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       Buffer.concat = (list: Buffer[]) => Buffer.from('', 'hex');
     `,
@@ -53,7 +53,7 @@ describe('Buffer.concat', () => {
   });
 
   test('cannot be "referenced"', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const keys = Buffer['concat'];
     `,

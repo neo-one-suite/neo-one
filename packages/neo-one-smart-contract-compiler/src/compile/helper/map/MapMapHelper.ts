@@ -19,7 +19,7 @@ export class MapMapHelper extends Helper {
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [iterator]
-    sb.emitSysCall(node, 'Neo.Iterator.Create');
+    sb.emitSysCall(node, 'System.Iterator.Create');
     // [accum, iterator]
     sb.emitOp(node, 'NEWMAP');
     // [accum]
@@ -28,10 +28,12 @@ export class MapMapHelper extends Helper {
       options,
       sb.helpers.rawIteratorReduce({
         each: (innerOptions) => {
-          // [3, accum, key, val]
-          sb.emitPushInt(node, 3);
+          // [accum, accum, key, val]
+          sb.emitOp(node, 'DUP');
+          // [val, key, accum, accum]
+          sb.emitOp(node, 'REVERSE4');
           // [accum, key, val, accum]
-          sb.emitOp(node, 'XTUCK');
+          sb.emitOp(node, 'REVERSE3');
           // [val, accum, key, accum]
           sb.emitOp(node, 'ROT');
           // [key, val, accum, accum]

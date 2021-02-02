@@ -47,14 +47,6 @@ export class HandleNormalHelper extends Helper {
         sb.emitPushInt(decl, 1);
         // [arg]
         sb.emitHelper(decl, options, sb.helpers.getArgument);
-        if (propInfo.claim) {
-          // [arg, arg]
-          sb.emitOp(decl, 'DUP');
-          // [transaction, arg, arg]
-          sb.emitSysCall(decl, 'System.ExecutionEngine.GetScriptContainer');
-          // [arg]
-          sb.emitOp(decl, 'APPEND');
-        }
         sb.withScope(decl, options, (innerOptions) => {
           sb.emitHelper(
             decl,
@@ -122,18 +114,6 @@ export class HandleNormalHelper extends Helper {
             });
           }
         }
-
-        return;
-      }
-
-      if (propInfo.type === 'refundAssets') {
-        sb.emitHelper(node, options, sb.helpers.refundAssets);
-
-        return;
-      }
-
-      if (propInfo.type === 'completeSend') {
-        sb.emitHelper(node, options, sb.helpers.completeSend);
 
         return;
       }

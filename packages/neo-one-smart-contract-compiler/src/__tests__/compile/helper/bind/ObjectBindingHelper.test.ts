@@ -37,7 +37,7 @@ describe('ObjectBindingHelper', () => {
     });
 
     test('builtin value computed property', async () => {
-      helpers.compileString(
+      await helpers.compileString(
         `
         import { Blockchain } from '@neo-one/smart-contract';
         const { ['currentTransaction']: currentTransaction } = Blockchain;
@@ -49,7 +49,7 @@ describe('ObjectBindingHelper', () => {
     });
 
     test('builtin value rest property', async () => {
-      helpers.compileString(
+      await helpers.compileString(
         `
         import { Blockchain } from '@neo-one/smart-contract';
         const { currentTransaction, ...rest } = Blockchain;
@@ -61,7 +61,7 @@ describe('ObjectBindingHelper', () => {
     });
 
     test('builtin value unknown property', async () => {
-      helpers.compileString(
+      await helpers.compileString(
         `
         import { Blockchain } from '@neo-one/smart-contract';
         const { 0: something } = Blockchain;
@@ -73,7 +73,7 @@ describe('ObjectBindingHelper', () => {
     });
 
     test('builtin value method property', async () => {
-      helpers.compileString(
+      await helpers.compileString(
         `
         import { Address } from '@neo-one/smart-contract';
         const { isSender } = Address;
@@ -84,44 +84,46 @@ describe('ObjectBindingHelper', () => {
       );
     });
 
+    // TODO: come back to this when notifications are implemented
     test('builtin instance value', async () => {
       await helpers.executeString(`
         import { Blockchain } from '@neo-one/smart-contract';
-        const { currentTransaction: { references } } = Blockchain;
+        const { currentTransaction: { notifications } } = Blockchain;
 
         assertEqual(references !== undefined, true);
         assertEqual(references.length, 0);
       `);
     });
 
+    // TODO: come back to this when notifications are implemented
     test('builtin value string property', async () => {
       await helpers.executeString(`
-        import { Blockchain, Output } from '@neo-one/smart-contract';
-        const { 'currentTransaction': { 'references': [value] } } = Blockchain;
+        import { Blockchain } from '@neo-one/smart-contract';
+        const { 'currentTransaction': { 'notifications': [value] } } = Blockchain;
 
-        assertEqual(value as Output | undefined, undefined);
+        assertEqual(value !== undefined, true);
       `);
     });
 
     test('builtin value instance computed property', async () => {
-      helpers.compileString(
+      await helpers.compileString(
         `
         import { Blockchain } from '@neo-one/smart-contract';
-        const { ['references']: references } = Blockchain.currentTransaction;
+        const { ['signers']: signers } = Blockchain.currentTransaction;
 
-        assertEqual(references !== undefined, true);
+        assertEqual(signers !== undefined, true);
       `,
         { type: 'error', code: DiagnosticCode.UnsupportedSyntax },
       );
     });
 
     test('builtin instance value method property', async () => {
-      helpers.compileString(
+      await helpers.compileString(
         `
-        import { Account, Address } from '@neo-one/smart-contract';
-        const { getBalance } = Account.for(Address.from('${keys[0].address}'));
+        import { ArrayStorage } from '@neo-one/smart-contract';
+        const { forEach } = ArrayStorage.for<number>();
 
-        assertEqual(getBalance !== undefined, true);
+        assertEqual(forEach !== undefined, true);
       `,
         { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
       );

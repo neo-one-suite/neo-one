@@ -67,8 +67,10 @@ class CreateEventNotifier extends BuiltinCall {
           sb.emitOp(node, 'INC');
           // [arr]
           sb.emitOp(node, 'PACK');
+          // [eventName, arr]
+          sb.emitPushString(node, eventName);
           // []
-          sb.emitSysCall(node, 'Neo.Runtime.Notify');
+          sb.emitSysCall(node, 'System.Runtime.Notify');
           // [val]
           sb.emitHelper(node, innerOptions, sb.helpers.wrapUndefined);
           // []

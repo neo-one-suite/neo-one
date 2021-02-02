@@ -28,7 +28,7 @@ export class RawIteratorForEachBaseHelper extends Helper {
           // [iterator, iterator]
           sb.emitOp(node, 'DUP');
           // [boolean, iterator]
-          sb.emitSysCall(node, 'Neo.Enumerator.Next');
+          sb.emitSysCall(node, 'System.Enumerator.Next');
         },
         each: (innerOptions) => {
           // [iterator, iterator]

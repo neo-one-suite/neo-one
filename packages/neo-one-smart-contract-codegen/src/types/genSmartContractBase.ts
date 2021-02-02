@@ -1,4 +1,4 @@
-import { ABI, ABIFunction } from '@neo-one/client-common';
+import { ContractManifestClient, ContractMethodDescriptorClient } from '@neo-one/client-common';
 import { createForwardedValueFuncArgsName, createForwardedValueFuncReturnName } from '@neo-one/client-core';
 import _ from 'lodash';
 import { genConstantFunction } from './genConstantFunction';
@@ -7,13 +7,18 @@ import { genForwardReturnFunction } from './genForwardReturnFunction';
 import { genFunction } from './genFunction';
 import { getEventName } from './getEventName';
 
-export const genSmartContractBase = (name: string, interfaceName: string, abi: ABI, migration = false): string => {
+export const genSmartContractBase = (
+  name: string,
+  interfaceName: string,
+  manifest: ContractManifestClient,
+  migration = false,
+): string => {
   const extendsClause = `<TClient extends Client = Client> extends SmartContract<TClient, ${getEventName(name)}>`;
 
   return `
 export interface ${interfaceName}${migration ? '' : extendsClause} {
   ${_.flatten(
-    _.sortBy(abi.functions, [(func: ABIFunction) => func.name]).map((func) => {
+    _.sortBy(manifest.abi.methods, [(func: ContractMethodDescriptorClient) => func.name]).map((func) => {
       const parameters = func.parameters === undefined ? [] : func.parameters;
       const forwardedParameters = parameters.filter((parameter) => parameter.forwardedValue);
       let decls = [

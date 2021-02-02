@@ -32,11 +32,11 @@ export class MapForEach extends BuiltinInstanceMemberCall {
     // [map]
     sb.emitHelper(node, options, sb.helpers.unwrapMap);
     // [iterator]
-    sb.emitSysCall(node, 'Neo.Iterator.Create');
+    sb.emitSysCall(node, 'System.Iterator.Create');
     // [objectVal, iterator]
     sb.visit(tsUtils.argumented.getArguments(node)[0], options);
     // []
-    sb.emitHelper(node, options, sb.helpers.rawIteratorForEachFunc);
+    sb.emitHelper(node, options, sb.helpers.rawIteratorForEachFunc({ deserializeKey: true }));
 
     if (optionsIn.pushValue) {
       // [val]

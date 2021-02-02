@@ -1,7 +1,7 @@
 import { Types } from '../../constants';
 import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
-import { SysCallInstanceMemberPrimitive } from './SysCallInstanceMemberPrimitive';
+import { BuiltinInstanceIndexValue } from './BuiltinInstanceIndexValue';
 import { ValueFor } from './ValueFor';
 import { ValueInstanceOf } from './ValueInstanceOf';
 
@@ -12,22 +12,15 @@ class ContractConstructorInterface extends BuiltinInterface {}
 export const add = (builtins: Builtins): void => {
   builtins.addContractInterface('Contract', new ContractInterface());
   builtins.addContractValue('Contract', new ValueInstanceOf('ContractConstructor', (sb) => sb.helpers.isContract));
-  builtins.addContractMember(
-    'Contract',
-    'script',
-    new SysCallInstanceMemberPrimitive('Neo.Contract.GetScript', Types.Contract, Types.Buffer),
-  );
-  builtins.addContractMember(
-    'Contract',
-    'payable',
-    new SysCallInstanceMemberPrimitive('Neo.Contract.IsPayable', Types.Contract, Types.Boolean),
-  );
-
+  builtins.addContractMember('Contract', 'script', new BuiltinInstanceIndexValue(0, Types.Contract, Types.Buffer));
+  builtins.addContractMember('Contract', 'manifest', new BuiltinInstanceIndexValue(1, Types.Contract, Types.String));
+  builtins.addContractMember('Contract', 'hasStorage', new BuiltinInstanceIndexValue(2, Types.Contract, Types.Boolean));
+  builtins.addContractMember('Contract', 'payable', new BuiltinInstanceIndexValue(3, Types.Contract, Types.Boolean));
   builtins.addContractInterface('ContractConstructor', new ContractConstructorInterface());
   builtins.addContractMember(
     'ContractConstructor',
     'for',
-    new ValueFor('Neo.Blockchain.GetContract', (sb, node, options) => {
+    new ValueFor('System.Blockchain.GetContract', (sb, node, options) => {
       sb.emitHelper(
         node,
         options,

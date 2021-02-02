@@ -185,6 +185,7 @@ export enum Op {
   REVERSEITEMS = 0xd1,
   REMOVE = 0xd2,
   CLEARITEMS = 0xd3,
+  POPITEM = 0xd4,
   ISNULL = 0xd8,
   ISTYPE = 0xd9,
   CONVERT = 0xdb,
@@ -280,6 +281,71 @@ export enum SysCall {
   'System.Binary.Atoi' = 'System.Binary.Atoi',
 }
 
+export enum SysCallHashNum {
+  'System.Binary.Serialize' = 0x3f1c0124,
+  'System.Binary.Deserialize' = 0x527cd0df,
+  'System.Binary.Base64Encode' = 0xacbf5376,
+  'System.Binary.Base64Decode' = 0xdba384c3,
+  'System.Blockchain.GetHeight' = 0x7ef5721f,
+  'System.Blockchain.GetBlock' = 0x8347922d,
+  'System.Blockchain.GetTransaction' = 0xe6558d48,
+  'System.Blockchain.GetTransactionHeight' = 0x4a3288b1,
+  'System.Blockchain.GetTransactionFromBlock' = 0x7e56fd69,
+  'System.Blockchain.GetContract' = 0xa9c54b41,
+  'System.Callback.Create' = 0xd6a52d2a,
+  'System.Callback.CreateFromMethod' = 0x7c507485,
+  'System.Callback.CreateFromSyscall' = 0xd46efa70,
+  'System.Callback.Invoke' = 0xd42b3dad,
+  'System.Contract.Create' = 0xce352c85,
+  'System.Contract.Update' = 0x31c6331d,
+  'System.Contract.Destroy' = 0xc69f1df0,
+  'System.Contract.Call' = 0x627d5b52,
+  'System.Contract.CallEx' = 0xeef40cdb,
+  'System.Contract.IsStandard' = 0xd76b9d85,
+  'System.Contract.GetCallFlags' = 0x95da3a81,
+  'System.Contract.CreateStandardAccount' = 0xcf998702,
+  'Neo.Crypto.RIPEMD160' = 0x26d1d6d2,
+  'Neo.Crypto.SHA256' = 0xd7ac7411,
+  'Neo.Crypto.VerifyWithECDsaSecp256r1' = 0x95440d78,
+  'Neo.Crypto.VerifyWithECDsaSecp256k1' = 0x7e3c53b7,
+  'Neo.Crypto.CheckMultisigWithECDsaSecp256r1' = 0x138defaf,
+  'Neo.Crypto.CheckMultisigWithECDsaSecp256k1' = 0x57c6efb2,
+  'System.Enumerator.Create' = 0xbbaa607a,
+  'System.Enumerator.Next' = 0x926d4cf0,
+  'System.Enumerator.Value' = 0xbd20202c,
+  'System.Enumerator.Concat' = 0xd406e5e1,
+  'System.Iterator.Create' = 0xed64f727,
+  'System.Iterator.Key' = 0x0e9488ba,
+  'System.Iterator.Keys' = 0xfd9096e9,
+  'System.Iterator.Values' = 0xbeee30ad,
+  'System.Iterator.Concat' = 0xe5870a81,
+  'System.Json.Serialize' = 0x248d264b,
+  'System.Json.Deserialize' = 0xa79c470e,
+  'Neo.Native.Deploy' = 0x123e7fe8,
+  'Neo.Native.Call' = 0x6b67780b,
+  'System.Runtime.Platform' = 0xb279fcf6,
+  'System.Runtime.GetTrigger' = 0xe97d38a0,
+  'System.Runtime.GetTime' = 0xb7c38803,
+  'System.Runtime.GetScriptContainer' = 0x2d510830,
+  'System.Runtime.GetExecutingScriptHash' = 0xdbfea874,
+  'System.Runtime.GetCallingScriptHash' = 0x39536e3c,
+  'System.Runtime.GetEntryScriptHash' = 0xf9b4e238,
+  'System.Runtime.CheckWitness' = 0xf827ec8c,
+  'System.Runtime.GetInvocationCounter' = 0x84271143,
+  'System.Runtime.Log' = 0xcfe74796,
+  'System.Runtime.Notify' = 0x95016f61,
+  'System.Runtime.GetNotifications' = 0x274335f1,
+  'System.Runtime.GasLeft' = 0x1488d8ce,
+  'System.Storage.GetContext' = 0x9bf667ce,
+  'System.Storage.GetReadOnlyContext' = 0xf6b46be2,
+  'System.Storage.AsReadOnly' = 0x764cbfe9,
+  'System.Storage.Get' = 0x925de831,
+  'System.Storage.Find' = 0xdf30b89a,
+  'System.Storage.Put' = 0xe63f1884,
+  'System.Storage.PutEx' = 0x73e19b3a,
+  'System.Storage.Delete' = 0x2f58c5ed,
+}
+
 export type SysCallName = keyof typeof SysCall;
 
 const isSysCall = (value: string): value is SysCall =>
@@ -291,6 +357,20 @@ export const assertSysCall = (value: string): SysCall => {
     return value;
   }
   throw new InvalidSysCallError(value);
+};
+
+export type SysCallHashName = keyof typeof SysCallHashNum;
+
+const isSysCallHash = (value: string): value is SysCallHashName =>
+  // tslint:disable-next-line: strict-type-predicates
+  SysCallHashNum[value as SysCallHashName] !== undefined;
+
+export const assertSysCallHash = (value: string): SysCallHashName => {
+  if (isSysCallHash(value)) {
+    return value;
+  }
+
+  throw new InvalidFormatError();
 };
 
 /**
@@ -359,3 +439,5 @@ export const toSysCallHash = (value: SysCall): SysCallHash => {
 
   return hash;
 };
+
+export const toSysCallName = (hash: SysCallHashNum): SysCallHashName => assertSysCallHash(SysCallHashNum[hash]);

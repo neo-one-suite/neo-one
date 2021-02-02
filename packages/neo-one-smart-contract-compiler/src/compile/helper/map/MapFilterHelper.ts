@@ -24,7 +24,7 @@ export class MapFilterHelper extends Helper {
       return;
     }
     // [iterator]
-    sb.emitSysCall(node, 'Neo.Iterator.Create');
+    sb.emitSysCall(node, 'System.Iterator.Create');
     // [accum, iterator]
     sb.emitOp(node, 'NEWMAP');
     // [accum]
@@ -56,10 +56,12 @@ export class MapFilterHelper extends Helper {
               whenTrue: () => {
                 // [accum, val, key]
                 sb.emitOp(node, 'ROT');
-                // [3, accum, val, key]
-                sb.emitPushInt(node, 3);
+                // [accum, accum, val, key]
+                sb.emitOp(node, 'DUP');
+                // [key, val, accum, accum]
+                sb.emitOp(node, 'REVERSE4');
                 // [accum, val, key, accum]
-                sb.emitOp(node, 'XTUCK');
+                sb.emitOp(node, 'REVERSE3');
                 // [key, accum, val, accum]
                 sb.emitOp(node, 'ROT');
                 // [val, key, accum, accum]

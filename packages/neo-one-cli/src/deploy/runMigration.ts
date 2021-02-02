@@ -1,6 +1,6 @@
 // tslint:disable promise-function-async no-any no-loop-statement
 import { Configuration } from '@neo-one/cli-common';
-import { SourceMaps } from '@neo-one/client-common';
+import { scriptHashToAddress, SourceMaps } from '@neo-one/client-common';
 import { getParamAndOptionsResults, SmartContractAny } from '@neo-one/client-core';
 import { Client } from '@neo-one/client-full-core';
 import { CompileContractResult } from '@neo-one/smart-contract-compiler';
@@ -37,7 +37,7 @@ export const runMigration = async (
   let contracts: Contracts = _.fromPairs(
     Object.entries(nameToContract).map(([name, contract]) => [
       name,
-      client.smartContract({ manifest: contract.manifest, networks: {} }),
+      client.smartContract({ manifest: contract.contract.manifest, networks: {} }),
     ]),
   );
 
@@ -46,15 +46,12 @@ export const runMigration = async (
     Object.entries(nameToContract).map(([name, contract]) => [
       name,
       _.fromPairs(
-        contract.manifest.abi.methods.map((func) => [
+        contract.contract.manifest.abi.methods.map((func) => [
           func.name,
           (...args: any[]) => {
             const { requiredArgs, forwardOptions, options, transfer, hash } = getParamAndOptionsResults({
               parameters: func.parameters === undefined ? [] : func.parameters,
               args,
-              send: !!func.send,
-              completeSend: !!func.completeSend,
-              refundAssets: !!func.refundAssets,
             });
 
             const deferred = createDeferred();
@@ -125,12 +122,12 @@ export const runMigration = async (
           const params = await Promise.all(action.params);
           const result = await client.publishAndDeploy(
             contract.contract,
-            contract.manifest,
+            contract.contract.manifest,
             params,
             {
               ...(action.options === undefined ? {} : action.options),
-              systemFee: new BigNumber(1000),
-              networkFee: new BigNumber(1),
+              maxSystemFee: new BigNumber(1000),
+              maxNetworkFee: new BigNumber(1),
             },
             sourceMaps,
           );
@@ -139,15 +136,15 @@ export const runMigration = async (
             throw new Error(receipt.result.message);
           }
 
-          print(`Deployed ${action.contract} at ${receipt.result.value.address}`);
+          print(`Deployed ${action.contract} at ${scriptHashToAddress(receipt.result.value.hash)}`);
 
           contracts = {
             ...contracts,
             [action.contract]: client.smartContract({
-              manifest: contract.manifest,
+              manifest: contract.contract.manifest,
               networks: {
                 [network]: {
-                  address: receipt.result.value.address,
+                  address: scriptHashToAddress(receipt.result.value.hash),
                 },
               },
             }),
@@ -157,7 +154,7 @@ export const runMigration = async (
             ...deployed,
             [action.contract]: {
               [network]: {
-                address: receipt.result.value.address,
+                address: scriptHashToAddress(receipt.result.value.hash),
               },
             },
           };

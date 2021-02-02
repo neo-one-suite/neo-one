@@ -98,10 +98,16 @@ export class ArrayStoragePop extends BuiltinInstanceMemberCall {
                 knownKeyType: Types.Number,
               }),
             );
-            // [5, deletedVal, idxVal, val, idx, val]
+            // [deletedVal, deletedVal, idxVal, val, idx, val]
+            sb.emitOp(node, 'DUP');
+            // [6, deletedVal, deletedVal, idxVal, val, idx, val]
+            sb.emitPushInt(node, 6);
+            // [val, idx, val, idxVal, deletedVal, deleteVal]
+            sb.emitOp(node, 'REVERSEN');
+            // [5, val, idx, val, idxVal, deletedVal, deleteVal]
             sb.emitPushInt(node, 5);
             // [deletedVal, idxVal, val, idx, val, deletedVal]
-            sb.emitOp(node, 'XTUCK');
+            sb.emitOp(node, 'REVERSEN');
             // [idxVal, val, idx, val, deletedVal]
             sb.emitOp(node, 'DROP');
           }

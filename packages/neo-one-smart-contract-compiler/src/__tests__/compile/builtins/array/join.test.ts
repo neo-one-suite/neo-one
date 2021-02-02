@@ -31,7 +31,7 @@ describe('Array.prototype.join', () => {
   });
 
   test('cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x: ReadonlyArray<number> = [0, 1, 2];
       const y = x.join;

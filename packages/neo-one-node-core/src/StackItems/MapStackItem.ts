@@ -1,6 +1,8 @@
+import { StackItemType } from '@neo-one/client-common';
+import { ContractParameter, MapContractParameter } from '../contractParameter';
+import { CircularReferenceError } from './errors';
 import { StackItemBase } from './StackItemBase';
 import { PrimitiveStackItem, StackItem } from './StackItems';
-import { StackItemType } from './StackItemType';
 
 export class MapStackItem extends StackItemBase {
   public static readonly maxKeySize = 64;
@@ -34,5 +36,20 @@ export class MapStackItem extends StackItemBase {
 
   public getBoolean() {
     return true;
+  }
+
+  public toContractParameter(seen: Set<StackItemBase> = new Set()): ContractParameter {
+    if (seen.has(this)) {
+      throw new CircularReferenceError();
+    }
+    const newSeen = new Set([...seen]);
+    newSeen.add(this);
+
+    return new MapContractParameter(
+      [...this.dictionary.keys()].map<readonly [ContractParameter, ContractParameter]>((key) => [
+        key.toContractParameter(newSeen),
+        (this.dictionary.get(key) as StackItem).toContractParameter(newSeen),
+      ]),
+    );
   }
 }

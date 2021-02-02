@@ -37,7 +37,9 @@ export class SetAdd extends BuiltinInstanceMemberCall {
     sb.emitHelper(node, options, sb.helpers.unwrapMap);
     // [valVal, map]
     sb.visit(tsUtils.argumented.getArguments(node)[0], options);
-    // [value, keyVal, map]
+    // [key, map]
+    sb.emitSysCall(node, 'System.Binary.Serialize');
+    // [value, key, map]
     sb.emitPushBoolean(node, true);
     // []
     sb.emitOp(node, 'SETITEM');

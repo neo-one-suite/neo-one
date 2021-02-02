@@ -3,16 +3,15 @@ import { DiagnosticCode } from '../../DiagnosticCode';
 
 const properties = `
 public readonly properties = {
-  codeVersion: '1.0',
-  author: 'dicarlo2',
-  email: 'alex.dicarlo@neotracker.io',
-  description: 'The TestSmartContract',
+  trusts: '*',
+  permissions: [],
+  groups: [],
 };
 `;
 
 describe('ABISmartContractProcessor', () => {
-  test('no duplicate events', () => {
-    helpers.compileString(
+  test('no duplicate events', async () => {
+    await helpers.compileString(
       `
       import { SmartContract, createEventNotifier } from '@neo-one/smart-contract';
 
@@ -30,8 +29,8 @@ describe('ABISmartContractProcessor', () => {
     );
   });
 
-  test('invalid method parameter', () => {
-    helpers.compileString(
+  test('invalid method parameter', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -49,8 +48,8 @@ describe('ABISmartContractProcessor', () => {
     );
   });
 
-  test('invalid method return', () => {
-    helpers.compileString(
+  test('invalid method return', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -68,8 +67,8 @@ describe('ABISmartContractProcessor', () => {
     );
   });
 
-  test('invalid method return - union', () => {
-    helpers.compileString(
+  test('invalid method return - union', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -90,8 +89,8 @@ describe('ABISmartContractProcessor', () => {
     );
   });
 
-  test('invalid getter', () => {
-    helpers.compileString(
+  test('invalid getter', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -109,8 +108,8 @@ describe('ABISmartContractProcessor', () => {
     );
   });
 
-  test('invalid setter', () => {
-    helpers.compileString(
+  test('invalid setter', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -132,8 +131,8 @@ describe('ABISmartContractProcessor', () => {
     );
   });
 
-  test('invalid getter + setter', () => {
-    helpers.compileString(
+  test('invalid getter + setter', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 

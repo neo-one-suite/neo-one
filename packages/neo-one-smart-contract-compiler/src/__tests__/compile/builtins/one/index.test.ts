@@ -3,7 +3,7 @@ import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('one', () => {
   test('cannot be referenced - one0', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = one0;
     `,
@@ -12,7 +12,7 @@ describe('one', () => {
   });
 
   test('cannot be referenced - one1', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = one1;
     `,
@@ -21,7 +21,7 @@ describe('one', () => {
   });
 
   test('cannot be referenced in property - one0', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = { [one0]: 'hello' };
     `,
@@ -30,7 +30,7 @@ describe('one', () => {
   });
 
   test('cannot be referenced in property - one1', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = { [one1]: 'hello' };
     `,
@@ -39,7 +39,7 @@ describe('one', () => {
   });
 
   test('cannot be referenced in property access - one0', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const error = new Error();
       const x = error[one0];
@@ -49,7 +49,7 @@ describe('one', () => {
   });
 
   test('cannot be referenced in property access - one1', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const error = new Error();
       const x = error[one1];

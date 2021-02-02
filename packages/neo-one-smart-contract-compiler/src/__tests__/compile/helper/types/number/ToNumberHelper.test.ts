@@ -48,7 +48,7 @@ describe('ToNumberHelper', () => {
   });
 
   test('null', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const value: null = null;
 
@@ -167,7 +167,7 @@ describe('ToNumberHelper', () => {
   });
 
   test('symbol', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       +Symbol.for('a');
     `,
@@ -176,7 +176,7 @@ describe('ToNumberHelper', () => {
   });
 
   test('undefined', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const value: undefined = undefined;
 
@@ -233,7 +233,7 @@ describe('ToNumberHelper', () => {
   });
 
   test('null or number', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const value: null | number = null as null | number;
 

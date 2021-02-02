@@ -1,3 +1,4 @@
+import { StackItemType } from '@neo-one/client-common';
 import ts from 'typescript';
 import { Types, WrappableType } from '../../constants';
 import { ScriptBuilder } from '../../sb';
@@ -58,7 +59,20 @@ export class EqualsEqualsEqualsHelper extends Helper {
       sb.emitHelper(node, innerOptions, sb.helpers.unwrapVal({ type }));
       sb.emitOp(node, 'SWAP');
       sb.emitHelper(node, innerOptions, sb.helpers.unwrapVal({ type }));
-      sb.emitOp(node, 'EQUAL');
+      if (type === Types.Boolean) {
+        sb.emitOp(node, 'NUMEQUAL');
+      } else if (type === Types.String) {
+        // [bytestring, buffer]
+        sb.emitOp(node, 'CONVERT', Buffer.from([StackItemType.ByteString]));
+        // [buffer, bytestring]
+        sb.emitOp(node, 'SWAP');
+        // [bytestring, bytestring]
+        sb.emitOp(node, 'CONVERT', Buffer.from([StackItemType.ByteString]));
+        // [boolean]
+        sb.emitOp(node, 'EQUAL');
+      } else {
+        sb.emitOp(node, 'EQUAL');
+      }
     };
 
     const compareStorageValue = () => {
@@ -72,8 +86,10 @@ export class EqualsEqualsEqualsHelper extends Helper {
 
     const compareNumber = (innerOptions: VisitOptions) => {
       sb.emitHelper(node, innerOptions, sb.helpers.unwrapNumber);
+      sb.emitOp(node, 'CONVERT', Buffer.from([StackItemType.Integer]));
       sb.emitOp(node, 'SWAP');
       sb.emitHelper(node, innerOptions, sb.helpers.unwrapNumber);
+      sb.emitOp(node, 'CONVERT', Buffer.from([StackItemType.Integer]));
       sb.emitOp(node, 'NUMEQUAL');
     };
 
@@ -109,13 +125,8 @@ export class EqualsEqualsEqualsHelper extends Helper {
           iterable: pushFalse,
           iterableIterator: pushFalse,
           transaction: pushFalse,
-          output: pushFalse,
           attribute: pushFalse,
-          input: pushFalse,
-          account: pushFalse,
-          asset: pushFalse,
           contract: pushFalse,
-          header: pushFalse,
           block: pushFalse,
           [value]: compareValue,
         }),
@@ -150,13 +161,8 @@ export class EqualsEqualsEqualsHelper extends Helper {
           iterable: pushFalse,
           iterableIterator: pushFalse,
           transaction: pushFalse,
-          output: pushFalse,
           attribute: pushFalse,
-          input: pushFalse,
-          account: pushFalse,
-          asset: pushFalse,
           contract: pushFalse,
-          header: pushFalse,
           block: pushFalse,
           [value]: compareStorageValue,
         }),
@@ -191,13 +197,8 @@ export class EqualsEqualsEqualsHelper extends Helper {
           iterable: pushFalse,
           iterableIterator: pushFalse,
           transaction: pushFalse,
-          output: pushFalse,
           attribute: pushFalse,
-          input: pushFalse,
-          account: pushFalse,
-          asset: pushFalse,
           contract: pushFalse,
-          header: pushFalse,
           block: pushFalse,
           [value]: pushTrue,
         }),
@@ -234,13 +235,8 @@ export class EqualsEqualsEqualsHelper extends Helper {
         iterable: createProcessIterable(),
         iterableIterator: createProcess('iterableIterator', Types.IterableIterator),
         transaction: createProcess('transaction', Types.Transaction),
-        output: createProcess('output', Types.Output),
         attribute: createProcess('attribute', Types.Attribute),
-        input: createProcess('input', Types.Input),
-        account: createProcess('account', Types.Account),
-        asset: createProcess('asset', Types.Asset),
         contract: createProcess('contract', Types.Contract),
-        header: createProcess('header', Types.Header),
         block: createProcess('block', Types.Block),
       }),
     );

@@ -1,6 +1,6 @@
-import { ABIFunction } from '@neo-one/client-common';
+import { ContractMethodDescriptorClient } from '@neo-one/client-common';
 
-export const hasForward = ({ parameters }: ABIFunction) =>
+export const hasForward = ({ parameters }: ContractMethodDescriptorClient) =>
   parameters !== undefined &&
   parameters.length > 0 &&
   parameters[parameters.length - 1].rest &&

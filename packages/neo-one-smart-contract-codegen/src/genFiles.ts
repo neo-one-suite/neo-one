@@ -1,7 +1,7 @@
-import { ABI, SmartContractNetworksDefinition } from '@neo-one/client-common';
-import { genABI } from './abi';
+import { ContractManifestClient, SmartContractNetworksDefinition } from '@neo-one/client-common';
 import { genContract } from './contract';
 import { formatFile } from './formatFile';
+import { genManifest } from './manifest';
 import { FileResult } from './type';
 import { genSmartContractTypes } from './types';
 
@@ -17,8 +17,8 @@ export const genFiles = ({
   sourceMapsPath,
   createContractPath,
   typesPath,
-  abiPath,
-  abi,
+  manifestPath,
+  manifest,
   browserify,
 }: {
   readonly name: string;
@@ -26,27 +26,27 @@ export const genFiles = ({
   readonly sourceMapsPath: string;
   readonly createContractPath: string;
   readonly typesPath: string;
-  readonly abiPath: string;
+  readonly manifestPath: string;
   readonly contractPath: string;
-  readonly abi: ABI;
+  readonly manifest: ContractManifestClient;
   readonly browserify: boolean;
 }) => {
-  const abiFile = formatFile(genABI(name, abi), browserify);
+  const manifestFile = formatFile(genManifest(name, manifest), browserify);
   const contractFile = formatFile(
     genContract({
       name,
       createContractPath,
       sourceMapsPath,
       typesPath,
-      abiPath,
+      manifestPath,
       networksDefinition,
     }),
     browserify,
   );
-  const typesFile = formatFile(genSmartContractTypes(name, abi), browserify);
+  const typesFile = formatFile(genSmartContractTypes(name, manifest), browserify);
 
   return {
-    abi: abiFile,
+    manifest: manifestFile,
     contract: contractFile,
     types: typesFile,
   };

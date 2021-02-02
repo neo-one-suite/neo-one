@@ -1,3 +1,4 @@
+import { StackItemType } from '@neo-one/client-common';
 import ts from 'typescript';
 import { Types } from '../../../constants';
 import { ScriptBuilder } from '../../../sb';
@@ -120,12 +121,16 @@ export class ToNumberHelper extends TypedHelper {
                   sb.emitOp(node, 'DEC');
                   // [nextRemain, remain]
                   sb.emitOp(node, 'LEFT');
+                  // [nextRemain, remain]
+                  sb.emitOp(node, 'CONVERT', Buffer.from([StackItemType.ByteString]));
                   // [remain]
                   sb.scope.set(sb, node, innerOptions, remain);
                   // [1, remain]
                   sb.emitPushInt(node, 1);
                   // [char]
                   sb.emitOp(node, 'RIGHT');
+                  // [char]
+                  sb.emitOp(node, 'CONVERT', Buffer.from([StackItemType.ByteString]));
                   // [0x30, char]
                   sb.emitPushInt(node, 0x30);
                   // [char - 0x30]
@@ -242,13 +247,8 @@ export class ToNumberHelper extends TypedHelper {
           iterable: throwTypeError,
           iterableIterator: throwTypeError,
           transaction: throwTypeError,
-          output: throwTypeError,
           attribute: throwTypeError,
-          input: throwTypeError,
-          account: throwTypeError,
-          asset: throwTypeError,
           contract: throwTypeError,
-          header: throwTypeError,
           block: throwTypeError,
         }),
       );

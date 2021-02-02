@@ -26,11 +26,11 @@ export class RawIteratorEveryHelper extends Helper {
           // [iterator, iterator]
           sb.emitOp(node, 'DUP');
           // [value, iterator]
-          sb.emitSysCall(node, 'Neo.Enumerator.Value');
+          sb.emitSysCall(node, 'System.Enumerator.Value');
           // [iterator, value]
           sb.emitOp(node, 'SWAP');
           // [key, value]
-          sb.emitSysCall(node, 'Neo.Iterator.Key');
+          sb.emitSysCall(node, 'System.Iterator.Key');
           // [result]
           this.each(innerOptions);
         },

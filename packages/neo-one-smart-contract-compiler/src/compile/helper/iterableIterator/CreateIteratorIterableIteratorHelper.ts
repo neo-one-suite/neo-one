@@ -4,6 +4,7 @@ import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 export interface CreateIteratorIterableIteratorHelperOptions {
+  readonly deserializeKey?: boolean;
   readonly mapKey?: (options: VisitOptions) => void;
   readonly mapValue?: (options: VisitOptions) => void;
 }
@@ -15,11 +16,13 @@ const doNothing = () => {
 // Input: [iterator]
 // Output: [val]
 export class CreateIteratorIterableIteratorHelper extends Helper {
+  private readonly deserializeKey: boolean;
   private readonly mapKey: (options: VisitOptions) => void;
   private readonly mapValue: (options: VisitOptions) => void;
 
   public constructor(options: CreateIteratorIterableIteratorHelperOptions) {
     super();
+    this.deserializeKey = options.deserializeKey ?? false;
     this.mapKey = options.mapKey === undefined ? doNothing : options.mapKey;
     this.mapValue = options.mapValue === undefined ? doNothing : options.mapValue;
   }
@@ -33,13 +36,17 @@ export class CreateIteratorIterableIteratorHelper extends Helper {
           // [iterator, iterator]
           sb.emitOp(node, 'DUP');
           // [value, iterator]
-          sb.emitSysCall(node, 'Neo.Enumerator.Value');
+          sb.emitSysCall(node, 'System.Enumerator.Value');
           // [valueVal, iterator]
           this.mapValue(innerOptions);
           // [iterator, valueVal]
           sb.emitOp(node, 'SWAP');
           // [key, valueVal]
-          sb.emitSysCall(node, 'Neo.Iterator.Key');
+          sb.emitSysCall(node, 'System.Iterator.Key');
+          if (this.deserializeKey) {
+            // [key, valueVal]
+            sb.emitSysCall(node, 'System.Binary.Deserialize');
+          }
           // [keyVal, valueVal]
           this.mapKey(innerOptions);
           // [number, keyVal, valueVal]

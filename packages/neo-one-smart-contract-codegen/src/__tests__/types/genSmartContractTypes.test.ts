@@ -3,6 +3,6 @@ import { genSmartContractTypes } from '../../types';
 
 describe('genSmartContractTypes', () => {
   test('NEP17', () => {
-    expect(genSmartContractTypes('Token', nep17.abi(4))).toMatchSnapshot();
+    expect(genSmartContractTypes('Token', nep17.manifest(4))).toMatchSnapshot();
   });
 });

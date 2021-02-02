@@ -37,6 +37,8 @@ export class MapSet extends BuiltinInstanceMemberCall {
     sb.emitHelper(node, options, sb.helpers.unwrapMap);
     // [keyVal, map]
     sb.visit(tsUtils.argumented.getArguments(node)[0], options);
+    // [key, map]
+    sb.emitSysCall(node, 'System.Binary.Serialize');
     // [valVal, keyVal, map]
     sb.visit(tsUtils.argumented.getArguments(node)[1], options);
     // []

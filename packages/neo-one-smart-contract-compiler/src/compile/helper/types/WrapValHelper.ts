@@ -41,9 +41,6 @@ export class WrapValHelper extends Helper {
       case Types.ForwardValue:
         sb.emitHelper(node, options, sb.helpers.wrapForwardValue);
         break;
-      case Types.Input:
-        sb.emitHelper(node, options, sb.helpers.wrapInput);
-        break;
       case Types.IteratorResult:
         sb.emitHelper(node, options, sb.helpers.wrapIteratorResult);
         break;
@@ -62,9 +59,6 @@ export class WrapValHelper extends Helper {
       case Types.Object:
         sb.emitHelper(node, options, sb.helpers.wrapObject);
         break;
-      case Types.Output:
-        sb.emitHelper(node, options, sb.helpers.wrapOutput);
-        break;
       case Types.Set:
         sb.emitHelper(node, options, sb.helpers.wrapSet);
         break;
@@ -80,17 +74,8 @@ export class WrapValHelper extends Helper {
       case Types.Symbol:
         sb.emitHelper(node, options, sb.helpers.wrapSymbol);
         break;
-      case Types.Account:
-        sb.emitHelper(node, options, sb.helpers.wrapAccount);
-        break;
-      case Types.Asset:
-        sb.emitHelper(node, options, sb.helpers.wrapAsset);
-        break;
       case Types.Contract:
         sb.emitHelper(node, options, sb.helpers.wrapContract);
-        break;
-      case Types.Header:
-        sb.emitHelper(node, options, sb.helpers.wrapHeader);
         break;
       case Types.Block:
         sb.emitHelper(node, options, sb.helpers.wrapBlock);

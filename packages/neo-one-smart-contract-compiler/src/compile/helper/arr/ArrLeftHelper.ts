@@ -19,7 +19,7 @@ export class ArrLeftHelper extends Helper {
     // [arr, start, arr]
     sb.emitOp(node, 'OVER');
     // [size, start, arr]
-    sb.emitOp(node, 'ARRAYSIZE');
+    sb.emitOp(node, 'SIZE');
     // [0, size, start, arr]
     sb.emitPushInt(node, 0);
     // [outputArr, size, start, arr]

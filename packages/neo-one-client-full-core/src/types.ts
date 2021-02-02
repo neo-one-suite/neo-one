@@ -24,7 +24,7 @@ import {
 export interface ContractRegister {
   readonly script: BufferString;
   readonly manifest: ContractManifestClient;
-  readonly id: number;
+  readonly name: string;
 }
 
 export interface PublishReceipt extends TransactionReceipt {

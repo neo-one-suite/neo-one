@@ -18,16 +18,12 @@ export enum Types {
   MapStorage = 17,
   SetStorage = 18,
   Transaction = 19,
-  Output = 20,
-  Attribute = 21,
-  Input = 22,
-  Account = 23,
-  Asset = 24,
-  Contract = 25,
-  Header = 26,
-  Block = 27,
+  Attribute = 20,
+  Contract = 21,
+  Block = 22,
+  Notification = 23,
   // Fake type, never appears
-  Iterable = 28,
+  Iterable = 24,
 }
 
 export type WrappableType =
@@ -48,14 +44,10 @@ export type WrappableType =
   | Types.MapStorage
   | Types.SetStorage
   | Types.Transaction
-  | Types.Output
   | Types.Attribute
-  | Types.Input
-  | Types.Account
-  | Types.Asset
   | Types.Contract
-  | Types.Header
-  | Types.Block;
+  | Types.Block
+  | Types.Notification;
 
 export type IterableTypes =
   | Types.Array

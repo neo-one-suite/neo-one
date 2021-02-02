@@ -15,7 +15,7 @@ describe('Address.from', () => {
   });
 
   test('Reports error on invalid address', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { Address } from '@neo-one/smart-contract';
       const keys = Address.from('abc');
@@ -25,7 +25,7 @@ describe('Address.from', () => {
   });
 
   test('cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { Address } from '@neo-one/smart-contract';
       const keys = Address.from;
@@ -35,7 +35,7 @@ describe('Address.from', () => {
   });
 
   test('cannot be referenced - object literal', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { Address } from '@neo-one/smart-contract';
       const { from } = Address;
@@ -45,7 +45,7 @@ describe('Address.from', () => {
   });
 
   test('cannot be element referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { Address } from '@neo-one/smart-contract';
       const keys = Address['from'];

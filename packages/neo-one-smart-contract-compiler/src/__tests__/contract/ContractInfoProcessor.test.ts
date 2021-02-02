@@ -3,10 +3,9 @@ import { DiagnosticCode } from '../../DiagnosticCode';
 
 const properties = `
 public readonly properties = {
-  codeVersion: '1.0',
-  author: 'dicarlo2',
-  email: 'alex.dicarlo@neotracker.io',
-  description: 'The TestSmartContract',
+  trusts: '*',
+  permissions: [],
+  groups: [],
 };
 `;
 
@@ -22,8 +21,8 @@ describe('ContractInfoProcessor', () => {
     `);
   });
 
-  test('no symbol properties', () => {
-    helpers.compileString(
+  test('no symbol properties', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -36,8 +35,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('no computed properties', () => {
-    helpers.compileString(
+  test('no computed properties', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -50,8 +49,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('no computed methods', () => {
-    helpers.compileString(
+  test('no computed methods', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -66,8 +65,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('no static properties', () => {
-    helpers.compileString(
+  test('no static properties', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -80,8 +79,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('no static methods', () => {
-    helpers.compileString(
+  test('no static methods', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -96,8 +95,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('no method decorators', () => {
-    helpers.compileString(
+  test('no method decorators', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -118,8 +117,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('no method parameter decorators', () => {
-    helpers.compileString(
+  test('no method parameter decorators', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -139,8 +138,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('no get accessor method decorators', () => {
-    helpers.compileString(
+  test('no get accessor method decorators', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -166,8 +165,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('no set accessor method decorators', () => {
-    helpers.compileString(
+  test('no set accessor method decorators', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -193,8 +192,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('no set accessor parameter decorators', () => {
-    helpers.compileString(
+  test('no set accessor parameter decorators', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -219,8 +218,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('no deploy method', () => {
-    helpers.compileString(
+  test('no deploy method', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -236,8 +235,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('multiple smart contracts', () => {
-    helpers.compileString(
+  test('multiple smart contracts', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -253,8 +252,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('abstract smart contracts', () => {
-    helpers.compileString(
+  test('abstract smart contracts', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -266,8 +265,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('new SmartContract()', () => {
-    helpers.compileString(
+  test('new SmartContract()', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -281,8 +280,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('@receive with @constant', () => {
-    helpers.compileString(
+  test('@receive with @constant', async () => {
+    await helpers.compileString(
       `
       import { SmartContract, receive, constant } from '@neo-one/smart-contract';
 
@@ -300,46 +299,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('@sendUnsafe with @constant', () => {
-    helpers.compileString(
-      `
-      import { SmartContract, sendUnsafe, constant } from '@neo-one/smart-contract';
-
-      export class TestSmartContract extends SmartContract {
-        ${properties}
-
-        @sendUnsafe
-        @constant
-        public verify(): boolean {
-          return true;
-        }
-      }
-    `,
-      { type: 'error', code: DiagnosticCode.InvalidContractMethod },
-    );
-  });
-
-  test('@claim with @constant', () => {
-    helpers.compileString(
-      `
-      import { SmartContract, claim, constant } from '@neo-one/smart-contract';
-
-      export class TestSmartContract extends SmartContract {
-        ${properties}
-
-        @claim
-        @constant
-        public verify(): boolean {
-          return true;
-        }
-      }
-    `,
-      { type: 'error', code: DiagnosticCode.InvalidContractMethod },
-    );
-  });
-
-  test('structured storage set in constructor', () => {
-    helpers.compileString(
+  test('structured storage set in constructor', async () => {
+    await helpers.compileString(
       `
       import { SmartContract, MapStorage } from '@neo-one/smart-contract';
 
@@ -356,8 +317,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('structured storage set public', () => {
-    helpers.compileString(
+  test('structured storage set public', async () => {
+    await helpers.compileString(
       `
       import { SmartContract, MapStorage } from '@neo-one/smart-contract';
 
@@ -370,8 +331,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('structured storage private modifiable', () => {
-    helpers.compileString(
+  test('structured storage private modifiable', async () => {
+    await helpers.compileString(
       `
       import { SmartContract, MapStorage } from '@neo-one/smart-contract';
 
@@ -384,8 +345,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('structured storage protected abstract', () => {
-    helpers.compileString(
+  test('structured storage protected abstract', async () => {
+    await helpers.compileString(
       `
       import { SmartContract, MapStorage } from '@neo-one/smart-contract';
 
@@ -398,8 +359,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('invalid storage type', () => {
-    helpers.compileString(
+  test('invalid storage type', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -414,8 +375,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('invalid storage structured array type', () => {
-    helpers.compileString(
+  test('invalid storage structured array type', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -430,8 +391,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('invalid storage structured map type', () => {
-    helpers.compileString(
+  test('invalid storage structured map type', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -446,8 +407,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('invalid storage structured set type', () => {
-    helpers.compileString(
+  test('invalid storage structured set type', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -462,8 +423,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('invalid property function not readonly', () => {
-    helpers.compileString(
+  test('invalid property function not readonly', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -478,8 +439,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('invalid property function set in constructor', () => {
-    helpers.compileString(
+  test('invalid property function set in constructor', async () => {
+    await helpers.compileString(
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
@@ -499,26 +460,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('invalid @sendUnsafe method with ForwardValue', () => {
-    helpers.compileString(
-      `
-      import { SmartContract, ForwardValue, sendUnsafe } from '@neo-one/smart-contract';
-
-      export class TestSmartContract extends SmartContract {
-        ${properties}
-
-        @sendUnsafe
-        public foo(value: ForwardValue): boolean {
-          return true;
-        }
-      }
-    `,
-      { type: 'error', code: DiagnosticCode.InvalidContractType },
-    );
-  });
-
-  test('invalid @receive method with ForwardValue', () => {
-    helpers.compileString(
+  test('invalid @receive method with ForwardValue', async () => {
+    await helpers.compileString(
       `
       import { SmartContract, ForwardValue, receive } from '@neo-one/smart-contract';
 
@@ -535,43 +478,8 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('invalid @claim method with ForwardValue', () => {
-    helpers.compileString(
-      `
-      import { SmartContract, ForwardValue, claim } from '@neo-one/smart-contract';
-
-      export class TestSmartContract extends SmartContract {
-        ${properties}
-
-        @claim
-        public foo(value: ForwardValue): void {
-        }
-      }
-    `,
-      { type: 'error', code: DiagnosticCode.InvalidContractType },
-    );
-  });
-
-  test('invalid @sendUnsafe method with ForwardedValue', () => {
-    helpers.compileString(
-      `
-      import { SmartContract, ForwardedValue, sendUnsafe } from '@neo-one/smart-contract';
-
-      export class TestSmartContract extends SmartContract {
-        ${properties}
-
-        @sendUnsafe
-        public foo(value: ForwardedValue<number>): boolean {
-          return true;
-        }
-      }
-    `,
-      { type: 'error', code: DiagnosticCode.InvalidContractType },
-    );
-  });
-
-  test('invalid @receive method with ForwardedValue', () => {
-    helpers.compileString(
+  test('invalid @receive method with ForwardedValue', async () => {
+    await helpers.compileString(
       `
       import { SmartContract, ForwardedValue, receive } from '@neo-one/smart-contract';
 
@@ -581,23 +489,6 @@ describe('ContractInfoProcessor', () => {
         @receive
         public foo(value: ForwardedValue<number>): boolean {
           return true;
-        }
-      }
-    `,
-      { type: 'error', code: DiagnosticCode.InvalidContractType },
-    );
-  });
-
-  test('invalid @claim method with ForwardedValue', () => {
-    helpers.compileString(
-      `
-      import { SmartContract, ForwardedValue, claim } from '@neo-one/smart-contract';
-
-      export class TestSmartContract extends SmartContract {
-        ${properties}
-
-        @claim
-        public foo(value: ForwardedValue<number>): void {
         }
       }
     `,

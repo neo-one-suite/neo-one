@@ -10,8 +10,5 @@ export const isOnlyAttribute = (context: Context, node: ts.Node, type: ts.Type):
 
 export const isAttribute = (context: Context, node: ts.Node, type: ts.Type): boolean =>
   context.builtins.isInterface(node, type, 'AttributeBase') ||
-  context.builtins.isInterface(node, type, 'BufferAttribute') ||
-  context.builtins.isInterface(node, type, 'PublicKeyAttribute') ||
-  context.builtins.isInterface(node, type, 'AddressAttribute') ||
-  context.builtins.isInterface(node, type, 'Hash256Attribute') ||
+  context.builtins.isInterface(node, type, 'HighPriorityAttribute') ||
   context.builtins.isType(node, type, 'Attribute');

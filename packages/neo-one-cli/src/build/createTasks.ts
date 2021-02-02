@@ -11,7 +11,7 @@ import { findContracts } from './findContracts';
 import { generateCode } from './generateCode';
 import { generateCommonCode } from './generateCommonCode';
 import { setupWallets } from './setupWallets';
-import { startNeotracker } from './startNeotracker';
+// import { startNeotracker } from './startNeotracker';
 import { startNetwork } from './startNetwork';
 
 export const createTasks = (cmd: Command, config: Configuration, reset: boolean) =>
@@ -45,7 +45,7 @@ export const createTasks = (cmd: Command, config: Configuration, reset: boolean)
           (ctx.foundContracts as Contracts).map((contract) => ({
             title: `Deploy ${contract.name}`,
             task: async (innerCtx) => {
-              const { linked, sourceMaps, abi, address, sourceMap } = await deployContract(
+              const { linked, sourceMaps, manifest, address, sourceMap } = await deployContract(
                 config,
                 contract.filePath,
                 contract.name,
@@ -67,7 +67,7 @@ export const createTasks = (cmd: Command, config: Configuration, reset: boolean)
                 config,
                 contract.filePath,
                 contract.name,
-                abi,
+                manifest,
                 _.merge(
                   {},
                   {
@@ -96,10 +96,11 @@ export const createTasks = (cmd: Command, config: Configuration, reset: boolean)
         await generateCommonCode(config, ctx.contracts, networks, ctx.sourceMaps);
       },
     },
-    {
-      title: 'Start NEO Tracker instance',
-      task: async (_ctx, task) => {
-        config.neotracker.skip ? task.skip('NEO Tracker instance skipped.') : await startNeotracker(cmd, config, reset);
-      },
-    },
+    // TODO: add this back
+    // {
+    //   title: 'Start NEO Tracker instance',
+    //   task: async (_ctx, task) => {
+    //     config.neotracker.skip ? task.skip('NEO Tracker instance skipped.') : await startNeotracker(cmd, config, reset);
+    //   },
+    // },
   ]);

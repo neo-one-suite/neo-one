@@ -108,9 +108,9 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test('(128 ^ 5) === 388 [CaretToken]', async () => {
+  test('(128 ^ 5) === 133 [CaretToken]', async () => {
     await helpers.executeString(`
-      if ((128 ^ 5) !== 388) {
+      if ((128 ^ 5) !== 133) {
         throw 'Failure';
       }
     `);

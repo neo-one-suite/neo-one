@@ -21,7 +21,7 @@ export class ContinueHelper extends Helper {
         pc = options.finallyPC;
         sb.emitPushInt(node, constants.FINALLY_COMPLETION);
       }
-      sb.emitJmp(node, 'JMP', pc);
+      sb.emitJmp(node, 'JMP_L', pc);
     }
   }
 }

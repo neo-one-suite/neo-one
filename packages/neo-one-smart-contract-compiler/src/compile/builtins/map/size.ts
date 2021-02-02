@@ -9,7 +9,7 @@ export class MapSize extends BuiltinInstanceMemberValue {
     // [map]
     sb.emitHelper(node, options, sb.helpers.unwrapMap);
     // [number]
-    sb.emitOp(node, 'ARRAYSIZE');
+    sb.emitOp(node, 'SIZE');
     // [val]
     sb.emitHelper(node, options, sb.helpers.wrapNumber);
   }

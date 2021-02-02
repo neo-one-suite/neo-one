@@ -14,7 +14,7 @@ describe('Symbol.toPrimitive', () => {
   });
 
   test('cannot be set', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       Symbol.toPrimitive = Symbol.for('foo');
     `,

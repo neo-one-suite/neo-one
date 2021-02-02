@@ -19,13 +19,14 @@ describe('Contract', () => {
       }
 
       assertEqual(contract instanceof Contract, true);
-      assertEqual(contract.script, ${helpers.getBufferHash(contract.script)});
+      assertEqual(contract.script, ${helpers.getBufferHash(contract.contract.script, 'base64')});
+      assertEqual(typeof contract.manifest, "string");
       assertEqual(contract.payable, true);
     `);
   });
 
   test('cannot be implemented', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { Contract } from '@neo-one/smart-contract';
 
@@ -36,8 +37,8 @@ describe('Contract', () => {
     );
   });
 
-  test('invalid reference', () => {
-    helpers.compileString(
+  test('invalid reference', async () => {
+    await helpers.compileString(
       `
       import { Contract } from '@neo-one/smart-contract';
 
@@ -47,8 +48,8 @@ describe('Contract', () => {
     );
   });
 
-  test('invalid "reference"', () => {
-    helpers.compileString(
+  test('invalid "reference"', async () => {
+    await helpers.compileString(
       `
       import { Contract } from '@neo-one/smart-contract';
 
@@ -58,8 +59,8 @@ describe('Contract', () => {
     );
   });
 
-  test('invalid reference - object', () => {
-    helpers.compileString(
+  test('invalid reference - object', async () => {
+    await helpers.compileString(
       `
       import { Contract } from '@neo-one/smart-contract';
 

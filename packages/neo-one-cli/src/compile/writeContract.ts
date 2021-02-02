@@ -6,7 +6,7 @@ import JSZip from 'jszip';
 import _ from 'lodash';
 import path from 'path';
 import { SourceMapConsumer } from 'source-map';
-import { convertABI, getDispatcherMethodDefinition, getJmpMethodDefinition } from './interop';
+import { convertABI, getDispatcherMethodDefinition, getJmpMethodDefinition, NEOONEContractMetadata } from './interop';
 
 export interface CompileWriteOptions {
   readonly json: boolean;
@@ -18,7 +18,7 @@ export interface CompileWriteOptions {
 const getJumpLength = (value: string): number => {
   const [, unknownOp] = value.split(':');
   const [op, arg] = unknownOp.split(' ');
-  if (op !== 'JMP') {
+  if (op !== 'JMP' && op !== 'JMP_L') {
     throw new Error(`${unknownOp} is not a JMP call`);
   }
 
@@ -34,14 +34,31 @@ export const writeContract = async (
   await fs.ensureDir(outDir);
   const outputPath = path.resolve(outDir, `${contractIn.contract.name}.contract.json`);
 
-  const { sourceMap: sourceMapPromise, debugInfo, contract, abi } = contractIn;
+  const { sourceMap: sourceMapPromise, debugInfo, contract } = contractIn;
+
+  const manifest = contract.manifest;
+
+  // TODO: get this from compiler? Or change properties expected
+  const metadata: NEOONEContractMetadata = {
+    name: contract.name,
+    description: 'A NEO•ONE Smart Contract',
+    codeVersion: '1.0',
+    author: 'NEO•ONE',
+    email: 'contact@neo-one.io',
+    storage: true,
+    dynamicInvoke: true,
+    payable: true,
+  };
 
   const sourceMap = await sourceMapPromise;
 
   if (jsonFlag) {
     const contractJSON = JSON.stringify(contract, undefined, 2);
     await Promise.all([
-      fs.writeFile(outputPath.replace('.contract.json', '.neoone.abi.json'), JSON.stringify(abi, undefined, 2)),
+      fs.writeFile(
+        outputPath.replace('.contract.json', '.neoone.manifest.json'),
+        JSON.stringify(manifest, undefined, 2),
+      ),
       fs.writeFile(outputPath, contractJSON),
     ]);
   }
@@ -52,7 +69,7 @@ export const writeContract = async (
       fs.writeFile(outputPath.replace('.contract.json', '.avm'), byteCode),
       fs.writeFile(
         outputPath.replace('.contract.json', '.abi.json'),
-        JSON.stringify(convertABI(abi, contract, byteCode), undefined, 2),
+        JSON.stringify(convertABI(manifest.abi, metadata, byteCode), undefined, 2),
       ),
     ]);
   }
@@ -63,7 +80,7 @@ export const writeContract = async (
     }
 
     const disassembled = disassembleByteCode(byteCode);
-    const jmpAddress = getJumpLength(disassembled[0].value);
+    const jmpAddress = getJumpLength(disassembled[3].value); // TODO: abstract this index from compiler package. FIRST_JMP_IDX = 3;
     const endAddress = disassembled[disassembled.length - 1].pc;
 
     const jmpMethod = getJmpMethodDefinition(contract.name);
@@ -75,7 +92,7 @@ export const writeContract = async (
           source: filePath,
           line,
           column: undefined,
-          // tslint:disable-next-line: no-any column doesn't have to be defined
+          // tslint:disable-next-line: no-any
         } as any)
         .map(({ line: lineOut }) => {
           if (lineOut !== null) {
@@ -130,13 +147,11 @@ export const writeContract = async (
       entrypoint: '0',
       documents: debugInfo.documents,
       methods: [jmpMethod, dispatcherMethod, ...methods],
-      events: abi.events
-        ? abi.events.map((event, index) => ({
-            id: `${lastID + index}`,
-            name: `${contract.name}-${event.name}`,
-            params: event.parameters.map((param) => `${param.name},${param.type}`),
-          }))
-        : [],
+      events: manifest.abi.events.map((event, index) => ({
+        id: `${lastID + index}`,
+        name: `${contract.name}-${event.name}`,
+        params: event.parameters.map((param) => `${param.name},${param.type}`),
+      })),
     };
 
     if (avmFlag) {

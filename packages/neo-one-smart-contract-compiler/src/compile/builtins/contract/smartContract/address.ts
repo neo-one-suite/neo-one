@@ -48,7 +48,7 @@ export class SmartContractAddress implements BuiltinInstanceMemberValue {
 
     if (options.pushValue) {
       // [value]
-      sb.emitSysCall(node, 'System.ExecutionEngine.GetExecutingScriptHash');
+      sb.emitSysCall(node, 'System.Runtime.GetExecutingScriptHash');
       // [val]
       sb.emitHelper(node, options, sb.helpers.wrapBuffer);
     }

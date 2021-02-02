@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import { JSONHelper } from '../JSONHelper';
 import { common, ECPoint, UInt160 } from '../common';
 import { crypto } from '../crypto';
 import { scriptHashToAddress } from '../helpers';
+import { JSONHelper } from '../JSONHelper';
 import { utils } from '../utils';
 import {
   ContractParameterTypeModel,

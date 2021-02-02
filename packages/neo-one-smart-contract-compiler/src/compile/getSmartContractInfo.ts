@@ -1,5 +1,11 @@
-import { ABI, ContractParameterType } from '@neo-one/client-common';
-import { ContractRegister } from '@neo-one/client-full-core';
+import {
+  ContractEventDescriptorClient,
+  ContractGroup,
+  ContractMethodDescriptorClient,
+  ContractPermission,
+  UInt160Hex,
+  WildcardContainer,
+} from '@neo-one/client-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import { OmitStrict, utils } from '@neo-one/utils';
 import ts from 'typescript';
@@ -8,12 +14,12 @@ import { Context } from '../Context';
 import {
   ContractInfo,
   DebugInfo,
-  getABI,
   getAllPropInfos,
   getContractInfo,
   getContractProperties,
   getDebugInfo,
 } from '../contract';
+import { getManifest } from '../contract/getManifest';
 import { DiagnosticCode } from '../DiagnosticCode';
 import { DiagnosticMessage } from '../DiagnosticMessage';
 import {
@@ -23,9 +29,6 @@ import {
   BuiltinInstanceMemberStorageProperty,
   BuiltinInstanceMemberStructuredStorageProperty,
 } from './builtins';
-
-const PARAMETERS: ReadonlyArray<ContractParameterType> = ['String', 'Array'];
-const RETURN_TYPE: ContractParameterType = 'Buffer';
 
 const getSmartContract = (context: Context, sourceFile: ts.SourceFile) => {
   const classDecls = tsUtils.statement
@@ -68,13 +71,7 @@ const addContractInfo = (context: Context, contractInfo: ContractInfo) => {
   const propertyNameToOverride = new Map<string, ts.Symbol>();
   getAllPropInfos(contractInfo).forEach((propInfo) => {
     const symbol = context.analysis.getSymbol(propInfo.classDecl);
-    if (
-      symbol !== undefined &&
-      propInfo.type !== 'deploy' &&
-      propInfo.type !== 'refundAssets' &&
-      propInfo.type !== 'upgrade' &&
-      propInfo.type !== 'completeSend'
-    ) {
+    if (symbol !== undefined && propInfo.type !== 'deploy' && propInfo.type !== 'upgrade') {
       const memberSymbol = propInfo.symbol;
       switch (propInfo.type) {
         case 'function':
@@ -125,11 +122,33 @@ const addContractInfo = (context: Context, contractInfo: ContractInfo) => {
   addOverrideSymbol(context, contractInfo);
 };
 
+export type SmartContractInfoMethodDescriptor = OmitStrict<ContractMethodDescriptorClient, 'offset'>;
+
+export interface SmartContractInfoABI {
+  readonly methods: readonly SmartContractInfoMethodDescriptor[];
+  readonly events: readonly ContractEventDescriptorClient[];
+}
+
+export interface SmartContractInfoManifest {
+  readonly groups: readonly ContractGroup[];
+  readonly features: {
+    readonly storage: boolean;
+    readonly payable: boolean;
+  };
+  readonly supportedStandards: readonly string[];
+  readonly abi: SmartContractInfoABI;
+  readonly permissions: readonly ContractPermission[];
+  readonly trusts: WildcardContainer<UInt160Hex>;
+  readonly safeMethods: WildcardContainer<string>;
+  readonly hasStorage: boolean;
+  readonly payable: boolean;
+}
+
 export interface SmartContractInfo {
+  readonly name: string;
   readonly contractInfo: ContractInfo | undefined;
-  readonly abi: ABI;
   readonly debugInfo: DebugInfo;
-  readonly contract: OmitStrict<ContractRegister, 'script'>;
+  readonly manifest: SmartContractInfoManifest;
 }
 
 export const getSmartContractInfo = (context: Context, sourceFile: ts.SourceFile): SmartContractInfo => {
@@ -137,47 +156,42 @@ export const getSmartContractInfo = (context: Context, sourceFile: ts.SourceFile
   const contractInfo = smartContract === undefined ? undefined : getContractInfo(context, smartContract);
   const properties =
     smartContract === undefined ? DEFAULT_CONTRACT_PROPERTIES : getContractProperties(context, smartContract);
-  const payable =
-    contractInfo === undefined
-      ? true
-      : contractInfo.propInfos.some((propInfo) => propInfo.type === 'function' && propInfo.receive);
   if (contractInfo !== undefined) {
     addContractInfo(context, contractInfo);
 
     return {
+      name: properties.name,
       contractInfo,
-      abi: getABI(context, contractInfo),
+      manifest: getManifest(context, contractInfo, properties),
       debugInfo: getDebugInfo(context, contractInfo),
-      contract: {
-        parameters: PARAMETERS,
-        returnType: RETURN_TYPE,
-        ...properties,
-        storage: true,
-        dynamicInvoke: true,
-        payable,
-      },
     };
   }
 
   return {
+    name: properties.name,
     contractInfo,
-    abi: {
-      functions: [],
-      events: [],
+    manifest: {
+      groups: [],
+      features: {
+        storage: true,
+        payable: true,
+      },
+      supportedStandards: [],
+      abi: {
+        methods: [],
+        events: [],
+      },
+      permissions: [],
+      trusts: '*',
+      safeMethods: '*',
+      hasStorage: true,
+      payable: true,
     },
     debugInfo: {
       entrypoint: '',
       documents: [],
       methods: [],
       events: [],
-    },
-    contract: {
-      parameters: PARAMETERS,
-      returnType: RETURN_TYPE,
-      ...properties,
-      storage: true,
-      dynamicInvoke: true,
-      payable,
     },
   };
 };

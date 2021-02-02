@@ -17,24 +17,20 @@ export const checkRawResult = async (receipt: RawCallReceipt, sourceMaps: Source
   if (receipt.state === 'FAULT') {
     enableConsoleLogForTest();
     try {
-      // TODO: reimplement this message processing
-      // const message = await processActionsAndMessage({
-      //   actions: receipt.actions,
-      //   message: receipt.message,
-      //   sourceMaps,
-      // });
-
-      throw new Error(receipt.stack as string);
+      const message = await processActionsAndMessage({
+        actions: [...receipt.notifications, ...receipt.logs],
+        sourceMaps,
+      });
+      throw new Error(message);
     } finally {
       disableConsoleLogForTest();
     }
   }
 
-  // TODO: reimplement this log processing
-  // await processConsoleLogMessages({
-  //   actions: receipt.actions,
-  //   sourceMaps,
-  // });
+  await processConsoleLogMessages({
+    actions: [...receipt.notifications, ...receipt.logs],
+    sourceMaps,
+  });
 
   if (checkStack && receipt.stack.length !== 0) {
     throw new Error(`Found leftover stack items, length: ${receipt.stack.length}`);

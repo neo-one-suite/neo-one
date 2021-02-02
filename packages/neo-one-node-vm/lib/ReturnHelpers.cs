@@ -156,7 +156,7 @@ namespace NEOONE
         containerHash = log.ScriptContainer != null ? Crypto.Hash256(log.ScriptContainer.GetHashData()) : null;
         callingScriptHash = log.ScriptHash != null ? log.ScriptHash.ToArray() : null;
         message = log.Message;
-        position = log.Position;
+        // position = log.Position;
       }
     }
 

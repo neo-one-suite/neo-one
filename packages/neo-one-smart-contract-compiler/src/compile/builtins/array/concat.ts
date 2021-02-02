@@ -75,13 +75,8 @@ export class ArrayConcat extends BuiltinInstanceMemberCall {
           iterable: handleOther,
           iterableIterator: handleOther,
           transaction: handleOther,
-          output: handleOther,
           attribute: handleOther,
-          input: handleOther,
-          account: handleOther,
-          asset: handleOther,
           contract: handleOther,
-          header: handleOther,
           block: handleOther,
         }),
       );

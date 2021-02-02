@@ -32,24 +32,22 @@ export class CommonStorageHelper extends Helper {
           // [map, map, number, globalObject, number, globalObject]
           sb.emitOp(node, 'DUP');
           // [buffer, map, number, globalObject, number, globalObject]
-          sb.emitSysCall(node, 'Neo.Runtime.Serialize');
+          sb.emitSysCall(node, 'System.Binary.Serialize');
         },
         handleDefined: () => {
           // [buffer, buffer, number, globalObject, number, globalObject]
           sb.emitOp(node, 'DUP');
           // [map, buffer, number, globalObject, number, globalObject]
-          sb.emitSysCall(node, 'Neo.Runtime.Deserialize');
+          sb.emitSysCall(node, 'System.Binary.Deserialize');
           // [buffer, map, number, globalObject, number, globalObject]
           sb.emitOp(node, 'SWAP');
         },
       }),
     );
-    // [number, buffer, map, number, globalObject, number, globalObject]
-    sb.emitPushInt(node, 4);
-    // [buffer, map, number, globalObject, buffer, number, globalObject]
-    sb.emitOp(node, 'XTUCK');
+    // [globalObject, number, map, buffer, number, globalObject]
+    sb.emitOp(node, 'REVERSE4');
     // [map, number, globalObject, buffer, number, globalObject]
-    sb.emitOp(node, 'DROP');
+    sb.emitOp(node, 'REVERSE3');
     // [buffer, number, globalObject]
     sb.emitOp(node, 'SETITEM');
     // []
@@ -72,7 +70,7 @@ export class CommonStorageHelper extends Helper {
     // [map, bufferOriginal]
     sb.emitOp(node, 'PICKITEM');
     // [buffer, bufferOriginal]
-    sb.emitSysCall(node, 'Neo.Runtime.Serialize');
+    sb.emitSysCall(node, 'System.Binary.Serialize');
     // [buffer, bufferOriginal, buffer]
     sb.emitOp(node, 'TUCK');
     sb.emitHelper(
@@ -89,7 +87,7 @@ export class CommonStorageHelper extends Helper {
         },
         whenFalse: () => {
           // [number, valueBuffer]
-          sb.emitSysCall(node, 'Neo.Runtime.GetTrigger');
+          sb.emitSysCall(node, 'System.Runtime.GetTrigger');
           // [number, number, valueBuffer]
           sb.emitPushInt(node, 0x10);
           sb.emitHelper(
@@ -104,9 +102,9 @@ export class CommonStorageHelper extends Helper {
                 // [keyBuffer, valueBuffer]
                 sb.emitPushBuffer(node, Buffer.alloc(0, 0));
                 // [context, keyBuffer, valBuffer]
-                sb.emitSysCall(node, 'Neo.Storage.GetContext');
+                sb.emitSysCall(node, 'System.Storage.GetContext');
                 // []
-                sb.emitSysCall(node, 'Neo.Storage.Put');
+                sb.emitSysCall(node, 'System.Storage.Put');
               },
               whenFalse: () => {
                 sb.emitOp(node, 'DROP');

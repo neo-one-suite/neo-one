@@ -1,15 +1,15 @@
-import { ABI } from '@neo-one/client-common';
+import { ContractManifestClient } from '@neo-one/client-common';
 import { genSmartContractTypes } from '../types';
 
-const testABI = (abi: ABI, name: string) => {
+const testContractManifestClient = (manifest: ContractManifestClient, name: string) => {
   test(name, () => {
     expect({
-      inputABI: abi,
-      types: genSmartContractTypes(name, abi),
+      inputManifest: manifest,
+      types: genSmartContractTypes(name, manifest),
     }).toMatchSnapshot();
   });
 };
 
 export const testUtils = {
-  testABI,
+  testContractManifestClient,
 };

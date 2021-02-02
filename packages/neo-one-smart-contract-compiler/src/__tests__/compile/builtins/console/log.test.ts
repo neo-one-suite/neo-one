@@ -7,8 +7,16 @@ import { DiagnosticCode } from '../../../../DiagnosticCode';
 const getMessages = async (receiptIn: CallReceiptJSON, sourceMaps: SourceMaps): Promise<ReadonlyArray<string>> => {
   const receipt = convertCallReceipt(receiptIn);
 
-  return createConsoleLogMessages(receipt.actions, sourceMaps, { onlyFileName: true });
+  return createConsoleLogMessages([...receipt.notifications, ...receipt.logs], sourceMaps, { onlyFileName: true });
 };
+
+const properties = `
+  public readonly properties = {
+    groups: [],
+    permissions: [],
+    trusts: "*",
+  };
+`;
 
 describe('console.log', () => {
   test('should log strings', async () => {
@@ -118,6 +126,7 @@ describe('console.log', () => {
   });
 
   test('should log objects', async () => {
+    // TODO
     const { receipt, sourceMaps } = await helpers.executeString(`
       console.log({
         a: 'a',
@@ -152,43 +161,60 @@ describe('console.log', () => {
   });
 
   test('should handle logs across contracts', async () => {
+    // TODO
     const node = await helpers.startNode();
     const firstContract = await node.addContract(
       `
-      const bar = () => {
-        console.log('bar');
-      }
-      const foo = () => {
-        console.log('calling bar');
-        bar();
-        console.log('done calling bar');
-      };
+      import { SmartContract } from '@neo-one/smart-contract';
 
-      console.log('calling foo');
-      foo();
-      console.log('done calling foo');
+      export class FirstContract extends SmartContract {
+        ${properties}
+
+        public run(): void {
+          const bar = () => {
+            console.log('bar');
+          }
+          const foo = () => {
+            console.log('calling bar');
+            bar();
+            console.log('done calling bar');
+          };
+
+          console.log('calling foo');
+          foo();
+          console.log('done calling foo');
+        }
+      }
     `,
-      { fileName: 'firstContract.ts' },
+      {
+        fileName: 'firstContract.ts',
+      },
     );
 
     const secondContract = await node.addContract(
       `
       import { Address, SmartContract } from '@neo-one/smart-contract';
 
-      interface Contract {
-        readonly run: () => void;
+      export class SecondContract extends SmartContract {
+        ${properties}
+
+        public run(): void {
+          interface Contract {
+            readonly run: () => void;
+          }
+
+          const invoke = () => {
+            console.log('calling run');
+            const contract = SmartContract.for<Contract>(Address.from('${firstContract.address}'));
+            contract.run();
+            console.log('done calling run');
+          };
+
+          console.log('calling invoke');
+          invoke();
+          console.log('done calling invoke');
+        }
       }
-
-      const invoke = () => {
-        console.log('calling run');
-        const contract = SmartContract.for<Contract>(Address.from('${firstContract.address}'));
-        contract.run();
-        console.log('done calling run');
-      };
-
-      console.log('calling invoke');
-      invoke();
-      console.log('done calling invoke');
     `,
       { fileName: 'secondContract.ts' },
     );
@@ -206,7 +232,7 @@ describe('console.log', () => {
       console.log('done');
     `);
 
-    const messages = await createConsoleLogMessages(receipt.actions, sourceMaps, {
+    const messages = await createConsoleLogMessages([...receipt.notifications, ...receipt.logs], sourceMaps, {
       onlyFileName: true,
     });
 
@@ -214,7 +240,7 @@ describe('console.log', () => {
   });
 
   test('cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const log = console.log;
     `,
@@ -223,7 +249,7 @@ describe('console.log', () => {
   });
 
   test('cannot be referenced - object literal', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const { log } = console;
     `,

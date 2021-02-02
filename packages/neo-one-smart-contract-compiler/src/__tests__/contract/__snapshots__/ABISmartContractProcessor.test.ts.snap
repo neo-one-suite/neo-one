@@ -40,15 +40,15 @@ exports[`ABISmartContractProcessor invalid method parameter 1`] = `
 `;
 
 exports[`ABISmartContractProcessor invalid method return - union 1`] = `
-"snippetCode.ts (15,9): Invalid SmartContract type. See https://neo-one.io/docs/methods#Parameter-and-Return-Types for valid parameter and return types.
+"snippetCode.ts (14,9): Invalid SmartContract type. See https://neo-one.io/docs/methods#Parameter-and-Return-Types for valid parameter and return types.
 
-      13 |         private foo: boolean = true;
-      14 | 
-    > 15 |         public test() {
+      12 |         private foo: boolean = true;
+      13 | 
+    > 14 |         public test() {
          |         ^
-      16 |           if (this.foo) {
-      17 |             return '';
-      18 |           }
+      15 |           if (this.foo) {
+      16 |             return '';
+      17 |           }
 "
 `;
 

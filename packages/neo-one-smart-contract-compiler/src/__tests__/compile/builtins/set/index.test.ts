@@ -12,7 +12,7 @@ describe('Set', () => {
   });
 
   test('cannot be extended', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       class MySet extends Set<string> {
       }

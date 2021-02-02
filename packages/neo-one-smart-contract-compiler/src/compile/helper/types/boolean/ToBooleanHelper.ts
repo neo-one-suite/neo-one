@@ -68,13 +68,8 @@ export class ToBooleanHelper extends TypedHelper {
         iterable: convertOther,
         iterableIterator: convertOther,
         transaction: convertOther,
-        output: convertOther,
         attribute: convertOther,
-        input: convertOther,
-        account: convertOther,
-        asset: convertOther,
         contract: convertOther,
-        header: convertOther,
         block: convertOther,
       }),
     );

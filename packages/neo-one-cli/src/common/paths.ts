@@ -15,12 +15,12 @@ export const getCommonPaths = (config: Configuration) => ({
 export const getContractPaths = (config: Configuration, name: string) => {
   const base = nodePath.resolve(config.codegen.path, name);
   const typesPath = nodePath.resolve(base, 'types.js');
-  const abiPath = nodePath.resolve(base, 'abi.js');
+  const manifestPath = nodePath.resolve(base, 'manifest.js');
   const createContractPath = nodePath.resolve(base, 'contract.js');
 
   return {
     typesPath,
-    abiPath,
+    manifestPath,
     createContractPath,
   };
 };

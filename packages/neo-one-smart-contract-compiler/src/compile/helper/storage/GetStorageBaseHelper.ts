@@ -10,9 +10,9 @@ export class GetStorageBaseHelper extends Helper {
     const options = sb.pushValueOptions(optionsIn);
 
     // [context, keyBuffer]
-    sb.emitSysCall(node, 'Neo.Storage.GetReadOnlyContext');
+    sb.emitSysCall(node, 'System.Storage.GetReadOnlyContext');
     // [iterator]
-    sb.emitSysCall(node, 'Neo.Storage.Find');
+    sb.emitSysCall(node, 'System.Storage.Find');
     // [iterator, iterator]
     sb.emitOp(node, 'DUP');
     sb.emitHelper(
@@ -21,11 +21,11 @@ export class GetStorageBaseHelper extends Helper {
       sb.helpers.if({
         condition: () => {
           // [boolean, iterator]
-          sb.emitSysCall(node, 'Neo.Enumerator.Next');
+          sb.emitSysCall(node, 'System.Enumerator.Next');
         },
         whenTrue: () => {
           // [value]
-          sb.emitSysCall(node, 'Neo.Enumerator.Value');
+          sb.emitSysCall(node, 'System.Enumerator.Value');
         },
         whenFalse: () => {
           // []

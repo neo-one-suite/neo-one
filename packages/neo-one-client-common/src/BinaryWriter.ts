@@ -253,6 +253,16 @@ export class BinaryWriter {
     });
   }
 
+  public writeVarBytesLEWithoutVar(value: Buffer): this {
+    return this.push({
+      fn: (val: Buffer, buffer: Buffer, pos: number) => {
+        writeFromBuffer(val, buffer, pos);
+      },
+      length: value.length,
+      value,
+    });
+  }
+
   public writeVarUIntLE(valueIn: number | BN): this {
     const value = new BN(valueIn);
     if (value.lt(utils.ZERO)) {
@@ -282,6 +292,15 @@ export class BinaryWriter {
     }
 
     return this.writeVarBytesLE(buffer);
+  }
+
+  public writeVarStringWithoutVar(value: string, max?: number): this {
+    let buffer = Buffer.from(value, 'utf8');
+    if (max !== undefined) {
+      buffer = buffer.slice(0, max);
+    }
+
+    return this.writeVarBytesLEWithoutVar(buffer);
   }
 
   public writeECPoint(value: ECPoint): this {

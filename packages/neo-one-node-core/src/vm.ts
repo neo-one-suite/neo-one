@@ -19,7 +19,8 @@ export interface VMLog {
   readonly containerHash?: UInt256;
   readonly callingScriptHash: UInt160;
   readonly message: string;
-  readonly position: number;
+  // TODO: remove?
+  // readonly position: number;
 }
 
 export interface CallReceipt {

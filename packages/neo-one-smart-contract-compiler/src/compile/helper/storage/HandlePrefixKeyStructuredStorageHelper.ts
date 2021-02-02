@@ -30,7 +30,7 @@ export class HandlePrefixKeyStructuredStorageHelper extends Helper {
           // [arr, arr]
           sb.emitOp(node, 'DUP');
           // [size, arr]
-          sb.emitOp(node, 'ARRAYSIZE');
+          sb.emitOp(node, 'SIZE');
           // [1, size, arr]
           sb.emitPushInt(node, 1);
           // [boolean, arr]

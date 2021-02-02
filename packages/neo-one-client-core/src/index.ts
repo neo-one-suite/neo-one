@@ -1,5 +1,4 @@
 import * as args from './args';
-import { addLocalKeysSync } from './clientUtils';
 import * as nep17 from './nep17';
 
 export * from './AsyncBlockIterator';
@@ -12,4 +11,4 @@ export * from './sc';
 export * from './trace';
 export * from './types';
 export * from './user';
-export { args, nep17, addLocalKeysSync };
+export { args, nep17 };

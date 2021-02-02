@@ -3,7 +3,7 @@ import { Builtin } from '../../../../compile/builtins';
 
 describe('IterableIterator', () => {
   test('cannot be implemented', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       class MyIterableIterator implements IterableIterator<number> {
         public readonly next: any = () => ({

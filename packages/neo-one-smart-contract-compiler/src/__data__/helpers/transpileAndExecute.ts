@@ -22,7 +22,7 @@ export const transpileAndExecuteSnippet = async (
     contract: { script: compiledCode },
     sourceMap,
     diagnostics,
-  } = compileContract({ filePath, host: createCompilerHost() });
+  } = await compileContract({ filePath, host: createCompilerHost() });
 
   const { receipt, sourceMaps } = await executeScript(diagnostics, compiledCode, sourceMap, options);
   await checkResult(receipt, sourceMaps);

@@ -46,10 +46,12 @@ export class GetCachedValueHelper extends Helper {
         whenFalse: () => {
           // [val, keyVal, map]
           this.create(options);
-          // [3, val, keyVal, map]
-          sb.emitPushInt(node, 3);
+          // [val, val, keyVal, map]
+          sb.emitOp(node, 'DUP');
+          // [map, keyVal, val, val]
+          sb.emitOp(node, 'REVERSE4');
           // [val, keyVal, map, val]
-          sb.emitOp(node, 'XTUCK');
+          sb.emitOp(node, 'REVERSE3');
           // [val]
           sb.emitOp(node, 'SETITEM');
         },

@@ -13,15 +13,13 @@ describe('declareEvent', () => {
       }
     `);
 
-    expect(definition.abi.events).toHaveLength(1);
-    const events = definition.abi.events;
-    if (events !== undefined) {
-      expect(events[0].name).toEqual('event');
-    }
+    expect(definition.manifest.abi.events).toHaveLength(1);
+    const events = definition.manifest.abi.events;
+    expect(events[0].name).toEqual('event');
   });
 
   test('invalid event name', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { declareEvent, SmartContract } from '@neo-one/smart-contract';
 
@@ -37,7 +35,7 @@ describe('declareEvent', () => {
   });
 
   test('invalid event parameter type', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { declareEvent, SmartContract } from '@neo-one/smart-contract';
 
@@ -53,7 +51,7 @@ describe('declareEvent', () => {
   });
 
   test('invalid event parameter type - forward value', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { declareEvent, SmartContract } from '@neo-one/smart-contract';
 

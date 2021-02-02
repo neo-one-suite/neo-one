@@ -36,7 +36,7 @@ export class RawEnumeratorFindHelper extends Helper {
       sb.helpers.if({
         condition: () => {
           // [size, arr]
-          sb.emitOp(node, 'ARRAYSIZE');
+          sb.emitOp(node, 'SIZE');
           // [0, size, arr]
           sb.emitPushInt(node, 0);
           // [size == 0, arr]

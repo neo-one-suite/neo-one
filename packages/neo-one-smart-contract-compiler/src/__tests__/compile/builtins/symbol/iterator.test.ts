@@ -16,7 +16,7 @@ describe('Symbol.iterator', () => {
   });
 
   test('cannot be set', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       Symbol.iterator = Symbol.for('foo');
     `,

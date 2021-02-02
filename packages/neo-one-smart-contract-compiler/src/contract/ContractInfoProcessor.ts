@@ -3,7 +3,6 @@ import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import ts from 'typescript';
 import { STRUCTURED_STORAGE_TYPES, StructuredStorageType } from '../compile/constants';
-import { hasForwardValue } from '../compile/helper/types';
 import {
   BUILTIN_PROPERTIES,
   ContractPropertyName,
@@ -31,20 +30,11 @@ export interface DeployPropInfo extends PropInfoBase {
   readonly callSignature?: ts.Signature;
 }
 
-export interface RefundAssetsPropInfo extends PropInfoBase {
-  readonly type: 'refundAssets';
-  readonly name: string;
-}
-
-export interface CompleteSendPropInfo extends PropInfoBase {
-  readonly type: 'completeSend';
-  readonly name: string;
-}
-
 export interface UpgradePropInfo extends PropInfoBase {
   readonly type: 'upgrade';
   readonly name: string;
   readonly approveUpgrade: ts.PropertyDeclaration | ts.MethodDeclaration;
+  readonly isSafe: boolean;
 }
 
 export interface FunctionPropInfo extends PropInfoBase {
@@ -53,12 +43,9 @@ export interface FunctionPropInfo extends PropInfoBase {
   readonly symbol: ts.Symbol;
   readonly decl: ts.PropertyDeclaration | ts.MethodDeclaration;
   readonly callSignature: ts.Signature | undefined;
-  readonly send: boolean;
-  readonly sendUnsafe: boolean;
   readonly receive: boolean;
-  readonly claim: boolean;
   readonly constant: boolean;
-  readonly acceptsClaim: boolean;
+  readonly isSafe: boolean;
   readonly returnType: ts.Type | undefined;
   readonly isAbstract: boolean;
 }
@@ -71,6 +58,7 @@ export interface PropertyPropInfo extends PropInfoBase {
   readonly propertyType: ts.Type | undefined;
   readonly isReadonly: boolean;
   readonly isAbstract: boolean;
+  readonly isSafe: boolean;
   readonly structuredStorageType: StructuredStorageType | undefined;
 }
 
@@ -82,22 +70,17 @@ export interface AccessorPropInfo extends PropInfoBase {
     readonly name: string;
     readonly decl: ts.GetAccessorDeclaration;
     readonly constant: boolean;
+    readonly isSafe: boolean;
   };
   readonly setter?: {
     readonly name: string;
     readonly decl: ts.SetAccessorDeclaration;
+    readonly isSafe: boolean;
   };
   readonly propertyType: ts.Type | undefined;
 }
 
-export type PropInfo =
-  | PropertyPropInfo
-  | AccessorPropInfo
-  | FunctionPropInfo
-  | DeployPropInfo
-  | RefundAssetsPropInfo
-  | UpgradePropInfo
-  | CompleteSendPropInfo;
+export type PropInfo = PropertyPropInfo | AccessorPropInfo | FunctionPropInfo | DeployPropInfo | UpgradePropInfo;
 
 export interface ContractInfo {
   readonly smartContract: ts.ClassDeclaration | ts.ClassExpression;
@@ -117,27 +100,6 @@ export class ContractInfoProcessor {
       );
     }
     const result = this.processClass(this.smartContract, this.context.analysis.getType(this.smartContract));
-
-    const hasReceive = result.propInfos.some((propInfo) => propInfo.type === 'function' && propInfo.receive);
-    const refundAssets: PropInfo | undefined = hasReceive
-      ? {
-          type: 'refundAssets',
-          name: ContractPropertyName.refundAssets,
-          classDecl: this.smartContract,
-          isPublic: true,
-        }
-      : undefined;
-
-    const hasSend = result.propInfos.some((propInfo) => propInfo.type === 'function' && propInfo.send);
-    const completeSend: PropInfo | undefined = hasSend
-      ? {
-          type: 'completeSend',
-          name: ContractPropertyName.completeSend,
-          classDecl: this.smartContract,
-          isPublic: true,
-        }
-      : undefined;
-
     const approveUpgrade = this.getApproveUpgradeDecl(result);
     const upgrade: PropInfo | undefined =
       approveUpgrade !== undefined
@@ -147,10 +109,11 @@ export class ContractInfoProcessor {
             classDecl: this.smartContract,
             isPublic: true,
             approveUpgrade,
+            isSafe: true, // TODO: check
           }
         : undefined;
 
-    const finalPropInfos = result.propInfos.concat([refundAssets, completeSend, upgrade].filter(utils.notNull));
+    const finalPropInfos = result.propInfos.concat([upgrade].filter(utils.notNull));
 
     if (this.hasDeployInfo(result)) {
       return {
@@ -424,6 +387,7 @@ export class ContractInfoProcessor {
                 name: tsUtils.node.getName(getDecl),
                 decl: getDecl,
                 constant: this.hasConstant(getDecl),
+                isSafe: this.hasSafe(getDecl) || this.hasConstant(getDecl),
               },
         setter:
           setDecl === undefined
@@ -431,6 +395,7 @@ export class ContractInfoProcessor {
             : {
                 name: getSetterName(tsUtils.node.getName(setDecl)),
                 decl: setDecl,
+                isSafe: this.hasSafe(setDecl),
               },
         isPublic,
         propertyType: type,
@@ -469,66 +434,11 @@ export class ContractInfoProcessor {
 
       const callSignature = callSignatures[0];
 
-      const send = this.hasSend(decl);
-      const sendUnsafe = this.hasSendUnsafe(decl);
-      const receive = this.hasReceive(decl);
-      const claim = this.hasClaim(decl);
       const constant = this.hasConstant(decl);
-      const isUTXO = send || sendUnsafe || receive || claim;
-
-      if (isUTXO && constant) {
-        const decorator = tsUtils.decoratable
-          .getDecoratorsArray(decl)
-          .find((dec) => this.isDecorator(dec, Decorator.constant));
-        this.context.reportError(
-          decorator === undefined ? decl : decorator,
-          DiagnosticCode.InvalidContractMethod,
-          DiagnosticMessage.InvalidContractMethodConstantNative,
-        );
-
-        return undefined;
-      }
+      const receive = this.hasReceive(decl);
+      const safe = this.hasSafe(decl);
 
       const returnType = callSignatures.length >= 1 ? tsUtils.signature.getReturnType(callSignature) : undefined;
-      if (claim && returnType !== undefined && !tsUtils.type_.isVoid(returnType)) {
-        const decorator = tsUtils.decoratable
-          .getDecoratorsArray(decl)
-          .find((dec) => this.isDecorator(dec, Decorator.claim));
-        this.context.reportError(
-          decorator === undefined ? decl : decorator,
-          DiagnosticCode.InvalidContractMethod,
-          DiagnosticMessage.InvalidContractMethodNativeReturn,
-        );
-
-        return undefined;
-      }
-
-      if (isUTXO && callSignatures.length >= 1) {
-        const signatureTypes = this.context.analysis.extractSignatureTypes(decl, callSignatures[0]);
-        if (signatureTypes !== undefined) {
-          const invalidParams = signatureTypes.paramDecls.filter((param) => {
-            const paramType = signatureTypes.paramTypes.get(param);
-
-            return (
-              paramType !== undefined &&
-              (hasForwardValue(this.context, param, paramType) ||
-                tsUtils.type_.hasType(paramType, (tpe) => this.context.builtins.isType(param, tpe, 'ForwardedValue')))
-            );
-          });
-
-          invalidParams.forEach((param) => {
-            this.context.reportError(
-              param,
-              DiagnosticCode.InvalidContractType,
-              DiagnosticMessage.InvalidContractTypeForwardNative,
-            );
-          });
-
-          if (invalidParams.length > 0) {
-            return undefined;
-          }
-        }
-      }
 
       return {
         type: 'function',
@@ -536,12 +446,9 @@ export class ContractInfoProcessor {
         classDecl,
         symbol: tsUtils.symbol.getTarget(symbol),
         decl,
-        send,
-        sendUnsafe,
         receive,
-        claim,
-        acceptsClaim: callSignatures.length >= 1 && this.isLastParamClaim(decl, callSignatures[0]),
         isPublic,
+        isSafe: safe || constant,
         callSignature,
         returnType,
         constant,
@@ -586,6 +493,7 @@ export class ContractInfoProcessor {
       isReadonly,
       isAbstract,
       structuredStorageType,
+      isSafe: true,
     };
   }
 
@@ -593,20 +501,12 @@ export class ContractInfoProcessor {
     return this.hasDecorator(decl, Decorator.constant);
   }
 
-  private hasSend(decl: ClassInstanceMemberType | ts.ConstructorDeclaration): boolean {
-    return this.hasDecorator(decl, Decorator.send);
-  }
-
-  private hasSendUnsafe(decl: ClassInstanceMemberType | ts.ConstructorDeclaration): boolean {
-    return this.hasDecorator(decl, Decorator.sendUnsafe);
-  }
-
   private hasReceive(decl: ClassInstanceMemberType | ts.ConstructorDeclaration): boolean {
     return this.hasDecorator(decl, Decorator.receive);
   }
 
-  private hasClaim(decl: ClassInstanceMemberType | ts.ConstructorDeclaration): boolean {
-    return this.hasDecorator(decl, Decorator.claim);
+  private hasSafe(decl: ClassInstanceMemberType | ts.ConstructorDeclaration): boolean {
+    return this.hasDecorator(decl, Decorator.safe);
   }
 
   private hasDecorator(decl: ClassInstanceMemberType | ts.ConstructorDeclaration, name: Decorator): boolean {
@@ -621,22 +521,6 @@ export class ContractInfoProcessor {
 
   private isDecorator(decorator: ts.Decorator, name: Decorator): boolean {
     return this.context.builtins.isValue(tsUtils.expression.getExpression(decorator), name);
-  }
-
-  private isLastParamClaim(node: ts.Node, callSignature: ts.Signature): boolean {
-    const signatureTypes = this.context.analysis.extractSignatureTypes(node, callSignature);
-    if (signatureTypes === undefined) {
-      return false;
-    }
-
-    if (signatureTypes.paramDecls.length === 0) {
-      return false;
-    }
-
-    const param = signatureTypes.paramDecls[signatureTypes.paramDecls.length - 1];
-    const paramType = signatureTypes.paramTypes.get(signatureTypes.paramDecls[signatureTypes.paramDecls.length - 1]);
-
-    return paramType !== undefined && this.context.builtins.isInterface(param, paramType, 'ClaimTransaction');
   }
 
   private hasDeployInfo(contractInfo: ContractInfo): boolean {

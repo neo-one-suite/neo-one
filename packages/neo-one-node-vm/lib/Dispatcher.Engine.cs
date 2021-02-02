@@ -232,13 +232,14 @@ namespace NEOONE
     private dynamic[] _getLogs()
     {
       this.isEngineInitialized();
-      var events = this.engine.Logs;
-      if (events == null || events.Count == 0)
-      {
-        return new dynamic[] { };
-      }
+      return new dynamic[] { };
+      // var events = this.engine.Logs;
+      // if (events == null || events.Count == 0)
+      // {
+      //   return new dynamic[] { };
+      // }
 
-      return events.Select((p) => ReturnHelpers.convertLog(p)).ToArray();
+      // return events.Select((p) => ReturnHelpers.convertLog(p)).ToArray();
     }
 
     private bool isEngineInitialized()

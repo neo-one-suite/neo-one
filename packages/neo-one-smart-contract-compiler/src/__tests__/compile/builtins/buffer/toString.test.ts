@@ -31,7 +31,7 @@ describe('Buffer.prototype.toString', () => {
   });
 
   test('cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = Buffer.from('5946158ab93f5f4fd6ba230f1c6c235117eec5f83e65275ac6f93ada9ca60477', 'hex');
       const y = x.toString;
@@ -41,7 +41,7 @@ describe('Buffer.prototype.toString', () => {
   });
 
   test('cannot have argument other than utf8', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       Buffer.from('5946158ab93f5f4fd6ba230f1c6c235117eec5f83e65275ac6f93ada9ca60477', 'hex').toString('hex');
     `,

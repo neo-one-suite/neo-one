@@ -1,4 +1,5 @@
 import {
+  ABIParameter,
   AddressString,
   common,
   ContractABIClient,
@@ -41,10 +42,15 @@ export interface NEP17SmartContract<TClient extends Client = Client> extends Sma
   ) => TransactionResult<InvokeReceipt<boolean, NEP17Event>>;
 }
 
+const defaultNEOONEParams: ReadonlyArray<ABIParameter> = [
+  { type: 'String', name: 'method' },
+  { type: 'Array', value: { type: 'Any' }, name: 'params' },
+];
+
 const decimalsFunction: ContractMethodDescriptorClient = {
   name: 'decimals',
   constant: true,
-  parameters: [],
+  parameters: [...defaultNEOONEParams],
   returnType: { type: 'Integer', decimals: 0 },
   offset: 0,
   safe: true,
@@ -60,7 +66,7 @@ export const abi = (decimals: number): ContractABIClient => ({
     {
       name: 'name',
       constant: true,
-      parameters: [],
+      parameters: [...defaultNEOONEParams],
       returnType: { type: 'String' },
       offset: 0,
       safe: true,
@@ -68,7 +74,7 @@ export const abi = (decimals: number): ContractABIClient => ({
     {
       name: 'symbol',
       constant: true,
-      parameters: [],
+      parameters: [...defaultNEOONEParams],
       returnType: { type: 'String' },
       offset: 0,
       safe: true,
@@ -77,7 +83,7 @@ export const abi = (decimals: number): ContractABIClient => ({
     {
       name: 'totalSupply',
       constant: true,
-      parameters: [],
+      parameters: [...defaultNEOONEParams],
       returnType: { type: 'Integer', decimals },
       offset: 0,
       safe: true,

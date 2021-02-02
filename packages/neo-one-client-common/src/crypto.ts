@@ -42,7 +42,7 @@ const sha1 = (value: Buffer): Buffer => createHash('sha1').update(value).digest(
 const sha256 = sha256In;
 
 const rmd160 = (value: Buffer): Buffer =>
-  createHash(process.versions.hasOwnProperty('electron') ? 'ripemd160' : 'rmd160')
+  createHash(process?.versions.hasOwnProperty('electron') ? 'ripemd160' : 'rmd160')
     .update(value)
     .digest();
 
@@ -892,6 +892,7 @@ const serializeHDNode = (node: HDNode, privateNode = true): string => {
 
 export const crypto = {
   addPublicKey,
+  rmd160,
   sha1,
   sha256,
   hash160,
