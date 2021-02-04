@@ -15,7 +15,6 @@ export const createNode = async () => {
   const node = new FullNode({
     options: {
       blockchain: createPriv({
-        // privateNet: true, // TODO: fix here
         standbyValidators: [constants.PRIVATE_NET_PUBLIC_KEY],
         extraCommitteeMembers: [],
       }),

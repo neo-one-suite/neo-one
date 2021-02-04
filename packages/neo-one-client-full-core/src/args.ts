@@ -77,6 +77,7 @@ export const assertContractRegister = (name: string, register?: unknown): Contra
   return {
     script: args.assertProperty(register, 'ContractRegister', 'script', args.assertBuffer),
     manifest: args.assertProperty(register, 'ContractRegister', 'manifest', args.assertContractManifestClient),
-    name: args.assertProperty(register, 'ContractRegister', 'name', args.assertString),
+    compilerName: args.assertProperty(register, 'ContractRegister', 'compilerName', args.assertString),
+    compilerVersion: args.assertProperty(register, 'ContractRegister', 'compilerVersion', args.assertString),
   };
 };

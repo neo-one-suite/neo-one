@@ -1,3 +1,4 @@
+import { common } from '@neo-one/client-common';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -42,12 +43,14 @@ export class UpgradeHelper extends Helper {
           sb.emitPushInt(node, 1);
           // [arg]
           sb.emitHelper(node, options, sb.helpers.getArgument);
-          // [length, ...args]
-          sb.emitOp(node, 'UNPACK');
-          // [...args]
-          sb.emitOp(node, 'DROP');
-          // [contract]
-          sb.emitSysCall(node, 'System.Contract.Update');
+          // TODO: need to test this and make sure the "arg" is an array
+          // first arg is nefFile and second is manifest
+          // ['update', arg]
+          sb.emitPushString(node, 'update');
+          // [buffer, 'update', arg]
+          sb.emitPushBuffer(node, common.nativeHashes.Management);
+          // [conract]
+          sb.emitSysCall(node, 'System.Contract.Call');
           // []
           sb.emitOp(node, 'DROP');
           // [boolean]

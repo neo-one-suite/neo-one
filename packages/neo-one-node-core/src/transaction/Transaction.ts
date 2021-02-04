@@ -230,7 +230,15 @@ export class Transaction
       } else if (crypto.isSignatureContract(witness.verification)) {
         netFee = netFee.sub(new BN(signatureContractCost.toString(), 10).muln(execFeeFactor));
       } else {
-        const { result, gas } = await verifyWitness(vm, this, storage, native, hashes[i], witness, netFee);
+        const { result, gas } = await verifyWitness({
+          vm,
+          verifiable: this,
+          storage,
+          native,
+          hash: hashes[i],
+          witness,
+          gas: netFee,
+        });
         if (!result) {
           return VerifyResultModel.InsufficientFunds;
         }
@@ -257,15 +265,15 @@ export class Transaction
     // tslint:disable-next-line: no-loop-statement
     for (let i = 0; i < hashes.length; i += 1) {
       if (crypto.isStandardContract(this.witnesses[i].verification)) {
-        const { result } = await verifyWitness(
+        const { result } = await verifyWitness({
           vm,
-          this,
+          verifiable: this,
           storage,
           native,
-          hashes[i],
-          this.witnesses[i],
-          maxVerificationGas,
-        );
+          hash: hashes[i],
+          witness: this.witnesses[i],
+          gas: maxVerificationGas,
+        });
         if (!result) {
           return VerifyResultModel.Invalid;
         }

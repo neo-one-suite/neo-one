@@ -131,17 +131,10 @@ export interface SmartContractInfoABI {
 
 export interface SmartContractInfoManifest {
   readonly groups: readonly ContractGroup[];
-  readonly features: {
-    readonly storage: boolean;
-    readonly payable: boolean;
-  };
   readonly supportedStandards: readonly string[];
   readonly abi: SmartContractInfoABI;
   readonly permissions: readonly ContractPermission[];
   readonly trusts: WildcardContainer<UInt160Hex>;
-  readonly safeMethods: WildcardContainer<string>;
-  readonly hasStorage: boolean;
-  readonly payable: boolean;
 }
 
 export interface SmartContractInfo {
@@ -151,6 +144,7 @@ export interface SmartContractInfo {
   readonly manifest: SmartContractInfoManifest;
 }
 
+// TODO: should name be in SmartContractInfoManifest?
 export const getSmartContractInfo = (context: Context, sourceFile: ts.SourceFile): SmartContractInfo => {
   const smartContract = getSmartContract(context, sourceFile);
   const contractInfo = smartContract === undefined ? undefined : getContractInfo(context, smartContract);
@@ -172,10 +166,6 @@ export const getSmartContractInfo = (context: Context, sourceFile: ts.SourceFile
     contractInfo,
     manifest: {
       groups: [],
-      features: {
-        storage: true,
-        payable: true,
-      },
       supportedStandards: [],
       abi: {
         methods: [],
@@ -183,9 +173,6 @@ export const getSmartContractInfo = (context: Context, sourceFile: ts.SourceFile
       },
       permissions: [],
       trusts: '*',
-      safeMethods: '*',
-      hasStorage: true,
-      payable: true,
     },
     debugInfo: {
       entrypoint: '',

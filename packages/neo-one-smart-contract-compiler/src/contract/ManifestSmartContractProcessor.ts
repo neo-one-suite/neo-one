@@ -23,13 +23,7 @@ import { Context } from '../Context';
 import { DiagnosticCode } from '../DiagnosticCode';
 import { DiagnosticMessage } from '../DiagnosticMessage';
 import { getSetterName, toABIReturn } from '../utils';
-import {
-  AccessorPropInfo,
-  ContractInfo,
-  DeployPropInfo,
-  FunctionPropInfo,
-  PropertyPropInfo,
-} from './ContractInfoProcessor';
+import { ContractInfo, DeployPropInfo } from './ContractInfoProcessor';
 
 const BOOLEAN_RETURN: ABIReturn = { type: 'Boolean' };
 const VOID_RETURN: ABIReturn = { type: 'Void' };
@@ -42,23 +36,12 @@ export class ManifestSmartContractProcessor {
   ) {}
 
   public process(): SmartContractInfoManifest {
-    // TODO: can remove this later
-    const storage = this.processStorage();
-    const payable = this.processPayable();
-
     return {
       groups: this.processGroups(),
-      features: {
-        storage,
-        payable,
-      },
       supportedStandards: this.processSupportedStandards(),
       abi: this.processABI(),
       permissions: this.processPermissions(),
       trusts: this.processTrusts(),
-      safeMethods: this.processSafeMethods(),
-      hasStorage: storage,
-      payable,
     };
   }
 
@@ -89,43 +72,6 @@ export class ManifestSmartContractProcessor {
     return this.properties.trusts;
   }
 
-  private processPayable(): boolean {
-    const propInfos = this.contractInfo.propInfos.filter((propInfo) => propInfo.isPublic && propInfo.type !== 'deploy');
-
-    return propInfos.some((info) => info.type === 'function' && info.receive);
-  }
-
-  // TODO: make sure this matches up with docs and with @safe decorator
-  // These methods are automatically safe:
-  // Marked with @safe or @constant
-  // Properties that are readonly or @safe
-  // Getters marked with @constant or @safe
-  // Not the deploy method
-  private processSafeMethods(): WildcardContainer<string> {
-    const propInfos = this.contractInfo.propInfos.filter((propInfo) => propInfo.isPublic && propInfo.type !== 'deploy');
-
-    const safeFuncs = propInfos
-      .filter((info) => info.type === 'function' && (info.constant || info.isSafe))
-      .map((info) => info.name);
-    const safeProps = propInfos
-      .filter((info) => info.type === 'property' && (info.isReadonly || info.isSafe))
-      .map((info) => info.name);
-    const safeGetters = propInfos
-      .filter((info): info is AccessorPropInfo => info.type === 'accessor')
-      .map((info) => info.getter)
-      .filter(utils.notNull)
-      .filter((getter) => getter.constant || getter.isSafe)
-      .map((getter) => getter.name);
-    const safeSetters = propInfos
-      .filter((info): info is AccessorPropInfo => info.type === 'accessor')
-      .map((info) => info.setter)
-      .filter(utils.notNull)
-      .filter((setter) => setter.isSafe)
-      .map((setter) => setter.name);
-
-    return safeFuncs.concat(safeProps, safeGetters, safeSetters);
-  }
-
   private processSupportedStandards(): readonly string[] {
     return [this.isNep5Contract() ? 'NEP-5' : undefined].filter(utils.notNull);
   }
@@ -151,20 +97,6 @@ export class ManifestSmartContractProcessor {
     const hasName = propInfos.some((info) => info.type === 'property' && info.name === 'name' && info.isReadonly);
 
     return hasTotalSupply && hasBalanceOf && hasTransfer && hasDecimals && hasSymbol && hasName && hasTransferEvent;
-  }
-
-  // TODO: can remove this later
-  private processStorage(): boolean {
-    const propInfos = this.contractInfo.propInfos.filter((propInfo) => propInfo.isPublic && propInfo.type !== 'deploy');
-
-    const funcProps = propInfos.filter((info): info is FunctionPropInfo => info.type === 'function');
-    const hasNonConstant = funcProps.some((info) => !info.constant);
-    const propProps = propInfos.filter((info): info is PropertyPropInfo => info.type === 'property');
-    const hasNonReadonly = propProps.some((info) => !info.isReadonly);
-    const accessorProps = propInfos.filter((info): info is AccessorPropInfo => info.type === 'accessor');
-    const hasSetter = accessorProps.some((info) => info.setter !== undefined);
-
-    return hasSetter || hasNonConstant || hasNonReadonly;
   }
 
   private processABI(): SmartContractInfoABI {
@@ -201,6 +133,12 @@ export class ManifestSmartContractProcessor {
     ];
   }
 
+  // TODO: make sure this matches up with docs and with @safe decorator
+  // These methods are automatically safe:
+  // Marked with @safe or @constant
+  // Properties that are readonly or @safe
+  // Getters marked with @constant or @safe
+  // Not the deploy method
   private processFunctions(): ReadonlyArray<SmartContractInfoMethodDescriptor> {
     const deployInfo = this.findDeployInfo();
     const propInfos = this.contractInfo.propInfos
@@ -219,6 +157,7 @@ export class ManifestSmartContractProcessor {
                     ? []
                     : this.getParameters({ callSignature: propInfo.callSignature }),
                   returnType: BOOLEAN_RETURN,
+                  safe: propInfo.isSafe,
                 },
               ];
             case 'upgrade':
@@ -230,6 +169,7 @@ export class ManifestSmartContractProcessor {
                     { name: 'manifest', type: 'Buffer' },
                   ],
                   returnType: VOID_RETURN,
+                  safe: propInfo.isSafe,
                 },
               ];
             case 'function':
@@ -241,6 +181,7 @@ export class ManifestSmartContractProcessor {
                   }),
                   returnType: this.toABIReturn(propInfo.decl, propInfo.returnType),
                   constant: propInfo.constant,
+                  safe: propInfo.isSafe,
                 },
               ];
             case 'property':
@@ -250,6 +191,7 @@ export class ManifestSmartContractProcessor {
                   parameters: [],
                   returnType: this.toABIReturn(propInfo.decl, propInfo.propertyType),
                   constant: true,
+                  safe: propInfo.isSafe,
                 },
                 propInfo.isReadonly
                   ? undefined
@@ -261,6 +203,7 @@ export class ManifestSmartContractProcessor {
                         }),
                       ].filter(utils.notNull),
                       returnType: VOID_RETURN,
+                      safe: propInfo.isSafe,
                     },
               ].filter(utils.notNull);
             case 'accessor':
@@ -272,6 +215,7 @@ export class ManifestSmartContractProcessor {
                       parameters: [],
                       constant: propInfo.getter.constant,
                       returnType: this.toABIReturn(propInfo.getter.decl, propInfo.propertyType),
+                      safe: propInfo.getter.isSafe,
                     },
                 propInfo.setter === undefined
                   ? undefined
@@ -287,6 +231,7 @@ export class ManifestSmartContractProcessor {
                         ),
                       ].filter(utils.notNull),
                       returnType: VOID_RETURN,
+                      safe: propInfo.setter.isSafe,
                     },
               ].filter(utils.notNull);
             default:

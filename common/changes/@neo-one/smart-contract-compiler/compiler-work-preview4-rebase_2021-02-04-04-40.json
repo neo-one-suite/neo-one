@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/smart-contract-compiler",
+      "comment": "Update compiler, client, and CLI for Preview4",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/smart-contract-compiler",
+  "email": "spencercorwin@icloud.com"
+}

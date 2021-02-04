@@ -28,6 +28,7 @@ export interface DeployPropInfo extends PropInfoBase {
   readonly isMixinDeploy: boolean;
   readonly decl?: ts.ConstructorDeclaration;
   readonly callSignature?: ts.Signature;
+  readonly isSafe: boolean;
 }
 
 export interface UpgradePropInfo extends PropInfoBase {
@@ -109,7 +110,7 @@ export class ContractInfoProcessor {
             classDecl: this.smartContract,
             isPublic: true,
             approveUpgrade,
-            isSafe: true, // TODO: check
+            isSafe: false,
           }
         : undefined;
 
@@ -131,6 +132,7 @@ export class ContractInfoProcessor {
           classDecl: this.smartContract,
           isPublic: true,
           isMixinDeploy: false,
+          isSafe: true, // TODO: check
         },
       ]),
     };
@@ -224,6 +226,7 @@ export class ContractInfoProcessor {
           classDecl,
           decl: ctor,
           isPublic: true,
+          isSafe: true, // TODO: check
           callSignature,
           isMixinDeploy: maybeFunc !== undefined && this.context.analysis.isSmartContractMixinFunction(maybeFunc),
         },
@@ -273,6 +276,7 @@ export class ContractInfoProcessor {
             classDecl: this.smartContract,
             isPublic: true,
             isMixinDeploy: false,
+            isSafe: true, // TODO: check
           },
         ]),
       };
@@ -462,6 +466,7 @@ export class ContractInfoProcessor {
     const isReadonly = tsUtils.modifier.isReadonly(decl);
     const isAbstract = tsUtils.modifier.isAbstract(decl);
     const initializer = tsUtils.initializer.getInitializer(decl);
+    const isSafe = this.hasSafe(decl);
     if (structuredStorageType !== undefined && (isPublic || isAbstract || !isReadonly || initializer === undefined)) {
       this.context.reportError(
         decl,
@@ -493,7 +498,7 @@ export class ContractInfoProcessor {
       isReadonly,
       isAbstract,
       structuredStorageType,
-      isSafe: true,
+      isSafe: isReadonly || isSafe,
     };
   }
 

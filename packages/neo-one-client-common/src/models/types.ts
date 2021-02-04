@@ -358,7 +358,6 @@ export interface ContractEventDescriptorJSON {
 }
 
 export interface ContractABIJSON {
-  readonly hash: string;
   readonly methods: readonly ContractMethodDescriptorJSON[];
   readonly events: readonly ContractEventDescriptorJSON[];
 }
@@ -379,6 +378,7 @@ export interface ContractPermissionJSON {
 }
 
 export interface ContractManifestJSON {
+  readonly name: string;
   readonly abi: ContractABIJSON;
   readonly groups: readonly ContractGroupJSON[];
   readonly permissions: readonly ContractPermissionJSON[];

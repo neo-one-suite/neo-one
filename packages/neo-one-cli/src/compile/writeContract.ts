@@ -32,7 +32,7 @@ export const writeContract = async (
   { json: jsonFlag, avm: avmFlag, debug: debugFlag, opcodes: opcodesFlag }: CompileWriteOptions,
 ) => {
   await fs.ensureDir(outDir);
-  const outputPath = path.resolve(outDir, `${contractIn.contract.name}.contract.json`);
+  const outputPath = path.resolve(outDir, `${contractIn.contract.manifest.name}.contract.json`);
 
   const { sourceMap: sourceMapPromise, debugInfo, contract } = contractIn;
 
@@ -40,7 +40,7 @@ export const writeContract = async (
 
   // TODO: get this from compiler? Or change properties expected
   const metadata: NEOONEContractMetadata = {
-    name: contract.name,
+    name: contract.manifest.name,
     description: 'A NEO•ONE Smart Contract',
     codeVersion: '1.0',
     author: 'NEO•ONE',
@@ -83,8 +83,8 @@ export const writeContract = async (
     const jmpAddress = getJumpLength(disassembled[3].value); // TODO: abstract this index from compiler package. FIRST_JMP_IDX = 3;
     const endAddress = disassembled[disassembled.length - 1].pc;
 
-    const jmpMethod = getJmpMethodDefinition(contract.name);
-    const dispatcherMethod = getDispatcherMethodDefinition(contract.name, jmpAddress, endAddress);
+    const jmpMethod = getJmpMethodDefinition(contract.manifest.name);
+    const dispatcherMethod = getDispatcherMethodDefinition(contract.manifest.name, jmpAddress, endAddress);
 
     const getMethodRanges = (consumer: SourceMapConsumer, line: number) =>
       consumer
@@ -131,7 +131,7 @@ export const writeContract = async (
 
             return {
               id: `${index + 2}`,
-              name: `${contract.name},${name}`,
+              name: `${contract.manifest.name},${name}`,
               range: `${range[0]}-${range[1]}`,
               params,
               return: returnType,
@@ -149,14 +149,14 @@ export const writeContract = async (
       methods: [jmpMethod, dispatcherMethod, ...methods],
       events: manifest.abi.events.map((event, index) => ({
         id: `${lastID + index}`,
-        name: `${contract.name}-${event.name}`,
+        name: `${contract.manifest.name}-${event.name}`,
         params: event.parameters.map((param) => `${param.name},${param.type}`),
       })),
     };
 
     if (avmFlag) {
       const zip = new JSZip();
-      zip.file<'text'>(`${contract.name}.debug.json`, JSON.stringify(debugJSON, undefined, 2));
+      zip.file<'text'>(`${contract.manifest.name}.debug.json`, JSON.stringify(debugJSON, undefined, 2));
       await new Promise((resolve) =>
         zip
           .generateNodeStream({ type: 'nodebuffer', streamFiles: true })

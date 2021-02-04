@@ -35,7 +35,7 @@ export class ContractState extends ContractStateModel<ContractManifest> {
   private readonly sizeInternal = utils.lazy(
     () =>
       IOHelper.sizeOfUInt32LE +
-      +IOHelper.sizeOfUInt16LE +
+      IOHelper.sizeOfUInt16LE +
       IOHelper.sizeOfUInt160 +
       IOHelper.sizeOfVarBytesLE(this.script) +
       this.manifest.size,

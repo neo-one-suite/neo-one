@@ -36,7 +36,7 @@ export abstract class NEP17NativeContract extends NativeContract {
 
   public async balanceOf({ storages }: NativeContractStorageContext, account: UInt160): Promise<BN> {
     const storage = await storages.tryGet(
-      this.createStorageKey(this.basePrefixes.totalSupply).addBuffer(account).toStorageKey(),
+      this.createStorageKey(this.basePrefixes.account).addBuffer(account).toStorageKey(),
     );
     if (storage === undefined) {
       return new BN(0);

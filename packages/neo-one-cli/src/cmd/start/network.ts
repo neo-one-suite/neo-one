@@ -26,7 +26,6 @@ export const handler = () => {
         blockchain: createPriv({
           standbyValidators: [common.ecPointToString(publicKey)],
           extraCommitteeMembers: [],
-          // privateNet: true,
         }),
         node: {
           consensus: {

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/client-switch",
+      "comment": "Update compiler, client, and CLI for Preview4",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/client-switch",
+  "email": "spencercorwin@icloud.com"
+}

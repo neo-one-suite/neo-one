@@ -1,6 +1,7 @@
 import {
   ABIParameter,
   ABIReturn,
+  BinaryWriter,
   BufferString,
   common,
   ContractManifestClient,
@@ -17,12 +18,15 @@ import {
   RawInvokeReceipt,
   ScriptBuilder,
   scriptHashToAddress,
+  SignerModel,
   SourceMaps,
   TransactionOptions,
   TransactionResult,
   UInt160,
   UserAccountID,
+  utils as clientUtils,
   Wildcard,
+  WitnessScopeModel,
 } from '@neo-one/client-common';
 import {
   convertParams,
@@ -89,9 +93,11 @@ const toContractParameterType = (parameter: ABIReturn | ABIParameter): ContractP
   }
 };
 
-export const contractRegisterToContractModel = (contractIn: ContractRegister): ContractStateModel => {
+export const contractRegisterToContractModel = (
+  contractIn: ContractRegister,
+  contractHash: UInt160,
+): ContractStateModel => {
   const abi = new ContractABIModel({
-    hash: common.stringToUInt160(contractIn.manifest.abi.hash),
     methods: contractIn.manifest.abi.methods.map(
       (methodIn) =>
         new ContractMethodDescriptorModel({
@@ -145,6 +151,7 @@ export const contractRegisterToContractModel = (contractIn: ContractRegister): C
     return '*';
   };
   const manifest = new ContractManifestModel({
+    name: contractIn.manifest.name,
     groups: contractIn.manifest.groups.map(
       (group) =>
         new ContractGroupModel({
@@ -166,10 +173,10 @@ export const contractRegisterToContractModel = (contractIn: ContractRegister): C
   });
 
   return new ContractStateModel({
-    hash: '',
-    updateCounter: 1,
+    hash: contractHash,
+    updateCounter: 1, // TODO: what should this be?
     script: Buffer.from(contractIn.script, 'hex'),
-    id: Math.floor(Math.random() * 1000000), // TODO: fix
+    id: clientUtils.randomUShort(),
     manifest,
   });
 };
@@ -273,10 +280,35 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     sourceMaps: SourceMaps = {},
     options?: TransactionOptions,
   ): Promise<TransactionResult<PublishReceipt>> {
-    const contract = contractRegisterToContractModel(contractIn);
+    const address = this.getCurrentUserAccount()?.id.address;
+    if (address === undefined) {
+      throw new Error('Expected address to be defined');
+    }
+    // TODO: clean up this mess and clean up this transaction flow
+    const signer = new SignerModel({
+      account: crypto.addressToScriptHash({ address, addressVersion: common.NEO_ADDRESS_VERSION }),
+      scopes: WitnessScopeModel.Global,
+    });
+
+    const contractHashUInt160 = crypto.getContractHash(signer.account, Buffer.from(contractIn.script, 'hex'));
+    const contractHash = common.uInt160ToString(contractHashUInt160);
+    const contract = contractRegisterToContractModel(contractIn, contractHashUInt160);
+
+    const writer = new BinaryWriter();
+    writer.writeUInt32LE(0x3346454e); // TODO: abstract this number
+    writer.writeFixedString(contractIn.compilerName, 32);
+    writer.writeFixedString(contractIn.compilerVersion, 32);
+    writer.writeVarBytesLE(Buffer.from(contractIn.script, 'hex'));
+    writer.writeBytes(crypto.sha256(crypto.sha256(writer.toBuffer())).slice(0, 4));
 
     const sb = new ScriptBuilder();
-    sb.emitSysCall('System.Contract.Create', contract.script, contract.manifest.serializeWire());
+    sb.emitPush(contract.manifest.serializeWireForNeo()); // TODO: remove this later
+    sb.emitPush(writer.toBuffer());
+    sb.emitPushInt(2);
+    sb.emitOp('PACK');
+    sb.emitPushString('deploy');
+    sb.emitPush(common.nativeHashes.Management);
+    sb.emitSysCall('System.Contract.Call');
     const { from } = this.getTransactionOptions(options);
     emit(sb, from);
 
@@ -293,10 +325,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         } else if (data.vmState === 'NONE' || data.vmState === 'BREAK') {
           throw new Error(`Something went wrong. Expected VM state HALT or FAULT. Got: ${data.vmState}`);
         } else {
-          const address = scriptHashToAddress(
-            common.uInt160ToString(crypto.toScriptHash(Buffer.from(contractIn.script, 'hex'))),
-          );
-          const contractOut = await this.provider.getContract(from.network, address);
+          const contractAddress = scriptHashToAddress(contractHash);
+          const contractOut = await this.provider.getContract(from.network, contractAddress);
 
           result = await this.getInvocationResultSuccess(data, contractOut, sourceMaps);
         }

@@ -701,6 +701,7 @@ export interface SmartContractNetworksDefinition {
  * Used to generate the smart contract APIs.
  */
 export interface SmartContractDefinition {
+  // TODO: may have to put hash here?
   /**
    * Configuration for the smart contract by network.
    */
@@ -767,7 +768,7 @@ export interface TransactionOptions {
    *
    * If unspecified, the currently selected `UserAccount` is used as the `from` address.
    *
-   * DApp developers will typically want to leave this unspecified.
+   * dApp developers will typically want to leave this unspecified.
    */
   from?: UserAccountID;
   /**
@@ -1487,23 +1488,23 @@ export interface ContractMethodDescriptorClient {
   /**
    * Parameters of the method.
    */
-  readonly parameters?: readonly ABIParameter[];
+  readonly parameters?: readonly ABIParameter[]; // TODO: should be be optional or no?
   /**
    * Return type of the method.
    */
-  readonly returnType: ABIReturn;
+  readonly returnType: ABIReturn; // TODO: should this be ContractParameterType?
   /**
    * Used to set the instruction pointer before executing the method.
    */
   readonly offset: number;
   /**
+   * `true` if the function is "safe" to be called by any other contract
+   */
+  readonly safe: boolean;
+  /**
    * `true` if the function is constant or read-only.
    */
   readonly constant?: boolean;
-  /**
-   * `true` if the function is "safe" to be called by any other contract
-   */
-  readonly safe?: boolean; // TODO: this might need to be required
   /**
    * `true` if the function is marked for receiving tokens.
    */
@@ -1544,7 +1545,7 @@ export interface ContractEventDescriptorClient {
   /**
    * Parameters of the event.
    */
-  readonly parameters: readonly ABIParameter[];
+  readonly parameters: readonly ABIParameter[]; // TODO: should this be ContractParameterDefinition?
 }
 
 /**
@@ -1568,10 +1569,6 @@ export interface ContractEventDescriptor {
  */
 export interface ContractABIClient {
   /**
-   * Script hash of the contract.
-   */
-  readonly hash: UInt160Hex;
-  /**
    * Specification of the smart contract methods.
    */
   readonly methods: readonly ContractMethodDescriptorClient[];
@@ -1587,10 +1584,6 @@ export interface ContractABIClient {
  * See the [Smart Contract APIs](https://neo-one.io/docs/smart-contract-apis) chapter of the main guide for more information.
  */
 export interface ContractABI {
-  /**
-   * Script hash of the contract.
-   */
-  readonly hash: UInt160Hex;
   /**
    * Specification of the smart contract methods.
    */
@@ -1657,9 +1650,9 @@ export interface ContractPermission {
  */
 export interface ContractManifestClient {
   /**
-   * The `Contract`'s hash.
+   * The name of the contract.
    */
-  readonly hash: UInt160Hex;
+  readonly name: string;
   /**
    * A group represents a set of mutually trusted contracts. A contract will trust and allow any contract in the same group to invoke it, and the user interface will not give any warnings.
    */
@@ -1693,6 +1686,10 @@ export interface ContractManifestClient {
  * it will be limited by its declared list of permissions.
  */
 export interface ContractManifest {
+  /**
+   * The name of the contract.
+   */
+  readonly name: string;
   /**
    * A group represents a set of mutually trusted contracts. A contract will trust and allow any contract in the same group to invoke it, and the user interface will not give any warnings.
    */

@@ -1,4 +1,3 @@
-import { common, crypto } from '@neo-one/client-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
@@ -75,7 +74,6 @@ export const compile = async ({
 
   const finalResult = emittingScriptBuilder.getFinalResult(sourceMaps);
   const script = finalResult.code.toString('hex');
-  const hash = common.uInt160ToString(crypto.toScriptHash(Buffer.from(script, 'hex')));
 
   const methods = await processMethods({
     context,
@@ -87,21 +85,17 @@ export const compile = async ({
 
   return {
     contract: {
-      name,
       script,
       manifest: {
-        hash,
+        name,
         ...manifest,
-        features: {
-          ...manifest.features,
-          ...finalResult.features,
-        },
         abi: {
-          hash,
           ...manifest.abi,
           methods,
         },
       },
+      compilerName: 'neo-one',
+      compilerVersion: '3.1.0-preview4',
     },
     context,
     debugInfo,

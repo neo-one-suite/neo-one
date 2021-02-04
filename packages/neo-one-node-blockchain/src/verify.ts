@@ -106,7 +106,7 @@ export const verifyWitness = async ({
         }
       } else {
         // tslint:disable-next-line: possible-timing-attack
-        if (native.isNative(hash) || hash !== witness.scriptHash) {
+        if (native.isNative(hash) || !hash.equals(witness.scriptHash)) {
           return { result: false, gas: initFee };
         }
 

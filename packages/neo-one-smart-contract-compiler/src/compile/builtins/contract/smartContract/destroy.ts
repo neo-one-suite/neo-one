@@ -1,3 +1,4 @@
+import { common } from '@neo-one/client-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../../sb';
@@ -23,7 +24,16 @@ export class SmartContractDestroy extends BuiltinInstanceMemberCall {
       sb.emitOp(node, 'DROP');
     }
 
-    sb.emitSysCall(node, 'System.Contract.Destroy');
+    // [1, buffer]
+    sb.emitPushInt(node, 1);
+    // [[buffer]]
+    sb.emitOp(node, 'PACK');
+    // ['destroy', [buffer], buffer]
+    sb.emitPushString(node, 'destroy');
+    // [buffer, 'destroy', [buffer]]
+    sb.emitPushBuffer(node, common.nativeHashes.Management);
+    // [conract]
+    sb.emitSysCall(node, 'System.Contract.Call');
 
     if (optionsIn.pushValue) {
       // [val]

@@ -397,6 +397,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
 
   private convertContractManifest(manifest: ContractManifestJSON): ContractManifest {
     return {
+      name: manifest.name,
       groups: manifest.groups.map(this.convertContractGroup),
       supportedStandards: manifest.supportedstandards,
       abi: this.convertContractABI(manifest.abi),
@@ -422,7 +423,6 @@ export class NEOONEDataProvider implements DeveloperProvider {
 
   private convertContractABI(abi: ContractABIJSON): ContractABI {
     return {
-      hash: abi.hash,
       methods: abi.methods.map(this.convertContractMethodDescriptor.bind(this)),
       events: abi.events.map(this.convertContractEventDescriptor.bind(this)),
     };

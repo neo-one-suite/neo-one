@@ -8,8 +8,6 @@ import {
   SerializableWire,
   SerializeWire,
   UInt160,
-  UInt160Hex,
-  utils,
   WildcardContainer,
 } from '@neo-one/client-common';
 import { JSONObject } from '@neo-one/utils';
@@ -22,6 +20,7 @@ export interface ContractManifestModelAdd<
   TContractGroup extends ContractGroupModel = ContractGroupModel,
   TContractPermission extends ContractPermissionModel = ContractPermissionModel
 > {
+  readonly name: string;
   readonly groups: readonly TContractGroup[];
   readonly supportedStandards: readonly string[];
   readonly abi: TContractABI;
@@ -36,6 +35,7 @@ export class ContractManifestModel<
   TContractPermission extends ContractPermissionModel = ContractPermissionModel
 > implements SerializableWire, SerializableJSON<ContractManifestJSON> {
   public static readonly maxLength = common.MAX_MANIFEST_LENGTH;
+  public readonly name: string;
   public readonly groups: readonly TContractGroup[];
   public readonly supportedStandards: readonly string[];
   public readonly abi: TContractABI;
@@ -43,10 +43,11 @@ export class ContractManifestModel<
   public readonly trusts: WildcardContainer<UInt160>;
   public readonly extra: JSONObject | undefined;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
-  private readonly hashInternal = utils.lazy(() => this.abi.hash);
-  private readonly hashHexInternal = utils.lazy(() => common.uInt160ToHex(this.hash));
+  // TODO: fix this
+  public readonly serializeWireForNeo: SerializeWire = createSerializeWire(this.serializeWireBaseForNeo.bind(this));
 
   public constructor({
+    name,
     groups,
     supportedStandards,
     abi,
@@ -54,6 +55,7 @@ export class ContractManifestModel<
     trusts,
     extra,
   }: ContractManifestModelAdd<TContractABI, TContractGroup, TContractPermission>) {
+    this.name = name;
     this.groups = groups;
     this.supportedStandards = supportedStandards;
     this.abi = abi;
@@ -62,16 +64,9 @@ export class ContractManifestModel<
     this.extra = extra;
   }
 
-  public get hash(): UInt160 {
-    return this.hashInternal();
-  }
-
-  public get hashHex(): UInt160Hex {
-    return this.hashHexInternal();
-  }
-
   public serializeJSON(): ContractManifestJSON {
     return {
+      name: this.name,
       groups: this.groups.map((group) => group.serializeJSON()),
       supportedstandards: this.supportedStandards,
       abi: this.abi.serializeJSON(),
@@ -82,6 +77,10 @@ export class ContractManifestModel<
   }
 
   public serializeWireBase(writer: BinaryWriter): void {
+    writer.writeVarString(JSON.stringify(this.serializeJSON()));
+  }
+
+  public serializeWireBaseForNeo(writer: BinaryWriter): void {
     // TODO: fix this. or bring up with Neo team
     writer.writeVarStringWithoutVar(JSON.stringify(this.serializeJSON()));
   }

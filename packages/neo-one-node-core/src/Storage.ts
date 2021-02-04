@@ -103,19 +103,19 @@ export interface LatestReadStorage<Key, Value> extends ReadStorage<Key, Value> {
 export type AddChange =
   | { readonly type: 'block'; readonly key: BlockKey; readonly value: TrimmedBlock }
   | { readonly type: 'transaction'; readonly key: TransactionKey; readonly value: TransactionState }
-  | { readonly type: 'contract'; readonly key: ContractKey; readonly value: ContractState }
+  // | { readonly type: 'contract'; readonly key: ContractKey; readonly value: ContractState }
   | { readonly type: 'storage'; readonly key: StorageKey; readonly value: StorageItem }
   | { readonly type: 'headerHashList'; readonly key: HeaderKey; readonly value: HeaderHashList }
   | { readonly type: 'blockHashIndex'; readonly value: HashIndexState }
   | { readonly type: 'headerHashIndex'; readonly value: HashIndexState }
-  | { readonly type: 'contractID'; readonly value: ContractIDState }
+  // | { readonly type: 'contractID'; readonly value: ContractIDState }
   | { readonly type: 'nep17Balance'; readonly key: Nep17BalanceKey; readonly value: Nep17Balance }
   | { readonly type: 'nep17TransferSent'; readonly key: Nep17TransferKey; readonly value: Nep17Transfer }
   | { readonly type: 'nep17TransferReceived'; readonly key: Nep17TransferKey; readonly value: Nep17Transfer }
   | { readonly type: 'applicationLog'; readonly key: TransactionKey; readonly value: ApplicationLog };
 
 export type DeleteChange =
-  | { readonly type: 'contract'; readonly key: ContractKey }
+  // | { readonly type: 'contract'; readonly key: ContractKey }
   | { readonly type: 'storage'; readonly key: StorageKey }
   | { readonly type: 'nep17Balance'; readonly key: Nep17BalanceKey };
 

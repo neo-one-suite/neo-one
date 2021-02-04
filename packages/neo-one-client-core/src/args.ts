@@ -610,6 +610,7 @@ const assertContractMethodDescriptorClient = (name: string, value?: unknown): Co
     ).map((parameter) => assertABIParameter('ContractMethodDescriptorClient.parameters', parameter)),
     returnType: assertProperty(value, 'ContractMethodDescriptorClient', 'returnType', assertABIReturn),
     constant: assertProperty(value, 'ContractMethodDescriptorClient', 'constant', assertNullableBoolean),
+    safe: assertProperty(value, 'ContractMethodDescriptorClient', 'safe', assertBoolean),
     offset: assertProperty(value, 'ContractMethodDescriptorClient', 'offset', assertNumber),
   };
 };
@@ -664,7 +665,6 @@ export const assertContractABIClient = (name: string, value?: unknown): Contract
   }
 
   return {
-    hash: assertProperty(value, 'ContractABI', 'hash', assertUInt160Hex),
     methods: assertProperty(value, 'ContractABI', 'methods', assertArray).map((method) =>
       assertContractMethodDescriptorClient('ContractABI.methods', method),
     ),
@@ -680,7 +680,6 @@ export const assertContractABI = (name: string, value?: unknown): ContractABI =>
   }
 
   return {
-    hash: assertProperty(value, 'ContractABI', 'hash', assertUInt160Hex),
     methods: assertProperty(value, 'ContractABI', 'methods', assertArray).map((method) =>
       assertContractMethodDescriptor('ContractABI.methods', method),
     ),
@@ -774,7 +773,7 @@ export const assertContractManifestClient = (name: string, value?: unknown): Con
   }
 
   return {
-    hash: assertProperty(value, 'ContractManifest', 'hash', assertUInt160Hex),
+    name: assertProperty(value, 'ContractManifest', 'name', assertString),
     groups: assertProperty(value, 'ContractManifest', 'groups', assertArray).map((group) =>
       assertContractGroup('ContractManifest.groups', group),
     ),
@@ -796,6 +795,7 @@ export const assertContractManifest = (name: string, value?: unknown): ContractM
   }
 
   return {
+    name: assertProperty(value, 'ContractManifest', 'name', assertString),
     groups: assertProperty(value, 'ContractManifest', 'groups', assertArray).map((group) =>
       assertContractGroup('ContractManifest.groups', group),
     ),
@@ -984,8 +984,12 @@ export const assertAttribute = (name: string, attribute?: unknown): Attribute =>
     throw new InvalidArgumentError('Attribute', name, attribute);
   }
 
+  // TODO: check this works for both attributes
   return {
     type: assertProperty(attribute, 'Attribute', 'type', assertAttributeTypeArg),
+    id: assertProperty(attribute, 'Attribute', 'id', assertBigNumber),
+    code: assertProperty(attribute, 'Attribute', 'code', assertNumber),
+    result: assertProperty(attribute, 'Attribute', 'result', assertBuffer),
   };
 };
 

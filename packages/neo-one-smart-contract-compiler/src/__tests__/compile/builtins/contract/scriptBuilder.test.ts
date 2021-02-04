@@ -10,6 +10,7 @@ const properties = `
   };
 `;
 
+// TODO: delete this later or put it in a better spot with better naming, etc.
 describe('Calling contract', () => {
   test('Call with script', async () => {
     const node = await helpers.startNode();
@@ -27,7 +28,7 @@ describe('Calling contract', () => {
     `);
 
     const result = await node.client.__call('priv', contract.address, 'run', ['run', []]);
-    // console.log(result);
+    console.log(result);
 
     expect(result.state).toEqual('HALT');
 
@@ -38,7 +39,7 @@ describe('Calling contract', () => {
       maxNetworkFee: new BigNumber(-1),
     });
     const final = await resultAgain.confirmed();
-    // console.log(final);
+    console.log(final);
 
     expect(final.state).toEqual('HALT');
   });

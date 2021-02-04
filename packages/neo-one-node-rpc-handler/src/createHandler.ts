@@ -785,6 +785,7 @@ export const createHandler = ({
           verifyResult: resultJSON,
         };
       } catch (error) {
+        console.log(error);
         throw new JSONRPCError(-110, `Relay transaction failed: ${error.message}`);
       }
     },

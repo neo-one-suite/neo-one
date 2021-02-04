@@ -159,7 +159,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   public getFinalResult(sourceMaps: { readonly [filePath: string]: RawSourceMap }): ScriptBuilderResult {
     this.withProgramCounter((programCounter) => {
       // Initialize static fields for scope tracking
-      this.emitOp(this.sourceFile, 'INITSSLOT', Buffer.from([0xff])); // TODO: currently only using a single slot, not all
+      this.emitOp(this.sourceFile, 'INITSSLOT', Buffer.from([0x01]));
       this.emitOp(this.sourceFile, 'NEWARRAY0');
       this.emitOp(this.sourceFile, 'STSFLD0');
       this.emitJmp(this.sourceFile, 'JMP_L', programCounter.getLast());

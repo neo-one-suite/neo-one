@@ -1,8 +1,9 @@
+import { common } from '@neo-one/client-common';
 import { Types } from '../../constants';
 import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
 import { BuiltinInstanceIndexValue } from './BuiltinInstanceIndexValue';
-import { ValueFor } from './ValueFor';
+import { ValueForWithScript } from './ValueForWithScript';
 import { ValueInstanceOf } from './ValueInstanceOf';
 
 class ContractInterface extends BuiltinInterface {}
@@ -20,28 +21,43 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractMember(
     'ContractConstructor',
     'for',
-    new ValueFor('System.Blockchain.GetContract', (sb, node, options) => {
-      sb.emitHelper(
-        node,
-        options,
-        sb.helpers.if({
-          condition: () => {
-            // [buffer, buffer]
-            sb.emitOp(node, 'DUP');
-            // [buffer, buffer, buffer]
-            sb.emitPushBuffer(node, Buffer.from([]));
-            // [boolean, buffer]
-            sb.emitOp(node, 'EQUAL');
-          },
-          whenTrue: () => {
-            sb.emitOp(node, 'DROP');
-            sb.emitHelper(node, options, sb.helpers.wrapUndefined);
-          },
-          whenFalse: () => {
-            sb.emitHelper(node, options, sb.helpers.wrapContract);
-          },
-        }),
-      );
-    }),
+    // TODO: this can be better/cleaner. also needs to be tested
+    new ValueForWithScript(
+      (sb, node, _options) => {
+        // [1, buffer]
+        sb.emitPushInt(node, 1);
+        // [[buffer]]
+        sb.emitOp(node, 'PACK');
+        // ['getContract', [buffer]]
+        sb.emitPushString(node, 'getContract');
+        // [buffer, 'getContract', [buffer]]
+        sb.emitPushBuffer(node, common.nativeHashes.Management);
+        // [conract]
+        sb.emitSysCall(node, 'System.Contract.Call');
+      },
+      (sb, node, options) => {
+        sb.emitHelper(
+          node,
+          options,
+          sb.helpers.if({
+            condition: () => {
+              // [buffer, buffer]
+              sb.emitOp(node, 'DUP');
+              // [buffer, buffer, buffer]
+              sb.emitPushBuffer(node, Buffer.from([]));
+              // [boolean, buffer]
+              sb.emitOp(node, 'EQUAL');
+            },
+            whenTrue: () => {
+              sb.emitOp(node, 'DROP');
+              sb.emitHelper(node, options, sb.helpers.wrapUndefined);
+            },
+            whenFalse: () => {
+              sb.emitHelper(node, options, sb.helpers.wrapContract);
+            },
+          }),
+        );
+      },
+    ),
   );
 };

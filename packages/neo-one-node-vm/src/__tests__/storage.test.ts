@@ -1,4 +1,4 @@
-import { common, ScriptBuilder, TriggerType, UInt256, WitnessScopeModel, VMState } from '@neo-one/client-common';
+import { common, ScriptBuilder, TriggerType, UInt256, VMState, WitnessScopeModel } from '@neo-one/client-common';
 import { assertArrayStackItem, Block, ConsensusData, Signer, Transaction, Witness } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import { Dispatcher } from '../Dispatcher';

@@ -115,11 +115,7 @@ const publish = async (
 ): Promise<Contract> => {
   throwOnDiagnosticErrorOrWarning(context.diagnostics, ignoreWarnings);
 
-  const result = await client.publish({
-    script: contract.script,
-    manifest: contract.manifest,
-    name: contract.name,
-  });
+  const result = await client.publish(contract);
 
   const [publishReceipt] = await Promise.all([
     result.confirmed({ timeoutMS: 2500 }),
@@ -166,7 +162,7 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
       ]);
       mutableSourceMaps[result.hash] = resolvedSourceMap;
 
-      return { contract: result, address: scriptHashToAddress(result.manifest.abi.hash) };
+      return { contract: result, address: scriptHashToAddress(result.hash) };
     },
     async addContractWithDefinition(
       script,
@@ -184,7 +180,7 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
         contract: result,
         definition: {
           manifest: contract.manifest,
-          networks: { [networkName]: { address: scriptHashToAddress(result.manifest.abi.hash) } },
+          networks: { [networkName]: { address: scriptHashToAddress(result.hash) } },
           sourceMaps: mutableSourceMaps,
         },
       };

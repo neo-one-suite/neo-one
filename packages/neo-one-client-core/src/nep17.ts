@@ -1,15 +1,12 @@
 import {
   ABIParameter,
   AddressString,
-  common,
   ContractABIClient,
   ContractManifestClient,
   ContractMethodDescriptorClient,
-  crypto,
   Event,
   InvokeReceipt,
   NetworkType,
-  ScriptBuilder,
   SmartContractNetworksDefinition,
   SmartContractReadOptions,
   TransactionOptions,
@@ -56,12 +53,7 @@ const decimalsFunction: ContractMethodDescriptorClient = {
   safe: true,
 };
 
-// TODO: check that the script/hash can/should be blank here. also check offsets
-const blankScript = new ScriptBuilder().build();
-const blankHash = crypto.toScriptHash(blankScript);
-
 export const abi = (decimals: number): ContractABIClient => ({
-  hash: common.uInt160ToString(blankHash),
   methods: [
     {
       name: 'name',
@@ -147,9 +139,8 @@ export const abi = (decimals: number): ContractABIClient => ({
   ],
 });
 
-// TODO: check that the script/hash can/should be blank here
 export const manifest = (decimals: number): ContractManifestClient => ({
-  hash: common.uInt160ToString(blankHash),
+  name: '',
   groups: [],
   supportedStandards: [],
   abi: abi(decimals),
@@ -167,7 +158,7 @@ export const getDecimals = async (
       networks: networksDefinition,
       manifest: {
         ...manifest(0),
-        abi: { hash: manifest(0).hash, events: [], methods: [decimalsFunction] },
+        abi: { events: [], methods: [decimalsFunction] },
       },
     })
     .decimals({ network });

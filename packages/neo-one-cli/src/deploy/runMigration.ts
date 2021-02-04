@@ -32,7 +32,7 @@ export const runMigration = async (
   print: Print,
 ) => {
   const nameToContract: NameToContract = _.fromPairs(
-    contractResults.map((contract) => [camel(contract.contract.name), contract]),
+    contractResults.map((contract) => [camel(contract.contract.manifest.name), contract]),
   );
   let contracts: Contracts = _.fromPairs(
     Object.entries(nameToContract).map(([name, contract]) => [

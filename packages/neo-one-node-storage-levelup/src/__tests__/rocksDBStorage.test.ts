@@ -7,7 +7,7 @@ import { storage as levelUpStorage } from '../';
 describe('levelUpStorage', () => {
   let storage: Storage;
   beforeEach(async () => {
-    const rocks = new RocksDB('/Users/danielbyrne/Desktop/test-location');
+    const rocks = new RocksDB('/Users/spencercorwin/Desktop/test-location');
     storage = levelUpStorage({ db: LevelUp(rocks), context: { messageMagic: 1953787457, validatorsCount: 7 } });
   });
   test('deleted items are undefined', async () => {
