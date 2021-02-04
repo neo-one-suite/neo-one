@@ -102,7 +102,7 @@ describe('Dispatcher Tests', () => {
     expect(dispatcher.getConfig()).toBeDefined();
   });
 
-  test.only('test output only', () => {
+  test.skip('test output only', () => {
     console.log(dispatcher.test());
   });
 });
