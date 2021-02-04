@@ -1,9 +1,8 @@
-import { common, ContractParameterTypeModel, ECPoint, SignatureString, UInt160 } from '@neo-one/client-common';
+import { common, ContractParameterTypeModel, ECPoint, UInt160 } from '@neo-one/client-common';
 import { constants } from '@neo-one/utils';
 import {
   ContractABIModel,
   ContractEventDescriptorModel,
-  ContractFeaturesModel,
   ContractGroupModel,
   ContractManifestModel,
   ContractMethodDescriptorModel,
@@ -73,7 +72,7 @@ export const contractMethodDescriptorModel = (
   returnType: ContractParameterTypeModel = ContractParameterTypeModel.Void,
   name = 'function',
   offset = 0,
-) => new ContractMethodDescriptorModel({ name, parameters, returnType, offset });
+) => new ContractMethodDescriptorModel({ name, parameters, returnType, offset, safe: true });
 
 export const contractEventDescriptorModel = (
   parameters: readonly ContractParameterDefinitionModel[] = [contractParamDefinitionModel.boolean],
@@ -112,14 +111,13 @@ export const contractPermissionModel = (
 
 export const contractManifestModel = (
   groups: readonly ContractGroupModel[] = [contractGroupModel()],
-  features: ContractFeaturesModel = ContractFeaturesModel.HasStoragePayable,
   abi: ContractABIModel = contractAbiModel(),
   permissions: readonly ContractPermissionModel[] = [contractPermissionModel('uint160', ['method1'])],
   trusts: readonly UInt160[] = [common.bufferToUInt160(Buffer.alloc(20, 1))],
-  safeMethods: readonly string[] = ['method1', 'method2'],
   supportedStandards: readonly string[] = [],
-) => new ContractManifestModel({ groups, features, supportedStandards, abi, permissions, trusts, safeMethods });
+) => new ContractManifestModel({ groups, supportedStandards, abi, permissions, trusts });
 
+// TODO: fixup
 export const contractModel = (
   id = 1,
   script: Buffer = Buffer.alloc(25),

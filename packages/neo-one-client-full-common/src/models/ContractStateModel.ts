@@ -1,32 +1,26 @@
-import { BinaryWriter, createSerializeWire, SerializableWire, SerializeWire } from '@neo-one/client-common';
+import { UInt160 } from '@neo-one/client-common';
 import { ContractManifestModel } from './manifest';
 
 export interface ContractStateModelAdd<TContractManifest extends ContractManifestModel = ContractManifestModel> {
   readonly id: number;
+  readonly updateCounter: number;
+  readonly hash: UInt160;
   readonly script: Buffer;
   readonly manifest: TContractManifest;
 }
 
-export class ContractStateModel<TContractManifest extends ContractManifestModel = ContractManifestModel>
-  implements SerializableWire {
+export class ContractStateModel<TContractManifest extends ContractManifestModel = ContractManifestModel> {
   public readonly id: number;
+  public readonly updateCounter: number;
+  public readonly hash: UInt160;
   public readonly script: Buffer;
   public readonly manifest: TContractManifest;
-  public readonly hasStorage: boolean;
-  public readonly payable: boolean;
-  public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
-  public constructor({ script, manifest, id }: ContractStateModelAdd<TContractManifest>) {
+  public constructor({ script, hash, manifest, id, updateCounter }: ContractStateModelAdd<TContractManifest>) {
     this.id = id;
+    this.updateCounter = updateCounter;
+    this.hash = hash;
     this.script = script;
     this.manifest = manifest;
-    this.hasStorage = manifest.hasStorage;
-    this.payable = manifest.payable;
-  }
-
-  public serializeWireBase(writer: BinaryWriter): void {
-    writer.writeUInt32LE(this.id);
-    writer.writeVarBytesLE(this.script);
-    this.manifest.serializeWireBase(writer);
   }
 }

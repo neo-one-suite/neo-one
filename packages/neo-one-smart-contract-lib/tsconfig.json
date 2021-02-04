@@ -24,5 +24,5 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true
   },
-  "exclude": ["./src/index.ts", "./src/ownership/*.ts", "./src/ICO.ts", "./src/NEP5Token.ts"]
+  "exclude": ["./src/index.ts", "./src/ownership/*.ts", "./src/ICO.ts", "src/NEP17Token.ts"]
 }

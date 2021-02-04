@@ -127,7 +127,7 @@ export {
   decryptNEP2,
   encryptNEP2,
   isNEP2,
-  nep5,
+  nep17,
   privateKeyToAddress,
   privateKeyToPublicKey,
   privateKeyToScriptHash,

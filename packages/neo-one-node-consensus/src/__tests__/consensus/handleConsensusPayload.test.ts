@@ -1,12 +1,11 @@
 // wallaby.skip
-import { common, crypto, Op, PrivateKey, ScriptBuilder, UInt256Hex, WitnessScopeModel } from '@neo-one/client-common';
+import { common, crypto, Op, ScriptBuilder, UInt256Hex, WitnessScopeModel } from '@neo-one/client-common';
 import {
   Block,
   ChangeViewConsensusMessage,
   ChangeViewReason,
   ConsensusContext,
   ConsensusData,
-  Contract,
   Signer,
   Transaction,
   TransactionVerificationContext,
@@ -45,6 +44,7 @@ describe('handleConsensusPayload', () => {
     knownHashes = new Set<UInt256Hex>();
   });
 
+  // TODO: fixup
   test('updates the expected view on new view number', async () => {
     const payload = await makeSignedPayload({
       node,
@@ -77,17 +77,13 @@ describe('handleConsensusPayload', () => {
 
       timerContext,
     });
-
-    console.log(result);
   });
 
+  // TODO: fixup
   test.only('settings help', () => {
     const privateKeyString = 'e35fa5d1652c4c65e296c86e63a3da6939bc471b741845be636e2daa320dc770';
     const privateKey = common.stringToPrivateKey(privateKeyString);
     const publicKey = crypto.privateKeyToPublicKey(privateKey);
-    const publicKeyString = common.ecPointToHex(publicKey);
-
-    // console.log({ privateKey: privateKeyString, publicKey: publicKeyString });
 
     const standbyValidators = [publicKey];
 
@@ -96,27 +92,6 @@ describe('handleConsensusPayload', () => {
     const deployWitness = new Witness({
       invocation: Buffer.from([]),
       verification: Buffer.from([Op.PUSH1]),
-    });
-
-    const scriptBuilder = new ScriptBuilder();
-    scriptBuilder.emitSysCall('Neo.Native.Deploy');
-    const script = scriptBuilder.build();
-
-    const deployTransaction = new Transaction({
-      version: 0,
-      script,
-      systemFee: new BN(0),
-      networkFee: new BN(0),
-      signers: [
-        new Signer({
-          account: crypto.hash160(Buffer.from([Op.PUSH1])),
-          scopes: WitnessScopeModel.None,
-        }),
-      ],
-      attributes: [],
-      witnesses: [deployWitness],
-      validUntilBlock: 0,
-      messageMagic: 7630401,
     });
 
     const consensusData = new ConsensusData({
@@ -131,14 +106,8 @@ describe('handleConsensusPayload', () => {
       nextConsensus: consensusAddress,
       witness: deployWitness,
       consensusData,
-      transactions: [deployTransaction],
+      transactions: [],
       messageMagic: 7630401,
     });
-
-    console.log(deployTransaction.hash);
-    console.log(consensusData);
-
-    const serializedBlock = genesisBlock.serializeWire();
-    console.log(serializedBlock.toString('hex'));
   });
 });

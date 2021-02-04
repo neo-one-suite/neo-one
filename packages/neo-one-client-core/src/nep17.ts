@@ -18,19 +18,18 @@ import BigNumber from 'bignumber.js';
 import { Client } from './Client';
 import { SmartContract } from './types';
 
-export type NEP5Event = NEP5TransferEvent;
+export type NEP17Event = NEP17TransferEvent;
 
-export interface NEP5TransferEventParameters {
+export interface NEP17TransferEventParameters {
   readonly from: AddressString | undefined;
   readonly to: AddressString | undefined;
   readonly amount: BigNumber;
 }
-export interface NEP5TransferEvent extends Event<'transfer', NEP5TransferEventParameters> {}
+export interface NEP17TransferEvent extends Event<'transfer', NEP17TransferEventParameters> {}
 
-export interface NEP5SmartContract<TClient extends Client = Client> extends SmartContract<TClient, NEP5Event> {
+export interface NEP17SmartContract<TClient extends Client = Client> extends SmartContract<TClient, NEP17Event> {
   readonly balanceOf: (address: AddressString, options?: SmartContractReadOptions) => Promise<BigNumber>;
   readonly decimals: (options?: SmartContractReadOptions) => Promise<BigNumber>;
-  readonly name: (options?: SmartContractReadOptions) => Promise<string>;
   readonly owner: (options?: SmartContractReadOptions) => Promise<AddressString>;
   readonly symbol: (options?: SmartContractReadOptions) => Promise<string>;
   readonly totalSupply: (options?: SmartContractReadOptions) => Promise<BigNumber>;
@@ -39,7 +38,7 @@ export interface NEP5SmartContract<TClient extends Client = Client> extends Smar
     to: AddressString,
     amount: BigNumber,
     options?: TransactionOptions,
-  ) => TransactionResult<InvokeReceipt<boolean, NEP5Event>>;
+  ) => TransactionResult<InvokeReceipt<boolean, NEP17Event>>;
 }
 
 const decimalsFunction: ContractMethodDescriptorClient = {
@@ -48,6 +47,7 @@ const decimalsFunction: ContractMethodDescriptorClient = {
   parameters: [],
   returnType: { type: 'Integer', decimals: 0 },
   offset: 0,
+  safe: true,
 };
 
 // TODO: check that the script/hash can/should be blank here. also check offsets
@@ -63,6 +63,7 @@ export const abi = (decimals: number): ContractABIClient => ({
       parameters: [],
       returnType: { type: 'String' },
       offset: 0,
+      safe: true,
     },
     {
       name: 'symbol',
@@ -70,6 +71,7 @@ export const abi = (decimals: number): ContractABIClient => ({
       parameters: [],
       returnType: { type: 'String' },
       offset: 0,
+      safe: true,
     },
     decimalsFunction,
     {
@@ -78,6 +80,7 @@ export const abi = (decimals: number): ContractABIClient => ({
       parameters: [],
       returnType: { type: 'Integer', decimals },
       offset: 0,
+      safe: true,
     },
     {
       name: 'transfer',
@@ -98,6 +101,7 @@ export const abi = (decimals: number): ContractABIClient => ({
       ],
       returnType: { type: 'Boolean' },
       offset: 0,
+      safe: false,
     },
     {
       name: 'balanceOf',
@@ -110,6 +114,7 @@ export const abi = (decimals: number): ContractABIClient => ({
       ],
       returnType: { type: 'Integer', decimals },
       offset: 0,
+      safe: false,
     },
   ],
   events: [
@@ -140,17 +145,10 @@ export const abi = (decimals: number): ContractABIClient => ({
 export const manifest = (decimals: number): ContractManifestClient => ({
   hash: common.uInt160ToString(blankHash),
   groups: [],
-  features: {
-    storage: true,
-    payable: true,
-  },
   supportedStandards: [],
   abi: abi(decimals),
   permissions: [],
   trusts: '*',
-  safeMethods: '*',
-  hasStorage: true,
-  payable: true,
 });
 
 export const getDecimals = async (
@@ -171,12 +169,12 @@ export const getDecimals = async (
   return decimalsBigNumber.toNumber();
 };
 
-export const createNEP5SmartContract = <TClient extends Client>(
+export const createNEP17SmartContract = <TClient extends Client>(
   client: TClient,
   networksDefinition: SmartContractNetworksDefinition,
   decimals: number,
-): NEP5SmartContract =>
-  client.smartContract<NEP5SmartContract<TClient>>({
+): NEP17SmartContract =>
+  client.smartContract<NEP17SmartContract<TClient>>({
     networks: networksDefinition,
     manifest: manifest(decimals),
   });

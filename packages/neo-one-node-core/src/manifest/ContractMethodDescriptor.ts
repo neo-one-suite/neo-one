@@ -8,12 +8,14 @@ export class ContractMethodDescriptor extends ContractMethodDescriptorModel<Cont
     const parameters = json.parameters.map((param) => ContractParameterDefinition.deserializeJSON(param));
     const offset = json.offset;
     const returnType = toContractParameterType(json.returntype);
+    const safe = json.safe;
 
     return new this({
       name,
       parameters,
       offset,
       returnType,
+      safe,
     });
   }
 }

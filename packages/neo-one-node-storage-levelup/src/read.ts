@@ -35,32 +35,32 @@ export function createTryGet<Key, Value>({
   };
 }
 
-// TODO: we haven't implemented any `tryGetLatest` functions, should we reimplement for something?
-// export function createTryGetLatest<Key, Value>({
-//   db,
-//   latestKey,
-//   deserializeResult,
-//   get,
-// }: {
-//   readonly db: LevelUp;
-//   readonly latestKey: string;
-//   readonly deserializeResult: (latestResult: Buffer) => Key;
-//   readonly get: (key: Key) => Promise<Value>;
-// }): () => Promise<Value | undefined> {
-//   return async (): Promise<Value | undefined> => {
-//     try {
-//       const result = await db.get(latestKey);
-//       const value = await get(deserializeResult(result as Buffer));
+// Keeping this around if we find a use for it
+export function createTryGetLatest<Key, Value>({
+  db,
+  latestKey,
+  deserializeResult,
+  get,
+}: {
+  readonly db: LevelUp;
+  readonly latestKey: string;
+  readonly deserializeResult: (latestResult: Buffer) => Key;
+  readonly get: (key: Key) => Promise<Value>;
+}): () => Promise<Value | undefined> {
+  return async (): Promise<Value | undefined> => {
+    try {
+      const result = await db.get(latestKey);
+      const value = await get(deserializeResult(result as Buffer));
 
-//       return value;
-//     } catch (error) {
-//       if (error.notFound || error.code === 'KEY_NOT_FOUND') {
-//         return undefined;
-//       }
-//       throw error;
-//     }
-//   };
-// }
+      return value;
+    } catch (error) {
+      if (error.notFound || error.code === 'KEY_NOT_FOUND') {
+        return undefined;
+      }
+      throw error;
+    }
+  };
+}
 
 export function createReadStorage<Key, Value>({
   db,
@@ -208,39 +208,6 @@ export function createReadAllFindStorage<Key, Value>({
     all$,
   };
 }
-
-// TODO: do we need to reimplement this for something?
-// export function createReadGetAllStorage<Key, Value>({
-//   db,
-//   serializeKey,
-//   getMinKey,
-//   getMaxKey,
-//   deserializeValue,
-// }: {
-//   readonly db: LevelUp;
-//   readonly serializeKey: SerializeKey<Key>;
-//   readonly getMinKey: (keys: Keys) => string;
-//   readonly getMaxKey: (keys: Keys) => string;
-//   readonly deserializeValue: (value: Buffer) => Value;
-// }): ReadGetAllStorage<Key, Keys, Value> {
-//   const readStorage = createReadStorage({
-//     db,
-//     serializeKey,
-//     deserializeValue,
-//   });
-
-//   return {
-//     get: readStorage.get,
-//     tryGet: readStorage.tryGet,
-//     getAll$: (keys: Keys) =>
-//       createAll$({
-//         db,
-//         minKey: getMinKey(keys),
-//         maxKey: getMaxKey(keys),
-//         deserializeValue,
-//       }),
-//   };
-// }
 
 export function createTryGetMetadata<Value>({
   get,

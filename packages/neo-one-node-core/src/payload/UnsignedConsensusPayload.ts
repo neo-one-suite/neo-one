@@ -5,10 +5,13 @@ import {
   crypto,
   ECPoint,
   getHashData,
+  InvalidFormatError,
   UInt256,
 } from '@neo-one/client-common';
+import { InvalidValidatorsError } from '../errors';
 import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableWire } from '../Serializable';
 import { BinaryReader, utils } from '../utils';
+import { GetScriptHashesContext } from '../Verifiable';
 import { ConsensusMessage, deserializeConsensusMessageWire } from './message/ConsensusMessage';
 
 export interface UnsignedConsensusPayloadAdd {
@@ -94,8 +97,7 @@ export class UnsignedConsensusPayload implements SerializableWire {
 
   public get consensusMessage() {
     if (this.consensusMessageInternal === undefined) {
-      // TODO: Implement an error here
-      throw new Error('Need a way to get consensusMessage');
+      throw new InvalidFormatError('Expected to receive a ConsensusMessage but could not find one.');
     }
 
     return this.consensusMessageInternal();
@@ -117,10 +119,15 @@ export class UnsignedConsensusPayload implements SerializableWire {
     return common.uInt256ToHex(this.hash);
   }
 
-  public getScriptHashesForVerifying(validators: readonly ECPoint[]) {
+  public async getScriptHashesForVerifying({ native, storage }: GetScriptHashesContext) {
+    const validators = await native.NEO.getNextBlockValidators(storage);
+
+    return this.getScriptHashesForVerifyingFromValidators(validators);
+  }
+
+  public getScriptHashesForVerifyingFromValidators(validators: readonly ECPoint[]) {
     if (validators.length <= this.validatorIndex) {
-      // TODO
-      throw new Error();
+      throw new InvalidValidatorsError(validators.length, this.validatorIndex);
     }
 
     return [crypto.toScriptHash(crypto.createSignatureRedeemScript(validators[this.validatorIndex]))];

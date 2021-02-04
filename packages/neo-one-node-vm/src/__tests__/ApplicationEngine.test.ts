@@ -1,4 +1,4 @@
-import { TriggerType } from '@neo-one/client-common';
+import { TriggerType, common, VMState } from '@neo-one/client-common';
 import { ApplicationEngine } from '../ApplicationEngine';
 import { Dispatcher } from '../Dispatcher';
 
@@ -11,10 +11,9 @@ describe('ApplicationEngine test', () => {
     const engine = new ApplicationEngine(dispatcher);
     engine.create({
       trigger: TriggerType.Application,
-      gas: 0,
-      testMode: true,
+      gas: common.TWENTY_FIXED8,
     });
 
-    expect(engine.state).toEqual('BREAK');
+    expect(engine.state).toEqual(VMState.BREAK);
   });
 });

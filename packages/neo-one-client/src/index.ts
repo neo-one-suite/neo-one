@@ -39,7 +39,6 @@ export {
   ContractABIClient,
   ContractEventDescriptor,
   ContractEventDescriptorClient,
-  ContractFeatures,
   ContractGroup,
   ContractManifest,
   ContractManifestClient,
@@ -199,7 +198,7 @@ export {
   SmartContract,
   SmartContractAny,
   UnlockedWallet,
-  nep5,
+  nep17,
 } from '@neo-one/client-core';
 
 // export { DeveloperTools } from '@neo-one/developer-tools';

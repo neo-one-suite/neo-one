@@ -1,4 +1,4 @@
-import { crypto, ScriptBuilder, UInt160 } from '@neo-one/client-common';
+import { common, crypto, ScriptBuilder, UInt160 } from '@neo-one/client-common';
 import { KeyBuilder } from './KeyBuilder';
 
 export interface NativeContractAdd {
@@ -11,6 +11,8 @@ export abstract class NativeContract {
   public readonly script: Buffer;
   public readonly hash: UInt160;
   public readonly id: number;
+  // newly added property will see if it is relevant on our end
+  // public readonly activeBlockIndex: number;
 
   public constructor({ name, id }: NativeContractAdd) {
     this.name = name;
@@ -18,10 +20,10 @@ export abstract class NativeContract {
 
     const builder = new ScriptBuilder();
     builder.emitPushString(this.name);
-    builder.emitSysCall('Neo.Native.Call');
+    builder.emitSysCall('System.Contract.CallNative');
     this.script = builder.build();
 
-    this.hash = crypto.toScriptHash(this.script);
+    this.hash = crypto.getContractHash(common.ZERO_UINT160, this.script);
   }
 
   protected createStorageKey(prefix: Buffer) {

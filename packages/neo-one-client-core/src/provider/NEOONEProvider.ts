@@ -2,7 +2,6 @@ import {
   Account,
   AddressString,
   Block,
-  FeelessTransactionModel,
   GetOptions,
   Hash256String,
   IterOptions,
@@ -83,6 +82,10 @@ export class NEOONEProvider implements Provider {
 
   public async getFeePerByte(network: NetworkType): Promise<BigNumber> {
     return this.getProvider(network).getFeePerByte();
+  }
+
+  public async getExecFeeFactor(network: NetworkType): Promise<number> {
+    return this.getProvider(network).getExecFeeFactor();
   }
 
   public async getVerificationCost(

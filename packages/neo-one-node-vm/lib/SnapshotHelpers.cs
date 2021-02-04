@@ -23,11 +23,6 @@ namespace NEOONE
       {
         set.Add(new Change("transaction", value));
       }
-
-      foreach (var value in snapshot.Contracts.GetChangeSet())
-      {
-        set.Add(new Change("contract", value));
-      }
       foreach (var value in snapshot.Storages.GetChangeSet())
       {
         set.Add(new Change("storage", value));

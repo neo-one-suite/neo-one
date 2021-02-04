@@ -1,8 +1,4 @@
 import { common, ECPoint, UInt256, UInt256Hex } from '@neo-one/client-common';
-import { BN } from 'bn.js';
-import _ from 'lodash';
-import { Block } from '../Block';
-import { ConsensusData } from '../ConsensusData';
 import { ChangeViewConsensusMessage, ConsensusPayload } from '../payload';
 import { DeserializeWireBaseOptions } from '../Serializable';
 import { Transaction } from '../transaction';
@@ -23,7 +19,7 @@ export interface ConsensusContextAdd {
   readonly commitPayloads?: ReadonlyArray<ConsensusPayload | undefined>;
   readonly changeViewPayloads?: ReadonlyArray<ConsensusPayload | undefined>;
   readonly lastChangeViewPayloads?: ReadonlyArray<ConsensusPayload | undefined>;
-  readonly lastSeenMessage?: readonly number[];
+  readonly lastSeenMessage?: { readonly [key: string]: number | undefined };
   readonly transactions?: { readonly [hash: string]: Transaction | undefined };
   readonly transactionHashes?: readonly UInt256[];
   readonly witnessSize?: number;
@@ -31,24 +27,8 @@ export interface ConsensusContextAdd {
 
 // tslint:disable-next-line no-any
 export class ConsensusContext {
-  public static deserializeWireBase(options: DeserializeWireBaseOptions) {
-    const { reader } = options;
-    const version = reader.readUInt32LE();
-    const index = reader.readUInt32LE();
-    const timestamp = reader.readUInt64LE();
-
-    const nextConsensusIn = reader.readUInt160();
-    const nextConsensus = nextConsensusIn.equals(common.ZERO_UINT160) ? undefined : nextConsensusIn;
-
-    const consensusData = ConsensusData.deserializeWireBase(options);
-    const viewNumber = reader.readInt8();
-    const transactionHashes = reader.readArray(() => reader.readUInt256());
-    const transactions = reader.readArray(
-      () => Transaction.deserializeWireBase(options),
-      Block.MaxTransactionsPerBlock,
-    );
-
-    // TODO: before we implement the rest of this see if reloading and saving is even necessary
+  public static deserializeWireBase(_options: DeserializeWireBaseOptions) {
+    throw new Error('not yet implemented');
   }
   public readonly viewNumber: number;
   public readonly myIndex: number;
@@ -59,7 +39,7 @@ export class ConsensusContext {
   public readonly commitPayloads: ReadonlyArray<ConsensusPayload | undefined>;
   public readonly changeViewPayloads: ReadonlyArray<ConsensusPayload | undefined>;
   public readonly lastChangeViewPayloads: ReadonlyArray<ConsensusPayload | undefined>;
-  public readonly lastSeenMessage: readonly number[];
+  public readonly lastSeenMessage: { readonly [key: string]: number | undefined };
   public readonly transactions: { readonly [hash: string]: Transaction | undefined };
   public readonly transactionHashes?: readonly UInt256[];
   public readonly transactionHashesSet: Set<UInt256Hex>;
@@ -77,7 +57,7 @@ export class ConsensusContext {
     commitPayloads = [],
     changeViewPayloads = [],
     lastChangeViewPayloads = [],
-    lastSeenMessage = [],
+    lastSeenMessage = {},
     transactions = {},
     transactionHashes,
     witnessSize = 0,
@@ -124,7 +104,18 @@ export class ConsensusContext {
   }
 
   public get countFailed(): number {
-    return this.lastSeenMessage.reduce((acc, val) => acc + (val < (this.blockBuilder.index ?? 0) - 1 ? 1 : 0), 0);
+    if (Object.values(this.lastSeenMessage).length === 0) {
+      return 0;
+    }
+
+    return this.validators.reduce((acc, validator) => {
+      const count = this.lastSeenMessage[common.ecPointToHex(validator)];
+      if (count === undefined) {
+        return acc + 1;
+      }
+
+      return acc + (count < (this.blockBuilder.index ?? 0) - 1 ? 1 : 0);
+    }, 0);
   }
 
   public get moreThanFNodesCommittedOrLost(): boolean {
@@ -197,19 +188,12 @@ export class ConsensusContext {
       lastChangeViewPayloads: this.lastChangeViewPayloads,
       transactions: this.transactions,
       transactionHashes: this.transactionHashes,
+      lastSeenMessage: this.lastSeenMessage,
       ...rest,
     });
   }
 
   public toJSON(): object {
-    return {
-      block: this.blockBuilder.toJSON(),
-      viewNumber: this.viewNumber,
-      myIndex: this.myIndex,
-      expectedView: [...this.expectedView],
-      validators: this.validators.map((validator) => common.ecPointToString(validator)),
-      blockReceivedTimeMS: this.blockReceivedTimeMS,
-      transactions: _.fromPairs(Object.entries(this.transactions).map(([hash, tx]) => [hash, tx?.serializeJSON()])),
-    };
+    throw new Error('not implemented');
   }
 }

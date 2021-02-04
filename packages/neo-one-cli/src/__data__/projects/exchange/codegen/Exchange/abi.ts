@@ -297,7 +297,7 @@ export const exchangeABI: ABI = {
     {
       claim: false,
       constant: false,
-      name: 'depositNEP5',
+      name: 'depositNEP17',
       parameters: [
         {
           forwardedValue: false,
@@ -330,7 +330,7 @@ export const exchangeABI: ABI = {
     {
       claim: false,
       constant: false,
-      name: 'withdrawNEP5',
+      name: 'withdrawNEP17',
       parameters: [
         {
           forwardedValue: false,

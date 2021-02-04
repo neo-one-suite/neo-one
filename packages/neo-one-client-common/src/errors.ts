@@ -95,7 +95,12 @@ export const InvalidAttributeTypeJSONError = makeErrorWithCode(
 );
 export const InvalidAttributeTypeError = makeErrorWithCode(
   'INVALID_ATTRIBUTE_TYPE',
-  (transactionAttributeType: number) => `Expected transaction type, found: ${transactionAttributeType.toString(16)}`,
+  (transactionAttributeType: number) =>
+    `Expected transaction attribute type, found: ${transactionAttributeType.toString(16)}`,
+);
+export const InvalidOracleResponseCodeError = makeErrorWithCode(
+  'INVALID_ORACLE_RESPONSE_CODE',
+  (value: number) => `Expected oracle response code, found: ${value.toString()}`,
 );
 export const InvalidAttributeUsageError = makeErrorWithCode(
   'INVALID_ATTRIBUTE_USAGE',

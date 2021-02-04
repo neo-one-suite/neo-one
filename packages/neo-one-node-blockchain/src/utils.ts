@@ -10,20 +10,22 @@ import {
   Verifiable,
   VM,
 } from '@neo-one/node-core';
-import { BN } from 'bn.js';
 import { ScriptVerifyError } from './errors';
 
 const hashListBatchSize = 2000;
 
 const getOnPersistNativeContractScript = coreUtils.lazy(() => {
-  const hashes = [common.nativeHashes.GAS, common.nativeHashes.NEO];
-  const script = new ScriptBuilder();
-  hashes.forEach((hash) => {
-    script.emitAppCall(hash, 'onPersist');
-    script.emitOp('DROP');
-  });
+  const builder = new ScriptBuilder();
+  builder.emitSysCall('System.Contract.NativeOnPersist');
 
-  return script.build();
+  return builder.build();
+});
+
+const getPostPersistNativeContractScript = coreUtils.lazy(() => {
+  const builder = new ScriptBuilder();
+  builder.emitSysCall('System.Contract.NativePostPersist');
+
+  return builder.build();
 });
 
 // tslint:disable-next-line: no-any
@@ -48,36 +50,32 @@ const getCallReceipt = (engine: ApplicationEngine, container?: Verifiable) => ({
 });
 
 const verifyContract = async (contract: ContractState, vm: VM, transaction: Transaction) => {
-  const verify = contract.manifest.abi.getMethod('verify');
-  if (verify === undefined) {
-    throw new InvalidFormatError(`the smart contract ${contract.scriptHash} does not have a verify method`);
-  }
-
-  const init = contract.manifest.abi.getMethod('_initialize');
   const gas = vm.withApplicationEngine(
     {
       trigger: TriggerType.Verification,
       container: transaction,
       snapshot: 'clone',
-      gas: new BN(0),
-      testMode: true,
+      gas: common.TWENTY_FIXED8,
     },
     (engine) => {
-      engine.loadScript(contract.script, CallFlags.None);
-      engine.setInstructionPointer(verify.offset);
-      if (init !== undefined) {
-        engine.setInstructionPointer(init.offset);
+      const loaded = engine.loadContract({
+        hash: contract.hash,
+        flags: CallFlags.None,
+        method: 'verify',
+        packParameters: true,
+      });
+
+      if (!loaded) {
+        throw new InvalidFormatError(`contract with hash: ${contract.hash} does not have a verify method.`);
       }
 
-      engine.loadScript(Buffer.from([]), CallFlags.None);
       const result = engine.execute();
-
       if (result === VMState.FAULT) {
-        throw new ScriptVerifyError(`contract ${contract.scriptHash} returned FAULT state`);
+        throw new ScriptVerifyError(`contract ${contract.hash} returned FAULT state`);
       }
 
       if (engine.resultStack.length !== 1 || !engine.resultStack[0].getBoolean()) {
-        throw new ScriptVerifyError(`contract ${contract.scriptHash} returns false`);
+        throw new ScriptVerifyError(`contract ${contract.hash} returns false`);
       }
 
       return engine.gasConsumed;
@@ -105,6 +103,7 @@ export const utils = {
   getApplicationExecuted,
   getCallReceipt,
   getOnPersistNativeContractScript,
+  getPostPersistNativeContractScript,
   verifyContract,
   blockComparator,
   isTransaction,

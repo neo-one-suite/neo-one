@@ -53,6 +53,7 @@ export interface Blockchain extends BlockchainStorage {
   readonly getMaxBlockSystemFee: () => Promise<BN>;
   readonly getMaxTransactionsPerBlock: () => Promise<number>;
   readonly getFeePerByte: () => Promise<BN>;
+  readonly shouldRefreshCommittee: (offset?: number) => boolean;
 
   readonly invokeScript: (script: Buffer, signers?: Signers) => CallReceipt;
   readonly testTransaction: (transaction: Transaction) => CallReceipt;

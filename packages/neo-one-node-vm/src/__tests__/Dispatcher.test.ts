@@ -13,7 +13,6 @@ describe('Dispatcher Tests', () => {
     const result = dispatcher.withApplicationEngine(
       {
         trigger: TriggerType.Application,
-        testMode: true,
         gas: common.ONE_HUNDRED_FIXED8,
       },
       (engine) => {
@@ -22,7 +21,7 @@ describe('Dispatcher Tests', () => {
         const script = new ScriptBuilder();
         script.emitOp('PUSHNULL');
 
-        engine.loadScript(script.build());
+        engine.loadScript({ script: script.build() });
 
         engine.execute();
 
@@ -103,7 +102,7 @@ describe('Dispatcher Tests', () => {
     expect(dispatcher.getConfig()).toBeDefined();
   });
 
-  test.only('test command', () => {
+  test.only('test output only', () => {
     console.log(dispatcher.test());
   });
 });

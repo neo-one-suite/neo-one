@@ -1,4 +1,4 @@
-import { nep5 } from '../__data__';
+import { nep17 } from '../__data__';
 import { genFiles } from '../genFiles';
 
 describe('genFiles', () => {
@@ -11,7 +11,7 @@ describe('genFiles', () => {
         typesPath: '/foo/bar/one/generated/Token/types.js',
         abiPath: '/foo/bar/one/generated/Token/abi.js',
         sourceMapsPath: '/foo/bar/one/generated/sourceMaps.js',
-        abi: nep5.abi(4),
+        abi: nep17.abi(4),
         networksDefinition: {
           main: {
             address: 'iamahash',

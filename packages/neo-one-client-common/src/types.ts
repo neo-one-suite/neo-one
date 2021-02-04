@@ -9,6 +9,7 @@ import {
   AccountContract,
   AttributeTypeModel,
   NotificationJSON,
+  OracleResponseCode,
   StackItemJSON,
   TriggerTypeJSON,
   VerifyResultModel,
@@ -73,21 +74,28 @@ export type NetworkType = 'main' | 'test' | string;
  * @see Attribute
  */
 export interface AttributeBase {
+  /**
+   * `type` specifies the `Attribute` type
+   */
   readonly type: AttributeTypeModel;
 }
 /**
  * `Attribute` whose transaction is "high priority".
  */
 export interface HighPriorityAttribute extends AttributeBase {
-  /**
-   * `type` specifies the `Attribute` type
-   */
   readonly type: AttributeTypeModel.HighPriority;
+}
+
+export interface OracleResponse extends AttributeBase {
+  readonly type: AttributeTypeModel.OracleResponse;
+  readonly id: BigNumber;
+  readonly code: OracleResponseCode;
+  readonly result: BufferString;
 }
 /**
  * `Attribute`s are used to store additional data on `Transaction`s.
  */
-export type Attribute = HighPriorityAttribute;
+export type Attribute = HighPriorityAttribute | OracleResponse;
 
 export type WitnessScope =
   | 'None'
@@ -429,6 +437,10 @@ export interface Transfer {
    * Destination address.
    */
   readonly to: AddressString;
+  /**
+   * Additional data to be attached to the transaction. Typed as `any` but should be used cautiously since it will need to be converted.
+   */
+  readonly data?: any;
 }
 
 /**
@@ -682,7 +694,7 @@ export interface DeveloperProvider {
 }
 
 /**
- * An `Account` represents the balances of NEO, GAS an other NEP5 assets at a given `Address`.
+ * An `Account` represents the balances of NEO, GAS an other NEP17 assets at a given `Address`.
  */
 export interface Account {
   /**
@@ -1322,6 +1334,10 @@ export interface ContractMethodDescriptorClient {
    */
   readonly returnType: ABIReturn;
   /**
+   * flags this as a safe method callable by any source.
+   */
+  readonly safe: boolean;
+  /**
    * TODO: fill out description here
    */
   readonly offset: number;
@@ -1467,28 +1483,6 @@ export interface ContractGroup {
   readonly signature: BufferString;
 }
 
-/**
- * Flag which determines which features are available to a contract.
- */
-export enum ContractFeatures {
-  /**
-   * Contract does not use any available features.
-   */
-  NoProperty = 0x00,
-  /**
-   * Contract modifies blockchain storage.
-   */
-  HasStorage = 0x01,
-  /**
-   * Contract can receive native assets.
-   */
-  Payable = 0x04,
-  /**
-   * Contract modifies blockchain storage and can receive native assets.
-   */
-  HasStoragePayable = 0x05,
-}
-
 export type WildcardContainer<T> = readonly T[] | Wildcard;
 
 /**
@@ -1514,8 +1508,8 @@ export interface ContractPermission {
 }
 
 /**
- * A manifest explicitly declares the features and permissions a Contract will use. Once deployed,
- * it will be limited by its declared list of features and permissions. `ContractManifestClient`
+ * A manifest explicitly declares the permissions a Contract will use. Once deployed,
+ * it will be limited by its declared list of permissions. `ContractManifestClient`
  * specifically contains extra contract information for use in the NEO•ONE Client
  */
 export interface ContractManifestClient {
@@ -1527,13 +1521,6 @@ export interface ContractManifestClient {
    * Set of mutually trusted contracts.
    */
   readonly groups: readonly ContractGroup[];
-  /**
-   * The features field describes what features are available for the contract.
-   */
-  readonly features: {
-    readonly storage: boolean;
-    readonly payable: boolean;
-  };
   /**
    * The Neo Enhancement Proposals (NEPs) and other standards that this smart contract supports.
    */
@@ -1553,45 +1540,20 @@ export interface ContractManifestClient {
    */
   readonly trusts: WildcardContainer<UInt160Hex>;
   /**
-   * The safeMethods field is an array containing a set of safe methods.
-   */
-  readonly safeMethods: WildcardContainer<string>;
-  /**
    * Custom user-defined JSON object.
    */
   readonly extra?: JSONObject;
-  /**
-   * True if the `Contract` modified blockchain storage.
-   */
-  readonly hasStorage: boolean;
-  /**
-   * True if the `Contract` can receive native assets.
-   */
-  readonly payable: boolean;
 }
 
 /**
- * A manifest explicitly declares the features and permissions a Contract will use. Once deployed,
- * it will be limited by its declared list of features and permissions.
+ * A manifest explicitly declares the permissions a Contract will use. Once deployed,
+ * it will be limited by its declared list of permissions.
  */
 export interface ContractManifest {
   /**
    * Set of mutually trusted contracts.
    */
   readonly groups: readonly ContractGroup[];
-  /**
-   * The features field describes what features are available for the contract.
-   */
-  readonly features: {
-    /**
-     * True if the `Contract` modified blockchain storage.
-     */
-    readonly storage: boolean;
-    /**
-     * True if the `Contract` can receive assets.
-     */
-    readonly payable: boolean;
-  };
   /**
    * The Neo Enhancement Proposals (NEPs) and other standards that this smart contract supports.
    */
@@ -1610,21 +1572,9 @@ export interface ContractManifest {
    */
   readonly trusts: WildcardContainer<UInt160Hex>;
   /**
-   * The safeMethods field is an array containing a set of safe methods.
-   */
-  readonly safeMethods: WildcardContainer<string>;
-  /**
    * Custom user-defined JSON object.
    */
   readonly extra?: JSONObject;
-  /**
-   * True if the `Contract` modified blockchain storage.
-   */
-  readonly hasStorage: boolean;
-  /**
-   * True if the `Contract` can receive assets.
-   */
-  readonly payable: boolean;
 }
 
 declare const OpaqueTagSymbol: unique symbol;

@@ -27,12 +27,12 @@ import {
   TransactionReceipt,
   TransactionResult,
   Transfer,
+  UInt160Hex,
   UserAccount,
   UserAccountID,
   utils,
   Witness,
   WitnessModel,
-  UInt160Hex,
 } from '@neo-one/client-common';
 import { Labels, utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
@@ -127,6 +127,7 @@ export interface Provider {
   readonly getNetworkSettings: (network: NetworkType) => Promise<NetworkSettings>;
   readonly getBlockCount: (network: NetworkType) => Promise<number>;
   readonly getFeePerByte: (network: NetworkType) => Promise<BigNumber>;
+  readonly getExecFeeFactor: (network: NetworkType) => Promise<number>;
   readonly getTransaction: (network: NetworkType, hash: Hash256String) => Promise<Transaction>;
   readonly iterBlocks: (network: NetworkType, options?: IterOptions) => AsyncIterable<Block>;
   readonly getAccount: (network: NetworkType, address: AddressString) => Promise<Account>;

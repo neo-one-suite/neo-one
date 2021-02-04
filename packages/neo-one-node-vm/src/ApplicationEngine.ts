@@ -1,8 +1,15 @@
-import { TriggerType, VMState } from '@neo-one/client-common';
-import { CallFlags, SerializableContainer, serializeScriptContainer, SnapshotName } from '@neo-one/node-core';
+import { common, TriggerType, VMState } from '@neo-one/client-common';
+import {
+  CallFlags,
+  LoadContractOptions,
+  LoadScriptOptions,
+  SerializableContainer,
+  serializeScriptContainer,
+  SnapshotName,
+} from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
-import { parseStackItems, convertLog } from './converters';
+import { convertLog, parseStackItems } from './converters';
 import { EngineMethods } from './Methods';
 import { DispatcherFunc } from './types';
 
@@ -11,7 +18,6 @@ export interface CreateOptions {
   readonly container?: SerializableContainer;
   readonly snapshot?: SnapshotName;
   readonly gas: BN;
-  readonly testMode: boolean;
 }
 
 interface ApplicationEngineDispatcher {
@@ -77,7 +83,7 @@ export class ApplicationEngine {
     }).map(convertLog);
   }
 
-  public create({ trigger, container, gas, snapshot, testMode }: CreateOptions) {
+  public create({ trigger, container, gas, snapshot }: CreateOptions) {
     return this.dispatch({
       method: 'create',
       args: {
@@ -85,7 +91,6 @@ export class ApplicationEngine {
         container: container ? serializeScriptContainer(container) : undefined,
         gas: gas.toString(),
         snapshot,
-        testMode,
       },
     });
   }
@@ -98,12 +103,26 @@ export class ApplicationEngine {
     ];
   }
 
-  public loadScript(script: Buffer, flag = CallFlags.All) {
+  public loadScript({ script, flags = CallFlags.All, scriptHash, initialPosition }: LoadScriptOptions) {
     return this.dispatch({
       method: 'loadscript',
       args: {
         script,
-        flag,
+        flags,
+        scriptHash: scriptHash ? common.uInt160ToHex(scriptHash) : undefined,
+        initialPosition,
+      },
+    });
+  }
+
+  public loadContract({ hash, method, flags, packParameters = false }: LoadContractOptions) {
+    return this.dispatch({
+      method: 'loadcontract',
+      args: {
+        hash,
+        method,
+        flags,
+        packParameters,
       },
     });
   }
@@ -111,13 +130,6 @@ export class ApplicationEngine {
   public checkScript() {
     return this.dispatch({
       method: 'checkscript',
-    });
-  }
-
-  public setInstructionPointer(position: number) {
-    return this.dispatch({
-      method: 'setinstructionpointer',
-      args: { position },
     });
   }
 }

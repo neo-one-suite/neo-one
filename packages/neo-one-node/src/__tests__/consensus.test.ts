@@ -1,10 +1,6 @@
 import { common } from '@neo-one/client-common';
 import { Block } from '@neo-one/node-core';
-import { storage as levelupStorage } from '@neo-one/node-storage-levelup';
-import { blockchainSettingsToProtocolSettings, Dispatcher } from '@neo-one/node-vm';
 import fs from 'fs-extra';
-import LevelUp from 'levelup';
-import RocksDB from 'rocksdb';
 import { FullNode } from '../FullNode';
 
 const timeout = 30000000;
@@ -70,21 +66,5 @@ describe('Consensus Testing', () => {
     const fullNode = new FullNode({ options: config });
 
     await Promise.all([fullNode.start(), new Promise((resolve) => setTimeout(resolve, timeout))]);
-  });
-
-  test('', async () => {
-    const db = LevelUp(RocksDB(config.path));
-
-    const storage = levelupStorage({
-      db,
-      context: { messageMagic: config.blockchain.messageMagic },
-    });
-
-    const dispatcher = new Dispatcher({
-      levelDBPath: config.path,
-      protocolSettings: blockchainSettingsToProtocolSettings(config.blockchain),
-    });
-
-    console.log(JSON.stringify(dispatcher.getConfig(), undefined, 2));
   });
 });

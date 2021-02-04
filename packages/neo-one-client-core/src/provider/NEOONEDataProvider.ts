@@ -5,6 +5,7 @@ import {
   ApplicationLogJSON,
   Attribute,
   AttributeJSON,
+  AttributeTypeModel,
   Block,
   BlockJSON,
   ConfirmedTransaction,
@@ -27,7 +28,6 @@ import {
   ContractPermission,
   ContractPermissionJSON,
   DeveloperProvider,
-  FeelessTransactionModel,
   GetOptions,
   Hash256String,
   IterOptions,
@@ -35,6 +35,7 @@ import {
   NetworkSettings,
   NetworkSettingsJSON,
   NetworkType,
+  OracleResponseJSON,
   Peer,
   PrivateNetworkSettings,
   RawApplicationLogData,
@@ -54,9 +55,9 @@ import {
   TransactionModel,
   TransactionReceipt,
   TransactionReceiptJSON,
+  UInt160Hex,
   VerifyResultJSON,
   VerifyResultModel,
-  UInt160Hex,
 } from '@neo-one/client-common';
 import { utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
@@ -148,6 +149,10 @@ export class NEOONEDataProvider implements DeveloperProvider {
     const feePerByte = await this.mutableClient.getFeePerByte();
 
     return new BigNumber(feePerByte);
+  }
+
+  public async getExecFeeFactor(): Promise<number> {
+    return this.mutableClient.getExecFeeFactor();
   }
 
   public async getVerificationCost(
@@ -265,7 +270,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
   }
 
   public async getAccount(address: AddressString): Promise<Account> {
-    const balances = await this.mutableClient.getNep5Balances(address);
+    const balances = await this.mutableClient.getNep17Balances(address);
 
     return {
       address,
@@ -356,9 +361,29 @@ export class NEOONEDataProvider implements DeveloperProvider {
   }
 
   private convertAttributes(attributes: readonly AttributeJSON[]): readonly Attribute[] {
-    return attributes.map((attribute) => ({
-      type: toAttributeType(attribute.type),
-    }));
+    return attributes.map(this.convertAttribute);
+  }
+
+  private convertAttribute(attribute: AttributeJSON): Attribute {
+    const type = toAttributeType(attribute.type);
+    switch (type) {
+      case AttributeTypeModel.HighPriority:
+        return {
+          type,
+        };
+      case AttributeTypeModel.OracleResponse:
+        // tslint:disable-next-line: no-any we know this is true but TS is being mean
+        const oracleJSON = attribute as OracleResponseJSON;
+
+        return {
+          type,
+          id: new BigNumber(oracleJSON.id),
+          code: oracleJSON.code,
+          result: oracleJSON.result,
+        };
+      default:
+        throw new Error();
+    }
   }
 
   private convertContract(contract: ContractJSON): Contract {
@@ -373,18 +398,11 @@ export class NEOONEDataProvider implements DeveloperProvider {
   private convertContractManifest(manifest: ContractManifestJSON): ContractManifest {
     return {
       groups: manifest.groups.map(this.convertContractGroup),
-      features: {
-        storage: manifest.features.storage,
-        payable: manifest.features.payable,
-      },
       supportedStandards: manifest.supportedstandards,
       abi: this.convertContractABI(manifest.abi),
       permissions: manifest.permissions.map(this.convertContractPermission),
       trusts: manifest.trusts,
-      safeMethods: manifest.safemethods,
       extra: manifest.extra,
-      hasStorage: manifest.features.storage,
-      payable: manifest.features.payable,
     };
   }
 

@@ -1,127 +1,27 @@
-import { common, TriggerType, UInt160, VMState } from '@neo-one/client-common';
+import { crypto, TriggerType, UInt160, VMState } from '@neo-one/client-common';
 import {
-  BlockchainStorage,
   CallFlags,
-  ContractMethodDescriptor,
+  ContractState,
   ExecuteScriptResult,
-  NativeContainer,
-  SerializableContainer,
-  Verifiable,
-  VM,
+  maxVerificationGas,
+  VerifyWitnessesOptions,
+  VerifyWitnessOptions,
 } from '@neo-one/node-core';
 import { BN } from 'bn.js';
-import { ContractMethodError, ContractStateFetchError, WitnessVerifyError } from './errors';
 
-const maxVerificationGas = common.fixed8FromDecimal('0.5');
-
-interface ApplicationEngineVerifyOptions {
-  readonly verification: Buffer;
-  readonly offset: number;
-  readonly init?: ContractMethodDescriptor;
-}
-
-const getApplicationEngineVerifyOptions = async (
-  verification: Buffer,
-  storage: BlockchainStorage,
-  hash: UInt160,
-  scriptHash: UInt160,
-): Promise<ApplicationEngineVerifyOptions> => {
-  if (verification.length === 0) {
-    const contractState = await storage.contracts.tryGet(hash);
-    if (contractState === undefined) {
-      throw new ContractStateFetchError(common.uInt160ToHex(hash));
-    }
-    const methodDescriptor = contractState.manifest.abi.getMethod('verify');
-    if (methodDescriptor === undefined) {
-      throw new ContractMethodError('verify', common.uInt160ToHex(hash));
-    }
-
-    return {
-      verification: contractState.script,
-      offset: methodDescriptor.offset,
-      init: contractState.manifest.abi.getMethod('_initialize'),
-    };
-  }
-
-  // tslint:disable-next-line: possible-timing-attack TODO: look into this `possible-timing-attack` warning
-  if (!hash.equals(scriptHash)) {
-    throw new WitnessVerifyError();
-  }
-
-  return {
-    verification,
-    offset: 0,
-  };
-};
-
-export const verifyWithApplicationEngine = (
-  vm: VM,
-  verifiable: Verifiable & SerializableContainer,
-  verification: Buffer,
-  index: number,
-  gas: BN,
-  offset: number,
-  init?: ContractMethodDescriptor,
-): ExecuteScriptResult =>
-  vm.withApplicationEngine(
-    { trigger: TriggerType.Verification, container: verifiable, snapshot: 'clone', gas, testMode: false },
-    (engine) => {
-      engine.loadScript(verification, CallFlags.None);
-      engine.setInstructionPointer(offset);
-      if (init !== undefined) {
-        engine.setInstructionPointer(init.offset);
-      }
-      engine.loadScript(verifiable.witnesses[index].invocation, CallFlags.None);
-
-      const state = engine.execute();
-      if (state === VMState.FAULT) {
-        return { result: false, gas };
-      }
-
-      const stack = engine.resultStack;
-      if (stack.length !== 1 || !stack[0].getBoolean()) {
-        return { result: false, gas };
-      }
-
-      return { result: true, gas: gas.sub(engine.gasConsumed) };
-    },
-  );
-
-export const tryVerifyHash = async (
-  vm: VM,
-  hash: UInt160,
-  index: number,
-  storage: BlockchainStorage,
-  verifiable: Verifiable & SerializableContainer,
-  gas: BN,
-): Promise<ExecuteScriptResult> => {
-  const { verification: verificationScript, scriptHash } = verifiable.witnesses[index];
-  try {
-    const { verification, offset, init } = await getApplicationEngineVerifyOptions(
-      verificationScript,
-      storage,
-      hash,
-      scriptHash,
-    );
-
-    return verifyWithApplicationEngine(vm, verifiable, verification, index, gas, offset, init);
-  } catch {
-    return { gas, result: false };
-  }
-};
-
-export const verifyWitnesses = async (
-  vm: VM,
-  verifiable: Verifiable & SerializableContainer,
-  storage: BlockchainStorage,
-  native: NativeContainer,
-  gasIn: BN,
-): Promise<boolean> => {
+export const verifyWitnesses = async ({
+  vm,
+  verifiable,
+  storage,
+  native,
+  gas: gasIn,
+  snapshot,
+}: VerifyWitnessesOptions): Promise<boolean> => {
   if (gasIn.ltn(0)) {
     return false;
   }
 
-  const gas = gasIn.gt(maxVerificationGas) ? maxVerificationGas : gasIn;
+  let gas = gasIn.gt(maxVerificationGas) ? maxVerificationGas : gasIn;
 
   let hashes: readonly UInt160[];
   try {
@@ -134,28 +34,97 @@ export const verifyWitnesses = async (
     return false;
   }
 
-  const { next, previous } = await hashes
-    .slice(1)
-    .reduce<Promise<{ readonly next: Promise<ExecuteScriptResult>; readonly previous: boolean }>>(
-      async (acc, hash, index) => {
-        const { next: accNext, previous: accPrevious } = await acc;
-        const { result, gas: newGas } = await accNext;
-        if (!result) {
-          return {
-            next: Promise.resolve({ result: false, gas: newGas }),
-            previous: false,
-          };
+  // tslint:disable-next-line: no-loop-statement
+  for (let i = 0; i < hashes.length; i += 1) {
+    const { result, gas: gasCost } = await verifyWitness({
+      vm,
+      verifiable,
+      storage,
+      native,
+      hash: hashes[i],
+      snapshot,
+      witness: verifiable.witnesses[i],
+      gas,
+    });
+
+    if (!result) {
+      return false;
+    }
+
+    gas = gas.sub(gasCost);
+  }
+
+  return true;
+};
+
+export const verifyWitness = async ({
+  vm,
+  verifiable,
+  snapshot: snapshotIn,
+  storage,
+  native,
+  hash,
+  witness,
+  gas,
+}: VerifyWitnessOptions): Promise<ExecuteScriptResult> => {
+  const initFee = new BN(0);
+  const { verification, invocation } = witness;
+  const callFlags = !crypto.isStandardContract(verification) ? CallFlags.ReadStates : CallFlags.None;
+
+  let contract: ContractState | undefined;
+  if (verification.length === 0) {
+    contract = await native.Management.getContract(storage, hash);
+    if (contract === undefined) {
+      return { result: false, gas: initFee };
+    }
+  }
+
+  const snapshot = snapshotIn ?? 'clone';
+  vm.withSnapshots(({ main }) => {
+    if (snapshotIn === 'clone') {
+      main.clone();
+    }
+  });
+
+  return vm.withApplicationEngine(
+    {
+      trigger: TriggerType.Verification,
+      container: verifiable,
+      snapshot,
+      gas,
+    },
+    async (engine) => {
+      if (contract !== undefined) {
+        const loadContractResult = engine.loadContract({
+          hash,
+          method: 'verify',
+          flags: callFlags,
+          packParameters: true,
+        });
+        if (!loadContractResult) {
+          return { result: false, gas: initFee };
+        }
+      } else {
+        // tslint:disable-next-line: possible-timing-attack
+        if (native.isNative(hash) || hash !== witness.scriptHash) {
+          return { result: false, gas: initFee };
         }
 
-        return {
-          next: tryVerifyHash(vm, hash, index, storage, verifiable, newGas),
-          previous: accPrevious && result,
-        };
-      },
-      Promise.resolve({ next: tryVerifyHash(vm, hashes[0], 0, storage, verifiable, gas), previous: true }),
-    );
+        engine.loadScript({ script: verification, flags: callFlags, scriptHash: hash, initialPosition: 0 });
+      }
 
-  const { result: finalResult } = await next;
+      engine.loadScript({ script: invocation, flags: CallFlags.None });
+      const result = engine.execute();
 
-  return finalResult && previous;
+      if (result === VMState.FAULT) {
+        return { result: false, gas: initFee };
+      }
+
+      if (engine.resultStack.length !== 1 || !engine.resultStack[0].getBoolean()) {
+        return { result: false, gas: initFee };
+      }
+
+      return { result: true, gas: engine.gasConsumed };
+    },
+  );
 };

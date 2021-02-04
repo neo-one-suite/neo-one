@@ -1,9 +1,12 @@
 import { InvalidFormatError } from '../common';
 
 export enum TriggerType {
+  OnPersist = 0x01,
+  PostPersist = 0x02,
   Verification = 0x20,
-  System = 0x01,
   Application = 0x40,
+  System = OnPersist | PostPersist,
+  All = OnPersist | PostPersist | Verification | Application,
 }
 
 export type TriggerTypeJSON = keyof typeof TriggerType;

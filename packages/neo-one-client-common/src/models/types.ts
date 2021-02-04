@@ -3,7 +3,7 @@ import { UInt256Hex } from '../common';
 import { UserAccount } from '../types';
 import { ContractParameterTypeModel } from './ContractParameterTypeModel';
 import { StorageFlagsModel } from './StorageFlagsModel';
-import { AttributeTypeModel } from './transaction/attribute/AttributeTypeModel';
+import { AttributeTypeModel } from './transaction';
 import { TriggerType, TriggerTypeJSON } from './trigger';
 import { VerifyResultModel } from './VerifyResultModel';
 import { VMState, VMStateJSON } from './vm';
@@ -196,9 +196,22 @@ export interface SignerJSON {
   readonly allowedgroups?: readonly string[];
 }
 
-export interface AttributeJSON {
+export interface AttributeJSONBase {
   readonly type: AttributeTypeJSON;
 }
+
+export interface HighPriorityAttributeJSON extends AttributeJSONBase {
+  readonly type: 'HighPriority';
+}
+
+export interface OracleResponseJSON extends AttributeJSONBase {
+  readonly type: 'OracleResponse';
+  readonly id: string;
+  readonly code: number;
+  readonly result: string;
+}
+
+export type AttributeJSON = HighPriorityAttributeJSON | OracleResponseJSON;
 
 export type AttributeTypeJSON = keyof typeof AttributeTypeModel;
 
@@ -347,6 +360,7 @@ export interface ContractMethodDescriptorJSON {
   readonly parameters: readonly ContractParameterDefinitionJSON[];
   readonly offset: number;
   readonly returntype: ContractParameterTypeJSON;
+  readonly safe: boolean;
 }
 
 export interface ContractEventDescriptorJSON {
@@ -377,11 +391,6 @@ export interface ContractManifestJSON {
   readonly groups: readonly ContractGroupJSON[];
   readonly permissions: readonly ContractPermissionJSON[];
   readonly trusts: WildcardContainerJSON;
-  readonly safemethods: WildcardContainerJSON;
-  readonly features: {
-    readonly storage: boolean;
-    readonly payable: boolean;
-  };
   readonly supportedstandards: readonly string[];
   readonly extra?: JSONObject;
 }
@@ -393,29 +402,30 @@ export interface ContractParameterDefinitionJSON {
 
 export interface ContractJSON {
   readonly id: number;
+  readonly updatecounter: number;
   readonly hash: string;
   readonly script: string;
   readonly manifest: ContractManifestJSON;
 }
 
-export interface Nep5TransfersJSON {
+export interface Nep17TransfersJSON {
   readonly address: string;
-  readonly received: readonly Nep5TransferJSON[];
-  readonly sent: readonly Nep5TransferJSON[];
+  readonly received: readonly Nep17TransferJSON[];
+  readonly sent: readonly Nep17TransferJSON[];
 }
 
-export interface Nep5BalancesJSON {
+export interface Nep17BalancesJSON {
   readonly address: string;
-  readonly balance: readonly Nep5BalanceJSON[];
+  readonly balance: readonly Nep17BalanceJSON[];
 }
 
-export interface Nep5BalanceJSON {
+export interface Nep17BalanceJSON {
   readonly assethash: string;
   readonly amount: string;
   readonly lastupdatedblock: number;
 }
 
-export interface Nep5TransferJSON {
+export interface Nep17TransferJSON {
   readonly timestamp: number;
   readonly assethash: string;
   readonly transferaddress: string;

@@ -78,7 +78,7 @@ import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
 import { ContractEventDescriptor, ContractMethodDescriptor } from '../../../neo-one-node-core/src/manifest';
 import { Hash160 } from '../Hash160';
-import * as nep5 from '../nep5';
+import * as nep17 from '../nep17';
 import { LockedWallet, UnlockedWallet } from '../user';
 import { data } from './data';
 import { keys } from './keys';
@@ -93,7 +93,7 @@ const createContractABIJSON = (options: Partial<ContractABIJSON> = {}): Contract
 });
 
 const createManifestJSON = (options: Partial<ContractManifestJSON> = {}): ContractManifestJSON => {
-  const { abi, features, ...optionsIn } = options;
+  const { abi, ...optionsIn } = options;
 
   return {
     hash: keys[0].scriptHashString,
@@ -102,12 +102,6 @@ const createManifestJSON = (options: Partial<ContractManifestJSON> = {}): Contra
     groups: [], // TODO
     permissions: [], // TODO
     trusts: '*',
-    safeMethods: '*',
-    features: {
-      storage: true,
-      payable: true,
-      ...features,
-    },
     supportedStandards: [], // TODO
     ...optionsIn,
   };
@@ -120,8 +114,6 @@ const createContractJSON = (options: Partial<ContractJSON> = {}): ContractJSON =
     id: 0,
     script: data.buffers.b,
     manifest: createManifestJSON(manifest),
-    hasStorage: true,
-    payable: true,
     ...optionsIn,
   };
 };
@@ -732,7 +724,7 @@ const createStringABIParameter = (options: Partial<StringABIParameter> = {}): St
 });
 
 const createABI = (options: Partial<ContractABI> = {}): ContractABI => ({
-  ...nep5.abi(8),
+  ...nep17.abi(8),
   ...options,
 });
 

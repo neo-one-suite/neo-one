@@ -1,15 +1,15 @@
-import { createSerializeWire, IOHelper, Nep5BalanceModel } from '@neo-one/client-common';
+import { createSerializeWire, IOHelper, Nep17BalanceModel } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from './Serializable';
 import { BinaryReader, utils } from './utils';
 
-export interface Nep5BalanceAdd {
+export interface Nep17BalanceAdd {
   readonly balanceBuffer: Buffer;
   readonly lastUpdatedBlock: number;
 }
 
-export class Nep5Balance extends Nep5BalanceModel {
-  public static deserializeWireBase(options: DeserializeWireBaseOptions): Nep5Balance {
+export class Nep17Balance extends Nep17BalanceModel {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): Nep17Balance {
     const { reader } = options;
     const balanceBuffer = reader.readVarBytesLE(512);
     const lastUpdatedBlock = reader.readUInt32LE();
@@ -20,7 +20,7 @@ export class Nep5Balance extends Nep5BalanceModel {
     });
   }
 
-  public static deserializeWire(options: DeserializeWireOptions): Nep5Balance {
+  public static deserializeWire(options: DeserializeWireOptions): Nep17Balance {
     return this.deserializeWireBase({
       context: options.context,
       reader: new BinaryReader(options.buffer),
@@ -41,7 +41,7 @@ export class Nep5Balance extends Nep5BalanceModel {
   }
 
   public clone() {
-    return new Nep5Balance({
+    return new Nep17Balance({
       balanceBuffer: this.balanceInternal,
       lastUpdatedBlock: this.lastUpdatedBlock,
     });

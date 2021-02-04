@@ -2,7 +2,8 @@ import { InvalidAttributeTypeError, InvalidAttributeTypeJSONError } from '../../
 import { AttributeTypeJSON } from '../../types';
 
 export enum AttributeTypeModel {
-  HighPriority = 1,
+  HighPriority = 0x01,
+  OracleResponse = 0x11,
 }
 
 const isAttributeType = (value: number): value is AttributeTypeModel =>

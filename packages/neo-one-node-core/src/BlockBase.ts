@@ -13,7 +13,7 @@ import {
 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { Equals, EquatableKey } from './Equatable';
-import { UnsignedBlockError } from './errors';
+import { InvalidPreviousHeaderError, UnsignedBlockError } from './errors';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,
@@ -47,14 +47,18 @@ export const getBlockScriptHashesForVerifying = async (
   storage: BlockchainStorage,
 ) => {
   if (block.previousHash === common.ZERO_UINT256) {
-    return [block.witness?.scriptHash];
+    const witnessHash = block.witness?.scriptHash;
+    if (witnessHash === undefined) {
+      throw new InvalidFormatError('Always expect a witness on the genesis block');
+    }
+
+    return [witnessHash];
   }
 
   const prevBlock = await storage.blocks.tryGet({ hashOrIndex: block.previousHash });
   const prevHeader = prevBlock?.header;
   if (prevHeader === undefined) {
-    // TODO: implement this as a makeError InvalidStorageHeaderFetch
-    throw new Error(`previous header hash ${block.previousHash} did not return a valid Header from storage`);
+    throw new InvalidPreviousHeaderError(common.uInt256ToHex(block.previousHash));
   }
 
   return [prevHeader.nextConsensus];
@@ -113,20 +117,7 @@ export abstract class BlockBase implements EquatableKey, SerializableContainer, 
   public readonly nextConsensus: UInt160;
   public readonly messageMagic: number;
   public readonly getScriptHashesForVerifying = utils.lazyAsync(
-    async (context: { readonly storage: BlockchainStorage }) => {
-      if (this.previousHash === common.ZERO_UINT256) {
-        return [this.witness.scriptHash];
-      }
-
-      const prevBlock = await context.storage.blocks.tryGet({ hashOrIndex: this.previousHash });
-      const prevHeader = prevBlock?.header;
-      if (prevHeader === undefined) {
-        // TODO: implement this as a makeError InvalidStorageHeaderFetch
-        throw new Error(`previous header hash ${this.previousHash} did not return a valid Header from storage`);
-      }
-
-      return [prevHeader.nextConsensus];
-    },
+    async (context: { readonly storage: BlockchainStorage }) => getBlockScriptHashesForVerifying(this, context.storage),
   );
   // tslint:disable-next-line no-any
   public readonly equals: Equals = utils.equals(this.constructor as any, this, (other: any) =>
@@ -261,7 +252,13 @@ export abstract class BlockBase implements EquatableKey, SerializableContainer, 
       return false;
     }
 
-    return verifyWitnesses(vm, this, storage, native, utils.ONE);
+    return verifyWitnesses({
+      vm,
+      verifiable: this,
+      storage,
+      native,
+      gas: utils.ONE,
+    });
   }
 
   protected readonly sizeExclusive: () => number = () => 0;

@@ -789,10 +789,6 @@ export const assertContractManifestClient = (name: string, value?: unknown): Con
     groups: assertProperty(value, 'ContractManifest', 'groups', assertArray).map((group) =>
       assertContractGroup('ContractManifest.groups', group),
     ),
-    features: {
-      storage: assertProperty(value, 'ContractManifest', 'hasStorage', assertBoolean),
-      payable: assertProperty(value, 'ContractManifest', 'payable', assertBoolean),
-    },
     supportedStandards: assertProperty(value, 'ContractManifest', 'supportedStandards', assertArray).map((std) =>
       assertString('ContractManifest.supportedStandards', std),
     ),
@@ -801,10 +797,7 @@ export const assertContractManifestClient = (name: string, value?: unknown): Con
       assertContractPermission('ContractManifest.permissions', permission),
     ),
     trusts: assertWildcardContainerProperty(value, 'ContractManifest', 'trusts', assertUInt160Hex),
-    safeMethods: assertWildcardContainerProperty(value, 'ContractManifest', 'safeMethods', assertString),
     extra: assertProperty(value, 'ContractManifest', 'extra', assertNullableJSON),
-    hasStorage: assertProperty(value, 'ContractManifest', 'hasStorage', assertBoolean),
-    payable: assertProperty(value, 'ContractManifest', 'payable', assertBoolean),
   };
 };
 
@@ -817,10 +810,6 @@ export const assertContractManifest = (name: string, value?: unknown): ContractM
     groups: assertProperty(value, 'ContractManifest', 'groups', assertArray).map((group) =>
       assertContractGroup('ContractManifest.groups', group),
     ),
-    features: {
-      storage: assertProperty(value, 'ContractManifest', 'hasStorage', assertBoolean),
-      payable: assertProperty(value, 'ContractManifest', 'payable', assertBoolean),
-    },
     supportedStandards: assertProperty(value, 'ContractManifest', 'supportedStandards', assertArray).map((std) =>
       assertString('ContractManifest.supportedStandards', std),
     ),
@@ -829,10 +818,7 @@ export const assertContractManifest = (name: string, value?: unknown): ContractM
       assertContractPermission('ContractManifest.permissions', permission),
     ),
     trusts: assertWildcardContainerProperty(value, 'ContractManifest', 'trusts', assertUInt160Hex),
-    safeMethods: assertWildcardContainerProperty(value, 'ContractManifest', 'safeMethods', assertString),
     extra: assertProperty(value, 'ContractManifest', 'extra', assertNullableJSON),
-    hasStorage: assertProperty(value, 'ContractManifest', 'hasStorage', assertBoolean),
-    payable: assertProperty(value, 'ContractManifest', 'payable', assertBoolean),
   };
 };
 

@@ -1,5 +1,5 @@
 import { common, InvalidFormatError, UInt160, UInt256 } from '@neo-one/client-common';
-import { BlockKey, Nep5BalanceKey, Nep5TransferKey, StorageKey, StreamOptions } from '@neo-one/node-core';
+import { BlockKey, Nep17BalanceKey, Nep17TransferKey, StorageKey, StreamOptions } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 
 export enum Prefix {
@@ -12,9 +12,9 @@ export enum Prefix {
   CurrentHeader = 0xc1,
   ContractID = 0xc2,
   ConsensusState = 0xf4,
-  Nep5Balance = 0xf8,
-  Nep5TransferSent = 0xf9,
-  Nep5TransferReceived = 0xfa,
+  Nep17Balance = 0xf8,
+  Nep17TransferSent = 0xf9,
+  Nep17TransferReceived = 0xfa,
   ApplicationLog = 0xfb, // Custom internal prefix. Can be changed.
 
   // NEO•ONE prefix, watch out for future collisions with https://github.com/neo-project/neo/blob/master/src/neo/Persistence/Prefixes.cs
@@ -101,19 +101,19 @@ const createStorageKey = getCreateKey<StorageKey>({
   prefix: Prefix.Storage,
 });
 
-const createNep5BalanceKey = getCreateKey<Nep5BalanceKey>({
+const createNep17BalanceKey = getCreateKey<Nep17BalanceKey>({
   serializeKey: (key) => key.serializeWire(),
-  prefix: Prefix.Nep5Balance,
+  prefix: Prefix.Nep17Balance,
 });
 
-const createNep5TransferSentKey = getCreateKey<Nep5TransferKey>({
+const createNep17TransferSentKey = getCreateKey<Nep17TransferKey>({
   serializeKey: (key) => key.serializeWire(),
-  prefix: Prefix.Nep5TransferSent,
+  prefix: Prefix.Nep17TransferSent,
 });
 
-const createNep5TransferReceivedKey = getCreateKey<Nep5TransferKey>({
+const createNep17TransferReceivedKey = getCreateKey<Nep17TransferKey>({
   serializeKey: (key) => key.serializeWire(),
-  prefix: Prefix.Nep5TransferReceived,
+  prefix: Prefix.Nep17TransferReceived,
 });
 
 const createHeaderHashListKey = getCreateKey<number>({
@@ -142,14 +142,14 @@ const maxBlockKey = createBlockKey({ hashOrIndex: common.MAX_UINT256 });
 
 const getStorageSearchRange = createGetSearchRange(Prefix.Storage);
 
-const getAllNep5BalanceSearchRange = {
-  gte: Buffer.from([Prefix.Nep5Balance]),
-  lte: Buffer.from([Prefix.Nep5TransferSent]),
+const getAllNep17BalanceSearchRange = {
+  gte: Buffer.from([Prefix.Nep17Balance]),
+  lte: Buffer.from([Prefix.Nep17TransferSent]),
 };
 
-const getNep5BalanceSearchRange = createGetSearchRange(Prefix.Nep5Balance);
-const getNep5TransferReceivedSearchRange = createGetSearchRange(Prefix.Nep5TransferReceived);
-const getNep5TransferSentSearchRange = createGetSearchRange(Prefix.Nep5TransferSent);
+const getNep17BalanceSearchRange = createGetSearchRange(Prefix.Nep17Balance);
+const getNep17TransferReceivedSearchRange = createGetSearchRange(Prefix.Nep17TransferReceived);
+const getNep17TransferSentSearchRange = createGetSearchRange(Prefix.Nep17TransferSent);
 
 const createApplicationLogKey = getCreateKey<UInt256>({
   serializeKey: (key) => key,
@@ -158,18 +158,18 @@ const createApplicationLogKey = getCreateKey<UInt256>({
 
 export const keys = {
   createBlockKey,
-  createNep5BalanceKey,
-  createNep5TransferSentKey,
-  createNep5TransferReceivedKey,
+  createNep17BalanceKey,
+  createNep17TransferSentKey,
+  createNep17TransferReceivedKey,
   createApplicationLogKey,
   createTransactionKey,
   createContractKey,
   createStorageKey,
   getStorageSearchRange,
-  getNep5BalanceSearchRange,
-  getAllNep5BalanceSearchRange,
-  getNep5TransferReceivedSearchRange,
-  getNep5TransferSentSearchRange,
+  getNep17BalanceSearchRange,
+  getAllNep17BalanceSearchRange,
+  getNep17TransferReceivedSearchRange,
+  getNep17TransferSentSearchRange,
   createHeaderHashListKey,
   blockHashIndexKey,
   headerHashIndexKey,
