@@ -3,7 +3,7 @@ import { DiagnosticCode } from '../../../../../DiagnosticCode';
 
 describe('Deploy.senderAddress', () => {
   test('cannot be used in a function', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { Deploy } from '@neo-one/smart-contract';
 
@@ -16,7 +16,7 @@ describe('Deploy.senderAddress', () => {
   });
 
   test('cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { Deploy } from '@neo-one/smart-contract';
 
@@ -27,7 +27,7 @@ describe('Deploy.senderAddress', () => {
   });
 
   test('cannot be referenced - object literal', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { Deploy } from '@neo-one/smart-contract';
 

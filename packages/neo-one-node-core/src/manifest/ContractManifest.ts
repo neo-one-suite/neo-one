@@ -9,10 +9,18 @@ export class ContractManifest extends ContractManifestModel<ContractABI, Contrac
   public static parseBytes(bytes: Buffer) {
     const reader = new BinaryReader(bytes);
 
-    return this.deserializeJSON(JSON.parse(reader.readVarString(this.maxLength)));
+    try {
+      return this.deserializeJSON(JSON.parse(reader.readVarString(this.maxLength)));
+    } catch {
+      // do nothing
+    }
+
+    // TODO: this is incredibly bad form. but possible but in Neo App engine
+    return this.deserializeJSON(JSON.parse(bytes.toString('utf8')));
   }
 
   private static deserializeJSON(json: ContractManifestJSON) {
+    const name = json.name;
     const groups = json.groups.map((group) => ContractGroup.deserializeJSON(group));
     const supportedStandards = json.supportedstandards;
     const abi = ContractABI.deserializeJSON(json.abi);
@@ -21,6 +29,7 @@ export class ContractManifest extends ContractManifestModel<ContractABI, Contrac
     const extra = json.extra;
 
     return new this({
+      name,
       groups,
       supportedStandards,
       abi,

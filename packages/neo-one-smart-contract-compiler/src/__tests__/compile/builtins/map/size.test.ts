@@ -29,7 +29,7 @@ describe('Map.prototype.size', () => {
   });
 
   test('cannot set the size of an map', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = new Map<string, number>();
       x.size = 4;
@@ -39,7 +39,7 @@ describe('Map.prototype.size', () => {
   });
 
   test('cannot set the "size" of an map', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x: { size: number } | Map<string, number> = new Map<string, number>() as { size: number } | Map<string, number>;
       const a = 'size';

@@ -1,14 +1,10 @@
-import { ABIFunction } from '@neo-one/client-common';
+import { ContractMethodDescriptorClient } from '@neo-one/client-common';
 import { toTypeScriptType } from '../utils';
 import { genFunctionParameters } from './genFunctionParameters';
 import { getEventName } from './getEventName';
 import { hasForward } from './hasForward';
 
-const getFunctionReturnReceipt = (name: string, abi: ABIFunction) => {
-  if (abi.claim) {
-    return 'TransactionReceipt';
-  }
-
+const getFunctionReturnReceipt = (name: string, abi: ContractMethodDescriptorClient) => {
   const eventName = getEventName(name);
   const event = hasForward(abi)
     ? `TForwardOptions extends ForwardOptions<infer T> ? ${eventName} | T : ${eventName}`
@@ -17,26 +13,25 @@ const getFunctionReturnReceipt = (name: string, abi: ABIFunction) => {
   return `InvokeReceipt<${toTypeScriptType(abi.returnType, { isParameter: false })}, ${event}>`;
 };
 
-const getFunctionReturnTransaction = (abi: ABIFunction) => (abi.claim ? 'ClaimTransaction' : 'InvocationTransaction');
+const getFunctionReturnType = (name: string, abi: ContractMethodDescriptorClient) =>
+  `TransactionResult<${getFunctionReturnReceipt(name, abi)}>`;
 
-const getFunctionReturnType = (name: string, abi: ABIFunction) =>
-  `TransactionResult<${getFunctionReturnReceipt(name, abi)}, ${getFunctionReturnTransaction(abi)}>`;
+const getForwardType = (abi: ContractMethodDescriptorClient) =>
+  hasForward(abi) ? '<TForwardOptions extends ForwardOptions<any>>' : '';
 
-const getForwardType = (abi: ABIFunction) => (hasForward(abi) ? '<TForwardOptions extends ForwardOptions<any>>' : '');
-
-const getFunctionType = (name: string, abi: ABIFunction, migration = false) =>
+const getFunctionType = (name: string, abi: ContractMethodDescriptorClient, migration = false) =>
   genFunctionParameters(abi, abi.parameters, {
     migration,
   })
     .map((params) => `${getForwardType(abi)}(${params}): Promise<${getFunctionReturnType(name, abi)}>;`)
     .join('  \n');
 
-const createConfirmedFunc = (abi: ABIFunction, params: string, name: string, arrow = false) =>
+const createConfirmedFunc = (abi: ContractMethodDescriptorClient, params: string, name: string, arrow = false) =>
   `${getForwardType(abi)}(${params})${arrow ? ' =>' : ':'} Promise<${getFunctionReturnReceipt(
     name,
     abi,
-  )} & { readonly transaction: ${getFunctionReturnTransaction(abi)}}>;`;
-const getConfirmedType = (name: string, abi: ABIFunction, migration = false) => {
+  )} & { readonly transaction: Transaction }>;`;
+const getConfirmedType = (name: string, abi: ContractMethodDescriptorClient, migration = false) => {
   const paramss = genFunctionParameters(abi, abi.parameters, {
     withConfirmedOptions: true,
     migration,
@@ -55,7 +50,7 @@ export interface GenFunctionOptions {
   readonly migration?: boolean;
 }
 
-export const genFunction = (name: string, abi: ABIFunction, options: GenFunctionOptions): string =>
+export const genFunction = (name: string, abi: ContractMethodDescriptorClient, options: GenFunctionOptions): string =>
   options.migration
     ? getConfirmedType(name, abi, options.migration)
     : `{

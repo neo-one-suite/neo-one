@@ -16,7 +16,7 @@ export class ArrForEachFuncHelper extends Helper {
     // [arr, arr, callable]
     sb.emitOp(node, 'DUP');
     // [size, arr, callable]
-    sb.emitOp(node, 'ARRAYSIZE');
+    sb.emitOp(node, 'SIZE');
     // [idx, size, arr, callable]
     sb.emitPushInt(node, 0);
     sb.emitHelper(

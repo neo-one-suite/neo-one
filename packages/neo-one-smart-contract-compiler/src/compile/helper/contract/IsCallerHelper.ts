@@ -1,3 +1,4 @@
+import { common } from '@neo-one/client-common';
 import ts from 'typescript';
 import { GlobalProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
@@ -32,8 +33,16 @@ export class IsCallerHelper extends Helper {
         whenFalse: () => {
           // [addressBuffer, addressBuffer]
           sb.emitOp(node, 'DUP');
+          // [1, addressBuffer, addressBuffer]
+          sb.emitPushInt(node, 1);
+          // [[addressBuffer], addressBuffer]
+          sb.emitOp(node, 'PACK');
+          // ['getContract', [addressBuffer], addressBuffer]
+          sb.emitPushString(node, 'getContract');
+          // [buffer, 'getContract', [addressBuffer], addressBuffer]
+          sb.emitPushBuffer(node, common.nativeHashes.Management);
           // [maybeContract, addressBuffer]
-          sb.emitSysCall(node, 'Neo.Blockchain.GetContract');
+          sb.emitSysCall(node, 'System.Contract.Call');
           sb.emitHelper(
             node,
             options,
@@ -49,7 +58,7 @@ export class IsCallerHelper extends Helper {
               // (this is the first contract called OR we are in verification BECAUSE verification already checks that this is the first contract called).
               whenTrue: () => {
                 // [boolean]
-                sb.emitSysCall(node, 'Neo.Runtime.CheckWitness');
+                sb.emitSysCall(node, 'System.Runtime.CheckWitness');
                 // [boolean, boolean]
                 sb.emitHelper(node, options, sb.helpers.invocationIsCaller);
                 // [boolean]

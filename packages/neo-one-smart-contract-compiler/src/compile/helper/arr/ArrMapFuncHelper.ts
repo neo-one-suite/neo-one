@@ -28,7 +28,9 @@ export class ArrMapFuncHelper extends Helper {
     // [size, callable, ...arr]
     sb.emitOp(node, 'SWAP');
     // [idx, size, callable, ...arr]
-    sb.emitPushInt(node, 0);
+    sb.emitOp(node, 'DUP');
+    // [idx, size, callable, ...arr]
+    sb.emitOp(node, 'DEC');
     // [size, idx, callable, ...arr]
     sb.emitOp(node, 'SWAP');
     sb.emitHelper(
@@ -36,12 +38,14 @@ export class ArrMapFuncHelper extends Helper {
       options,
       sb.helpers.forLoop({
         condition: () => {
-          // [size, idx, size, callable, ...arr]
-          sb.emitOp(node, 'TUCK');
-          // [idx, size, idx, size, callable, ...arr]
-          sb.emitOp(node, 'OVER');
-          // [size > idx, idx, size, callable, ...arr]
-          sb.emitOp(node, 'GT');
+          // [idx, size, callable, ...arr]
+          sb.emitOp(node, 'SWAP');
+          // [idx, idx, size, callable, ...arr]
+          sb.emitOp(node, 'DUP');
+          // [0, idx, idx, size, callable, ...arr]
+          sb.emitPushInt(node, 0);
+          // [idx >= 0, idx, size, callable, ...arr]
+          sb.emitOp(node, 'GE');
         },
         each: (innerOptions) => {
           // [callable, idx, size, ...arr]
@@ -56,9 +60,15 @@ export class ArrMapFuncHelper extends Helper {
           sb.emitHelper(node, options, sb.helpers.wrapNumber);
           // [idx, idxVal, callable, idx, callable, size, ...arr]
           sb.emitOp(node, 'SWAP');
-          // [5, idx, idxVal, callable, idx, callable, size, ...arr]
-          sb.emitPushInt(node, 5);
-          // [idx + 5, idxVal, callable, idx, callable, size, ...arr]
+          // [idxVal, callable, idx, callable, size, ...arr]
+          sb.emitOp(node, 'DROP');
+          // [4, idxVal, callable, idx, callable, size, ...arr]
+          sb.emitPushInt(node, 4);
+          // [size, idxVal, callable, idx, callable, size, ...arr]
+          sb.emitOp(node, 'PICK');
+          // [4, size, idxVal, callable, idx, callable, size, ...arr]
+          sb.emitPushInt(node, 4);
+          // [size + 4, idxVal, callable, idx, callable, size, ...arr]
           sb.emitOp(node, 'ADD');
           // [val, idxVal, callable, idx, callable, size, ...arr]
           sb.emitOp(node, 'ROLL');
@@ -70,24 +80,18 @@ export class ArrMapFuncHelper extends Helper {
           sb.emitOp(node, 'SWAP');
           // [val, idx, callable, size, ...arr]
           sb.emitHelper(node, innerOptions, sb.helpers.call);
-          // [idx, val, idx, callable, size, ...arr]
-          sb.emitOp(node, 'OVER');
-          // [4, idx, val, idx, callable, size, ...arr]
-          sb.emitPushInt(node, 4);
-          // [idx + 4, val, idx, callable, size, ...arr]
-          sb.emitOp(node, 'ADD');
-          // [val, idx, callable, size, ...arr]
-          sb.emitOp(node, 'XTUCK');
+          // [size, callable, idx, ...arr]
+          sb.emitOp(node, 'REVERSE4');
           // [idx, callable, size, ...arr]
-          sb.emitOp(node, 'DROP');
+          sb.emitOp(node, 'REVERSE3');
           // [idx, callable, size, ...arr]
-          sb.emitOp(node, 'INC');
+          sb.emitOp(node, 'DEC');
           // [size, idx, callable, ...arr]
           sb.emitOp(node, 'ROT');
         },
         cleanup: () => {
           // [size, callable, ...arr]
-          sb.emitOp(node, 'NIP');
+          sb.emitOp(node, 'DROP');
           // [size, ...arr]
           sb.emitOp(node, 'NIP');
           // [arr]

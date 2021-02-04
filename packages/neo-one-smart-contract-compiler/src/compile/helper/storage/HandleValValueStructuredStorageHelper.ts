@@ -16,7 +16,7 @@ export class HandleValValueStructuredStorageHelper extends Helper {
     // [iterator, iterator]
     sb.emitOp(node, 'DUP');
     // [keyBuffer, iterator, size]
-    sb.emitSysCall(node, 'Neo.Iterator.Key');
+    sb.emitSysCall(node, 'System.Iterator.Key');
     sb.emitHelper(
       node,
       options,
@@ -35,9 +35,9 @@ export class HandleValValueStructuredStorageHelper extends Helper {
         },
         whenFalse: () => {
           // [value]
-          sb.emitSysCall(node, 'Neo.Enumerator.Value');
+          sb.emitSysCall(node, 'System.Enumerator.Value');
           // [arr]
-          sb.emitSysCall(node, 'Neo.Runtime.Deserialize');
+          sb.emitSysCall(node, 'System.Binary.Deserialize');
           // [1, arr]
           sb.emitPushInt(node, 1);
           // [val]

@@ -94,7 +94,7 @@ export class Dispatcher {
     });
   }
 
-  public updateStore(storage: ReadonlyArray<{ key: Buffer; value: Buffer }>): void {
+  public updateStore(storage: ReadonlyArray<{ readonly key: Buffer; readonly value: Buffer }>): void {
     const tableChanges = storage.map((change) => ({
       table: change.key[0],
       key: change.key.slice(1),

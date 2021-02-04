@@ -2,7 +2,7 @@ import { helpers } from '../../../../__data__';
 
 describe('console', () => {
   test('cannot be implemented', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       class MyConsole implements Console {
       }
@@ -12,7 +12,7 @@ describe('console', () => {
   });
 
   test('cannot be extended', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       class MyFunction extends Console {
       }

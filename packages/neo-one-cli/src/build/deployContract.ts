@@ -13,7 +13,7 @@ export const deployContract = async (
   linked: LinkedContracts,
   sourceMaps: SourceMaps,
 ) => {
-  const contract = compileContract(filePath, name, createCompilerHost(), linked);
+  const contract = await compileContract(filePath, name, createCompilerHost(), linked);
   if (contract.diagnostics.some((diagnostic) => diagnostic.category === DiagnosticCategory.Error)) {
     throw new Error('Compilation error.');
   }
@@ -32,13 +32,13 @@ export const deployContract = async (
   await deployContractBase(
     provider,
     contract.contract,
-    contract.abi,
+    contract.contract.manifest,
     nextSourceMaps,
     common.privateKeyToString(getPrimaryKeys().privateKey),
   );
 
   return {
-    abi: contract.abi,
+    manifest: contract.contract.manifest,
     address,
     sourceMap,
     sourceMaps: nextSourceMaps,

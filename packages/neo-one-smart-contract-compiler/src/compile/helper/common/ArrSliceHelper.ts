@@ -35,7 +35,7 @@ export class ArrSliceHelper extends Helper {
       // [arr, start, arr]
       sb.emitOp(node, 'OVER');
       // [end, start, arr]
-      sb.emitOp(node, 'ARRAYSIZE');
+      sb.emitOp(node, 'SIZE');
       // [start, end, arr]
       sb.emitOp(node, 'SWAP');
     }
@@ -60,7 +60,7 @@ export class ArrSliceHelper extends Helper {
           // [arr, start, arr, end]
           sb.emitOp(node, 'TUCK');
           // [size, start, arr, end]
-          sb.emitOp(node, 'ARRAYSIZE');
+          sb.emitOp(node, 'SIZE');
           // [start, arr, end]
           sb.emitOp(node, 'ADD');
           // [end, start, arr]
@@ -87,7 +87,7 @@ export class ArrSliceHelper extends Helper {
           // [arr, end, arr, start]
           sb.emitOp(node, 'TUCK');
           // [size, end, arr, start]
-          sb.emitOp(node, 'ARRAYSIZE');
+          sb.emitOp(node, 'SIZE');
           // [end, arr, start]
           sb.emitOp(node, 'ADD');
           // [start, end, arr]
@@ -103,7 +103,7 @@ export class ArrSliceHelper extends Helper {
     // [arr, end, arr, start]
     sb.emitOp(node, 'TUCK');
     // [size, end, arr, start]
-    sb.emitOp(node, 'ARRAYSIZE');
+    sb.emitOp(node, 'SIZE');
     // [end, arr, start]
     sb.emitOp(node, 'MIN');
     // [start, end, arr]

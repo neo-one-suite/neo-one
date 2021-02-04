@@ -1,3 +1,4 @@
+import { StackItemType } from '@neo-one/client-common';
 import ts from 'typescript';
 
 import { ScriptBuilder } from '../../../sb';
@@ -14,6 +15,8 @@ export abstract class SetObjectDataPropertyHelperBase extends Helper {
     sb.emitHelper(node, sb.pushValueOptions(options), this.getObject(sb));
     // [stringProp, obj, val]
     sb.emitOp(node, 'ROT');
+    // [stringProp, obj, val]
+    sb.emitOp(node, 'CONVERT', Buffer.from([StackItemType.ByteString]));
     // [val, stringProp, obj]
     sb.emitOp(node, 'ROT');
     // [1, val, stringProp, obj]

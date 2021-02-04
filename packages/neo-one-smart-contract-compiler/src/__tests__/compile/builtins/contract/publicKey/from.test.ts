@@ -14,7 +14,7 @@ describe('PublicKey.from', () => {
   });
 
   test('Reports error on invalid public key', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { PublicKey } from '@neo-one/smart-contract';
       const keys = PublicKey.from('abc');
@@ -24,7 +24,7 @@ describe('PublicKey.from', () => {
   });
 
   test('cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { PublicKey } from '@neo-one/smart-contract';
       const keys = PublicKey.from;
@@ -34,7 +34,7 @@ describe('PublicKey.from', () => {
   });
 
   test('cannot be referenced - object', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { PublicKey } from '@neo-one/smart-contract';
       const { from } = PublicKey;
@@ -44,7 +44,7 @@ describe('PublicKey.from', () => {
   });
 
   test('cannot be element referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { PublicKey } from '@neo-one/smart-contract';
       const keys = PublicKey['from'];

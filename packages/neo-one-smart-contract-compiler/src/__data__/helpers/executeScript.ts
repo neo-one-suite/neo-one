@@ -1,14 +1,21 @@
-import { CallReceiptJSON, common, crypto, scriptHashToAddress, SourceMaps } from '@neo-one/client-common';
+import {
+  CallReceiptJSON,
+  common,
+  crypto,
+  scriptHashToAddress,
+  SourceMaps,
+  toVMStateJSON,
+} from '@neo-one/client-common';
 import { Blockchain } from '@neo-one/node-blockchain';
+import { NativeContainer } from '@neo-one/node-native';
 import { test as testNet } from '@neo-one/node-neo-settings';
 import { storage } from '@neo-one/node-storage-levelup';
-import { Dispatcher, blockchainSettingsToProtocolSettings } from '@neo-one/node-vm';
+import { blockchainSettingsToProtocolSettings, Dispatcher } from '@neo-one/node-vm';
 import LevelUp from 'levelup';
 import MemDown from 'memdown';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import { throwOnDiagnosticErrorOrWarning } from '../../utils';
-import { NativeContainer } from '@neo-one/node-native';
 
 export interface ExecuteOptions {
   readonly prelude?: Buffer;
@@ -49,11 +56,18 @@ export const executeScript = async (
   const address = scriptHashToAddress(common.uInt160ToString(crypto.toScriptHash(code)));
   await blockchain.stop();
 
-  // TODO: pickup here, how are we converting this?
   return {
     receipt: {
-      result: receipt,
-      actions: receipt.actions.map((action) => action.serializeJSON(blockchain.serializeJSONContext)),
+      script: compiledCode,
+      state: toVMStateJSON(receipt.state),
+      gasconsumed: receipt.gasConsumed.toString(),
+      stack: receipt.stack.map((stackItem, _) => stackItem.toContractParameter().serializeJSON()),
+      notifications: receipt.notifications.map((n) => n.serializeJSON()),
+      logs: receipt.logs.map((log) => ({
+        message: log.message,
+        containerhash: log.containerHash ? common.uInt256ToString(log.containerHash) : undefined,
+        callingscripthash: common.uInt160ToString(log.callingScriptHash),
+      })),
     },
     sourceMaps: {
       [address]: resolvedSourceMap,

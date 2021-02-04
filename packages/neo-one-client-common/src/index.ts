@@ -13,3 +13,4 @@ export * from './BaseScriptBuilder';
 export * from './ScriptBuilder';
 export * from './types';
 export * from './utils';
+export * from './StackItemType';

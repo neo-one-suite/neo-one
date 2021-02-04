@@ -1,5 +1,4 @@
 import { Context } from '../../Context';
-import { add as addArguments } from './arguments';
 import { add as addArray } from './array';
 import { add as addAssertEqual } from './assertEqual';
 import { add as addBoolean } from './boolean';
@@ -27,7 +26,6 @@ import { add as addTypedPropertyDescriptor } from './typedPropertyDescriptor';
 
 export const createBuiltins = (context: Context): Builtins => {
   const builtins = new Builtins(context);
-  addArguments(builtins);
   addArray(builtins);
   addAssertEqual(builtins);
   addBoolean(builtins);

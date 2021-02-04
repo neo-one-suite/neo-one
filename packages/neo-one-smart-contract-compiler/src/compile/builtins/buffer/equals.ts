@@ -1,5 +1,7 @@
+import { StackItemType } from '@neo-one/client-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
+import { Types } from '../../constants';
 import { isBuffer } from '../../helper/types';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -40,6 +42,16 @@ export class BufferEquals extends BuiltinInstanceMemberCall {
 
     // [bufferVal, bufferVal]
     sb.visit(tsUtils.argumented.getArguments(node)[0], options);
+    // [buffer, bufferVal]
+    sb.emitHelper(node, options, sb.helpers.unwrapVal({ type: Types.Buffer }));
+    // [bytestring, bufferVal]
+    sb.emitOp(node, 'CONVERT', Buffer.from([StackItemType.ByteString]));
+    // [bufferVal, bytestring]
+    sb.emitOp(node, 'SWAP');
+    // [buffer, bytestring]
+    sb.emitHelper(node, options, sb.helpers.unwrapVal({ type: Types.Buffer }));
+    // [bytestring, bytestring]
+    sb.emitOp(node, 'CONVERT', Buffer.from([StackItemType.ByteString]));
     // [boolean]
     sb.emitOp(node, 'EQUAL');
     if (optionsIn.pushValue) {

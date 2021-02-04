@@ -39,7 +39,7 @@ export class CallHelper extends Helper {
       sb.helpers.if({
         condition: () => {
           // [size, [scopes, this], func]
-          sb.emitOp(node, 'ARRAYSIZE');
+          sb.emitOp(node, 'SIZE');
           // [3, size, [scopes, this], func]
           sb.emitPushInt(node, 3);
           // [size === 3, [scopes, this], func]
@@ -65,7 +65,7 @@ export class CallHelper extends Helper {
     );
 
     // [func]
-    sb.emitOp(node, 'TOALTSTACK');
+    sb.emitHelper(node, options, sb.helpers.pushScope);
 
     // Push the target on the stack
     // [0, func]
@@ -77,7 +77,7 @@ export class CallHelper extends Helper {
     sb.emitCall(node);
 
     // Remove scope
-    sb.emitOp(node, 'FROMALTSTACK');
+    sb.emitHelper(node, options, sb.helpers.popScope);
     sb.emitOp(node, 'DROP');
 
     sb.emitHelper(node, optionsIn, sb.helpers.handleCompletion);

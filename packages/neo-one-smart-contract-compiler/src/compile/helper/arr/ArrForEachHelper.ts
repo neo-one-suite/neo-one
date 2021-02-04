@@ -23,7 +23,7 @@ export class ArrForEachHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (this.withIndex) {
       // [iterator]
-      sb.emitSysCall(node, 'Neo.Iterator.Create');
+      sb.emitSysCall(node, 'System.Iterator.Create');
       // []
       sb.emitHelper(
         node,
@@ -39,7 +39,7 @@ export class ArrForEachHelper extends Helper {
       );
     } else {
       // [enumerator]
-      sb.emitSysCall(node, 'Neo.Enumerator.Create');
+      sb.emitSysCall(node, 'System.Enumerator.Create');
       sb.emitHelper(
         node,
         options,

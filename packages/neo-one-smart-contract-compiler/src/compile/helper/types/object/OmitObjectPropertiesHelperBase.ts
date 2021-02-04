@@ -1,3 +1,4 @@
+import { StackItemType } from '@neo-one/client-common';
 import ts from 'typescript';
 
 import { ScriptBuilder } from '../../../sb';
@@ -25,6 +26,8 @@ export abstract class OmitObjectPropertiesHelperBase extends Helper {
           sb.emitHelper(node, options, this.getObject(sb));
           // [string, obj]
           sb.emitOp(node, 'SWAP');
+          // [string, obj]
+          sb.emitOp(node, 'CONVERT', Buffer.from([StackItemType.ByteString]));
           // []
           sb.emitOp(node, 'REMOVE');
         },

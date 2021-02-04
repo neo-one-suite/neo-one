@@ -4,7 +4,7 @@ import { BN } from 'bn.js';
 import ts from 'typescript';
 import { Context } from '../../Context';
 import { Helper, Helpers } from '../helper';
-import { Jump, Line, ProgramCounter, ProgramCounterHelper } from '../pc';
+import { JmpOp, Jump, Line, ProgramCounter, ProgramCounterHelper } from '../pc';
 import { Name, Scope } from '../scope';
 import { HandleSuperConstruct, VisitOptions } from '../types';
 import { JumpTable } from './JumpTable';
@@ -34,7 +34,7 @@ export interface ScriptBuilder {
   readonly emitPushBoolean: (node: ts.Node, value: boolean) => void;
   readonly emitPushString: (node: ts.Node, value: string) => void;
   readonly emitPushBuffer: (node: ts.Node, value: Buffer) => void;
-  readonly emitJmp: (node: ts.Node, code: 'JMP' | 'JMPIF' | 'JMPIFNOT', pc: ProgramCounter) => void;
+  readonly emitJmp: (node: ts.Node, code: JmpOp, pc: ProgramCounter) => void;
   readonly emitHelper: <T extends ts.Node>(node: T, options: VisitOptions, helper: Helper<T>) => void;
   readonly emitBytecode: (bytecode: Bytecode) => void;
   readonly emitCall: (node: ts.Node) => void;

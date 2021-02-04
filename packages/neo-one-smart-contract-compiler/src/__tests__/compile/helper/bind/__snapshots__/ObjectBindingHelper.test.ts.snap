@@ -4,11 +4,11 @@ exports[`ObjectBindingHelper variable builtin instance value method property 1`]
 "snippetCode.ts (3,17): Builtin properties cannot be referenced
 
       1 | 
-      2 |         import { Account, Address } from '@neo-one/smart-contract';
-    > 3 |         const { getBalance } = Account.for(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
+      2 |         import { ArrayStorage } from '@neo-one/smart-contract';
+    > 3 |         const { forEach } = ArrayStorage.for<number>();
         |                 ^
       4 | 
-      5 |         assertEqual(getBalance !== undefined, true);
+      5 |         assertEqual(forEach !== undefined, true);
       6 |       
 "
 `;
@@ -31,10 +31,10 @@ exports[`ObjectBindingHelper variable builtin value instance computed property 1
 
       1 | 
       2 |         import { Blockchain } from '@neo-one/smart-contract';
-    > 3 |         const { ['references']: references } = Blockchain.currentTransaction;
+    > 3 |         const { ['signers']: signers } = Blockchain.currentTransaction;
         |                 ^
       4 | 
-      5 |         assertEqual(references !== undefined, true);
+      5 |         assertEqual(signers !== undefined, true);
       6 |       
 "
 `;

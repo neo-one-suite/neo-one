@@ -1,6 +1,13 @@
-import { common } from '@neo-one/client-common';
-import { helpers, keys } from '../../../../__data__';
+import { hashes, helpers, keys } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
+
+const properties = `
+  public readonly properties = {
+    groups: [],
+    permissions: [],
+    trusts: "*",
+  };
+`;
 
 describe('SetStorage', () => {
   test('add, delete, has', async () => {
@@ -10,12 +17,8 @@ describe('SetStorage', () => {
       import { SetStorage, SmartContract } from '@neo-one/smart-contract';
 
       export class StorageContract extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'StorageContract',
-        };
+        ${properties}
+
         private readonly storage = SetStorage.for<string>();
 
         public run(): void {
@@ -72,12 +75,8 @@ describe('SetStorage', () => {
       import { SetStorage, SmartContract } from '@neo-one/smart-contract';
 
       export class StorageContract extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'StorageContract',
-        };
+        ${properties}
+
         private readonly storage = SetStorage.for<number>();
 
         public run(): void {
@@ -148,8 +147,8 @@ describe('SetStorage', () => {
 
       const addressA = Address.from('${keys[0].address}');
       const addressB = Address.from('${keys[1].address}');
-      const hashA = Hash256.from('${common.NEO_ASSET_HASH}');
-      const hashB = Hash256.from('${common.GAS_ASSET_HASH}');
+      const hashA = Hash256.from('${hashes.OLD_NEO_ASSET_HASH}');
+      const hashB = Hash256.from('${hashes.OLD_GAS_ASSET_HASH}');
       const keyA = 'keyA';
       const keyB = 'keyB';
       const keyC = 'keyC';
@@ -268,12 +267,8 @@ describe('SetStorage', () => {
       }
 
       export class StorageContract extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'StorageContract',
-        };
+        ${properties}
+
         private readonly storage = SetStorage.for<[Address, Hash256, string]>();
 
         public run(): void {
@@ -310,8 +305,8 @@ describe('SetStorage', () => {
 
       const addressA = Address.from('${keys[0].address}');
       const addressB = Address.from('${keys[1].address}');
-      const hashA = Hash256.from('${common.NEO_ASSET_HASH}');
-      const hashB = Hash256.from('${common.GAS_ASSET_HASH}');
+      const hashA = Hash256.from('${hashes.OLD_NEO_ASSET_HASH}');
+      const hashB = Hash256.from('${hashes.OLD_GAS_ASSET_HASH}');
       const keyA = 'keyA';
       const keyB = 'keyB';
       const keyC = 'keyC';
@@ -395,12 +390,8 @@ describe('SetStorage', () => {
       }
 
       export class StorageContract extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'StorageContract',
-        };
+        ${properties}
+
         private readonly storage = SetStorage.for<[Address, Hash256, string]>();
 
         public run(): void {
@@ -435,8 +426,8 @@ describe('SetStorage', () => {
 
       const addressA = Address.from('${keys[0].address}');
       const addressB = Address.from('${keys[1].address}');
-      const hashA = Hash256.from('${common.NEO_ASSET_HASH}');
-      const hashB = Hash256.from('${common.GAS_ASSET_HASH}');
+      const hashA = Hash256.from('${hashes.OLD_NEO_ASSET_HASH}');
+      const hashB = Hash256.from('${hashes.OLD_GAS_ASSET_HASH}');
       const keyA = 'keyA';
       const keyB = 'keyB';
       const keyC = 'keyC';
@@ -549,12 +540,8 @@ describe('SetStorage', () => {
       }
 
       export class StorageContract extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'StorageContract',
-        };
+        ${properties}
+
         private readonly storage = SetStorage.for<[Address, Hash256, string]>();
 
         public run(): void {
@@ -581,8 +568,8 @@ describe('SetStorage', () => {
     `);
   });
 
-  test('invalid create', () => {
-    helpers.compileString(
+  test('invalid create', async () => {
+    await helpers.compileString(
       `
       import { SetStorage } from '@neo-one/smart-contract';
 
@@ -592,8 +579,8 @@ describe('SetStorage', () => {
     );
   });
 
-  test('invalid reference', () => {
-    helpers.compileString(
+  test('invalid reference', async () => {
+    await helpers.compileString(
       `
       import { SetStorage } from '@neo-one/smart-contract';
 
@@ -603,8 +590,8 @@ describe('SetStorage', () => {
     );
   });
 
-  test('invalid "reference"', () => {
-    helpers.compileString(
+  test('invalid "reference"', async () => {
+    await helpers.compileString(
       `
       import { SetStorage } from '@neo-one/smart-contract';
 
@@ -614,8 +601,8 @@ describe('SetStorage', () => {
     );
   });
 
-  test('invalid reference - object', () => {
-    helpers.compileString(
+  test('invalid reference - object', async () => {
+    await helpers.compileString(
       `
       import { SetStorage } from '@neo-one/smart-contract';
 

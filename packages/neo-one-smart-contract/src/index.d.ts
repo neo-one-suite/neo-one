@@ -65,6 +65,18 @@ export interface AddressConstructor {
    * @returns true if `Address` signed this `Transaction`
    */
   readonly isSender: (address: Address) => boolean;
+  /**
+   * `Address` of the NEO `Contract`.
+   */
+  readonly NEO: Address;
+  /**
+   * `Address` of the GAS `Contract`.
+   */
+  readonly GAS: Address;
+  /**
+   * `Address` of the Policy `Contract`.
+   */
+  readonly Policy: Address;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 
@@ -91,14 +103,6 @@ export interface Hash256Constructor {
    * @returns `Hash256` for the specified `value`
    */
   readonly from: (value: string) => Hash256;
-  /**
-   * `Hash256` of the NEO `Asset`.
-   */
-  readonly NEO: Hash256;
-  /**
-   * `Hash256` of the GAS `Asset`.
-   */
-  readonly GAS: Hash256;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 
@@ -151,111 +155,24 @@ export type Fixed8 = Fixed<8>;
 /**
  * `Attribute` usage flag indicates the type of the data.
  *
- * @see BufferAttributeUsage
- * @see PublicKeyAttributeUsage
- * @see AddressAttributeUsage
- * @see Hash256AttributeUsage
+ * @see HighPriorityAttributeUsage
  */
 export enum AttributeUsage {
-  ContractHash = 0x00,
-  ECDH02 = 0x02,
-  ECDH03 = 0x03,
-  Script = 0x20,
-  Vote = 0x30,
-  DescriptionUrl = 0x81,
-  Description = 0x90,
-  Hash1 = 0xa1,
-  Hash2 = 0xa2,
-  Hash3 = 0xa3,
-  Hash4 = 0xa4,
-  Hash5 = 0xa5,
-  Hash6 = 0xa6,
-  Hash7 = 0xa7,
-  Hash8 = 0xa8,
-  Hash9 = 0xa9,
-  Hash10 = 0xaa,
-  Hash11 = 0xab,
-  Hash12 = 0xac,
-  Hash13 = 0xad,
-  Hash14 = 0xae,
-  Hash15 = 0xaf,
-  Remark = 0xf0,
-  Remark1 = 0xf1,
-  Remark2 = 0xf2,
-  Remark3 = 0xf3,
-  Remark4 = 0xf4,
-  Remark5 = 0xf5,
-  Remark6 = 0xf6,
-  Remark7 = 0xf7,
-  Remark8 = 0xf8,
-  Remark9 = 0xf9,
-  Remark10 = 0xfa,
-  Remark11 = 0xfb,
-  Remark12 = 0xfc,
-  Remark13 = 0xfd,
-  Remark14 = 0xfe,
-  Remark15 = 0xff,
+  HighPriority = 0x01,
+  Reserved = 0xff, // Strange behavior in TypeScript compiler API makes this necessary for now
 }
-
 /**
- * `Attribute` usage flag indicating the data is an arbitrary `Buffer`
+ * `Attribute` usage flag indicating the data is high priority.
  *
- * @see BufferAttribute
+ * @see HighPriorityAttribute
  */
-export type BufferAttributeUsage =
-  | AttributeUsage.DescriptionUrl
-  | AttributeUsage.Description
-  | AttributeUsage.Remark
-  | AttributeUsage.Remark1
-  | AttributeUsage.Remark2
-  | AttributeUsage.Remark3
-  | AttributeUsage.Remark4
-  | AttributeUsage.Remark5
-  | AttributeUsage.Remark6
-  | AttributeUsage.Remark7
-  | AttributeUsage.Remark8
-  | AttributeUsage.Remark9
-  | AttributeUsage.Remark10
-  | AttributeUsage.Remark11
-  | AttributeUsage.Remark12
-  | AttributeUsage.Remark13
-  | AttributeUsage.Remark14
-  | AttributeUsage.Remark15;
+export type HighPriorityAttributeUsage = AttributeUsage.HighPriority;
 /**
- * `Attribute` usage flag indicating the data is a `PublicKey`
+ * `Attribute` placeholder for TypeScript compiler.
  *
- * @see PublicKeyAttribute
+ * @see ReservedAttribute
  */
-export type PublicKeyAttributeUsage = AttributeUsage.ECDH02 | AttributeUsage.ECDH03;
-/**
- * `Attribute` usage flag indicating the data is an `Address`
- *
- * @see AddressAttribute
- */
-export type AddressAttributeUsage = AttributeUsage.Script;
-/**
- * `Attribute` usage flag indicating the data is a `Hash256`
- *
- * @see Hash256Attribute
- */
-export type Hash256AttributeUsage =
-  | AttributeUsage.ContractHash
-  | AttributeUsage.Vote
-  | AttributeUsage.Hash1
-  | AttributeUsage.Hash2
-  | AttributeUsage.Hash3
-  | AttributeUsage.Hash4
-  | AttributeUsage.Hash5
-  | AttributeUsage.Hash6
-  | AttributeUsage.Hash7
-  | AttributeUsage.Hash8
-  | AttributeUsage.Hash9
-  | AttributeUsage.Hash10
-  | AttributeUsage.Hash11
-  | AttributeUsage.Hash12
-  | AttributeUsage.Hash13
-  | AttributeUsage.Hash14
-  | AttributeUsage.Hash15;
+export type ReservedAttributeUsage = AttributeUsage.Reserved;
 
 /**
  * Base interface for `Attribute`s
@@ -265,263 +182,84 @@ export type Hash256AttributeUsage =
 export const AttributeBase: AttributeBaseConstructor;
 export interface AttributeBase {
   readonly usage: AttributeUsage;
-  readonly data: Buffer;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
+
 export interface AttributeBaseConstructor {
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 
-/**
- * `Attribute` whose data is an arbitrary `Buffer`.
- */
-export interface BufferAttribute extends AttributeBase {
-  readonly usage: BufferAttributeUsage;
-  readonly data: Buffer;
+export interface HighPriorityAttribute extends AttributeBase {
+  readonly usage: HighPriorityAttributeUsage;
 }
-/**
- * `Attribute` whose data is a `PublicKey`.
- */
-export interface PublicKeyAttribute extends AttributeBase {
-  readonly usage: PublicKeyAttributeUsage;
-  readonly data: PublicKey;
-}
-/**
- * `Attribute` whose data is an `Address`.
- */
-export interface AddressAttribute extends AttributeBase {
-  readonly usage: AddressAttributeUsage;
-  readonly data: Address;
-}
-/**
- * `Attribute` whose data is a `Hash256`.
- */
-export interface Hash256Attribute extends AttributeBase {
-  readonly usage: Hash256AttributeUsage;
-  readonly data: Hash256;
+
+export interface ReservedAttribute extends AttributeBase {
+  readonly usage: ReservedAttributeUsage;
 }
 
 /**
  * `Attribute`s are used to store additional data on `Transaction`s. Most `Attribute`s are used to store arbitrary data, whereas some, like `AddressAttribute`, have specific uses in the NEO
- * protocol.
+ * protocol. The only attribute currently available in the Neo v3 protocol is the "HighPriority" attribute.
  */
-export type Attribute = BufferAttribute | PublicKeyAttribute | AddressAttribute | Hash256Attribute;
+export type Attribute = HighPriorityAttribute | ReservedAttribute;
 
+export enum WitnessScope {
+  None = 0x00,
+  CalledByEntry = 0x01,
+  CustomContracts = 0x10,
+  CustomGroups = 0x20,
+  Global = 0x80,
+}
+
+export const WitnessScopeBase: WitnessScopeBaseConstructor;
 /**
- * `Output`s represent the destination `Address` and amount transferred of a given `Asset`.
+ * Base interface for `WitnessScope`
  *
- * The sum of the unspent `Output`s of an `Address` represent the total balance of the `Address`.
+ * @see WitnessScope
  */
-export const Output: OutputConstructor;
-export interface Output {
-  /**
-   * Destination `Address`.
-   */
-  readonly address: Address;
-  /**
-   * `Hash256` of the `Asset` that was transferred.
-   */
-  readonly asset: Hash256;
-  /**
-   * Amount transferred.
-   */
-  readonly value: Fixed8;
-  readonly [OpaqueTagSymbol0]: unique symbol;
-}
-export interface OutputConstructor {
+export interface WitnessScopeBase {
+  readonly scope: WitnessScope;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 
-/**
- * `Input`s are a reference to an `Output` of a `Transaction` that has been persisted to the blockchain. The sum of the `value`s of the referenced `Output`s is the total amount transferred in the `Transaction`.
- */
-export const Input: InputConstructor;
-export interface Input {
-  /**
-   * `Hash256` of the `Transaction` this input references.
-   */
-  readonly hash: Hash256;
-  /**
-   * `Output` index within the `Transaction` this input references.
-   */
-  readonly index: Integer;
-  readonly [OpaqueTagSymbol0]: unique symbol;
-}
-export interface InputConstructor {
+export interface WitnessScopeBaseConstructor {
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 
-/**
- * Constants that specify the type of a `Transaction`.
- */
-export enum TransactionType {
-  /**
-   * First `Transaction` in each block which contains the `Block` rewards for the consensus node that produced the `Block`.
-   *
-   * @see MinerTransaction
-   */
-  Miner = 0x00,
-  /**
-   * Issues new currency of a first-class `Asset`.
-   *
-   * @see IssueTransaction
-   */
-  Issue = 0x01,
-  /**
-   * Claims GAS for a set of spent `Output`s.
-   *
-   * @see ClaimTransaction
-   */
-  Claim = 0x02,
-  /**
-   * Enrolls a new validator for a given `PublicKey`.
-   *
-   * @see EnrollmentTransaction
-   * @deprecated
-   */
-  Enrollment = 0x20,
-  /**
-   * Registers a new first class `Asset`
-   *
-   * @see RegisterTransaction
-   * @deprecated Replaced by `Client#registerAsset`
-   */
-  Register = 0x40,
-  /**
-   * Transfers first class `Asset`s
-   *
-   * @see ContractTransaction
-   */
-  Contract = 0x80,
-  State = 0x90,
-  /**
-   * Registers a new `Contract`
-   *
-   * @see PublishTransaction
-   * @deprecated Replaced by `Client#publish`
-   */
-  Publish = 0xd0,
-  /**
-   * Runs a script in the NEO VM.
-   *
-   * @see InvocationTransaction
-   */
-  Invocation = 0xd1,
+export interface NoneWitnessScope extends WitnessScopeBase {
+  readonly scope: WitnessScope.None;
 }
 
-/**
- * Base interface for all `Transaction`s.
- */
-export const TransactionBase: TransactionBaseConstructor;
-export interface TransactionBase {
+export interface CalledByEntryWitnessScope extends WitnessScopeBase {
+  readonly scope: WitnessScope.CalledByEntry;
+}
+
+export interface CustomContractsWitnessScope extends WitnessScopeBase {
+  readonly scope: WitnessScope.CustomContracts;
+}
+
+export interface CustomGroupsWitnessScope extends WitnessScopeBase {
+  readonly scope: WitnessScope.CustomGroups;
+}
+
+export interface GlobalWitnessScope extends WitnessScopeBase {
+  readonly scope: WitnessScope.Global;
+}
+
+export const Signer: SignerConstructor;
+export interface Signer {
   /**
-   * `Hash256` of this `Transaction`.
+   * `Address` representing the account of this signer.
    */
-  readonly hash: Hash256;
+  readonly account: Address;
   /**
-   * Type of the `Transaction`.
-   *
-   * @see TransactionType
+   * `Scopes` of this signature.
    */
-  readonly type: TransactionType;
-  /**
-   * `Attribute`s attached to the `Transaction`.
-   *
-   * @see Attribute
-   */
-  readonly attributes: Attribute[];
-  /**
-   * `Output`s of the `Transaction`.
-   *
-   * @see Output
-   */
-  readonly outputs: Output[];
-  /**
-   * `Input`s of the `Transaction`.
-   *
-   * @see Input
-   */
-  readonly inputs: Input[];
-  /**
-   * Corresponding `Output`s for the `Input`s of the `Transaction`.
-   *
-   * @see Output
-   */
-  readonly references: Output[];
-  /**
-   * `Output`s which have not been spent.
-   *
-   * @see Output
-   */
-  readonly unspentOutputs: Output[];
+  readonly scopes: WitnessScope;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export interface TransactionBaseConstructor {}
+export interface SignerConstructor {}
 
-/**
- * First `Transaction` in each `Block` which contains the `Block` rewards for the consensus node that produced the `Block`.
- */
-export interface MinerTransaction extends TransactionBase {
-  readonly type: TransactionType.Miner;
-}
-/**
- * Issues new currency of a first-class `Asset`.
- */
-export interface IssueTransaction extends TransactionBase {
-  readonly type: TransactionType.Issue;
-}
-/**
- * Claims GAS for a set of spent `Output`s.
- */
-export interface ClaimTransaction extends TransactionBase {
-  readonly type: TransactionType.Claim;
-}
-/**
- * Enrolls a new validator for a given `PublicKey`.
- *
- * @deprecated
- */
-export interface EnrollmentTransaction extends TransactionBase {
-  readonly type: TransactionType.Enrollment;
-}
-/**
- * Registers a new first class `Asset`.
- *
- * @deprecated Replaced by `Client#registerAsset`
- */
-export interface RegisterTransaction extends TransactionBase {
-  readonly type: TransactionType.Register;
-}
-/**
- * `Transaction` that transfers first class `Asset`s.
- */
-export interface ContractTransaction extends TransactionBase {
-  readonly type: TransactionType.Contract;
-}
-/**
- * Contains the state of votes.
- */
-export interface StateTransaction extends TransactionBase {
-  readonly type: TransactionType.State;
-}
-/**
- * Registers a new `Contract`
- *
- * @deprecated Replaced by `Client#publish`
- */
-export interface PublishTransaction extends TransactionBase {
-  readonly type: TransactionType.Publish;
-}
-/**
- * `Transaction` which runs a script in the NEO VM.
- */
-export interface InvocationTransaction extends TransactionBase {
-  readonly type: TransactionType.Invocation;
-  /**
-   * Code that was executed in NEO VM.
-   */
-  readonly script: Buffer;
-}
 /**
  * `Transaction`s are persisted to the blockchain and represent various functionality like transferring first class `Asset`s or executing smart contracts.
  *
@@ -531,132 +269,60 @@ export interface InvocationTransaction extends TransactionBase {
  *
  * const transactionHash = Hash256.from('0xd6572a459b95d9136b7a713c5485ca709f9efa4f08f1c25dd792672d2bd75bfb');
  * const transaction = Transaction.for(transactionHash);
- * const transactionOutputs = transaction.outputs;
  *
  */
 export const Transaction: TransactionConstructor;
-export type Transaction =
-  | MinerTransaction
-  | IssueTransaction
-  | ClaimTransaction
-  | EnrollmentTransaction
-  | RegisterTransaction
-  | ContractTransaction
-  | StateTransaction
-  | PublishTransaction
-  | InvocationTransaction;
+/**
+ * Interface for all `Transaction`s.
+ */
+export interface Transaction {
+  /**
+   * `Hash256` of this `Transaction`.
+   */
+  readonly hash: Hash256;
+  /**
+   * Neo protocol version.
+   */
+  readonly version: number;
+  /**
+   * Unique number in order to ensure the hash for this contract is unique.
+   */
+  readonly nonce: number;
+  /**
+   * `Address` of the transaction sender.
+   */
+  readonly sender: Address;
+  /**
+   * GAS execution fee for the transaction.
+   */
+  readonly systemFee: number;
+  /**
+   * GAS network priority fee for the transaction.
+   */
+  readonly networkFee: number;
+  /**
+   * Block expiration time.
+   */
+  readonly validUntilBlock: number;
+  /**
+   * The index of the `Transaction` within the `Block`
+   */
+  readonly height: number;
+  /**
+   * Code that was executed in NEO VM.
+   */
+  readonly script: Buffer;
+  /**
+   * `Notification`s emitted by the `Transaction`.
+   */
+  // readonly notifications: Notification[];
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
 export interface TransactionConstructor {
   /**
    * @returns `Transaction` for the specified `hash`.
    */
   readonly for: (hash: Hash256) => Transaction;
-  readonly [OpaqueTagSymbol0]: unique symbol;
-}
-
-/**
- * Balance and vote information for an `Address`.
- *
- * @example
- *
- * const address = Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW');
- * const account = Account.for(address);
- * const neoBalance = account.getBalance(Hash256.NEO);
- *
- */
-export const Account: AccountConstructor;
-export interface Account {
-  /**
-   * `Address` of this `Account`.
-   */
-  readonly address: Address;
-  /**
-   * Retrieve the balance for a first class `Asset` based on its `Hash256`.
-   */
-  readonly getBalance: (asset: Hash256) => Fixed8;
-  readonly [OpaqueTagSymbol0]: unique symbol;
-}
-export interface AccountConstructor {
-  /**
-   * @returns `Account` for the specified `address`.
-   */
-  readonly for: (address: Address) => Account;
-  readonly [OpaqueTagSymbol0]: unique symbol;
-}
-
-/**
- * Constants that specify the type of the `Asset`.
- */
-export enum AssetType {
-  Credit = 0x40,
-  Duty = 0x80,
-  /**
-   * Reserved for the NEO `Asset`.
-   */
-  Governing = 0x00,
-  /**
-   * Reserved for the GAS `Asset`.
-   */
-  Utility = 0x01,
-  Currency = 0x08,
-  Share = 0x90,
-  Invoice = 0x98,
-  Token = 0x60,
-}
-
-/**
- * Attributes of a first class asset.
- *
- * Smart contract authors will typically only interact with the NEO and GAS `Asset`s.
- *
- * @example
- *
- * const asset = Asset.for(Hash256.NEO);
- * const neoAmount = asset.amount;
- *
- */
-export const Asset: AssetConstructor;
-export interface Asset {
-  /**
-   * `Hash256` of this `Asset`.
-   */
-  readonly hash: Hash256;
-  /**
-   * `AssetType` of the `Asset`
-   *
-   * @see AssetType
-   */
-  readonly type: AssetType;
-  /**
-   * Total possible supply of the `Asset`
-   */
-  readonly amount: Fixed8;
-  /**
-   * Amount currently available of the `Asset`
-   */
-  readonly available: Fixed8;
-  /**
-   * Precision (number of decimal places) of the `Asset`
-   */
-  readonly precision: Integer;
-  /**
-   * Owner of the `Asset`.
-   */
-  readonly owner: PublicKey;
-  /**
-   * Admin of the `Asset`.
-   */
-  readonly admin: Address;
-  /**
-   * Issuer of the `Asset`.
-   */
-  readonly issuer: Address;
-  readonly [OpaqueTagSymbol0]: unique symbol;
-}
-export interface AssetConstructor {
-  /**
-   * @returns `Asset` for the specified `hash`.
-   */
-  readonly for: (hash: Hash256) => Asset;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 
@@ -677,7 +343,15 @@ export interface Contract {
    */
   readonly script: Buffer;
   /**
-   * Flag that indicates if the `Contract` supports receiving `Asset`s.
+   * A string representation of the contract's manifest
+   */
+  readonly manifest: string;
+  /**
+   * If `true` then contract uses blockchain storage.
+   */
+  readonly hasStorage: boolean;
+  /**
+   * If `true` then contract is payable.
    */
   readonly payable: boolean;
   readonly [OpaqueTagSymbol0]: unique symbol;
@@ -692,17 +366,63 @@ export interface ContractConstructor {
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 
+// export enum StackItemType {
+//   Any = 0x00,
+//   Pointer = 0x10,
+//   Boolean = 0x20,
+//   Integer = 0x21,
+//   ByteString = 0x28,
+//   Buffer = 0x30,
+//   Array = 0x40,
+//   Struct = 0x41,
+//   Map = 0x48,
+//   InteropInterface = 0x60,
+// }
+
+// export interface StackItemBase {
+//   readonly type: StackItemType;
+// }
+
+// export interface BufferStackItem extends StackItemBase {
+//   readonly type: StackItemType.Buffer;
+//   readonly value: Buffer;
+// }
+
+// export type StackItem = BufferStackItem;
+
+// /**
+//  *
+//  */
+// export interface Notification {
+//   /**
+//    *
+//    */
+//   readonly scriptHash: Address;
+//   /**
+//    * The name of the notification event. "Transfer" in the event of a transfer.
+//    */
+//   readonly eventName: string;
+//   /**
+//    *
+//    */
+//   readonly state: StackItem[];
+// }
+
 /**
- * Attributes of a `Block` persisted to the blockchain. `Header` includes all information except the list of `Transaction`s.
+ * Attributes of a `Block` persisted to the blockchain.
+ *
+ * @example
+ *
+ * const genesisBlock = Block.for(0);
  *
  * @example
  *
  * const blockHash = Hash256.from('0xd6572a459b95d9136b7a713c5485ca709f9efa4f08f1c25dd792672d2bd75bfb');
- * const header = Header.for(blockHash);
+ * const arbitraryBlock = Block.for(blockHash);
  *
  */
-export const Header: HeaderConstructor;
-export interface Header {
+export const Block: BlockConstructor;
+export interface Block {
   /**
    * `Block` hash.
    */
@@ -731,32 +451,10 @@ export interface Header {
    * Next consensus address.
    */
   readonly nextConsensus: Address;
-  readonly [OpaqueTagSymbol0]: unique symbol;
-}
-export interface HeaderConstructor {
   /**
-   * Accepts either the `Hash256` or the index of the `Block`.
-   *
-   * @returns `Header` for the specified `hashOrIndex`.
+   * The number of `Transaction`s contained in the `Block`.
    */
-  readonly for: (hashOrIndex: Hash256 | Integer) => Header;
-  readonly [OpaqueTagSymbol0]: unique symbol;
-}
-
-/**
- * Attributes of a `Block` persisted to the blockchain.
- *
- * @example
- *
- * const genesisBlock = Block.for(0);
- *
- */
-export const Block: BlockConstructor;
-export interface Block extends Header {
-  /**
-   * `Transaction`s contained in the `Block`.
-   */
-  readonly transactions: Transaction[];
+  readonly transactionsLength: Integer;
 }
 export interface BlockConstructor {
   /**
@@ -1041,9 +739,9 @@ export interface BlockchainConstructor {
    */
   readonly currentHeight: number;
   /**
-   * `InvocationTransaction` this smart contract is executed in.
+   * `Transaction` this smart contract is executed in.
    */
-  readonly currentTransaction: InvocationTransaction;
+  readonly currentTransaction: Transaction;
   /**
    * The `Address` of the smart contract that directly invoked the contract.
    *
@@ -1286,15 +984,59 @@ type IsValidSmartContract<T> = {
 };
 
 /**
- * Object with string literals for the contract properties to be used in deployment.
+ * Object that defines a contract group for use in deployment.
+ *
+ * See the [Deployment](https://neo-one.io/docs/deployment#Properties) chapter of the main guide for more information.
+ */
+export interface ContractGroup {
+  /**
+   * The public key of the group.
+   */
+  readonly publicKey: string;
+  /**
+   * The signature of the contract hash.
+   */
+  readonly signature: string;
+}
+
+/**
+ * Object that defines a contract permission for use in deployment.
+ *
+ * See the [Deployment](https://neo-one.io/docs/deployment#Properties) chapter of the main guide for more information.
+ */
+export interface ContractPermission {
+  /**
+   * An object indicating the contract to be invoked. It can be the hash of a single contract or the public key of a contract group.
+   * If it specifies the hash of a contract then the contract can be invoked.
+   * If it specifies the public key of a group, then any contract in this group can be invoked
+   * If this object has hash and group as undefined then this will be considered a wildcard ("*") and any contract can be invoked.
+   */
+  readonly contract: { readonly hash?: string; readonly group?: string };
+  /**
+   * An array of methods that are allowed to be called. An empty array means that no methods will be allowed to be called. This can also be a wildcard string: "*", which means that any method can be called.
+   */
+  readonly methods: string | readonly string[];
+}
+
+/**
+ * Object with literals for the contract properties to be used in deployment.
  *
  * See the [Deployment](https://neo-one.io/docs/deployment#Properties) chapter of the main guide for more information.
  */
 export interface ContractProperties {
-  readonly codeVersion: string;
-  readonly author: string;
-  readonly email: string;
-  readonly description: string;
+  /**
+   * A group represents a set of mutually trusted contracts. A contract will trust and allow any contract in the same group to invoke it, and the user interface will not give any warnings.
+   */
+  readonly groups: readonly ContractGroup[];
+  /**
+   * The permissions field is an array containing a set of `ContractPermission` objects. It describes which contracts may be invoked and which methods are called.
+   */
+  readonly permissions: readonly ContractPermission[];
+  /**
+   * The trusts field is an array containing a set of contract hashes or group public keys. It can also be assigned with a wildcard *. If it is a wildcard *, then it means that this contract trusts any contract.
+   * If a contract is trusted, the user interface will not give any warnings when called by the contract.
+   */
+  readonly trusts: string | readonly string[];
 }
 
 /**
@@ -1311,24 +1053,6 @@ export class SmartContract {
    * `Address` of the `SmartContract`.
    */
   public readonly address: Address;
-  /**
-   * Stores `Transaction` hashes that have been processed by a method marked with `@receive`, `@send`, or `@sendUnsafe`.
-   *
-   * Used to enforce that a `Transaction` with native `Asset`s is only ever processed once by an appropriate `@receive`, `@send`, or `@sendUnsafe` method.
-   *
-   * Unprocessed transactions that sent assets to the smart contract can be refunded by using `refundAssets`.
-   *
-   * See the [Native Assets](https://neo-one.io/docs/native-assets) chapter of the advanced guide for more information.
-   */
-  protected readonly processedTransactions: SetStorage<Hash256>;
-  /**
-   * Stores `Transaction` hashes that have been claimed by an address with a method marked with `@send`.
-   *
-   * The first contract output of a claimed transaction may be sent to the receiver by using `completeSend`.
-   *
-   * See the [Native Assets](https://neo-one.io/docs/native-assets) chapter of the advanced guide for more information.
-   */
-  protected readonly claimedTransactions: MapStorage<Hash256, Address>;
   /**
    * Property primarily used internally to validate that the smart contract is deployed only once.
    */
@@ -1358,33 +1082,11 @@ export class SmartContract {
    */
   protected readonly destroy: () => void;
   /**
-   * Method automatically added for refunding native `Asset`s.
-   *
-   * See the [Native Assets](https://neo-one.io/docs/native-assets) chapter of the advanced guide for more information.
-   */
-  public readonly refundAssets: () => boolean;
-  /**
-   * Method automatically added for sending native `Asset`s that have been claimed by a `@send` method.
-   *
-   * See the [Native Assets](https://neo-one.io/docs/native-assets) chapter of the advanced guide for more information.
-   */
-  public readonly completeSend: () => boolean;
-  /**
    * Used internally by client APIs to upgrade the contract. Control whether an invocation is allowed to upgrade the contract by overriding `approveUpgrade`.
    *
    * See the [Deployment](https://neo-one.io/docs/deployment#Upgrade) chapter of the main guide for more information.
    */
-  public readonly upgrade: (
-    script: Buffer,
-    parameterList: Buffer,
-    returnType: number,
-    properties: number,
-    contractName: string,
-    codeVersion: string,
-    author: string,
-    email: string,
-    description: string,
-  ) => boolean;
+  public readonly upgrade: (script: Buffer, manifest: Buffer) => boolean;
   /**
    * Returns the singleton instance of the `SmartContract` defined by the interface `T` at `address`.
    *
@@ -1440,15 +1142,15 @@ export type Hashable = number | string | boolean | Buffer;
  */
 export interface CryptoConstructor {
   /**
-   * Returns a `Buffer` of the SHA1 hash of the input
-   */
-  readonly sha1: (value: Hashable) => Buffer;
-  /**
    * Returns a `Buffer` of the SHA256 hash of the input
    */
   readonly sha256: (value: Hashable) => Buffer;
   /**
-   * Returns a `Buffer` of the RMD160 hash of the SHA256 hash of the input.
+   * Returns a `Buffer` of the RIPEMD160 hash of the input.
+   */
+  readonly ripemd160: (value: Hashable) => Address;
+  /**
+   * Returns a `Buffer` of the RIPEMD160 hash of the SHA256 hash of the input.
    */
   readonly hash160: (value: Hashable) => Address;
   /**

@@ -20,6 +20,15 @@ describe('Array.prototype.every', () => {
     `);
   });
 
+  test('should apply a function over an array - all false', async () => {
+    await helpers.executeString(`
+      const x = [0, 1, 2];
+      const y = x.every((value) => false);
+
+      assertEqual(y, false);
+    `);
+  });
+
   test('should apply a function over an array with index', async () => {
     await helpers.executeString(`
       const x = [1, 2, 3];
@@ -57,7 +66,7 @@ describe('Array.prototype.every', () => {
   });
 
   test('cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = [0, 1, 2];
       const y = x.every;
@@ -67,7 +76,7 @@ describe('Array.prototype.every', () => {
   });
 
   test('cannot be "referenced"', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = [0, 1, 2];
       const y = x['every'];

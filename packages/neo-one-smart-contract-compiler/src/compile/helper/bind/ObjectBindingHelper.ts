@@ -260,13 +260,8 @@ export class ObjectBindingHelper extends TypedHelper<ts.ObjectBindingPattern> {
               iterable: throwInnerTypeError,
               iterableIterator: throwInnerTypeError,
               transaction: throwInnerTypeError,
-              output: throwInnerTypeError,
               attribute: throwInnerTypeError,
-              input: throwInnerTypeError,
-              account: throwInnerTypeError,
-              asset: throwInnerTypeError,
               contract: throwInnerTypeError,
-              header: throwInnerTypeError,
               block: throwInnerTypeError,
             }),
           );
@@ -337,10 +332,12 @@ export class ObjectBindingHelper extends TypedHelper<ts.ObjectBindingPattern> {
         sb.emitPushInt(node, 3);
         // [obj, propertyArr, symbolArr]
         sb.emitHelper(node, innerOptions, sb.helpers.packObject);
-        // [3, objectVal, propertyArr, symbolArr]
-        sb.emitPushInt(node, 3);
+        // [objectVal, objectVal, propertyArr, symbolArr]
+        sb.emitOp(node, 'DUP');
+        // [symbolArr, propertyArr, objectVal, objectVal]
+        sb.emitOp(node, 'REVERSE4');
         // [objectVal, propertyArr, symbolArr, objectVal]
-        sb.emitOp(node, 'XTUCK');
+        sb.emitOp(node, 'REVERSE3');
         // [symbolArr, objectVal, propertyArr, objectVal]
         sb.emitOp(restElement, 'ROT');
         // [propertyArr, symbolArr, objectVal, objectVal]
@@ -388,14 +385,9 @@ export class ObjectBindingHelper extends TypedHelper<ts.ObjectBindingPattern> {
         iteratorResult: createProcessBuiltin('IteratorResult'),
         iterable: createProcessBuiltin('Iterable'),
         iterableIterator: createProcessBuiltin('IterableIterator'),
-        transaction: createProcessBuiltin('TransactionBase'),
-        output: createProcessBuiltin('Output'),
+        transaction: createProcessBuiltin('Transaction'),
         attribute: createProcessBuiltin('AttributeBase'),
-        input: createProcessBuiltin('Input'),
-        account: createProcessBuiltin('Account'),
-        asset: createProcessBuiltin('Asset'),
         contract: createProcessBuiltin('Contract'),
-        header: createProcessBuiltin('Header'),
         block: createProcessBuiltin('Block'),
       }),
     );

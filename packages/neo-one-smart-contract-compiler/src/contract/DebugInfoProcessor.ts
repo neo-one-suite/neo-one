@@ -14,7 +14,7 @@ export interface DebugInfo {
   readonly documents: readonly string[];
 }
 
-interface DebugMethod {
+export interface DebugMethod {
   readonly id: string;
   readonly name: string;
   readonly range: readonly [number, number];
@@ -47,15 +47,36 @@ export class DebugInfoProcessor {
   }
 
   private processMethods(): ReadonlyArray<DebugMethod> {
-    const propInfos = this.contractInfo.propInfos.filter(utils.notNull);
+    const propInfos = this.contractInfo.propInfos.filter((propInfo) => propInfo.isPublic).filter(utils.notNull);
 
     return _.flatten<DebugMethod>(
       propInfos.map(
         (propInfo): ReadonlyArray<DebugMethod> => {
           switch (propInfo.type) {
+            case 'deploy':
+              return [
+                {
+                  id: '',
+                  name: propInfo.name,
+                  params: propInfo.isMixinDeploy ? [] : this.getParameters({ callSignature: propInfo.callSignature }),
+                  range: [0, 0],
+                  returnType: 'Boolean',
+                },
+              ];
+
+            case 'upgrade':
+              return [
+                {
+                  id: '',
+                  name: propInfo.name,
+                  params: ['script,Buffer', 'manifest,Buffer'],
+                  range: [0, 0],
+                  returnType: 'Void',
+                },
+              ];
+
             case 'function':
               const funcRange = this.getSourceRange(propInfo.decl);
-
               if (funcRange === undefined) {
                 return [];
               }
@@ -66,8 +87,6 @@ export class DebugInfoProcessor {
                   name: propInfo.name,
                   params: this.getParameters({
                     callSignature: propInfo.callSignature,
-                    send: propInfo.send,
-                    claim: propInfo.claim,
                   }),
                   range: funcRange,
                   returnType: this.toDebugReturn(propInfo.decl, propInfo.returnType),
@@ -76,7 +95,6 @@ export class DebugInfoProcessor {
 
             case 'property':
               const propRange = this.getSourceRange(propInfo.decl);
-
               if (propRange === undefined) {
                 return [];
               }
@@ -95,7 +113,8 @@ export class DebugInfoProcessor {
               return [this.getGetterInfo(propInfo), this.getSetterInfo(propInfo)].filter(utils.notNull);
 
             default:
-              return [];
+              utils.assertNever(propInfo);
+              throw new Error('For TS');
           }
         },
       ),
@@ -150,25 +169,14 @@ export class DebugInfoProcessor {
 
   private getParameters({
     callSignature,
-    claim = false,
-    send = false,
   }: {
     readonly callSignature: ts.Signature | undefined;
-    readonly claim?: boolean;
-    readonly send?: boolean;
   }): ReadonlyArray<string> {
     if (callSignature === undefined) {
       return [];
     }
 
-    let parameters = callSignature.getParameters();
-    if (claim && this.checkLastParam(parameters, 'ClaimTransaction')) {
-      parameters = parameters.slice(0, -1);
-    }
-
-    if (send && this.checkLastParam(parameters, 'Transfer')) {
-      parameters = parameters.slice(0, -1);
-    }
+    const parameters = callSignature.getParameters();
 
     return parameters.map((parameter) => this.paramToABIParameter(parameter)).filter(utils.notNull);
   }
@@ -192,24 +200,6 @@ export class DebugInfoProcessor {
     const decl = utils.nullthrows(decls[0]);
 
     return this.context.analysis.getTypeOfSymbol(param, decl);
-  }
-
-  private checkLastParam(parameters: ReadonlyArray<ts.Symbol>, value: string): boolean {
-    return this.checkLastParamBase(parameters, (decl, type) => this.context.builtins.isInterface(decl, type, value));
-  }
-
-  private checkLastParamBase(
-    parameters: ReadonlyArray<ts.Symbol>,
-    checkParamType: (decl: ts.Node, type: ts.Type) => boolean,
-  ): boolean {
-    if (parameters.length === 0) {
-      return false;
-    }
-
-    const lastParam = parameters[parameters.length - 1];
-    const lastParamType = this.getParamSymbolType(lastParam);
-
-    return lastParamType !== undefined && checkParamType(tsUtils.symbol.getDeclarations(lastParam)[0], lastParamType);
   }
 
   private toDebugParameter(

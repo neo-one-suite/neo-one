@@ -33,7 +33,6 @@ export class SmartContractFor extends SmartContractForBase {
     node: ts.CallExpression,
     prop: ts.Declaration,
     addressName: Name,
-    callBuffer: Buffer,
     options: VisitOptions,
   ): void {
     if (tsUtils.argumented.getArguments(node).length < 1) {
@@ -43,16 +42,27 @@ export class SmartContractFor extends SmartContractForBase {
 
     const arg = tsUtils.argumented.getArguments(node)[0];
     const scriptHash = sb.context.analysis.extractLiteralAddress(arg);
+    // TODO: remove this and change how we call smart contracts, including our own
+    // [string, params, string]
+    sb.emitOp(node, 'TUCK');
+    // [2, string, params, string]
+    sb.emitPushInt(node, 2);
+    // [[string, params], string]
+    sb.emitOp(node, 'PACK');
+    // [string, [string, params]]
+    sb.emitOp(node, 'SWAP');
     if (scriptHash === undefined) {
       // [bufferVal, string, params]
       sb.scope.get(sb, arg, options, addressName);
       // [buffer, string, params]
       sb.emitHelper(prop, options, sb.helpers.unwrapBuffer);
       // [result]
-      sb.emitOp(prop, 'CALL_ED', callBuffer);
+      sb.emitSysCall(node, 'System.Contract.Call');
     } else {
+      // [buffer, string, params]
+      sb.emitPushBuffer(prop, scriptHash);
       // [result]
-      sb.emitOp(prop, 'CALL_E', Buffer.concat([callBuffer, scriptHash]));
+      sb.emitSysCall(node, 'System.Contract.Call');
     }
   }
 }

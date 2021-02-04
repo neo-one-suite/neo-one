@@ -1,8 +1,10 @@
+import { StackItemType } from '@neo-one/client-common';
 import { BN } from 'bn.js';
+import { ContractParameter, IntegerContractParameter } from '../contractParameter';
 import { InvalidIntegerStackItemError } from '../errors';
 import { PrimitiveStackItemBase } from './PrimitiveStackItemBase';
+import { StackItemBase } from './StackItemBase';
 import { isIntegerStackItem, StackItem } from './StackItems';
-import { StackItemType } from './StackItemType';
 
 export class IntegerStackItem extends PrimitiveStackItemBase {
   public static readonly Zero = new IntegerStackItem(new BN(0));
@@ -40,5 +42,9 @@ export class IntegerStackItem extends PrimitiveStackItemBase {
 
   public getInteger() {
     return this.value;
+  }
+
+  public toContractParameter(_seen: Set<StackItemBase> = new Set()): ContractParameter {
+    return new IntegerContractParameter(this.value);
   }
 }

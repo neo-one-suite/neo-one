@@ -1,7 +1,8 @@
+import { isStackItemType, StackItemType } from '@neo-one/client-common';
+import { AnyContractParameter, ContractParameter } from '../contractParameter';
 import { InvalidStackItemCastError } from '../errors';
 import { StackItemBase } from './StackItemBase';
 import { StackItem } from './StackItems';
-import { isStackItemType, StackItemType } from './StackItemType';
 
 export class NullStackItem extends StackItemBase {
   public constructor() {
@@ -33,5 +34,9 @@ export class NullStackItem extends StackItemBase {
 
   public getString() {
     return '';
+  }
+
+  public toContractParameter(_seen: Set<StackItemBase> = new Set()): ContractParameter {
+    return new AnyContractParameter();
   }
 }

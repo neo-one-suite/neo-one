@@ -5,7 +5,9 @@ export enum TriggerType {
   PostPersist = 0x02,
   Verification = 0x20,
   Application = 0x40,
+  // tslint:disable-next-line: no-bitwise
   System = OnPersist | PostPersist,
+  // tslint:disable-next-line: no-bitwise
   All = OnPersist | PostPersist | Verification | Application,
 }
 

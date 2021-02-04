@@ -28,7 +28,7 @@ export class RawIteratorReduceBaseHelper extends Helper {
           // [iterator, accum, iterator]
           sb.emitOp(node, 'OVER');
           // [boolean, accum, iterator]
-          sb.emitSysCall(node, 'Neo.Enumerator.Next');
+          sb.emitSysCall(node, 'System.Enumerator.Next');
         },
         each: (innerOptions) => {
           // [iterator, accum, iterator]

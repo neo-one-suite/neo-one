@@ -197,13 +197,8 @@ export class ToStringHelper extends TypedHelper {
           iterable: convertEmptyString,
           iterableIterator: convertEmptyString,
           transaction: convertEmptyString,
-          output: convertEmptyString,
           attribute: convertEmptyString,
-          input: convertEmptyString,
-          account: convertEmptyString,
-          asset: convertEmptyString,
           contract: convertEmptyString,
-          header: convertEmptyString,
           block: convertEmptyString,
         }),
       );

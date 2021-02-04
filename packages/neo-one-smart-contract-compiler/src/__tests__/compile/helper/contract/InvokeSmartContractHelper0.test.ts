@@ -1,16 +1,15 @@
 import { helpers } from '../../../../__data__';
 
 const properties = `
-public readonly properties = {
-  codeVersion: '1.0',
-  author: 'dicarlo2',
-  email: 'alex.dicarlo@neotracker.io',
-  description: 'The TestSmartContract',
-};
+  public readonly properties = {
+    groups: [],
+    permissions: [],
+    trusts: "*",
+  };
 `;
 
 describe('InvokeSmartContractHelper', () => {
-  test('basic class no constructor', async () => {
+  test.only('basic class no constructor', async () => {
     const node = await helpers.startNode();
     const contract = await node.addContract(`
       import { SmartContract } from '@neo-one/smart-contract';

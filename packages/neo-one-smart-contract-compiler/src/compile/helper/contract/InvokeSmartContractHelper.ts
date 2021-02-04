@@ -1,17 +1,15 @@
 // tslint:disable prefer-switch
-import { TransactionTypeModel as TransactionType } from '@neo-one/client-common';
+import { TriggerType } from '@neo-one/client-common';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import ts from 'typescript';
 import { ContractPropertyName } from '../../../constants';
 import {
   AccessorPropInfo,
-  CompleteSendPropInfo,
   ContractInfo,
   DeployPropInfo,
   FunctionPropInfo,
   PropertyPropInfo,
-  RefundAssetsPropInfo,
   UpgradePropInfo,
 } from '../../../contract';
 import { ScriptBuilder } from '../../sb';
@@ -136,11 +134,14 @@ export interface InvokeSmartContractHelperOptions {
  *  const args = getArgument(1);
  *  return contract.normalMethod(...args);
  * }
- *
+ */
+
+// TODO: args has changed. no longer array of properties, but a script and a serialized manifest
+/**
  * const handleUpgrade = () => {
  *  if (contract.approveUpgrade()) {
  *    const args = getArgument(1);
- *    Neo.Contract.Migrate(...args);
+ *    System.Contract.Update(...args);
  *    return true;
  *  }
  *  return false;
@@ -166,66 +167,18 @@ export interface InvokeSmartContractHelperOptions {
  *  switch (method) {
  *    case 'normalMethod':
  *      return handleNormalMethod();
- *    case 'sendMethod':
- *      return handleSend();
- *    case 'sendUnsafeMethod':
- *      return handleSendUnsafe();
- *    case 'receiveMethod':
- *      return handleReceive();
  *    case 'upgrade':
  *      return handleUpgrade();
- *    case 'refundAssets':
- *      return handleRefund();
- *    case 'completeSend':
- *      return handleCompleteSend();
  *    case 'deploy':
  *      return handleDeploy();
  *    default:
  *      throw new Error('Unknown method');
  * } else if (trigger === TriggerType.Verification) {
- *  const transaction = System.ExecutionEnginer.GetScriptContainer();
- *  if (transaction.type === TransactionType.Invocation) {
- *    const method = getArgument(0);
- *    switch (method) {
- *      case 'sendMethod':
- *        if (!applicationScriptMatchesVerification()) {
- *          return false;
- *        }
- *        return handleSend();
- *      case 'sendUnsafeMethod':
- *        if (!applicationScriptMatchesVerification()) {
- *          return false;
- *        }
- *        return handleSendUnsafe();
- *      case 'receiveMethod':
- *        if (!applicationScriptMatchesVerification()) {
- *          return false;
- *        }
- *        return handleReceive();
- *      case 'completeSend':
- *        return handleCompleteSend();
- *      default:
- *        if (didSendAssets() || didReceiveAssets()) {
- *          throw new Error();
- *        }
- *        return handleOther();
- *    }
- *  } else if (transaction.type === TransactionType.Claim) {
- *    if (didSendAssets() || didReceiveNonClaimAssets()) {
- *      return false;
- *    }
- *    const method = getArgument(0);
- *    switch (method) {
- *      case 'claimMethod':
- *        return handleClaim();
- *      default:
- *        throw new Error();
- *    } else {
- *      throw new Error();
- *    }
- *  } else {
- *    throw new Error();
- *  }
+ *   const method = getArgument(0);
+ *   switch (method) {
+ *     default:
+ *       return handleOther();
+ *   }
  * }
  *
  */
@@ -267,24 +220,7 @@ export class InvokeSmartContractHelper extends Helper {
 
           return;
         }
-
-        if (propInfo.send) {
-          sb.emitHelper(decl, options, sb.helpers.handleSend({ method: decl, returnType: propInfo.returnType }));
-        } else if (propInfo.receive) {
-          sb.emitHelper(
-            decl,
-            options,
-            sb.helpers.handleReceive({ opposite: propInfo.sendUnsafe, method: decl, returnType: propInfo.returnType }),
-          );
-        } else if (propInfo.sendUnsafe) {
-          sb.emitHelper(
-            decl,
-            options,
-            sb.helpers.handleSendUnsafe({ opposite: propInfo.receive, method: decl, returnType: propInfo.returnType }),
-          );
-        } else {
-          sb.emitHelper(decl, options, sb.helpers.handleNormal({ propInfo }));
-        }
+        sb.emitHelper(decl, options, sb.helpers.handleNormal({ propInfo }));
       });
 
     const getDeployCase = (contractInfo: ContractInfo, propInfo: DeployPropInfo) => {
@@ -327,16 +263,7 @@ export class InvokeSmartContractHelper extends Helper {
       return mutableCases;
     };
 
-    const getRefundAssetsCase = (propInfo: RefundAssetsPropInfo) =>
-      getCaseBase(node, ContractPropertyName.refundAssets, () => {
-        sb.emitHelper(node, options, sb.helpers.handleNormal({ propInfo }));
-      });
-
-    const getCompleteSendCase = (propInfo: CompleteSendPropInfo) =>
-      getCaseBase(node, ContractPropertyName.completeSend, () => {
-        sb.emitHelper(node, options, sb.helpers.handleNormal({ propInfo }));
-      });
-
+    // TODO: change arguments from properties array to script and serialized new manifest
     const getUpgradeCase = (propInfo: UpgradePropInfo) =>
       getCaseBase(node, ContractPropertyName.upgrade, () => {
         sb.emitHelper(node, options, sb.helpers.handleNormal({ propInfo }));
@@ -350,34 +277,24 @@ export class InvokeSmartContractHelper extends Helper {
             return [
               {
                 propCase: getFunctionCase(propInfo),
-                claimVerify: propInfo.claim,
-                invokeVerify: propInfo.send || propInfo.sendUnsafe || propInfo.receive,
+                invokeVerify: false,
               },
             ];
           }
 
-          if (propInfo.type === 'refundAssets') {
-            return [{ propCase: getRefundAssetsCase(propInfo), claimVerify: false, invokeVerify: true }];
-          }
-
-          if (propInfo.type === 'completeSend') {
-            return [{ propCase: getCompleteSendCase(propInfo), claimVerify: false, invokeVerify: true }];
-          }
-
           if (propInfo.type === 'property') {
-            return [{ propCase: getPropertyCase(propInfo), claimVerify: false, invokeVerify: false }];
+            return [{ propCase: getPropertyCase(propInfo), invokeVerify: false }];
           }
 
           if (propInfo.type === 'accessor') {
             return getAccessorCase(propInfo).map((propCase) => ({
               propCase,
-              claimVerify: false,
               invokeVerify: false,
             }));
           }
 
           if (propInfo.type === 'upgrade') {
-            return [{ propCase: getUpgradeCase(propInfo), claimVerify: false, invokeVerify: false }];
+            return [{ propCase: getUpgradeCase(propInfo), invokeVerify: false }];
           }
 
           if (propInfo.type === 'deploy') {
@@ -390,18 +307,17 @@ export class InvokeSmartContractHelper extends Helper {
           throw new Error('For TS');
         }),
     );
-    let applicationCases = allCases.filter((propCase) => !propCase.claimVerify).map(({ propCase }) => propCase);
+    let applicationCases = allCases.map(({ propCase }) => propCase);
     const deploy = findDeployInfo(this.contractInfo);
     if (deploy !== undefined) {
       applicationCases = applicationCases.concat(getDeployCase(deploy[0], deploy[1]));
     }
     const invocationVerifyCases = allCases.filter((propCase) => propCase.invokeVerify).map(({ propCase }) => propCase);
     const nonVerifyCases = allCases.filter((propCase) => !propCase.invokeVerify).map(({ propCase }) => propCase);
-    const claimCases = allCases.filter((propCase) => propCase.claimVerify).map(({ propCase }) => propCase);
 
     const throwDefault = () => {
       sb.emitOp(node, 'DROP');
-      sb.emitOp(node, 'THROW');
+      sb.emitOp(node, 'ABORT');
     };
 
     const handleInvokeVerify = (func: () => void) => {
@@ -425,46 +341,16 @@ export class InvokeSmartContractHelper extends Helper {
       );
     };
 
-    const handleClaimVerify = (func: () => void) => {
-      // [value]
-      func();
-      // []
-      sb.emitOp(node, 'DROP');
-      // [boolean]
-      sb.emitPushBoolean(node, true);
-    };
-
     const handleDefaultInvokeVerify = () => {
-      // []
-      sb.emitOp(node, 'DROP');
-      // [boolean]
-      sb.emitHelper(node, options, sb.helpers.didReceiveAssets);
-      // [boolean, boolean]
-      sb.emitHelper(node, options, sb.helpers.didSendAssets);
-      sb.emitHelper(
-        node,
-        options,
-        sb.helpers.if({
-          condition: () => {
-            // [boolean]
-            sb.emitOp(node, 'BOOLOR');
-          },
-          whenTrue: () => {
-            sb.emitOp(node, 'THROW');
-          },
-          whenFalse: () => {
-            // [number]
-            sb.emitPushInt(node, 0);
-            // [arg]
-            sb.emitHelper(node, options, sb.helpers.getArgument);
-            sb.emitHelper(node, options, sb.helpers.case(nonVerifyCases, throwDefault));
-          },
-        }),
-      );
+      // [number]
+      sb.emitPushInt(node, 0);
+      // [arg]
+      sb.emitHelper(node, options, sb.helpers.getArgument);
+      sb.emitHelper(node, options, sb.helpers.case(nonVerifyCases, throwDefault));
     };
 
     // [number]
-    sb.emitSysCall(node, 'Neo.Runtime.GetTrigger');
+    sb.emitSysCall(node, 'System.Runtime.GetTrigger');
     sb.emitHelper(
       node,
       options,
@@ -475,7 +361,7 @@ export class InvokeSmartContractHelper extends Helper {
               // [number, number]
               sb.emitOp(node, 'DUP');
               // [number, number, number]
-              sb.emitPushInt(node, 0x10);
+              sb.emitPushInt(node, TriggerType.Application);
               // [boolean, number]
               sb.emitOp(node, 'NUMEQUAL');
             },
@@ -495,106 +381,29 @@ export class InvokeSmartContractHelper extends Helper {
               // [number, number]
               sb.emitOp(node, 'DUP');
               // [number, number, number]
-              sb.emitPushInt(node, 0x00);
+              sb.emitPushInt(node, TriggerType.Verification);
               // [boolean, number]
               sb.emitOp(node, 'NUMEQUAL');
             },
             whenTrue: () => {
               // []
               sb.emitOp(node, 'DROP');
-              // [transaction]
-              sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
-              // [type]
-              sb.emitSysCall(node, 'Neo.Transaction.GetType');
+              // [number]
+              sb.emitPushInt(node, 0);
+              // [arg]
+              sb.emitHelper(node, options, sb.helpers.getArgument);
+              // []
               sb.emitHelper(
                 node,
                 options,
                 sb.helpers.case(
-                  [
-                    {
-                      condition: () => {
-                        // [type, type]
-                        sb.emitOp(node, 'DUP');
-                        // [number, type, type]
-                        sb.emitPushInt(node, TransactionType.Invocation);
-                        // [boolean, type]
-                        sb.emitOp(node, 'NUMEQUAL');
-                      },
-                      whenTrue: () => {
-                        // []
-                        sb.emitOp(node, 'DROP');
-                        // [number]
-                        sb.emitPushInt(node, 0);
-                        // [arg]
-                        sb.emitHelper(node, options, sb.helpers.getArgument);
-                        // []
-                        sb.emitHelper(
-                          node,
-                          options,
-                          sb.helpers.case(
-                            invocationVerifyCases.map((propCase) => ({
-                              ...propCase,
-                              whenTrue: () => {
-                                handleInvokeVerify(propCase.whenTrue);
-                              },
-                            })),
-                            handleDefaultInvokeVerify,
-                          ),
-                        );
-                      },
+                  invocationVerifyCases.map((propCase) => ({
+                    ...propCase,
+                    whenTrue: () => {
+                      handleInvokeVerify(propCase.whenTrue);
                     },
-                    {
-                      condition: () => {
-                        // [type, type]
-                        sb.emitOp(node, 'DUP');
-                        // [number, type, type]
-                        sb.emitPushInt(node, TransactionType.Claim);
-                        // [boolean, type]
-                        sb.emitOp(node, 'NUMEQUAL');
-                      },
-                      whenTrue: () => {
-                        // []
-                        sb.emitOp(node, 'DROP');
-                        // [boolean]
-                        sb.emitHelper(node, options, sb.helpers.didReceiveNonClaimAssets);
-                        // [boolean, boolean]
-                        sb.emitHelper(node, options, sb.helpers.didSendAssets);
-                        sb.emitHelper(
-                          node,
-                          options,
-                          sb.helpers.if({
-                            condition: () => {
-                              // [boolean]
-                              sb.emitOp(node, 'BOOLOR');
-                            },
-                            whenTrue: () => {
-                              sb.emitPushBoolean(node, false);
-                            },
-                            whenFalse: () => {
-                              // [number]
-                              sb.emitPushInt(node, 0);
-                              // [arg]
-                              sb.emitHelper(node, options, sb.helpers.getArgument);
-                              sb.emitHelper(
-                                node,
-                                options,
-                                sb.helpers.case(
-                                  claimCases.map((propCase) => ({
-                                    ...propCase,
-                                    whenTrue: () => {
-                                      handleClaimVerify(propCase.whenTrue);
-                                    },
-                                  })),
-                                  throwDefault,
-                                ),
-                              );
-                            },
-                          }),
-                        );
-                      },
-                    },
-                  ],
-                  throwDefault,
+                  })),
+                  handleDefaultInvokeVerify,
                 ),
               );
             },

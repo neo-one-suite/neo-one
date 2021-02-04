@@ -57,7 +57,7 @@ Here's how to setup your local development environment:
 
 2. Follow the [installation instructions for Create React App](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) to make a new project.
 
-- Be sure to invoke Create React App with the `--typescript` flag in order to enable TypeScript support: `npx create-react-app token --typescript`
+- Be sure to invoke Create React App with the `--template typescript` flag in order to enable TypeScript support: `npx create-react-app token --template typescript`
 
 3. Install NEO•ONE using either [yarn](https://yarnpkg.com/)
 

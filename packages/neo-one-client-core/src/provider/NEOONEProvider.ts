@@ -2,6 +2,7 @@ import {
   Account,
   AddressString,
   Block,
+  Contract,
   GetOptions,
   Hash256String,
   IterOptions,
@@ -130,6 +131,10 @@ export class NEOONEProvider implements Provider {
 
   public async getAccount(network: NetworkType, address: AddressString): Promise<Account> {
     return this.getProvider(network).getAccount(address);
+  }
+
+  public async getContract(network: NetworkType, address: AddressString): Promise<Contract> {
+    return this.getProvider(network).getContract(address);
   }
 
   public iterBlocks(network: NetworkType, options: IterOptions = {}): AsyncIterable<Block> {

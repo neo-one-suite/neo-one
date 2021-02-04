@@ -1,4 +1,4 @@
-import { ABIFunction, ABIParameter } from '@neo-one/client-common';
+import { ABIParameter, ContractMethodDescriptorClient } from '@neo-one/client-common';
 import _ from 'lodash';
 import { toTypeScriptType } from '../utils';
 
@@ -12,35 +12,15 @@ interface Options {
   readonly migration?: boolean;
 }
 
-const getOptions = (abi: ABIFunction, { withConfirmedOptions = false }: Options = {}) => {
+const getOptions = (abi: ContractMethodDescriptorClient, { withConfirmedOptions = false }: Options = {}) => {
   if (abi.constant) {
     return withConfirmedOptions ? ['options?: GetOptions'] : [];
   }
 
   const type = withConfirmedOptions ? ' & GetOptions' : '';
 
-  if (abi.sendUnsafe && abi.receive) {
-    return [`options?: InvokeSendUnsafeReceiveTransactionOptions${type}`];
-  }
-
-  if (abi.sendUnsafe) {
-    return [`options?: InvokeSendUnsafeTransactionOptions${type}`];
-  }
-
   if (abi.receive) {
     return [`options?: InvokeReceiveTransactionOptions${type}`];
-  }
-
-  if (abi.refundAssets) {
-    return [`hash: Hash256String, options?: TransactionOptions${type}`];
-  }
-
-  if (abi.send) {
-    return [`transfer: Transfer, options?: TransactionOptions${type}`];
-  }
-
-  if (abi.completeSend) {
-    return [`hash: Hash256String, options?: TransactionOptions${type}`];
   }
 
   return [`options?: TransactionOptions${type}`];
@@ -50,7 +30,7 @@ const getRestParameter = (param: ABIParameter, migration = false) =>
   `...${param.name}: ${toTypeScriptType(param, { isParameter: true, includeOptional: false, migration })}[]`;
 
 export const genFunctionParameters = (
-  abi: ABIFunction,
+  abi: ContractMethodDescriptorClient,
   parameters: ReadonlyArray<ABIParameter> = abi.parameters === undefined ? [] : abi.parameters,
   options: Options = {},
 ): ReadonlyArray<string> => {

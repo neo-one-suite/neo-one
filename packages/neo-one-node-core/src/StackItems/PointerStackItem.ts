@@ -1,6 +1,13 @@
+import { StackItemType } from '@neo-one/client-common';
+import { BN } from 'bn.js';
+import {
+  ArrayContractParameter,
+  ByteArrayContractParameter,
+  ContractParameter,
+  IntegerContractParameter,
+} from '../contractParameter';
 import { StackItemBase } from './StackItemBase';
 import { isPointerStackItem, StackItem } from './StackItems';
-import { StackItemType } from './StackItemType';
 
 // TODO: can decide if we need to implement this later;
 export type PointerStackItemScript = Buffer;
@@ -37,5 +44,12 @@ export class PointerStackItem extends StackItemBase {
 
   public getBoolean() {
     return true;
+  }
+
+  public toContractParameter(_seen: Set<StackItemBase> = new Set()): ContractParameter {
+    return new ArrayContractParameter([
+      new ByteArrayContractParameter(this.script),
+      new IntegerContractParameter(new BN(this.position)),
+    ]);
   }
 }

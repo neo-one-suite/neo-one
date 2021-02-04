@@ -1,3 +1,4 @@
+import { common } from '@neo-one/client-common';
 import { GlobalProperty, Types } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -20,8 +21,16 @@ class BlockchainCurrentCallerContract extends BuiltinMemberValue {
       sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: GlobalProperty.CallingScriptHash }));
       // [buffer, buffer]
       sb.emitOp(node, 'DUP');
-      // [contract, buffer]
-      sb.emitSysCall(node, 'Neo.Blockchain.GetContract');
+      // [1, buffer, buffer]
+      sb.emitPushInt(node, 1);
+      // [[buffer], buffer]
+      sb.emitOp(node, 'PACK');
+      // ['getContract', [buffer], buffer]
+      sb.emitPushString(node, 'getContract');
+      // [buffer, 'getContract', [buffer], buffer]
+      sb.emitPushBuffer(node, common.nativeHashes.Management);
+      // [conract, buffer]
+      sb.emitSysCall(node, 'System.Contract.Call');
       sb.emitHelper(
         node,
         options,
@@ -55,17 +64,17 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractMember(
     'BlockchainConstructor',
     'currentBlockTime',
-    new SysCallMemberValue('Neo.Runtime.GetTime', Types.Number),
+    new SysCallMemberValue('System.Runtime.GetTime', Types.Number),
   );
   builtins.addContractMember(
     'BlockchainConstructor',
     'currentHeight',
-    new SysCallMemberValue('Neo.Blockchain.GetHeight', Types.Number),
+    new SysCallMemberValue('System.Blockchain.GetHeight', Types.Number),
   );
   builtins.addContractMember(
     'BlockchainConstructor',
     'currentTransaction',
-    new SysCallMemberValue('System.ExecutionEngine.GetScriptContainer', Types.Transaction),
+    new SysCallMemberValue('System.Runtime.GetScriptContainer', Types.Transaction),
   );
   builtins.addContractMember('BlockchainConstructor', 'currentCallerContract', new BlockchainCurrentCallerContract());
 };

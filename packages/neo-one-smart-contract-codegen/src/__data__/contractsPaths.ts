@@ -14,7 +14,7 @@ export const contractsPaths: ReadonlyArray<ContractPaths> = [
     contractPath: '/foo/bar/one/contracts/Token.ts',
     typesPath: '/foo/bar/one/generated/Token/types.js',
     createContractPath: '/foo/bar/one/generated/Token/contract.js',
-    abiPath: '/foo/bar/one/generated/Token/abi.js',
+    manifestPath: '/foo/bar/one/generated/Token/manifest.js',
     sourceMap,
   },
   {
@@ -22,7 +22,7 @@ export const contractsPaths: ReadonlyArray<ContractPaths> = [
     contractPath: '/foo/bar/one/contracts/ICO.ts',
     typesPath: '/foo/bar/one/generated/ICO/types.js',
     createContractPath: '/foo/bar/one/generated/ICO/contract.js',
-    abiPath: '/foo/bar/one/generated/ICO/abi.js',
+    manifestPath: '/foo/bar/one/generated/ICO/manifest.js',
     sourceMap,
   },
 ];

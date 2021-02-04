@@ -42,6 +42,6 @@ export class JumpTable {
       );
     });
 
-    sb.emitOp(outerNode, 'THROW');
+    sb.emitOp(outerNode, 'ABORT');
   }
 }

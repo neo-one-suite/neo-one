@@ -11,7 +11,7 @@ export abstract class NativeContract {
   public readonly script: Buffer;
   public readonly hash: UInt160;
   public readonly id: number;
-  // newly added property will see if it is relevant on our end
+  // TODO: newly added property will see if it is relevant on our end
   // public readonly activeBlockIndex: number;
 
   public constructor({ name, id }: NativeContractAdd) {

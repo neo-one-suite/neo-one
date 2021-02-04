@@ -1,6 +1,6 @@
-import { utils as commonUtils, JSONObject } from '@neo-one/utils';
+import { utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import { common, InvalidFormatError } from './common';
+import { common } from './common';
 import { crypto } from './crypto';
 import { InvalidContractParameterError } from './errors';
 import { JSONHelper } from './JSONHelper';
@@ -29,18 +29,12 @@ import {
   VoidABI,
 } from './types';
 import { utils } from './utils';
-import {
-  assertContractParameterType,
-  toContractParameterType,
-  assertContractParameterTypeJSON,
-  ContractParameterTypeModel,
-} from './models';
 
 const toBufferBuffer = (contractParameter: ContractParameter): Buffer => {
   let value;
   switch (contractParameter.type) {
     case 'Any':
-      value = Buffer.from([]); // TODO: check
+      value = Buffer.alloc(0, 0);
       break;
     case 'Signature':
       value = JSONHelper.readBuffer(contractParameter.value);
@@ -323,10 +317,11 @@ const toVoidNullable = wrapNullable(toVoid) as (param: ContractParameter) => und
 const toForwardValueNullable = wrapNullable(toForwardValue) as (param: ContractParameter) => undefined | undefined;
 
 export const contractParameters = {
-  // TODO: check
   Any: (_contractParameter: ContractParameter, _parameter: AnyABI): Return | undefined => undefined,
   String: (contractParameter: ContractParameter, parameter: StringABI): Return | undefined =>
     parameter.optional ? toStringNullable(contractParameter) : toString(contractParameter),
+  Address: (contractParameter: ContractParameter, parameter: Hash160ABI): Return | undefined =>
+    parameter.optional ? toAddressNullable(contractParameter) : toAddress(contractParameter),
   Hash160: (contractParameter: ContractParameter, parameter: Hash160ABI): Return | undefined =>
     parameter.optional ? toAddressNullable(contractParameter) : toAddress(contractParameter),
   Hash256: (contractParameter: ContractParameter, parameter: Hash256ABI): Return | undefined =>

@@ -1,5 +1,6 @@
+import { StackItemType } from '@neo-one/client-common';
 import { BN } from 'bn.js';
-import { StackItemType } from './StackItemType';
+import { ContractParameter } from '../contractParameter';
 
 export interface StackItemAdd {
   readonly isNull: boolean;
@@ -34,5 +35,10 @@ export abstract class StackItemBase {
 
   public getString(): string {
     return this.getBuffer().toString('utf-8');
+  }
+
+  public toContractParameter(): ContractParameter {
+    /* istanbul ignore next */
+    throw new Error('method not implemented');
   }
 }

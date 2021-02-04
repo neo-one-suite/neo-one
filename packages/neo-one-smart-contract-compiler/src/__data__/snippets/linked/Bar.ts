@@ -4,10 +4,9 @@ import { Foo } from './Foo';
 
 export class Bar extends SmartContract {
   public readonly properties = {
-    codeVersion: '1.0',
-    author: 'dicarlo2',
-    email: 'alex.dicarlo@neotracker.io',
-    description: 'Bar',
+    groups: [],
+    permissions: [],
+    trusts: '*',
   };
 
   public getFoo(expected: Address): string {

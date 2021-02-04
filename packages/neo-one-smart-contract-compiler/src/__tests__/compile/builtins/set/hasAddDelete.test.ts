@@ -20,7 +20,7 @@ describe('Set.prototype.hasAddDelete', () => {
     `);
   });
 
-  test('should respect reference semantics', async () => {
+  test('should NOT respect reference semantics', async () => {
     await helpers.executeString(`
       const x = new Set<ReadonlyArray<number>>();
       const y = [0];
@@ -29,11 +29,11 @@ describe('Set.prototype.hasAddDelete', () => {
 
       assertEqual(x.has(y), true);
       assertEqual(x.has(z), true);
-      assertEqual(x.has([0]), false);
-      assertEqual(x.size, 2);
+      assertEqual(x.has([0]), true);
+      assertEqual(x.size, 1);
 
       x.delete(y);
-      assertEqual(x.delete(z), true);
+      assertEqual(x.delete(z), false);
       assertEqual(x.delete(z), false);
       assertEqual(x.size, 0);
       assertEqual(x.has(y), false);
@@ -68,7 +68,7 @@ describe('Set.prototype.hasAddDelete', () => {
   });
 
   test('add cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = new Set<string>();
       const y = x.add;
@@ -78,7 +78,7 @@ describe('Set.prototype.hasAddDelete', () => {
   });
 
   test('has cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = new Set<string>();
       const y = x.has;
@@ -88,7 +88,7 @@ describe('Set.prototype.hasAddDelete', () => {
   });
 
   test('delete cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = new Set<string>();
       const y = x.delete;

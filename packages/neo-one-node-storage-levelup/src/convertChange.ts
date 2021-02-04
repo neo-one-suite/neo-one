@@ -66,14 +66,14 @@ const convertAddChange = (change: AddChange): readonly PutBatch[] => {
         },
       ];
 
-    case 'contract':
-      return [
-        {
-          type: 'put',
-          key: keys.createContractKey(change.key),
-          value: change.value.serializeWire(),
-        },
-      ];
+    // case 'contract':
+    //   return [
+    //     {
+    //       type: 'put',
+    //       key: keys.createContractKey(change.key),
+    //       value: change.value._serializeWire(),
+    //     },
+    //   ];
 
     case 'storage':
       return [
@@ -111,14 +111,14 @@ const convertAddChange = (change: AddChange): readonly PutBatch[] => {
         },
       ];
 
-    case 'contractID':
-      return [
-        {
-          type: 'put',
-          key: keys.contractIDKey,
-          value: change.value.serializeWire(),
-        },
-      ];
+    // case 'contractID':
+    //   return [
+    //     {
+    //       type: 'put',
+    //       key: keys.contractIDKey,
+    //       value: change.value.serializeWire(),
+    //     },
+    //   ];
 
     default:
       utils.assertNever(change);
@@ -128,11 +128,11 @@ const convertAddChange = (change: AddChange): readonly PutBatch[] => {
 
 const convertDeleteChange = (change: DeleteChange): DelBatch => {
   switch (change.type) {
-    case 'contract':
-      return {
-        type: 'del',
-        key: keys.createContractKey(change.key),
-      };
+    // case 'contract':
+    //   return {
+    //     type: 'del',
+    //     key: keys.createContractKey(change.key),
+    //   };
 
     case 'storage':
       return {

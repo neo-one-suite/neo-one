@@ -5,8 +5,8 @@ import { isOracleResponse, Transaction } from './transaction';
 
 const assertSender = (sender: UInt160 | undefined) => {
   if (sender === undefined) {
-    // TODO: implement error;
-    throw new Error(`Sender must be defined`);
+    // TODO: implement error
+    throw new Error('Sender must be defined');
   }
 
   return sender;
@@ -61,8 +61,8 @@ export class TransactionVerificationContext {
     const key = common.uInt160ToHex(sender);
     const maybeFee = this.mutableSenderFee[key];
     if (maybeFee === undefined) {
-      // TODO: implement error;
-      throw new Error('transaction not present in verification context to remove');
+      // TODO: implement error
+      throw new Error('Transaction not present in verification context to remove');
     }
 
     const newFee = maybeFee.sub(tx.systemFee).sub(tx.networkFee);

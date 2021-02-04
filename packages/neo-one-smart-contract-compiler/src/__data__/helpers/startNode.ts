@@ -3,28 +3,41 @@
 import {
   common,
   Contract,
+  ContractABI,
+  ContractMethodDescriptorClient,
   crypto,
-  InvocationResult,
   RawInvokeReceipt,
   scriptHashToAddress,
   SmartContractDefinition,
   SourceMaps,
-  UserAccountID,
   Transaction,
-  ContractABI,
+  UserAccountID,
 } from '@neo-one/client-common';
-import { DeveloperClient, LocalKeyStore, LocalWallet, NEOONEDataProvider, SmartContract } from '@neo-one/client-core';
-import { Client, InvokeExecuteTransactionOptions, ReadClient } from '@neo-one/client-full-core';
+import {
+  DeveloperClient,
+  LocalKeyStore,
+  LocalWallet,
+  NEOONEDataProvider,
+  NEOONEProvider,
+  SmartContract,
+} from '@neo-one/client-core';
+import {
+  Client,
+  ContractRegister,
+  InvokeExecuteTransactionOptions,
+  LocalUserAccountProvider,
+  ReadClient,
+} from '@neo-one/client-full-core';
 import { createCompilerHost, pathResolve } from '@neo-one/smart-contract-compiler-node';
 import { tsUtils } from '@neo-one/ts-utils';
 import { Modifiable } from '@neo-one/utils';
 import * as appRootDir from 'app-root-dir';
 import BigNumber from 'bignumber.js';
 import ts from 'typescript';
+import { createNode } from '../../../../neo-one-smart-contract-test/src/createNode';
 import { compile } from '../../compile';
 import { CompileResult, LinkedContracts } from '../../compile/types';
 import { Context } from '../../Context';
-import { createNode } from '@neo-one/smart-contract-test';
 import { createContextForPath, createContextForSnippet } from '../../createContext';
 import { throwOnDiagnosticErrorOrWarning } from '../../utils';
 import { checkRawResult } from './extractors';
@@ -42,10 +55,14 @@ export interface Result {
 
 interface AddContractOptions {
   readonly fileName?: string;
+  readonly manifestMethods?: readonly ContractMethodDescriptorClient[];
 }
 
 export interface TestNode {
-  readonly addContract: (script: string, options?: AddContractOptions) => Promise<Contract>;
+  readonly addContract: (
+    script: string,
+    options?: AddContractOptions,
+  ) => Promise<{ readonly contract: Contract; readonly address: string }>;
   readonly addContractWithDefinition: (
     script: string,
     options?: AddContractOptions,
@@ -60,12 +77,13 @@ export interface TestNode {
     readonly transaction: Transaction;
     readonly sourceMaps: SourceMaps;
   }>;
-  readonly compileScript: (script: string) => CompileResult;
+  readonly compileScript: (script: string) => Promise<CompileResult>;
   readonly masterWallet: LocalWallet;
   readonly client: Client;
   readonly readClient: ReadClient;
   readonly developerClient: DeveloperClient;
   readonly sourceMaps: SourceMaps;
+  readonly userAccountProviders: { readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider> };
 }
 
 export interface Options {
@@ -79,13 +97,7 @@ export interface StartNodeOptions {
   readonly ignoreWarnings?: boolean;
 }
 
-// execute string
-export interface InvokeValidateResultOptions {
-  readonly result: InvocationResult<Contract>;
-  readonly developerClient: DeveloperClient;
-}
-
-const getCompiledScript = (script: string, fileName?: string): CompileResult => {
+const getCompiledScript = async (script: string, fileName?: string): Promise<CompileResult> => {
   const { context, sourceFile } = createContextForSnippet(script, createCompilerHost(), {
     fileName,
     withTestHarness: true,
@@ -98,24 +110,12 @@ const publish = async (
   client: Client,
   developerClient: DeveloperClient,
   context: Context,
-  code: string,
+  contract: ContractRegister,
   ignoreWarnings?: boolean,
 ): Promise<Contract> => {
   throwOnDiagnosticErrorOrWarning(context.diagnostics, ignoreWarnings);
 
-  const result = await client.publish({
-    script: code,
-    parameters: ['String', 'Array'],
-    returnType: 'Buffer',
-    name: 'TestContract',
-    codeVersion: '1.0',
-    author: 'test',
-    email: 'test@test.com',
-    description: 'test',
-    storage: true,
-    dynamicInvoke: true,
-    payable: true,
-  });
+  const result = await client.publish(contract);
 
   const [publishReceipt] = await Promise.all([
     result.confirmed({ timeoutMS: 2500 }),
@@ -140,46 +140,49 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
     await developerClient.runConsensusNow();
   });
   client.hooks.beforeRelay.tapPromise('DeveloperClient', async (options) => {
+    // tslint:disable-next-line: no-object-mutation
     options.maxNetworkFee = new BigNumber(-1);
+    // tslint:disable-next-line: no-object-mutation
     options.maxSystemFee = new BigNumber(-1);
   });
 
   return {
-    async addContract(script, options = {}): Promise<Contract> {
-      const {
-        contract: { script: outputScript },
-        context,
-        sourceMap,
-      } = getCompiledScript(script, options.fileName);
+    async addContract(
+      script,
+      options = {},
+    ): Promise<{
+      readonly contract: Contract;
+      readonly address: string;
+    }> {
+      const { contract, context, sourceMap } = await getCompiledScript(script, options.fileName);
 
       const [result, resolvedSourceMap] = await Promise.all([
-        publish(client, developerClient, context, outputScript, outerOptions.ignoreWarnings),
+        publish(client, developerClient, context, contract, outerOptions.ignoreWarnings),
         sourceMap,
       ]);
       mutableSourceMaps[result.hash] = resolvedSourceMap;
 
-      return result;
+      return { contract: result, address: scriptHashToAddress(result.hash) };
     },
     async addContractWithDefinition(
       script,
       options = {},
     ): Promise<{ contract: Contract; definition: SmartContractDefinition }> {
-      const {
-        contract: { script: outputScript },
-        context,
-        sourceMap,
-        abi,
-      } = getCompiledScript(script, options.fileName);
+      const { contract, context, sourceMap } = await getCompiledScript(script, options.fileName);
 
       const [result, resolvedSourceMap] = await Promise.all([
-        publish(client, developerClient, context, outputScript, outerOptions.ignoreWarnings),
+        publish(client, developerClient, context, contract, outerOptions.ignoreWarnings),
         sourceMap,
       ]);
       mutableSourceMaps[result.hash] = resolvedSourceMap;
 
       return {
         contract: result,
-        definition: createContractDefinition(result, mutableSourceMaps),
+        definition: {
+          manifest: contract.manifest,
+          networks: { [networkName]: { address: scriptHashToAddress(result.hash) } },
+          sourceMaps: mutableSourceMaps,
+        },
       };
     },
     async addContractFromSnippet(snippetPath, linked = {}): Promise<Contract> {
@@ -194,13 +197,10 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
       );
       const context = createContextForPath(filePath, createCompilerHost(), { withTestHarness: true });
       const sourceFile = tsUtils.file.getSourceFileOrThrow(context.program, filePath);
-      const {
-        contract: { script: outputScript },
-        sourceMap,
-      } = compile({ context, sourceFile, linked });
+      const { contract, sourceMap } = await compile({ context, sourceFile, linked });
 
       const [result, resolvedSourceMap] = await Promise.all([
-        publish(client, developerClient, context, outputScript, outerOptions.ignoreWarnings),
+        publish(client, developerClient, context, contract, outerOptions.ignoreWarnings),
         sourceMap,
       ]);
       mutableSourceMaps[result.hash] = resolvedSourceMap;
@@ -212,7 +212,7 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
         contract: { script: outputScript },
         sourceMap,
         context,
-      } = getCompiledScript(script);
+      } = await getCompiledScript(script);
 
       throwOnDiagnosticErrorOrWarning(context.diagnostics, outerOptions.ignoreWarnings);
 
@@ -240,6 +240,7 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
     },
     compileScript: getCompiledScript,
     client,
+    userAccountProviders,
     readClient: client.read(networkName),
     masterWallet,
     developerClient,

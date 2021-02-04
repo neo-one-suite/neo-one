@@ -2,7 +2,7 @@ import { helpers } from '../../../../__data__';
 
 describe('String', () => {
   test('cannot be implemented', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       class MyString implements String {
       }
@@ -12,7 +12,7 @@ describe('String', () => {
   });
 
   test('cannot be extended', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       class MyString extends String {
       }

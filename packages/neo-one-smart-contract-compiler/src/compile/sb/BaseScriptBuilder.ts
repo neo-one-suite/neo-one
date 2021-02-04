@@ -1,15 +1,14 @@
 import {
   assertSysCall,
-  BinaryWriter,
   ByteBuffer,
   ByteCode,
   common,
   crypto,
+  getSysCallHash,
   Op,
   OpCode,
   ScriptBuilder as ClientScriptBuilder,
   SysCallName,
-  toSysCallHash,
   UInt160,
   UnknownOpError,
   utils,
@@ -28,10 +27,10 @@ import { expressions } from '../expression';
 import { files } from '../file';
 import { Helper, Helpers } from '../helper';
 import { NodeCompiler } from '../NodeCompiler';
-import { Call, DeferredProgramCounter, Jmp, Jump, Line, ProgramCounter, ProgramCounterHelper } from '../pc';
+import { Call, DeferredProgramCounter, Jmp, JmpOp, Jump, Line, ProgramCounter, ProgramCounterHelper } from '../pc';
 import { Name, Scope } from '../scope';
 import { statements } from '../statement';
-import { Features, HandleSuperConstruct, LinkedContracts, ScriptBuilderResult, VisitOptions } from '../types';
+import { HandleSuperConstruct, LinkedContracts, ScriptBuilderResult, VisitOptions } from '../types';
 import { JumpTable } from './JumpTable';
 import { resolveJumps } from './resolveJumps';
 import { Bytecode, CaptureResult, ScriptBuilder, SingleBytecode, SingleBytecodeValue, Tags } from './ScriptBuilder';
@@ -57,7 +56,6 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   private readonly mutableExportMap: { [K in string]?: Set<string> } = {};
   private mutableNextModuleIndex = 0;
   private mutableCurrentModuleIndex = 0;
-  private mutableFeatures: Features = { dynamicInvoke: false };
 
   public constructor(
     public readonly context: Context,
@@ -160,7 +158,11 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
 
   public getFinalResult(sourceMaps: { readonly [filePath: string]: RawSourceMap }): ScriptBuilderResult {
     this.withProgramCounter((programCounter) => {
-      this.emitJmp(this.sourceFile, 'JMP', programCounter.getLast());
+      // Initialize static fields for scope tracking
+      this.emitOp(this.sourceFile, 'INITSSLOT', Buffer.from([0x01]));
+      this.emitOp(this.sourceFile, 'NEWARRAY0');
+      this.emitOp(this.sourceFile, 'STSFLD0');
+      this.emitJmp(this.sourceFile, 'JMP_L', programCounter.getLast());
       this.jumpTablePC.setPC(programCounter.getCurrent());
       this.jumpTable.emitTable(this, this.sourceFile);
     });
@@ -177,19 +179,19 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     const buffers = bytecode.map(([node, tags, value], idx) => {
       let finalValue: Buffer;
       if (value instanceof Jump) {
-        let jumpPCBuffer = Buffer.alloc(2, 0);
+        let jumpPCBuffer = Buffer.alloc(4, 0);
         const offsetPC = new BN(value.pc.getPC()).sub(new BN(pc));
-        const jumpPC = offsetPC.toTwos(16);
+        const jumpPC = offsetPC.toTwos(32);
         try {
-          if (jumpPC.fromTwos(16).toNumber() !== value.pc.getPC() - pc) {
+          if (jumpPC.fromTwos(32).toNumber() !== value.pc.getPC() - pc) {
             /* istanbul ignore next */
             throw new Error(
               `Something went wrong, expected 2's complement of ${value.pc.getPC() - pc}, found: ${jumpPC
-                .fromTwos(16)
+                .fromTwos(32)
                 .toNumber()}`,
             );
           }
-          jumpPCBuffer = jumpPC.toArrayLike(Buffer, 'le', 2);
+          jumpPCBuffer = jumpPC.toArrayLike(Buffer, 'le', 4);
         } catch {
           this.context.reportError(
             node,
@@ -205,7 +207,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
         finalValue = Buffer.concat([byteCodeBuffer, jumpPCBuffer]);
       } else if (value instanceof Line) {
         const currentLine = new BN(idx + 1);
-        const byteCodeBuffer = ByteBuffer[Op.PUSHBYTES4];
+        const byteCodeBuffer = ByteBuffer[Op.PUSHINT32];
         finalValue = Buffer.concat([byteCodeBuffer, currentLine.toArrayLike(Buffer, 'le', 4)]);
       } else {
         finalValue = value;
@@ -252,7 +254,6 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     return {
       code: Buffer.concat(buffers),
       sourceMap,
-      features: this.mutableFeatures,
     };
   }
 
@@ -288,13 +289,6 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   }
 
   public emitOp(node: ts.Node, code: OpCode, buffer?: Buffer | undefined): void {
-    if (
-      ((code === 'APPCALL' || code === 'TAILCALL') && buffer !== undefined && buffer.equals(Buffer.alloc(20, 0))) ||
-      code === 'CALL_ED'
-    ) {
-      this.mutableFeatures = { ...this.mutableFeatures, dynamicInvoke: true };
-    }
-
     const bytecode = Op[code] as Op | undefined;
     if (bytecode === undefined) {
       /* istanbul ignore next */
@@ -305,15 +299,43 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
 
   public emitPushInt(node: ts.Node, valueIn: number | BN): void {
     const value = new BN(valueIn);
-    if (value.eq(utils.NEGATIVE_ONE)) {
-      this.emitOp(node, 'PUSHM1');
-    } else if (value.eq(utils.ZERO)) {
-      this.emitPush(node, utils.toSignedBuffer(value));
-    } else if (value.gt(utils.ZERO) && value.lt(utils.SIXTEEN)) {
-      this.emitOpByte(node, Op.PUSH1 - 1 + value.toNumber());
-    } else {
-      this.emitPush(node, utils.toSignedBuffer(value));
+    if (value.gte(utils.NEGATIVE_ONE) && value.lte(utils.SIXTEEN)) {
+      this.emitOpByte(node, Op.PUSH0 + value.toNumber());
+
+      return;
     }
+    const data = utils.toSignedBuffer(value);
+    if (data.length === 1) {
+      this.emitOp(node, 'PUSHINT8', data);
+
+      return;
+    }
+    if (data.length === 2) {
+      this.emitOp(node, 'PUSHINT16', data);
+
+      return;
+    }
+    if (data.length <= 4) {
+      this.emitOp(node, 'PUSHINT32', value.toArrayLike(Buffer, 'le', 4));
+
+      return;
+    }
+    if (data.length <= 8) {
+      this.emitOp(node, 'PUSHINT64', value.toArrayLike(Buffer, 'le', 8));
+
+      return;
+    }
+    if (data.length <= 16) {
+      this.emitOp(node, 'PUSHINT128', value.toArrayLike(Buffer, 'le', 16));
+
+      return;
+    }
+    if (data.length <= 32) {
+      this.emitOp(node, 'PUSHINT256', value.toArrayLike(Buffer, 'le', 32));
+
+      return;
+    }
+    throw new Error('Invalid buffer length');
   }
 
   public emitPushBoolean(node: ts.Node, value: boolean): void {
@@ -328,7 +350,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     this.emitPush(node, value);
   }
 
-  public emitJmp(node: ts.Node, code: 'JMP' | 'JMPIF' | 'JMPIFNOT', pc: ProgramCounter): void {
+  public emitJmp(node: ts.Node, code: JmpOp, pc: ProgramCounter): void {
     this.emitJump(node, new Jmp(code, pc));
   }
 
@@ -365,11 +387,15 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   }
 
   public emitSysCall(node: ts.Node, name: SysCallName): void {
-    const sysCallBuffer = Buffer.allocUnsafe(4);
-    sysCallBuffer.writeUInt32LE(toSysCallHash(assertSysCall(name)), 0);
-    const writer = new BinaryWriter();
-    writer.writeVarBytesLE(sysCallBuffer);
-    this.emitOp(node, 'SYSCALL', writer.toBuffer());
+    // TODO: check. commented out was Dan's change
+    // const sysCallBuffer = Buffer.allocUnsafe(4);
+    // sysCallBuffer.writeUInt32LE(toSysCallHash(assertSysCall(name)), 0);
+    // const writer = new BinaryWriter();
+    // writer.writeVarBytesLE(sysCallBuffer);
+    // this.emitOp(node, 'SYSCALL', writer.toBuffer());
+
+    const hash = getSysCallHash(assertSysCall(name));
+    this.emitOp(node, 'SYSCALL', hash);
   }
 
   public emitLine(node: ts.Node): void {
@@ -562,14 +588,12 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   }
 
   private emitPush(node: ts.Node, value: Buffer): void {
-    if (value.length <= Op.PUSHBYTES75) {
-      this.emitOpByte(node, value.length, value);
-    } else if (value.length < 0x100) {
-      this.emitOp(node, 'PUSHDATA1', new ClientScriptBuilder().emitUInt8(value.length).emit(value).build());
+    if (value.length < 0x100) {
+      this.emitOp(node, 'PUSHDATA1', new ClientScriptBuilder().emitUInt8(value.length).emitRaw(value).build());
     } else if (value.length < 0x10000) {
-      this.emitOp(node, 'PUSHDATA2', new ClientScriptBuilder().emitUInt16LE(value.length).emit(value).build());
+      this.emitOp(node, 'PUSHDATA2', new ClientScriptBuilder().emitUInt16LE(value.length).emitRaw(value).build());
     } else if (value.length < 0x100000000) {
-      this.emitOp(node, 'PUSHDATA4', new ClientScriptBuilder().emitUInt32LE(value.length).emit(value).build());
+      this.emitOp(node, 'PUSHDATA4', new ClientScriptBuilder().emitUInt32LE(value.length).emitRaw(value).build());
     } else {
       throw new Error('Value too large.');
     }
@@ -591,7 +615,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
 
   private emitJump(node: ts.Node, jump: Jump, tags: Tags = this.mutableCurrentTags): void {
     this.push(node, tags, jump);
-    this.mutablePC += 3;
+    this.mutablePC += 5;
   }
 
   private emitLineRaw(node: ts.Node, line: Line, tags: Tags = this.mutableCurrentTags): void {

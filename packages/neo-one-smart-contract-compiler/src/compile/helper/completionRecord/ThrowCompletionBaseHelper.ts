@@ -28,13 +28,13 @@ export class ThrowCompletionBaseHelper extends Helper {
 
     if (catchPC !== undefined) {
       sb.emitPushInt(node, constants.THROW_COMPLETION);
-      sb.emitJmp(node, 'JMP', catchPC);
+      sb.emitJmp(node, 'JMP_L', catchPC);
     } else if (finallyPC !== undefined) {
       // [throw, val]
       sb.emitPushInt(node, constants.THROW_COMPLETION);
       // [finally, throw, val]
       sb.emitPushInt(node, constants.FINALLY_COMPLETION);
-      sb.emitJmp(node, 'JMP', finallyPC);
+      sb.emitJmp(node, 'JMP_L', finallyPC);
     } else if (ts.isSourceFile(node) || (parent !== undefined && ts.isSourceFile(parent))) {
       sb.emitOp(node, 'DROP');
       sb.emitHelper(
@@ -45,7 +45,7 @@ export class ThrowCompletionBaseHelper extends Helper {
             sb.emitHelper(node, options, sb.helpers.invocationIsCaller);
           },
           whenTrue: () => {
-            sb.emitOp(node, 'THROW');
+            sb.emitOp(node, 'ABORT');
           },
           whenFalse: () => {
             sb.emitPushBoolean(node, false);

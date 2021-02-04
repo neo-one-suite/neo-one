@@ -38,13 +38,23 @@ export class LinkedSmartContractFor extends SmartContractForBase {
     node: ts.CallExpression,
     prop: ts.Declaration,
     _addressName: Name,
-    callBuffer: Buffer,
     _options: VisitOptions,
   ): void {
     const scriptHash = this.getScriptHash(sb, node);
     if (scriptHash !== undefined) {
+      // TODO: remove this and change how we call smart contracts, including our own
+      // [string, params, string]
+      sb.emitOp(node, 'TUCK');
+      // [2, string, params, string]
+      sb.emitPushInt(node, 2);
+      // [[string, params], string]
+      sb.emitOp(node, 'PACK');
+      // [string, [string, params]]
+      sb.emitOp(node, 'SWAP');
+      // [buffer, string, params]
+      sb.emitPushBuffer(prop, scriptHash);
       // [result]
-      sb.emitOp(prop, 'CALL_E', Buffer.concat([callBuffer, scriptHash]));
+      sb.emitSysCall(prop, 'System.Contract.Call');
     }
   }
 

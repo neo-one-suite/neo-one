@@ -26,7 +26,7 @@ export class ObjectKeys extends BuiltinMemberCall {
       // [arr]
       sb.emitHelper(node, innerOptions, sb.helpers.unwrapArray);
       // [number]
-      sb.emitOp(node, 'ARRAYSIZE');
+      sb.emitOp(node, 'SIZE');
       // [arr]
       sb.emitHelper(
         node,
@@ -101,13 +101,8 @@ export class ObjectKeys extends BuiltinMemberCall {
         iterable: emptyArray,
         iterableIterator: emptyArray,
         transaction: emptyArray,
-        output: emptyArray,
         attribute: emptyArray,
-        input: emptyArray,
-        account: emptyArray,
-        asset: emptyArray,
         contract: emptyArray,
-        header: emptyArray,
         block: emptyArray,
       }),
     );

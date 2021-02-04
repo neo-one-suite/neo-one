@@ -2,7 +2,7 @@ import { helpers } from '../../../../__data__';
 
 describe('TemplateStringsArray', () => {
   test('cannot be implemented', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       class MyTemplateStringsArray implements TemplateStringsArray {
       }

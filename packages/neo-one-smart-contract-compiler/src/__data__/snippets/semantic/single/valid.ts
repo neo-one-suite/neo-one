@@ -47,16 +47,16 @@ interface TokenPayableContract {
 // tslint:disable-next-line export-name
 export class One extends SmartContract {
   public readonly properties = {
-    codeVersion: '1.0',
-    author: 'dicarlo2',
-    email: 'alex.dicarlo@neotracker.io',
-    description: 'NEO•ONE ICO',
+    trusts: '*',
+    groups: [],
+    permissions: [],
   };
   public readonly name = 'One';
   public readonly symbol = 'ONE';
   public readonly decimals = 8;
   public readonly amountPerNEO = 100_000;
   private readonly balances = MapStorage.for<Address, Fixed<8>>();
+  // tslint:disable-next-line: readonly-array
   private readonly approvedTransfers = MapStorage.for<[Address, Address], Fixed<8>>();
   private mutableRemaining: Fixed<8> = 10_000_000_000_00000000;
   private mutableSupply: Fixed<8> = 0;
@@ -189,30 +189,30 @@ export class One extends SmartContract {
       throw new Error('Invalid mintTokens');
     }
 
-    const { references } = Blockchain.currentTransaction;
-    if (references.length === 0) {
-      throw new Error('Invalid mintTokens');
-    }
-    const sender = references[0].address;
+    // Outputs represent the destination addresses and amounts for native assets
+    // A reference is a corresponding output for the inputs of the transaction
+    // Now we want to use notifications to check if transfers were sent to this contract
+    // const { notifications, sender } = Blockchain.currentTransaction;
 
-    let amount = 0;
-    // tslint:disable-next-line no-loop-statement
-    for (const output of Blockchain.currentTransaction.outputs) {
-      if (output.address.equals(this.address)) {
-        if (!output.asset.equals(Hash256.NEO)) {
-          throw new Error('Invalid mintTokens');
-        }
+    // // Here we're getting the amount of NEO sent to the contract
+    // let amount = 0;
+    // // tslint:disable-next-line no-loop-statement
+    // for (const notification of notifications) {
+    //   // Every notification we check that the transferTo address is to this contract
+    //   if (notification.state[1].equals(this.address)) {
+    //     // Only distribute for NEO received
+    //     if (notification.scriptHash.equals(Hash256.NEO)) {
+    //       amount += notification[2] * this.amountPerNEO;
+    //     }
+    //   }
+    // }
 
-        amount += output.value * this.amountPerNEO;
-      }
-    }
+    // if (amount > this.remaining) {
+    //   throw new Error('Invalid mintTokens');
+    // }
 
-    if (amount > this.remaining) {
-      throw new Error('Invalid mintTokens');
-    }
-
-    this.mutableRemaining -= amount;
-    this.issue(sender, amount);
+    // this.mutableRemaining -= amount;
+    // this.issue(sender, amount);
   }
 
   private issue(addr: Address, amount: Fixed<8>): void {

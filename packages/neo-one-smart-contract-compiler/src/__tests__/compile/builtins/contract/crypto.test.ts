@@ -3,34 +3,34 @@ import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('crypto', () => {
-  test('sha1', async () => {
+  test('ripemd160', async () => {
     const value = Buffer.alloc(4, 0x10);
-    const expected = crypto.sha1(value);
+    const expected = crypto.rmd160(value);
     await helpers.executeString(`
       import { crypto } from '@neo-one/smart-contract';
 
-      const result = crypto.sha1(${helpers.getBuffer(value)})
+      const result = crypto.ripemd160(${helpers.getBuffer(value)})
       assertEqual(result, ${helpers.getBuffer(expected)})
     `);
   });
 
-  test('sha1 cannot be referenced', async () => {
-    helpers.compileString(
+  test('ripemd160 cannot be referenced', async () => {
+    await helpers.compileString(
       `
       import { crypto } from '@neo-one/smart-contract';
 
-      const sha1 = crypto.sha1;
+      const ripemd160 = crypto.ripemd160;
     `,
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
   });
 
-  test('sha1 cannot be referenced - object literal', async () => {
-    helpers.compileString(
+  test('ripemd160 cannot be referenced - object literal', async () => {
+    await helpers.compileString(
       `
       import { crypto } from '@neo-one/smart-contract';
 
-      const { sha1 } = crypto;
+      const { ripemd160 } = crypto;
     `,
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
@@ -48,7 +48,7 @@ describe('crypto', () => {
   });
 
   test('sha256 cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { crypto } from '@neo-one/smart-contract';
 
@@ -59,7 +59,7 @@ describe('crypto', () => {
   });
 
   test('sha256 cannot be referenced - object literal', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { crypto } from '@neo-one/smart-contract';
 
@@ -81,7 +81,7 @@ describe('crypto', () => {
   });
 
   test('hash160 cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { crypto } from '@neo-one/smart-contract';
 
@@ -92,7 +92,7 @@ describe('crypto', () => {
   });
 
   test('hash160 cannot be referenced - object literal', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { crypto } from '@neo-one/smart-contract';
 
@@ -114,7 +114,7 @@ describe('crypto', () => {
   });
 
   test('hash256 cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { crypto } from '@neo-one/smart-contract';
 
@@ -125,7 +125,7 @@ describe('crypto', () => {
   });
 
   test('hash256 cannot be referenced - object literal', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       import { crypto } from '@neo-one/smart-contract';
 

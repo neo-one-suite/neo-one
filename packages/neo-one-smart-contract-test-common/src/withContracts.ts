@@ -128,7 +128,9 @@ export const withContracts = async <T>(
     if (autoSystemFee) {
       client.hooks.beforeRelay.tapPromise('AutoSystemFee', async (options) => {
         // tslint:disable-next-line no-object-mutation
-        options.systemFee = new BigNumber(-1);
+        options.maxSystemFee = new BigNumber(-1);
+        // tslint:disable-next-line no-object-mutation
+        options.maxNetworkFee = new BigNumber(-1);
       });
     }
     if (autoConsensus) {
@@ -141,7 +143,7 @@ export const withContracts = async <T>(
 
     const deployedContracts = await contracts.reduce<Promise<T>>(async (accIn, { filePath, name }) => {
       const acc = await accIn;
-      const { contract, sourceMap, abi } = compileContract(
+      const { contract, sourceMap } = await compileContract(
         filePath,
         name,
         createCompilerHost(),
@@ -155,9 +157,15 @@ export const withContracts = async <T>(
       let result: TransactionResult<PublishReceipt>;
       // tslint:disable-next-line prefer-conditional-expression
       if (deploy) {
-        result = await client.publishAndDeploy(contract, abi, [], { systemFee: new BigNumber(-1) }, mutableSourceMaps);
+        result = await client.publishAndDeploy(
+          contract,
+          contract.manifest,
+          ['deploy', []], // TODO: fix contract calling here
+          { maxSystemFee: new BigNumber(-1), maxNetworkFee: new BigNumber(-1) },
+          mutableSourceMaps,
+        );
       } else {
-        result = await client.publish(contract, { systemFee: new BigNumber(-1) });
+        result = await client.publish(contract, { maxSystemFee: new BigNumber(-1), maxNetworkFee: new BigNumber(-1) });
       }
 
       const [receipt] = await Promise.all([result.confirmed({ timeoutMS: 2500 }), developerClient.runConsensusNow()]);
@@ -167,7 +175,7 @@ export const withContracts = async <T>(
 
       const smartContract = client.smartContract({
         networks: { [networkName]: { address } },
-        abi,
+        manifest: contract.manifest,
         sourceMaps: mutableSourceMaps,
       });
       mutableLinked[filePath] = { [name]: address };

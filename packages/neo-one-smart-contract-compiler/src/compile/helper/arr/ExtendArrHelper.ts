@@ -13,7 +13,7 @@ export class ExtendArrHelper extends Helper {
     // [arr, length, arr]
     sb.emitOp(node, 'OVER');
     // [currentLength, length, arr]
-    sb.emitOp(node, 'ARRAYSIZE');
+    sb.emitOp(node, 'SIZE');
     sb.emitHelper(
       node,
       options,

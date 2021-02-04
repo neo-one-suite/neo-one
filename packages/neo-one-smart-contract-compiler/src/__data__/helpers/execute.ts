@@ -16,7 +16,7 @@ const execute = async (
   const {
     contract: { script: compiledCode },
     sourceMap,
-  } = compile({ context, sourceFile });
+  } = await compile({ context, sourceFile });
   const { receipt, sourceMaps } = await executeScript(context.diagnostics, compiledCode, sourceMap, options);
   await checkResult(receipt, sourceMaps, true);
 

@@ -1,4 +1,4 @@
-export * from './getABI';
+export * from './getManifest';
 export * from './getAllPropInfos';
 export * from './getContractInfo';
 export * from './getDebugInfo';

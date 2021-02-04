@@ -35,7 +35,7 @@ export class RawIteratorForEachFuncBaseHelper extends Helper {
           // [iterator, iterator, callable]
           sb.emitOp(node, 'DUP');
           // [boolean, iterator, callable]
-          sb.emitSysCall(node, 'Neo.Enumerator.Next');
+          sb.emitSysCall(node, 'System.Enumerator.Next');
         },
         each: (innerOptionsIn) => {
           const innerOptions = sb.pushValueOptions(innerOptionsIn);

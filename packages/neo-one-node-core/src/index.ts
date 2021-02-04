@@ -42,3 +42,5 @@ export * from './Nep17Transfer';
 export * from './Nep17BalanceKey';
 export * from './Nep17TransferKey';
 export * from './ApplicationLog';
+export * from './disassembleByteCode';
+export * from './contractParameter';

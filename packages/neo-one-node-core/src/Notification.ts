@@ -1,12 +1,13 @@
 import { common, NotificationJSON, UInt160 } from '@neo-one/client-common';
-import { assertArrayStackItem, StackItem, stackItemToJSON } from './StackItems';
+import { ContractParameter } from './contractParameter';
+import { assertArrayStackItem, StackItem } from './StackItems';
 import { Verifiable } from './Verifiable';
 
 export interface NotificationAdd {
   readonly container?: Verifiable;
   readonly scriptHash: UInt160;
   readonly eventName: string;
-  readonly state: readonly StackItem[];
+  readonly state: readonly ContractParameter[];
 }
 
 export class Notification {
@@ -14,7 +15,7 @@ export class Notification {
     const array = assertArrayStackItem(stackItem).array;
     const scriptHash = common.bufferToUInt160(array[0].getBuffer());
     const eventName = array[1].getString();
-    const state = assertArrayStackItem(array[2]).array;
+    const state = assertArrayStackItem(array[2]).array.map((stackItemIn) => stackItemIn.toContractParameter());
 
     return new Notification({
       container,
@@ -27,7 +28,7 @@ export class Notification {
   public readonly container?: Verifiable;
   public readonly scriptHash: UInt160;
   public readonly eventName: string;
-  public readonly state: readonly StackItem[];
+  public readonly state: readonly ContractParameter[];
 
   public constructor({ container, scriptHash, eventName, state }: NotificationAdd) {
     this.container = container;
@@ -39,7 +40,7 @@ export class Notification {
   public serializeJSON(): NotificationJSON {
     let state;
     try {
-      state = this.state.map((s) => stackItemToJSON(s, undefined));
+      state = this.state.map((s) => s.serializeJSON());
     } catch {
       state = 'error: recursive reference';
     }

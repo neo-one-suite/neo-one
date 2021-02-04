@@ -51,7 +51,7 @@ export class AtStructuredStorageHelper extends KeyStructuredStorageBaseHelper {
     // [valKeyArr, size, number, struct, struct]
     sb.emitOp(node, 'ROLL');
     // [addSize, size, number, struct, struct]
-    sb.emitOp(node, 'ARRAYSIZE');
+    sb.emitOp(node, 'SIZE');
     // [size, number, struct, struct]
     sb.emitOp(node, 'ADD');
     // [struct]

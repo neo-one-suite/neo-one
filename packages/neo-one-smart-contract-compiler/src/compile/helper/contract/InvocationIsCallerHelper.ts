@@ -16,11 +16,11 @@ export class InvocationIsCallerHelper extends Helper {
     // [buffer]
     sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: GlobalProperty.CallingScriptHash }));
     // [buffer, buffer]
-    sb.emitSysCall(node, 'System.ExecutionEngine.GetEntryScriptHash');
+    sb.emitSysCall(node, 'System.Runtime.GetEntryScriptHash');
     // [boolean]
     sb.emitOp(node, 'EQUAL');
     // [trigger, boolean]
-    sb.emitSysCall(node, 'Neo.Runtime.GetTrigger');
+    sb.emitSysCall(node, 'System.Runtime.GetTrigger');
     // [number, trigger, boolean]
     sb.emitPushInt(node, 0x00);
     // [boolean, boolean]

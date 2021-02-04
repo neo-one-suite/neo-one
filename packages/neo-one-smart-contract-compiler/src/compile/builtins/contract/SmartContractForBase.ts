@@ -123,8 +123,7 @@ export abstract class SmartContractForBase extends BuiltinMemberCall {
                 // [string, params]
                 sb.emitPushString(prop, getSetterName(propName));
 
-                const callBuffer = Buffer.from([0, 2]);
-                this.emitInvoke(sb, func, node, prop, addressName, callBuffer, sb.noPushValueOptions(innerOptions));
+                this.emitInvoke(sb, func, node, prop, addressName, sb.noPushValueOptions(innerOptions));
                 // [val]
                 sb.emitHelper(prop, innerOptions, sb.helpers.wrapUndefined);
                 // []
@@ -162,8 +161,7 @@ export abstract class SmartContractForBase extends BuiltinMemberCall {
               sb.emitPushString(prop, propName);
 
               const isVoidReturn = propReturnType !== undefined && tsUtils.type_.isVoid(propReturnType);
-              const callBuffer = Buffer.from([isVoidReturn ? 0 : 1, 2]);
-              this.emitInvoke(sb, func, node, prop, addressName, callBuffer, innerOptions);
+              this.emitInvoke(sb, func, node, prop, addressName, innerOptions);
 
               if (isVoidReturn) {
                 sb.emitHelper(prop, innerOptions, sb.helpers.wrapUndefined);
@@ -237,7 +235,6 @@ export abstract class SmartContractForBase extends BuiltinMemberCall {
     node: ts.CallExpression,
     prop: ts.Declaration,
     addressName: Name,
-    callBuffer: Buffer,
     optionsIn: VisitOptions,
   ): void;
 }

@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Transaction cannot be implemented 1`] = `
-"snippetCode.ts (4,13): Class 'MyTransaction' incorrectly implements interface 'TransactionBase'.
-  Type 'MyTransaction' is missing the following properties from type 'TransactionBase': hash, type, attributes, outputs, and 4 more.
+"snippetCode.ts (4,13): Class 'MyTransaction' incorrectly implements interface 'Transaction'.
+  Type 'MyTransaction' is missing the following properties from type 'Transaction': hash, version, nonce, sender, and 6 more.
 
-      2 |       import { TransactionBase } from '@neo-one/smart-contract';
+      2 |       import { Transaction } from '@neo-one/smart-contract';
       3 | 
-    > 4 |       class MyTransaction implements TransactionBase {
+    > 4 |       class MyTransaction implements Transaction {
         |             ^
       5 |       }
       6 |     

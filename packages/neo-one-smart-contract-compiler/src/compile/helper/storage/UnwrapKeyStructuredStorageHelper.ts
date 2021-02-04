@@ -48,13 +48,8 @@ export class UnwrapKeyStructuredStorageHelper extends TypedHelper {
         iterable: wrapArray,
         iterableIterator: wrapArray,
         transaction: wrapArray,
-        output: wrapArray,
         attribute: wrapArray,
-        input: wrapArray,
-        account: wrapArray,
-        asset: wrapArray,
         contract: wrapArray,
-        header: wrapArray,
         block: wrapArray,
       }),
     );

@@ -2,7 +2,7 @@ import { helpers } from '../../../../__data__';
 
 describe('Symbol', () => {
   test('cannot be implemented', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       class MySymbol implements Symbol {
       }
@@ -12,7 +12,7 @@ describe('Symbol', () => {
   });
 
   test('cannot be extended', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       class MySymbol extends Symbol {
       }

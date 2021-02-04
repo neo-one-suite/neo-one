@@ -19,7 +19,8 @@ export interface VMLog {
   readonly containerHash?: UInt256;
   readonly callingScriptHash: UInt160;
   readonly message: string;
-  readonly position: number;
+  // TODO: add this here and downstream. Make sure it's implemented in VM fork
+  // readonly position: number;
 }
 
 export interface CallReceipt {

@@ -1,4 +1,4 @@
-import { ContractABI } from '@neo-one/client';
+import { ContractABIClient } from '@neo-one/client';
 import { common, crypto } from '@neo-one/client-common';
 
 const jmpABI = {
@@ -47,7 +47,7 @@ const getDispatcherMethodDefinition = (contractName: string, jumpAddress: number
   'sequence-points': [],
 });
 
-interface NEOONEContractMetadata {
+export interface NEOONEContractMetadata {
   readonly name: string;
   readonly description: string;
   readonly codeVersion: string;
@@ -69,7 +69,7 @@ const convertABIMetadata = (metadata: NEOONEContractMetadata) => ({
   'is-payable': metadata.payable,
 });
 
-const convertABI = (abi: ContractABI, metadata: NEOONEContractMetadata, script: Buffer) => ({
+const convertABI = (abi: ContractABIClient, metadata: NEOONEContractMetadata, script: Buffer) => ({
   hash: common.uInt160ToHex(crypto.toScriptHash(script)),
   entrypoint: '@Jmp',
   functions: [

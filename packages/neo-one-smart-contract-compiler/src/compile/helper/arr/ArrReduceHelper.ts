@@ -25,7 +25,7 @@ export class ArrReduceHelper extends Helper {
       // [arr, accum]
       sb.emitOp(node, 'SWAP');
       // [iterator, accum]
-      sb.emitSysCall(node, 'Neo.Iterator.Create');
+      sb.emitSysCall(node, 'System.Iterator.Create');
       // [accum, iterator]
       sb.emitOp(node, 'SWAP');
       // [accum]
@@ -47,7 +47,7 @@ export class ArrReduceHelper extends Helper {
       // [arr, accum]
       sb.emitOp(node, 'SWAP');
       // [enumerator, accum]
-      sb.emitSysCall(node, 'Neo.Enumerator.Create');
+      sb.emitSysCall(node, 'System.Enumerator.Create');
       // [accum, enumerator]
       sb.emitOp(node, 'SWAP');
       // [accum]

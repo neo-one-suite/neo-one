@@ -2,8 +2,7 @@ import {
   ApplicationLog,
   BinaryReader,
   BlockKey,
-  ContractIDState,
-  ContractState,
+  // ContractIDState,
   DeserializeWireContext,
   // InvocationData,
   HashIndexState,
@@ -139,16 +138,6 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
         }),
     }),
 
-    contracts: read.createReadStorage({
-      db,
-      serializeKey: keys.createContractKey,
-      deserializeValue: (buffer) =>
-        ContractState.deserializeWire({
-          context,
-          buffer,
-        }),
-    }),
-
     storages: read.createReadFindStorage({
       db,
       getSearchRange: keys.getStorageSearchRange,
@@ -187,11 +176,11 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
       deserializeValue: (buffer) => HashIndexState.deserializeWire({ context, buffer }),
     }),
 
-    contractID: read.createReadMetadataStorage({
-      db,
-      key: keys.headerHashIndexKey,
-      deserializeValue: (buffer) => ContractIDState.deserializeWire({ context, buffer }),
-    }),
+    // contractID: read.createReadMetadataStorage({
+    //   db,
+    //   key: keys.headerHashIndexKey,
+    //   deserializeValue: (buffer) => ContractIDState.deserializeWire({ context, buffer }),
+    // }),
 
     // consensusState: read.createReadMetadataStorage({
     //   db,

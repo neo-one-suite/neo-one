@@ -13,7 +13,7 @@ export class ConsoleLogHelper extends Helper {
     // [value]
     sb.emitHelper(node, options, sb.helpers.genericLogSerialize);
     // [buffer]
-    sb.emitSysCall(node, 'Neo.Runtime.Serialize');
+    sb.emitSysCall(node, 'System.Binary.Serialize');
     // [line, buffer]
     sb.emitLine(node);
     // ['console.log', line, buffer]
@@ -22,7 +22,9 @@ export class ConsoleLogHelper extends Helper {
     sb.emitPushInt(node, 3);
     // [arr]
     sb.emitOp(node, 'PACK');
+    // ['console.log', arr]
+    sb.emitPushString(node, 'console.log');
     // []
-    sb.emitSysCall(node, 'Neo.Runtime.Notify');
+    sb.emitSysCall(node, 'System.Runtime.Notify');
   }
 }

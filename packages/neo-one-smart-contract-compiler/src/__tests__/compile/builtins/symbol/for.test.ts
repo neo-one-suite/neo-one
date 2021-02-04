@@ -22,7 +22,7 @@ describe('Symbol.for', () => {
   });
 
   test('cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const value = Symbol.for;
     `,
@@ -31,7 +31,7 @@ describe('Symbol.for', () => {
   });
 
   test('cannot be referenced - object literal', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const { for } = Symbol;
     `,

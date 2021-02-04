@@ -40,7 +40,7 @@ describe('Map.prototype.forEach', () => {
   });
 
   test('cannot be referenced', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = new Map<string, number>();
       const y = x.forEach;
@@ -50,7 +50,7 @@ describe('Map.prototype.forEach', () => {
   });
 
   test('cannot be referenced - object literal', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = new Map<string, number>();
       const { forEach } = x;
@@ -60,7 +60,7 @@ describe('Map.prototype.forEach', () => {
   });
 
   test('cannot be "referenced"', async () => {
-    helpers.compileString(
+    await helpers.compileString(
       `
       const x = new Map<string, number>();
       const y = x['forEach'];

@@ -1,4 +1,4 @@
-import { ABI, ABIDefault, ABIReturn } from '@neo-one/client-common';
+import { ABIDefault, ABIReturn, ContractABIClient } from '@neo-one/client-common';
 import _ from 'lodash';
 
 // tslint:disable-next-line:no-any
@@ -72,7 +72,7 @@ const abiReturns: ReadonlyArray<ABIReturn> = [
 
 const boolReturnType: ABIReturn = { type: 'Boolean' };
 
-const createBaseABIFunctions = (): ReadonlyArray<ABI> => {
+const createBaseABIFunctions = (): ReadonlyArray<ContractABIClient> => {
   const combinations = getCombinations([abiReturns, abiFunctionOptions]);
 
   return combinations.map(([abiReturn, abiFuncProps]) => {
@@ -80,7 +80,7 @@ const createBaseABIFunctions = (): ReadonlyArray<ABI> => {
     const name = `${abiReturn.type}${`${funcPropNames.length === 0 ? '' : '_'}${funcPropNames.join('_')}`}`;
 
     return {
-      functions: [
+      methods: [
         {
           name,
           returnType: abiReturn,
@@ -91,7 +91,7 @@ const createBaseABIFunctions = (): ReadonlyArray<ABI> => {
   });
 };
 
-const createBaseABIEvents = (): ReadonlyArray<ABI> => {
+const createBaseABIEvents = (): ReadonlyArray<ContractABIClient> => {
   const combinations = getCombinations([abiReturns, abiParameterOptions]);
 
   return combinations.map(([abiReturn, abiParamProps]) => {
@@ -99,7 +99,7 @@ const createBaseABIEvents = (): ReadonlyArray<ABI> => {
     const name = `${abiReturn.type}${`${paramPropNames.length === 0 ? '' : '_'}${paramPropNames.join('_')}`}`;
 
     return {
-      functions: [
+      methods: [
         {
           name: 'foo',
           returnType: boolReturnType,
@@ -121,7 +121,7 @@ const createBaseABIEvents = (): ReadonlyArray<ABI> => {
   });
 };
 
-const createBaseABIFunctionParameters = (): ReadonlyArray<ABI> => {
+const createBaseABIFunctionParameters = (): ReadonlyArray<ContractABIClient> => {
   const combinations = getCombinations([abiReturns, abiParameterOptions]);
 
   return combinations.map(([abiReturn, abiParamProps]) => {
@@ -129,7 +129,7 @@ const createBaseABIFunctionParameters = (): ReadonlyArray<ABI> => {
     const name = `${abiReturn.type}${`${paramPropNames.length === 0 ? '' : '_'}${paramPropNames.join('_')}`}`;
 
     return {
-      functions: [
+      methods: [
         {
           name,
           parameters: [

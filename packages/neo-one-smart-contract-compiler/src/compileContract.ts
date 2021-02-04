@@ -1,4 +1,3 @@
-import { ContractManifestClient } from '@neo-one/client-common';
 import { ContractRegister } from '@neo-one/client-full-core';
 import { tsUtils } from '@neo-one/ts-utils';
 import { normalizePath } from '@neo-one/utils';
@@ -17,18 +16,17 @@ export interface CompileContractOptions extends WithLinked {
 }
 
 export interface CompileContractResult {
-  readonly manifest: ContractManifestClient;
   readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
   readonly contract: ContractRegister;
   readonly sourceMap: Promise<RawSourceMap>;
   readonly debugInfo: DebugInfo;
 }
 
-export const compileContract = ({
+export const compileContract = async ({
   filePath: filePathIn,
   host,
   linked: linkedIn = {},
-}: CompileContractOptions): CompileContractResult => {
+}: CompileContractOptions): Promise<CompileContractResult> => {
   const filePath = normalizePath(filePathIn);
   const linked = _.fromPairs(Object.entries(linkedIn).map(([key, value]) => [normalizePath(key), value]));
   const transpileContext = createContextForPath(filePath, host);
@@ -41,7 +39,7 @@ export const compileContract = ({
       ? transpileContext
       : updateContext(transpileContext, { [filePath]: transpileResult.text });
 
-  const { manifest, sourceMap: finalSourceMap, contract, debugInfo } = compile({
+  const { sourceMap: finalSourceMap, contract, debugInfo } = await compile({
     sourceFile: tsUtils.file.getSourceFileOrThrow(context.program, filePath),
     context,
     linked,
@@ -51,7 +49,6 @@ export const compileContract = ({
   return {
     diagnostics: context.diagnostics,
     sourceMap: finalSourceMap,
-    manifest,
     contract,
     debugInfo,
   };

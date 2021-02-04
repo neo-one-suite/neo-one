@@ -89,13 +89,8 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
             iterable: throwTypeError,
             iterableIterator: throwTypeError,
             transaction: throwTypeError,
-            output: throwTypeError,
             attribute: throwTypeError,
-            input: throwTypeError,
-            account: throwTypeError,
-            asset: throwTypeError,
             contract: throwTypeError,
-            header: throwTypeError,
             block: throwTypeError,
           }),
         );

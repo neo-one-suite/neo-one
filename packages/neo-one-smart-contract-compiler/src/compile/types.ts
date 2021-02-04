@@ -1,4 +1,3 @@
-import { ABI } from '@neo-one/client-common';
 import { ContractRegister } from '@neo-one/client-full-core';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
@@ -32,17 +31,12 @@ export interface VisitOptions {
   readonly handleSuperConstruct?: HandleSuperConstruct;
 }
 
-export interface Features {
-  // TODO: is dynamicInvoke even a thing now?
-  readonly dynamicInvoke: boolean;
-}
 export interface ScriptBuilderResult {
   readonly code: Buffer;
   readonly sourceMap: Promise<RawSourceMap>;
 }
 export interface CompileResult {
   readonly contract: ContractRegister;
-  readonly abi: ABI;
   readonly context: Context;
   readonly sourceMap: Promise<RawSourceMap>;
   readonly debugInfo: DebugInfo;

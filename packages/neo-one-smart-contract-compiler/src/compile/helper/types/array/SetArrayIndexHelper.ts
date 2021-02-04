@@ -12,10 +12,12 @@ export class SetArrayIndexHelper extends Helper {
     sb.emitOp(node, 'ROT');
     // [arr, val, indexNumber]
     sb.emitHelper(node, options, sb.helpers.unwrapArray);
-    // [3, arr, val, indexNumber]
-    sb.emitPushInt(node, 3);
+    // [arr, arr, val, indexNumber]
+    sb.emitOp(node, 'DUP');
+    // [indexNumber, val, arr, arr]
+    sb.emitOp(node, 'REVERSE4');
     // [arr, val, indexNumber, arr]
-    sb.emitOp(node, 'XTUCK');
+    sb.emitOp(node, 'REVERSE3');
     // [2, arr, val, indexNumber, arr]
     sb.emitPushInt(node, 2);
     // [indexNumber, arr, val, indexNumber, arr]

@@ -12,7 +12,7 @@ import { getData } from '../__data__';
 describe('Blockchain invocation / storage tests', () => {
   test('Can persist the first 3 blocks with disk storage', async () => {
     const blockchainSettings = createTest();
-    const levelDBPath = '/Users/danielbyrne/Desktop/node-data';
+    const levelDBPath = '/Users/spencercorwin/Desktop/node-data';
     const db = LevelUp(RocksDB(levelDBPath));
     const blockData = getData(blockchainSettings.messageMagic);
 

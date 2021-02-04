@@ -1,30 +1,35 @@
-import { ABI } from '@neo-one/client-common';
+import { ContractABIClient } from '@neo-one/client-common';
 
-const abi = (decimals: number): ABI => ({
-  functions: [
+const abi = (decimals: number): ContractABIClient => ({
+  hash: '',
+  methods: [
     {
       name: 'name',
       constant: true,
       parameters: [],
       returnType: { type: 'String' },
+      offset: 0,
     },
     {
       name: 'symbol',
       constant: true,
       parameters: [],
       returnType: { type: 'String' },
+      offset: 0,
     },
     {
       name: 'decimals',
       constant: true,
       parameters: [],
       returnType: { type: 'Integer', decimals: 0 },
+      offset: 0,
     },
     {
       name: 'totalSupply',
       constant: true,
       parameters: [],
       returnType: { type: 'Integer', decimals: 8 },
+      offset: 0,
     },
     {
       name: 'transfer',
@@ -49,6 +54,7 @@ const abi = (decimals: number): ABI => ({
         },
       ],
       returnType: { type: 'Boolean' },
+      offset: 0,
     },
     {
       name: 'balanceOf',
@@ -60,6 +66,7 @@ const abi = (decimals: number): ABI => ({
         },
       ],
       returnType: { type: 'Integer', decimals },
+      offset: 0,
     },
     {
       name: 'forward',
@@ -68,6 +75,7 @@ const abi = (decimals: number): ABI => ({
         { name: 'args', type: 'ForwardValue', rest: true },
       ],
       returnType: { type: 'ForwardValue' },
+      offset: 0,
     },
     {
       name: 'forwardConstant',
@@ -77,6 +85,7 @@ const abi = (decimals: number): ABI => ({
         { name: 'args', type: 'ForwardValue', rest: true },
       ],
       returnType: { type: 'ForwardValue' },
+      offset: 0,
     },
     {
       name: 'forwardForward',
@@ -85,6 +94,7 @@ const abi = (decimals: number): ABI => ({
         { name: 'args', type: 'ForwardValue', rest: true, forwardedValue: true },
       ],
       returnType: { type: 'ForwardValue', forwardedValue: true },
+      offset: 0,
     },
     {
       name: 'forwardForwardConstant',
@@ -94,6 +104,7 @@ const abi = (decimals: number): ABI => ({
         { name: 'args', type: 'ForwardValue', rest: true, forwardedValue: true },
       ],
       returnType: { type: 'ForwardValue', forwardedValue: true },
+      offset: 0,
     },
     {
       name: 'forwardTo',
@@ -102,6 +113,7 @@ const abi = (decimals: number): ABI => ({
         { name: 'second', type: 'Integer', decimals: 0, forwardedValue: true },
       ],
       returnType: { type: 'Integer', decimals: 8, forwardedValue: true },
+      offset: 0,
     },
     {
       name: 'forwardToConstant',
@@ -111,6 +123,7 @@ const abi = (decimals: number): ABI => ({
         { name: 'second', type: 'Integer', decimals: 0, forwardedValue: true },
       ],
       returnType: { type: 'Integer', decimals: 8, forwardedValue: true },
+      offset: 0,
     },
     {
       name: 'obj',
@@ -129,6 +142,7 @@ const abi = (decimals: number): ABI => ({
         },
       ],
       returnType: { type: 'Void' },
+      offset: 0,
     },
   ],
   events: [

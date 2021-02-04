@@ -25,7 +25,7 @@ export class SetArrayStorageHelper extends Helper {
       sb.helpers.if({
         condition: () => {
           // [length <= number, val, valueVal, number]
-          sb.emitOp(node, 'LTE');
+          sb.emitOp(node, 'LE');
         },
         whenTrue: () => {
           // [val, val, valueVal, number]

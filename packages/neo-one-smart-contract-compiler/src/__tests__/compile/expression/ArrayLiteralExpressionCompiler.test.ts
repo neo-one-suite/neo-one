@@ -1,12 +1,11 @@
 import { helpers } from '../../../__data__';
 
 const properties = `
-public readonly properties = {
-  codeVersion: '1.0',
-  author: 'dicarlo2',
-  email: 'alex.dicarlo@neotracker.io',
-  description: 'The TestSmartContract',
-};
+  public readonly properties = {
+    groups: [],
+    permissions: [],
+    trusts: "*",
+  };
 `;
 
 describe('ArrayLiteralExpressionCompiler', () => {
@@ -131,6 +130,7 @@ describe('ArrayLiteralExpressionCompiler', () => {
     `);
   });
 
+  // TODO
   test('array storage spread', async () => {
     const node = await helpers.startNode();
     const contract = await node.addContract(`
@@ -171,6 +171,7 @@ describe('ArrayLiteralExpressionCompiler', () => {
     `);
   });
 
+  // TODO
   test('map storage', async () => {
     const node = await helpers.startNode();
     const contract = await node.addContract(`
@@ -216,6 +217,7 @@ describe('ArrayLiteralExpressionCompiler', () => {
     `);
   });
 
+  // TODO
   test('set storage spread', async () => {
     const node = await helpers.startNode();
     const contract = await node.addContract(`

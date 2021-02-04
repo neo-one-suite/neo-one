@@ -1,5 +1,5 @@
 import { Configuration } from '@neo-one/cli-common';
-import { ABI, SmartContractNetworksDefinition } from '@neo-one/client-common';
+import { ContractManifestClient, SmartContractNetworksDefinition } from '@neo-one/client-common';
 import { genFiles } from '@neo-one/smart-contract-codegen';
 import * as fs from 'fs-extra';
 import * as nodePath from 'path';
@@ -10,20 +10,20 @@ export const generateCode = async (
   config: Configuration,
   filePath: string,
   name: string,
-  abi: ABI,
+  manifest: ContractManifestClient,
   networksDefinition: SmartContractNetworksDefinition,
 ) => {
   const base = nodePath.resolve(config.codegen.path, name);
   const { sourceMapsPath } = getCommonPaths(config);
-  const { typesPath, abiPath, createContractPath } = getContractPaths(config, name);
-  const { abi: abiFile, contract, types } = genFiles({
+  const { typesPath, manifestPath, createContractPath } = getContractPaths(config, name);
+  const { manifest: manifestFile, contract, types } = genFiles({
     name,
     networksDefinition,
     contractPath: filePath,
     typesPath,
-    abiPath,
+    manifestPath,
     createContractPath,
-    abi,
+    manifest,
     sourceMapsPath,
     browserify: config.codegen.browserify,
   });
@@ -34,11 +34,11 @@ export const generateCode = async (
   await fs.ensureDir(base);
   if (config.codegen.language === 'typescript') {
     await Promise.all([
-      writeFile(getTSPath(abiPath), abiFile.ts),
+      writeFile(getTSPath(manifestPath), manifestFile.ts),
       writeFile(getTSPath(createContractPath), contract.ts),
       writeFile(getTSPath(typesPath), types.ts),
     ]);
   } else {
-    await Promise.all([writeFile(abiPath, abiFile.js), writeFile(createContractPath, contract.js)]);
+    await Promise.all([writeFile(manifestPath, manifestFile.js), writeFile(createContractPath, contract.js)]);
   }
 };

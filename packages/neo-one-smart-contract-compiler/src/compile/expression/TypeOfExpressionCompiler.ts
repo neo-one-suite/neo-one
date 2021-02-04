@@ -45,13 +45,8 @@ export class TypeOfExpressionCompiler extends NodeCompiler<ts.TypeOfExpression> 
         iterable: pushObject,
         iterableIterator: pushObject,
         transaction: pushObject,
-        output: pushObject,
         attribute: pushObject,
-        input: pushObject,
-        account: pushObject,
-        asset: pushObject,
         contract: pushObject,
-        header: pushObject,
         block: pushObject,
       }),
     );

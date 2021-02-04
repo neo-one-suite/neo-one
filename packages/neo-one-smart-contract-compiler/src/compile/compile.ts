@@ -1,6 +1,8 @@
+import { tsUtils } from '@neo-one/ts-utils';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import { Context } from '../Context';
+import { processMethods } from '../utils';
 import { getSmartContractInfo } from './getSmartContractInfo';
 import { createHelpers } from './helper';
 import {
@@ -31,9 +33,14 @@ export const compileForDiagnostics = ({ context, sourceFile }: DiagnosticCompile
   scriptBuilder.process();
 };
 
-export const compile = ({ context, sourceFile, linked = {}, sourceMaps = {} }: CompileOptions): CompileResult => {
+export const compile = async ({
+  context,
+  sourceFile,
+  linked = {},
+  sourceMaps = {},
+}: CompileOptions): Promise<CompileResult> => {
   const helpers = createHelpers();
-  const { contractInfo, abi, contract, debugInfo } = getSmartContractInfo(context, sourceFile);
+  const { name, contractInfo, manifest, debugInfo } = getSmartContractInfo(context, sourceFile);
 
   const helperScriptBuilder = new HelperCapturingScriptBuilder(
     context,
@@ -66,14 +73,30 @@ export const compile = ({ context, sourceFile, linked = {}, sourceMaps = {} }: C
   emittingScriptBuilder.process();
 
   const finalResult = emittingScriptBuilder.getFinalResult(sourceMaps);
+  const script = finalResult.code.toString('hex');
+
+  const methods = await processMethods({
+    context,
+    manifest,
+    debugInfo,
+    finalResult,
+    filePath: tsUtils.file.getFilePath(sourceFile),
+  });
 
   return {
     contract: {
-      script: finalResult.code.toString('hex'),
-      ...contract,
-      ...finalResult.features,
+      script,
+      manifest: {
+        name,
+        ...manifest,
+        abi: {
+          ...manifest.abi,
+          methods,
+        },
+      },
+      compilerName: 'neo-one',
+      compilerVersion: '3.1.0-preview4',
     },
-    abi,
     context,
     debugInfo,
     sourceMap: finalResult.sourceMap,

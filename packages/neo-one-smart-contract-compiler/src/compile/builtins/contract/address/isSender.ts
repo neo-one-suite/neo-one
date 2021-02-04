@@ -27,7 +27,7 @@ export class AddressIsSender extends BuiltinMemberCall {
     // [buffer, buffer]
     sb.emitOp(node, 'DUP');
     // [boolean, buffer]
-    sb.emitSysCall(node, 'Neo.Runtime.CheckWitness');
+    sb.emitSysCall(node, 'System.Runtime.CheckWitness');
     // [buffer, boolean]
     sb.emitOp(node, 'SWAP');
     // [buffer, buffer, boolean]

@@ -24,7 +24,7 @@ export class ArrEveryHelper extends Helper {
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [enumerator]
-    sb.emitSysCall(node, 'Neo.Enumerator.Create');
+    sb.emitSysCall(node, 'System.Enumerator.Create');
     // [val]
     sb.emitHelper(
       node,

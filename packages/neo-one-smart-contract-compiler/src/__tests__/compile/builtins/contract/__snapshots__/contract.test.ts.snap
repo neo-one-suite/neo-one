@@ -2,7 +2,7 @@
 
 exports[`Contract cannot be implemented 1`] = `
 "snippetCode.ts (4,13): Class 'MyContract' incorrectly implements interface 'Contract'.
-  Type 'MyContract' is missing the following properties from type 'Contract': script, payable, [OpaqueTagSymbol0]
+  Type 'MyContract' is missing the following properties from type 'Contract': script, manifest, hasStorage, payable, [OpaqueTagSymbol0]
 
       2 |       import { Contract } from '@neo-one/smart-contract';
       3 | 

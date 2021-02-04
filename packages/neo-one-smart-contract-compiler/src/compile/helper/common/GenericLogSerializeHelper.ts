@@ -50,6 +50,7 @@ export class GenericLogSerializeHelper extends Helper {
         node,
         innerOptions,
         sb.helpers.mapReduce({
+          deserializeKey: true,
           each: (innerInnerOptions) => {
             // [val, arr, key]
             sb.emitOp(node, 'ROT');
@@ -87,6 +88,7 @@ export class GenericLogSerializeHelper extends Helper {
         node,
         innerOptions,
         sb.helpers.mapReduce({
+          deserializeKey: true,
           each: (innerInnerOptions) => {
             // [val, arr, key]
             sb.emitOp(node, 'ROT');
@@ -185,13 +187,8 @@ export class GenericLogSerializeHelper extends Helper {
               iterable: throwTypeError,
               iterableIterator: throwTypeError,
               transaction: throwTypeError,
-              output: throwTypeError,
               attribute: throwTypeError,
-              input: throwTypeError,
-              account: throwTypeError,
-              asset: throwTypeError,
               contract: throwTypeError,
-              header: throwTypeError,
               block: throwTypeError,
             }),
           );

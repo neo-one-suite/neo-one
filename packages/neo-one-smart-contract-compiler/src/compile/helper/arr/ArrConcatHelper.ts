@@ -10,7 +10,7 @@ export class ArrConcatHelper extends Helper {
     const options = sb.pushValueOptions(optionsIn);
 
     // [enumerator, result]
-    sb.emitSysCall(node, 'Neo.Enumerator.Create');
+    sb.emitSysCall(node, 'System.Enumerator.Create');
     sb.emitHelper(
       node,
       options,
@@ -19,7 +19,7 @@ export class ArrConcatHelper extends Helper {
           // [enumerator, result, enumerator]
           sb.emitOp(node, 'TUCK');
           // [boolean, result, enumerator]
-          sb.emitSysCall(node, 'Neo.Enumerator.Next');
+          sb.emitSysCall(node, 'System.Enumerator.Next');
         },
         each: () => {
           // [result, enumerator, result]
@@ -27,7 +27,7 @@ export class ArrConcatHelper extends Helper {
           // [enumerator, result, enumerator, result]
           sb.emitOp(node, 'OVER');
           // [value, result, enumerator, result]
-          sb.emitSysCall(node, 'Neo.Enumerator.Value');
+          sb.emitSysCall(node, 'System.Enumerator.Value');
           // [enumerator, result]
           sb.emitOp(node, 'APPEND');
         },

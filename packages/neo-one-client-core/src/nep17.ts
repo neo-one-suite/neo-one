@@ -1,14 +1,12 @@
 import {
+  ABIParameter,
   AddressString,
-  common,
   ContractABIClient,
   ContractManifestClient,
   ContractMethodDescriptorClient,
-  crypto,
   Event,
   InvokeReceipt,
   NetworkType,
-  ScriptBuilder,
   SmartContractNetworksDefinition,
   SmartContractReadOptions,
   TransactionOptions,
@@ -41,26 +39,26 @@ export interface NEP17SmartContract<TClient extends Client = Client> extends Sma
   ) => TransactionResult<InvokeReceipt<boolean, NEP17Event>>;
 }
 
+const defaultNEOONEParams: ReadonlyArray<ABIParameter> = [
+  { type: 'String', name: 'method' },
+  { type: 'Array', value: { type: 'Any' }, name: 'params' },
+];
+
 const decimalsFunction: ContractMethodDescriptorClient = {
   name: 'decimals',
   constant: true,
-  parameters: [],
+  parameters: [...defaultNEOONEParams],
   returnType: { type: 'Integer', decimals: 0 },
   offset: 0,
   safe: true,
 };
 
-// TODO: check that the script/hash can/should be blank here. also check offsets
-const blankScript = new ScriptBuilder().build();
-const blankHash = crypto.toScriptHash(blankScript);
-
 export const abi = (decimals: number): ContractABIClient => ({
-  hash: common.uInt160ToString(blankHash),
   methods: [
     {
       name: 'name',
       constant: true,
-      parameters: [],
+      parameters: [...defaultNEOONEParams],
       returnType: { type: 'String' },
       offset: 0,
       safe: true,
@@ -68,7 +66,7 @@ export const abi = (decimals: number): ContractABIClient => ({
     {
       name: 'symbol',
       constant: true,
-      parameters: [],
+      parameters: [...defaultNEOONEParams],
       returnType: { type: 'String' },
       offset: 0,
       safe: true,
@@ -77,7 +75,7 @@ export const abi = (decimals: number): ContractABIClient => ({
     {
       name: 'totalSupply',
       constant: true,
-      parameters: [],
+      parameters: [...defaultNEOONEParams],
       returnType: { type: 'Integer', decimals },
       offset: 0,
       safe: true,
@@ -141,9 +139,8 @@ export const abi = (decimals: number): ContractABIClient => ({
   ],
 });
 
-// TODO: check that the script/hash can/should be blank here
 export const manifest = (decimals: number): ContractManifestClient => ({
-  hash: common.uInt160ToString(blankHash),
+  name: '',
   groups: [],
   supportedStandards: [],
   abi: abi(decimals),
@@ -161,7 +158,7 @@ export const getDecimals = async (
       networks: networksDefinition,
       manifest: {
         ...manifest(0),
-        abi: { hash: manifest(0).hash, events: [], methods: [decimalsFunction] },
+        abi: { events: [], methods: [decimalsFunction] },
       },
     })
     .decimals({ network });

@@ -35,7 +35,7 @@ export class DoStatementCompiler extends NodeCompiler<ts.DoStatement> {
             );
           },
           whenTrue: () => {
-            sb.emitJmp(node, 'JMP', breakPC.getFirst());
+            sb.emitJmp(node, 'JMP_L', breakPC.getFirst());
           },
         }),
       );

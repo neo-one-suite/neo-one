@@ -12,8 +12,8 @@ import { composeDisposable, Disposable, noopDisposable } from '@neo-one/utils';
 import { AbstractLevelDOWN } from 'abstract-leveldown';
 import fs from 'fs-extra';
 import LevelUp from 'levelup';
+import MemDown from 'memdown';
 import RocksDB from 'rocksdb';
-import Memdown from 'memdown';
 import { toArray } from 'rxjs/operators';
 
 export interface LoggingOptions {
@@ -40,6 +40,7 @@ export interface FullNodeOptions {
   readonly leveldown?: AbstractLevelDOWN;
 }
 
+// tslint:disable-next-line: no-any
 const getUpdateVMMemoryStore = (vm: Dispatcher, db: any) => async () => {
   const updates = await streamToObservable<{ readonly key: Buffer; readonly value: Buffer }>(() =>
     db.createReadStream(),
@@ -64,7 +65,7 @@ export const startFullNode = async ({
   leveldown: customLeveldown,
 }: FullNodeOptions): Promise<Disposable> => {
   let disposable = noopDisposable;
-  const isMemoryStore = customLeveldown !== undefined && customLeveldown instanceof Memdown;
+  const isMemoryStore = customLeveldown !== undefined && customLeveldown instanceof MemDown;
   try {
     if (!isMemoryStore) {
       await fs.ensureDir(dataPath);

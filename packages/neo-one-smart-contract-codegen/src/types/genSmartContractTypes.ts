@@ -1,4 +1,4 @@
-import { ABI } from '@neo-one/client-common';
+import { ContractManifestClient } from '@neo-one/client-common';
 import { genEvent } from './genEvent';
 import { genMigrationSmartContract } from './genMigrationSmartContract';
 import { genSmartContract } from './genSmartContract';
@@ -60,14 +60,6 @@ const getImportClauses = (text: string) => {
     mutableClauses.push('TransactionReceipt');
   }
 
-  if (text.includes('ClaimTransaction')) {
-    mutableClauses.push('ClaimTransaction');
-  }
-
-  if (text.includes('InvocationTransaction')) {
-    mutableClauses.push('InvocationTransaction');
-  }
-
   if (text.includes('TransactionOptions')) {
     mutableClauses.push('TransactionOptions');
   }
@@ -96,19 +88,23 @@ const getImportClauses = (text: string) => {
     mutableClauses.push('ForwardOptions');
   }
 
+  if (text.includes('Transaction')) {
+    mutableClauses.push('Transaction');
+  }
+
   return mutableClauses;
 };
 
-export const genSmartContractTypes = (name: string, abi: ABI) => {
-  const events = abi.events === undefined ? [] : abi.events;
+export const genSmartContractTypes = (name: string, manifest: ContractManifestClient) => {
+  const events = manifest.abi.events;
   const eventType = `export type ${getEventName(name)} = ${
     events.length === 0 ? 'never' : events.map((event) => getSingleEventName(name, event.name)).join(' | ')
   }`;
   const text = `
 ${events.map((event) => genEvent(name, event)).join('\n')}
 ${eventType}
-${genSmartContract(name, abi)}
-${genMigrationSmartContract(name, abi)}`;
+${genSmartContract(name, manifest)}
+${genMigrationSmartContract(name, manifest)}`;
 
   const importClauses = getImportClauses(text);
   // tslint:disable-next-line no-array-mutation

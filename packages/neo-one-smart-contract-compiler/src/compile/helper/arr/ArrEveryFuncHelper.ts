@@ -14,7 +14,7 @@ export class ArrEveryFuncHelper extends Helper {
     // [arr, callable]
     sb.emitOp(node, 'SWAP');
     // [enumerator, callable]
-    sb.emitSysCall(node, 'Neo.Enumerator.Create');
+    sb.emitSysCall(node, 'System.Enumerator.Create');
     // [idx, enumerator, callable]
     sb.emitPushInt(node, 0);
     // [result, idx, enumerator, callable]
@@ -31,7 +31,7 @@ export class ArrEveryFuncHelper extends Helper {
           // [enumerator, result, enumerator, result, idx, callable]
           sb.emitOp(node, 'OVER');
           // [boolean, result, enumerator, result, idx, callable]
-          sb.emitSysCall(node, 'Neo.Enumerator.Next');
+          sb.emitSysCall(node, 'System.Enumerator.Next');
           // [boolean, enumerator, result, idx, callable]
           sb.emitOp(node, 'BOOLAND');
         },
@@ -41,7 +41,7 @@ export class ArrEveryFuncHelper extends Helper {
           // [enumerator, enumerator, idx, callable]
           sb.emitOp(node, 'DUP');
           // [value, enumerator, idx, callable]
-          sb.emitSysCall(node, 'Neo.Enumerator.Value');
+          sb.emitSysCall(node, 'System.Enumerator.Value');
           // [2, value, enumerator, idx, callable]
           sb.emitPushInt(node, 2);
           // [idx, value, enumerator, idx, callable]
