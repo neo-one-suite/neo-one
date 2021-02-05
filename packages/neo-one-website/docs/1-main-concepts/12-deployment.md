@@ -130,7 +130,7 @@ This will ensure that after deploying the `ico` contract (and confirming it is d
 Once you have successfully configured your `migration` file as explained above you are all set to deploy your Smart Contract! Using the set of [networks](/docs/config-options) defined in `.neo-one.config.js` you can deploy using the command:
 
 ```bash
-yarn neo-one deploy --<network>
+yarn neo-one deploy --network <network>
 ```
 
 where `network` is one of the keys provided by your configuration. By default `yarn neo-one deploy` will use the `test` key.

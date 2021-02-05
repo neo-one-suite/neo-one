@@ -38,6 +38,6 @@ export class SetIterator extends BuiltinInstanceMemberCall {
     // [enumerator]
     sb.emitSysCall(node, 'Neo.Iterator.Keys');
     // [val]
-    sb.emitHelper(node, options, sb.helpers.createEnumeratorIterableIterator({}));
+    sb.emitHelper(node, options, sb.helpers.createEnumeratorIterableIterator({ deserializeKey: true }));
   }
 }

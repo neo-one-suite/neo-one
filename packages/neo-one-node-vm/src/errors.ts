@@ -121,14 +121,26 @@ export const InvalidPickItemKeyError = makeErrorWithCode(
   (context: ExecutionContext, key: string, value: string) =>
     getMessage(context, `Invalid PICKITEM Index: ${key}. Value: ${value}`),
 );
+export const InvalidPickItemKeyTypeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, `Invalid PICKITEM Key Type`),
+);
 export const InvalidRemoveIndexError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, index: number) =>
   getMessage(context, `Invalid REMOVE Index: ${index}`),
+);
+export const InvalidRemoveKeyTypeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, `Invalid REMOVE Key Type`),
 );
 export const InvalidHasKeyIndexError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
   getMessage(context, 'Invalid HASKEY Index'),
 );
+export const InvalidHasKeyKeyTypeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, `Invalid HASKEY Key Type`),
+);
 export const InvalidSetItemIndexError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
   getMessage(context, 'Invalid SETITEM Index'),
+);
+export const InvalidSetItemKeyTypeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, `Invalid SETITEM Key Type`),
 );
 export const InvalidCheckWitnessArgumentsError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
   getMessage(context, 'Invalid CheckWitness Arguments'),

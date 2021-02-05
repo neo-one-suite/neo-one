@@ -142,6 +142,7 @@ import {
   RawEnumeratorFindHelper,
   RawEnumeratorFindHelperOptions,
   RawEnumeratorForEachFuncHelper,
+  RawEnumeratorForEachFuncHelperOptions,
   RawEnumeratorForEachHelper,
   RawEnumeratorForEachHelperOptions,
   RawEnumeratorReduceHelper,
@@ -158,6 +159,7 @@ import {
   RawIteratorForEachFuncBaseHelperOptions,
   RawIteratorForEachFuncHelper,
   RawIteratorForEachHelper,
+  RawIteratorForEachHelperFuncOptions,
   RawIteratorForEachHelperOptions,
   RawIteratorForEachKeyHelper,
   RawIteratorForEachKeyHelperOptions,
@@ -631,11 +633,11 @@ export interface Helpers {
   readonly rawIteratorForEach: (options: RawIteratorForEachHelperOptions) => RawIteratorForEachHelper;
   readonly rawIteratorForEachKey: (options: RawIteratorForEachKeyHelperOptions) => RawIteratorForEachKeyHelper;
   readonly rawIteratorForEachBase: (options: RawIteratorForEachBaseHelperOptions) => RawIteratorForEachBaseHelper;
-  readonly rawIteratorForEachFunc: RawIteratorForEachFuncHelper;
+  readonly rawIteratorForEachFunc: (options: RawIteratorForEachHelperFuncOptions) => RawIteratorForEachFuncHelper;
   readonly rawIteratorForEachFuncBase: (
     options: RawIteratorForEachFuncBaseHelperOptions,
   ) => RawIteratorForEachFuncBaseHelper;
-  readonly rawEnumeratorForEachFunc: RawEnumeratorForEachFuncHelper;
+  readonly rawEnumeratorForEachFunc: (options: RawEnumeratorForEachFuncHelperOptions) => RawEnumeratorForEachFuncHelper;
   readonly rawEnumeratorForEach: (options: RawEnumeratorForEachHelperOptions) => RawEnumeratorForEachHelper;
   readonly rawEnumeratorFilter: (options: RawEnumeratorFilterHelperOptions) => RawEnumeratorFilterHelper;
   readonly rawEnumeratorFind: (options: RawEnumeratorFindHelperOptions) => RawEnumeratorFindHelper;
@@ -1072,9 +1074,9 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     rawIteratorForEach: (options) => new RawIteratorForEachHelper(options),
     rawIteratorForEachKey: (options) => new RawIteratorForEachKeyHelper(options),
     rawIteratorForEachBase: (options) => new RawIteratorForEachBaseHelper(options),
-    rawIteratorForEachFunc: new RawIteratorForEachFuncHelper(),
+    rawIteratorForEachFunc: (options) => new RawIteratorForEachFuncHelper(options),
     rawIteratorForEachFuncBase: (options) => new RawIteratorForEachFuncBaseHelper(options),
-    rawEnumeratorForEachFunc: new RawEnumeratorForEachFuncHelper(),
+    rawEnumeratorForEachFunc: (options) => new RawEnumeratorForEachFuncHelper(options),
     rawEnumeratorForEach: (options) => new RawEnumeratorForEachHelper(options),
     rawEnumeratorFilter: (options) => new RawEnumeratorFilterHelper(options),
     rawEnumeratorFind: (options) => new RawEnumeratorFindHelper(options),

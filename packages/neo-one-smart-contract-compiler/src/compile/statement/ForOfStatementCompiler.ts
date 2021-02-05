@@ -87,6 +87,7 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
         node,
         innerOptions,
         sb.helpers.rawIteratorForEach({
+          deserializeKey: true,
           each: (innerInnerOptionsIn) => {
             const innerInnerOptions = sb.pushValueOptions(innerInnerOptionsIn);
             // [2, key, val]
@@ -129,7 +130,7 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
       // [iterator]
       sb.emitSysCall(expression, 'Neo.Iterator.Create');
       // []
-      sb.emitHelper(node, innerOptions, sb.helpers.rawIteratorForEachKey({ each }));
+      sb.emitHelper(node, innerOptions, sb.helpers.rawIteratorForEachKey({ each, deserializeKey: true }));
     };
 
     const handleSetStorage = (innerOptions: VisitOptions) => {

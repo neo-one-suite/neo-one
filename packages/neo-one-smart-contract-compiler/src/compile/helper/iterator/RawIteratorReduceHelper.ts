@@ -4,17 +4,20 @@ import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 export interface RawIteratorReduceHelperOptions {
+  readonly deserializeKey?: boolean;
   readonly each: (options: VisitOptions) => void;
 }
 
 // Input: [accum, iterator]
 // Output: [accum]
 export class RawIteratorReduceHelper extends Helper {
+  private readonly deserializeKey: boolean;
   private readonly each: (options: VisitOptions) => void;
 
   public constructor(options: RawIteratorReduceHelperOptions) {
     super();
     this.each = options.each;
+    this.deserializeKey = options.deserializeKey ?? false;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
@@ -31,6 +34,10 @@ export class RawIteratorReduceHelper extends Helper {
           sb.emitOp(node, 'ROT');
           // [key, value, accum]
           sb.emitSysCall(node, 'Neo.Iterator.Key');
+          if (this.deserializeKey) {
+            // [key, value, accum]
+            sb.emitSysCall(node, 'Neo.Runtime.Deserialize');
+          }
           // [accum, key, value]
           sb.emitOp(node, 'ROT');
           // [accum]
