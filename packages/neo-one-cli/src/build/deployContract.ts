@@ -18,6 +18,7 @@ export const deployContract = async (
     throw new Error('Compilation error.');
   }
 
+  // TODO: this will be wrong now since contract script hash need sender for script completion
   const address = scriptHashToAddress(
     common.uInt160ToString(crypto.toScriptHash(Buffer.from(contract.contract.script, 'hex'))),
   );
@@ -39,7 +40,7 @@ export const deployContract = async (
 
   return {
     manifest: contract.contract.manifest,
-    address,
+    address, // TODO: this should be a "pre-address script" or something that will be used with the sender
     sourceMap,
     sourceMaps: nextSourceMaps,
     linked: {

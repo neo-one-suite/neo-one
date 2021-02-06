@@ -42,7 +42,9 @@ export const builder = (yargsBuilder: typeof yargs) =>
       'typescript',
       'Initialize a NEO•ONE project with TypeScript. If no tsconfig is found a default one will be generated.',
     )
-    .default('typescript', false);
+    .default('typescript', false)
+    .string('configPath')
+    .describe('configPath', 'Optional path to the config file if not in root of project directory.');
 export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
   start(async (_cmd, config) => {
     const tsconfigPath = nodePath.resolve(config.contracts.path, 'tsconfig.json');
@@ -219,5 +221,5 @@ export const ExampleHelloWorld = () => {
     console.log(
       'NEO•ONE initialized, run `neo-one build` to deploy the HelloWorld smart contract to a local development network.',
     );
-  });
+  }, argv.configPath);
 };

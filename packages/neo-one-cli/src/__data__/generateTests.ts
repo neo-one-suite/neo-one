@@ -331,13 +331,10 @@ const verifySmartContractAfterMint = async (
   expect(escrowPairBalanceAfterClaim.toString()).toEqual('15');
 };
 
-export const buildTests = async (project: string) => {
+export const generateTests = async (project: string) => {
   const start = Math.round(Date.now() / 1000);
   const exec = one.createExec(project);
-  one.addCleanup(async () => {
-    await exec('stop network');
-  });
-  await exec('build');
+  await exec('generate');
 
   const [{ client: outerClient }, config] = await Promise.all([getClients(project), one.getProjectConfig(project)]);
   const contracts = await getContracts(outerClient, constants.LOCAL_NETWORK_NAME);

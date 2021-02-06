@@ -42,7 +42,9 @@ if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true')
               `localKeyStore.addUserAccount({ network: '${localDevNetworkName}', name: '${name}', privateKey: '${wif}' }),`,
           )
           .join('\n          ')}
-      ], localKeyStore);
+      ]).catch(() => {
+        // do nothing
+      });
     }
   }
 }`;

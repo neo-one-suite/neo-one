@@ -18,6 +18,7 @@ export const compileContract = async (
     common.uInt160ToString(crypto.toScriptHash(Buffer.from(contract.contract.script, 'hex'))),
   );
 
+  // TODO: this will be wrong now since contract script hash need sender for script completion
   const sourceMap = await contract.sourceMap;
   const nextSourceMaps = {
     ...sourceMaps,
@@ -26,6 +27,7 @@ export const compileContract = async (
 
   return {
     contract,
+    address, // TODO: this should be a "pre-address script" or something that will be used with the sender
     sourceMap,
     sourceMaps: nextSourceMaps,
     linked: {
