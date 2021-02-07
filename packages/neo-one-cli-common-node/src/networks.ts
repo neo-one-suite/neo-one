@@ -1,3 +1,4 @@
+import { rpcURL as commonRpcURL } from '@neo-one/cli-common';
 import { LocalKeyStore, LocalMemoryStore, NEOONEProvider } from '@neo-one/client-core';
 import { LocalUserAccountProvider } from '@neo-one/client-full-core';
 import prompts from 'prompts';
@@ -21,12 +22,12 @@ export const createUserAccountProviderFunc = (network: string, rpcURL: string) =
 // tslint:disable-next-line export-name
 export const defaultNetworks = {
   main: {
-    userAccountProvider: createUserAccountProviderFunc('main', 'https://neotracker.io/rpc'),
+    userAccountProvider: createUserAccountProviderFunc('main', commonRpcURL.main),
   },
   test: {
-    userAccountProvider: createUserAccountProviderFunc('test', 'https://testnet.neotracker.io/rpc'),
+    userAccountProvider: createUserAccountProviderFunc('test', commonRpcURL.test),
   },
   local: {
-    userAccountProvider: createUserAccountProviderFunc('neo-one', 'localhost:9040'),
+    userAccountProvider: createUserAccountProviderFunc('neo-one', 'localhost:9040'), // TODO: should this end with /rpc ? abstrac this if not
   },
 };

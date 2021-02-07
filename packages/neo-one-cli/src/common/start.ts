@@ -9,12 +9,12 @@ type StartFunc = (cmd: Command, config: Configuration) => Promise<StartReturn | 
 
 const startInternal = createStart(cliLogger);
 
-export const start = (startFunc: StartFunc) => {
+export const start = (startFunc: StartFunc, optionalConfigPath?: string) => {
   // tslint:disable-next-line no-object-mutation
   cliLogger.level = 'info';
 
   startInternal(async () => {
-    const config = await loadConfiguration();
+    const config = await loadConfiguration(optionalConfigPath);
 
     const cmd = {
       bin: process.argv[0],

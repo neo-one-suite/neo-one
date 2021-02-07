@@ -32,18 +32,15 @@ import {
   VersionPayload,
 } from './payload';
 
-const tryCompression = ({ command }: MessageValue) => {
-  return (
-    command === Command.Block ||
-    command === Command.Consensus ||
-    command === Command.Transaction ||
-    command === Command.Headers ||
-    command === Command.Addr ||
-    command === Command.MerkleBlock ||
-    command === Command.FilterLoad ||
-    command === Command.FilterAdd
-  );
-};
+const tryCompression = ({ command }: MessageValue) =>
+  command === Command.Block ||
+  command === Command.Consensus ||
+  command === Command.Transaction ||
+  command === Command.Headers ||
+  command === Command.Addr ||
+  command === Command.MerkleBlock ||
+  command === Command.FilterLoad ||
+  command === Command.FilterAdd;
 
 export type MessageValue =
   | { readonly command: Command.Addr; readonly payload: AddrPayload }
