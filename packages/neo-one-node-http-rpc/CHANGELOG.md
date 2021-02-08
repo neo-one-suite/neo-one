@@ -1,6 +1,11 @@
 # Change Log - @neo-one/node-http-rpc
 
-This log was last generated on Tue, 08 Dec 2020 19:29:01 GMT and should not be manually modified.
+This log was last generated on Mon, 08 Feb 2021 21:00:42 GMT and should not be manually modified.
+
+## 3.0.1
+Mon, 08 Feb 2021 21:00:42 GMT
+
+*Version update only*
 
 ## 3.0.0
 Tue, 08 Dec 2020 19:29:01 GMT

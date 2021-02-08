@@ -2,6 +2,46 @@
   "name": "@neo-one/client-full-core",
   "entries": [
     {
+      "version": "3.1.0",
+      "tag": "@neo-one/client-full-core_v3.1.0",
+      "date": "Mon, 08 Feb 2021 21:00:42 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update for Preview3, primarily in compiler, client, and CLI."
+          },
+          {
+            "comment": "Update compiler, client, and CLI for Preview4"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Preview4 release"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-common\" from `^3.0.0` to `^3.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-core\" from `^3.0.0` to `^3.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-full-common\" from `^3.0.0` to `^3.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-switch\" from `^3.0.0` to `^3.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/utils\" from `^3.0.0` to `^3.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-core\" from `^3.0.0` to `^3.1.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.0.0",
       "tag": "@neo-one/client-full-core_v3.0.0",
       "date": "Tue, 08 Dec 2020 19:29:01 GMT",
