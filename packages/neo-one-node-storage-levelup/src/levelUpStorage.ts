@@ -1,3 +1,4 @@
+// import { UInt256 } from '@neo-one/client-common';
 import {
   ApplicationLog,
   BinaryReader,
@@ -31,7 +32,7 @@ interface LevelUpStorageOptions {
 
 export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage => {
   // TODO: implement getting blockHash from an index
-  // const getHash = async ({ hashOrIndex }: HeaderKey): Promise<UInt256> => {
+  // const getHash = async ({ hashOrIndex }: { readonly hashOrIndex: UInt256 | number }): Promise<UInt256> => {
   //   let hash = hashOrIndex;
   //   if (typeof hash === 'number') {
   //     try {
@@ -59,6 +60,7 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
   });
 
   const getBlock = async ({ hashOrIndex }: BlockKey): Promise<TrimmedBlock> => {
+    // const hash = await getHash({ hashOrIndex });
     // TODO: implement getting block hash from index
     if (typeof hashOrIndex === 'number') {
       throw new Error('not implemented');

@@ -1,7 +1,7 @@
 {
   "name": "@neo-one/node-vm",
   "version": "3.0.0",
-  "description": "NEO•ONE C# Wrapper for neo3 VM",
+  "description": "NEO•ONE C# Wrapper for Neo3 VM",
   "main": "./dist/cjs/index",
   "scripts": {
     "build": "gulp",

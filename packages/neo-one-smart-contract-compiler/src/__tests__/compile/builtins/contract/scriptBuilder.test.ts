@@ -43,4 +43,27 @@ describe('Calling contract', () => {
 
     expect(final.state).toEqual('HALT');
   });
+
+  test('Contract publish and deply', async () => {
+    const node = await helpers.startNode();
+
+    const contract = await node.compileScript(`
+      import { SmartContract } from '@neo-one/smart-contract';
+
+      export class StorageContract extends SmartContract {
+        ${properties}
+
+        public run(): string {
+          return 'hi';
+        }
+      }
+    `);
+
+    const result = await node.client.publishAndDeploy(contract.contract, contract.contract.manifest, ['deploy', []], {
+      maxSystemFee: new BigNumber(-1),
+      maxNetworkFee: new BigNumber(-1),
+    });
+
+    console.log(result);
+  });
 });
