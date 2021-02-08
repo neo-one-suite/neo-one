@@ -1,6 +1,21 @@
 # Change Log - @neo-one/node-vm
 
-This log was last generated on Tue, 08 Dec 2020 19:29:01 GMT and should not be manually modified.
+This log was last generated on Mon, 08 Feb 2021 21:00:42 GMT and should not be manually modified.
+
+## 3.1.0
+Mon, 08 Feb 2021 21:00:42 GMT
+
+### Minor changes
+
+- Preview4 release
+- add log support, update neo fork version
+- add default environment variable instead of requiring them from the user
+
+### Patches
+
+- 3.0.1-preview3 release
+- Update for Preview3, primarily in compiler, client, and CLI.
+- Update compiler, client, and CLI for Preview4
 
 ## 3.0.0
 Tue, 08 Dec 2020 19:29:01 GMT

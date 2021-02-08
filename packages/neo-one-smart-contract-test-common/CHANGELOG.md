@@ -1,6 +1,17 @@
 # Change Log - @neo-one/smart-contract-test-common
 
-This log was last generated on Tue, 08 Dec 2020 19:29:01 GMT and should not be manually modified.
+This log was last generated on Mon, 08 Feb 2021 21:00:42 GMT and should not be manually modified.
+
+## 3.1.0
+Mon, 08 Feb 2021 21:00:42 GMT
+
+### Minor changes
+
+- Preview4 release
+
+### Patches
+
+- Update compiler, client, and CLI for Preview4
 
 ## 2.7.1
 Tue, 08 Dec 2020 19:29:01 GMT
