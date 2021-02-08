@@ -40,6 +40,6 @@ export const getFormat = (requestedFormat: string) => {
     case 'next':
       return NEXT_FORMAT;
     default:
-      throw new Error(`invalid requested format: ${requestedFormat}`);
+      throw new Error(`Invalid requested build format: ${requestedFormat}`);
   }
 };

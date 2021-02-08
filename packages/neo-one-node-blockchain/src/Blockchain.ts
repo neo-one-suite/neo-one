@@ -69,6 +69,7 @@ export interface BlockchainOptions extends CreateBlockchainOptions {
   // tslint:disable-next-line: readonly-array
   readonly headerIndexCache: HeaderIndexCache;
   readonly currentBlock?: Block;
+  readonly previousBlock?: Block;
 }
 
 interface Entry {
@@ -138,6 +139,10 @@ export class Blockchain {
 
       const currentBlock = await currentBlockTrimmed.getBlock(storage.transactions);
 
+      const prevHeaderHash = await headerIndexCache.get(headerIndexCache.length - 2);
+      const prevBlockTrimmed = await storage.blocks.tryGet({ hashOrIndex: prevHeaderHash });
+      const previousBlock = await prevBlockTrimmed?.getBlock(storage.transactions);
+
       return new Blockchain({
         headerIndexCache,
         settings,
@@ -145,6 +150,7 @@ export class Blockchain {
         native,
         vm,
         currentBlock,
+        previousBlock,
         onPersist,
       });
     }
@@ -205,6 +211,7 @@ export class Blockchain {
       validatorsCount: this.settings.validatorsCount,
     };
     this.mutableCurrentBlock = options.currentBlock;
+    this.mutablePreviousBlock = options.previousBlock;
     this.onPersist = options.onPersist === undefined ? () => this.vm.updateSnapshots() : options.onPersist;
     this.start();
   }

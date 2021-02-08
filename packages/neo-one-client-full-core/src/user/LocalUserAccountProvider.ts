@@ -218,12 +218,11 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     return this.publishBase(
       'publish',
       contract,
-      (sb, from) => {
+      (sb, from, hash) => {
         const deployFunc = manifest.abi.methods.find((func) => func.name === 'deploy');
         if (deployFunc !== undefined) {
           // []
           sb.emitOp('DROP');
-          const hash = crypto.toScriptHash(Buffer.from(contract.script, 'hex'));
           sb.emitAppCall(
             hash,
             'deploy',
@@ -276,7 +275,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   protected async publishBase(
     method: string,
     contractIn: ContractRegister,
-    emit: (sb: ScriptBuilder, from: UserAccountID) => void,
+    emit: (sb: ScriptBuilder, from: UserAccountID, hash: UInt160) => void,
     sourceMaps: SourceMaps = {},
     options?: TransactionOptions,
   ): Promise<TransactionResult<PublishReceipt>> {
@@ -310,7 +309,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     sb.emitPush(common.nativeHashes.Management);
     sb.emitSysCall('System.Contract.Call');
     const { from } = this.getTransactionOptions(options);
-    emit(sb, from);
+    emit(sb, from, contractHashUInt160);
 
     const script = sb.build();
 

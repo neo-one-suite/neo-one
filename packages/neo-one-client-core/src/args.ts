@@ -1007,8 +1007,8 @@ export const assertTransactionOptions = (name: string, options?: unknown): Trans
     attributes: assertProperty(options, 'TransactionOptions', 'attributes', assertNullableArray).map((value) =>
       assertAttribute('TransactionOption.attributes', value),
     ),
-    maxNetworkFee: assertProperty(options, 'TransactionOptions', 'networkFee', assertNullableBigNumber),
-    maxSystemFee: assertProperty(options, 'TransactionOptions', 'systemFee', assertNullableBigNumber),
+    maxNetworkFee: assertProperty(options, 'TransactionOptions', 'maxNetworkFee', assertBigNumber),
+    maxSystemFee: assertProperty(options, 'TransactionOptions', 'maxSystemFee', assertBigNumber),
   };
 };
 
@@ -1035,13 +1035,13 @@ export const assertInvokeSendUnsafeReceiveTransactionOptions = (
     maxNetworkFee: assertProperty(
       options,
       'InvokeSendUnsafeReceiveTransactionOptions',
-      'networkFee',
+      'maxNetworKFee',
       assertNullableBigNumber,
     ),
     maxSystemFee: assertProperty(
       options,
       'InvokeSendUnsafeReceiveTransactionOptions',
-      'systemFee',
+      'maxSystemFee',
       assertNullableBigNumber,
     ),
     sendTo: assertProperty(options, 'InvokeSendUnsafeReceiveTransactionOptions', 'sendTo', assertNullableSendTo),

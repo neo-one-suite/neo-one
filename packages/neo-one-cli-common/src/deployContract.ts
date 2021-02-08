@@ -36,5 +36,5 @@ export const deployContract = async (
     throw new Error(receipt.result.message);
   }
 
-  return common.uInt160ToString(receipt.result.value.manifest.abi.hash);
+  return common.uInt160ToString(receipt.result.value.hash);
 };

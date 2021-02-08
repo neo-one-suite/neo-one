@@ -72,7 +72,6 @@ export class ScriptBuilder extends BaseScriptBuilder {
     return this.emitSysCall('System.Contract.Call');
   }
 
-  // TODO: need to fix how we call contracts later
   // tslint:disable-next-line readonly-array
   public emitAppCall(scriptHash: UInt160, operation: string, ...params: ScriptBuilderParam[]): this {
     this.emitAppCallInvocation(operation, ...params);
