@@ -12,7 +12,7 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/cli-common": "^3.1.0",
-    "@neo-one/client-common": "^3.1.0",
+    "@neo-one/client-common": "^3.1.0-preview4",
     "@neo-one/client-core": "^3.1.0",
     "@neo-one/node-browser": "^2.3.0",
     "@neo-one/smart-contract-codegen": "^3.1.0",
