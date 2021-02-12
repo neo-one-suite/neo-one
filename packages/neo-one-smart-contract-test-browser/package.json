@@ -11,7 +11,7 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-core": "^3.1.0",
+    "@neo-one/client-core": "^3.1.0-preview4",
     "@neo-one/local-browser": "^2.3.1",
     "@neo-one/local-singleton": "^2.3.1",
     "@neo-one/node-browser": "^2.3.0",
