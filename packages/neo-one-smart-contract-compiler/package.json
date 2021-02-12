@@ -18,7 +18,7 @@
     "@neo-one/client-core": "^3.1.0",
     "@neo-one/client-full-common": "^3.1.0",
     "@neo-one/client-full-core": "^3.1.0",
-    "@neo-one/smart-contract": "^3.1.0",
+    "@neo-one/smart-contract": "^3.1.0-preview4",
     "@neo-one/ts-utils": "^2.6.1",
     "@neo-one/typescript-concatenator": "^2.6.2",
     "@neo-one/utils": "^3.1.0",
