@@ -25,7 +25,7 @@ export const TypeFilter = ({ selected, onChange, ...props }: Props) => (
     {...props}
     formatOptionLabel={createFormatOptionLabel}
     placeholder="Select Type"
-    value={selected}
+    value={[`${selected}`]}
     options={TYPE_FILTER_OPTIONS}
     onChange={onChange}
   />
