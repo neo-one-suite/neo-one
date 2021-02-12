@@ -17,7 +17,7 @@
     "@neo-one/client-switch": "^3.1.0",
     "@neo-one/logger": "^2.6.1",
     "@neo-one/node-consensus": "^3.1.0",
-    "@neo-one/node-core": "^3.1.0",
+    "@neo-one/node-core": "^3.1.0-preview4",
     "@neo-one/utils": "^3.1.0",
     "@types/bloom-filter": "^0.2.0",
     "@types/bn.js": "^4.11.5",
