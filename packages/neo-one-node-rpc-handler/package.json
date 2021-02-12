@@ -14,7 +14,7 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/client-common": "^3.1.0",
-    "@neo-one/client-switch": "^3.1.0",
+    "@neo-one/client-switch": "^3.1.0-preview4",
     "@neo-one/logger": "^2.6.1",
     "@neo-one/node-core": "^3.1.0",
     "@neo-one/utils": "^3.1.0",
