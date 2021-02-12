@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
-    "@neo-one/smart-contract-compiler-node": "^2.7.2",
+    "@neo-one/smart-contract-compiler-node": "^2.7.2-preview4",
     "@types/app-root-dir": "^0.1.0",
     "@types/fs-extra": "^8.0.0",
     "@types/jest": "^24.0.18",

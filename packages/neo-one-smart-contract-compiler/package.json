@@ -38,7 +38,7 @@
     "@neo-one/node-neo-settings": "^3.1.0",
     "@neo-one/node-storage-levelup": "^3.1.0",
     "@neo-one/node-vm": "^3.1.0",
-    "@neo-one/smart-contract-compiler-node": "^2.7.2",
+    "@neo-one/smart-contract-compiler-node": "^2.7.2-preview4",
     "@types/app-root-dir": "^0.1.0",
     "@types/babel__code-frame": "^7.0.1",
     "@types/jest": "^24.0.18",
