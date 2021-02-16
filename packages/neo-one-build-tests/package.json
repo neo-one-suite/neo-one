@@ -8,7 +8,7 @@
   },
   "sideEffects": false,
   "devDependencies": {
-    "@babel/preset-env": "^7.6.3",
+    "@babel/preset-env": "^7.12.16",
     "@neo-one/build-tools": "^1.0.0",
     "@neo-one/logger": "^2.6.1",
     "app-root-dir": "^1.0.2",
