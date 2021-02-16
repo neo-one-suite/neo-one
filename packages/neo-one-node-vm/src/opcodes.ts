@@ -21,10 +21,14 @@ import {
   InsufficientReturnValueError,
   InvalidCheckMultisigArgumentsError,
   InvalidHasKeyIndexError,
+  InvalidHasKeyKeyTypeError,
   InvalidPackCountError,
   InvalidPickItemKeyError,
+  InvalidPickItemKeyTypeError,
   InvalidRemoveIndexError,
+  InvalidRemoveKeyTypeError,
   InvalidSetItemIndexError,
+  InvalidSetItemKeyTypeError,
   InvalidTailCallReturnValueError,
   ItemTooLargeError,
   LeftNegativeError,
@@ -1719,6 +1723,9 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => {
           const key = args[0];
+          if (key.isICollection) {
+            throw new InvalidPickItemKeyTypeError(context);
+          }
           if (args[1].isArray()) {
             const index = vmUtils.toNumber(context, key.asBigIntegerUnsafe());
             const val = args[1].asArray();
@@ -1756,6 +1763,9 @@ const OPCODE_PAIRS = ([
         invoke: ({ context, args }) => {
           let newItem = args[0];
           const key = args[1];
+          if (key.isICollection) {
+            throw new InvalidSetItemKeyTypeError(context);
+          }
           if (newItem instanceof StructStackItem) {
             newItem = newItem.clone();
           }
@@ -1862,6 +1872,9 @@ const OPCODE_PAIRS = ([
         in: 2,
         invoke: ({ context, args }) => {
           const key = args[0];
+          if (key.isICollection) {
+            throw new InvalidRemoveKeyTypeError(context);
+          }
           if (args[1].isArray()) {
             const index = vmUtils.toNumber(context, key.asBigIntegerUnsafe());
             const mutableValue = args[1].asArray();
@@ -1910,6 +1923,9 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => {
           const key = args[0];
+          if (key.isICollection) {
+            throw new InvalidHasKeyKeyTypeError(context);
+          }
           if (args[1].isArray()) {
             const index = vmUtils.toNumber(context, key.asBigIntegerUnsafe());
             const val = args[1].asArray();
