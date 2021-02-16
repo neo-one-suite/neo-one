@@ -4,7 +4,6 @@ import { StackItemType } from './StackItemType';
 
 export class ArrayStackItem extends ArrayLikeStackItem {
   public static readonly type = StackItemType.Array;
-  public readonly isICollection = true;
   private readonly referenceID = getNextID();
 
   public toStructuralKey(): string {
