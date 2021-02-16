@@ -5,11 +5,13 @@ on:
       - master
       - staging
       - trying
+      - master-2.x
   pull_request:
     branches:
       - master
       - staging
       - trying
+      - master-2.x
 jobs:
   cypress12:
     name: cypress12
