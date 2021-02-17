@@ -16,7 +16,7 @@
     "@neo-one/edge": "^15.0.0",
     "@neo-one/node-core": "^3.1.0",
     "@neo-one/client-common": "^3.1.0",
-    "@neo-one/utils": "^3.1.0",
+    "@neo-one/utils": "^3.1.0-preview4",
     "bn.js": "^5.0.0"
   },
   "devDependencies": {

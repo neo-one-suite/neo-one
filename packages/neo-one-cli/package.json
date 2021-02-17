@@ -33,7 +33,7 @@
     "@neo-one/smart-contract-codegen": "^3.1.0",
     "@neo-one/smart-contract-compiler": "^3.1.0",
     "@neo-one/smart-contract-compiler-node": "^2.7.2",
-    "@neo-one/utils": "^3.1.0",
+    "@neo-one/utils": "^3.1.0-preview4",
     "@neo-one/utils-node": "^2.6.2",
     "@types/listr": "^0.14.2",
     "@types/yargs": "^13.0.3",

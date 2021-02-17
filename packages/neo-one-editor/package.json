@@ -38,7 +38,7 @@
     "@neo-one/react-common": "^3.0.0",
     "@neo-one/smart-contract-compiler": "^3.1.0",
     "@neo-one/smart-contract-test-browser": "^2.3.1",
-    "@neo-one/utils": "^3.1.0",
+    "@neo-one/utils": "^3.1.0-preview4",
     "@neo-one/worker": "^2.3.0",
     "@render-props/scrollable": "^0.1.20",
     "anser": "^1.4.8",

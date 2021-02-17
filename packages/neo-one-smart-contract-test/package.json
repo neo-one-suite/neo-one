@@ -19,7 +19,7 @@
     "@neo-one/node-neo-settings": "^3.1.0",
     "@neo-one/smart-contract-compiler-node": "^2.7.2",
     "@neo-one/smart-contract-test-common": "^3.1.0",
-    "@neo-one/utils": "^3.1.0",
+    "@neo-one/utils": "^3.1.0-preview4",
     "lodash": "^4.17.15",
     "memdown": "^5.0.0",
     "tslib": "^1.10.0"
