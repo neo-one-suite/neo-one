@@ -36,7 +36,14 @@ export const builder = (yargsBuilder: typeof yargs) =>
   yargsBuilder
     .boolean('react')
     .describe('react', 'Generate an example react component that uses the HelloWorld smart contract.')
-    .default('react', false);
+    .default('react', false)
+    .boolean('typescript')
+    .describe(
+      'typescript',
+      'Initialize a NEO•ONE project with TypeScript. If no tsconfig is found a default one will be generated.',
+    )
+    .string('configPath')
+    .describe('configPath', 'Optional path to the config file if not in the root of project directory.');
 export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
   start(async (_cmd, config) => {
     const tsconfigPath = nodePath.resolve(config.contracts.path, 'tsconfig.json');
@@ -155,8 +162,38 @@ export const ExampleHelloWorld = () => {
       argv.react ? writeFile(reactPath, reactContents) : Promise.resolve(),
     ]);
 
-    if (rootTSConfigContents) {
-      const rootTSConfig = JSON.parse(rootTSConfigContents);
+    if (rootTSConfigContents !== undefined || argv.typescript) {
+      // This acts as a default if there's an unparsable tsconfig present. This is taken from create-react-app tsconfig
+      let rootTSConfig = {
+        compilerOptions: {
+          target: 'es5',
+          lib: ['dom', 'dom.iterable', 'esnext'],
+          allowJs: true,
+          skipLibCheck: true,
+          esModuleInterop: true,
+          allowSyntheticDefaultImports: true,
+          strict: true,
+          forceConsistentCasingInFileNames: true,
+          module: 'esnext',
+          moduleResolution: 'node',
+          resolveJsonModule: true,
+          isolatedModules: true,
+          noEmit: true,
+          jsx: 'react-jsx',
+        },
+        // tslint:disable-next-line: no-any
+      } as any;
+
+      if (rootTSConfigContents !== undefined) {
+        try {
+          rootTSConfig = JSON.parse(rootTSConfigContents);
+        } catch (e) {
+          console.log(
+            `Problem parsing the root tsconfig found at ${rootTSConfigPath}. Creating a default tsconfig. Make sure your tsconfig is JSON and try again. Parse error: ${e.message}`,
+          );
+        }
+      }
+
       const exclude = rootTSConfig.exclude === undefined ? [] : rootTSConfig.exclude;
       const excludePath = normalizePath(nodePath.relative(process.cwd(), nodePath.join(config.contracts.path, '*.ts')));
       if (!new Set(exclude).has(excludePath)) {
@@ -184,5 +221,5 @@ export const ExampleHelloWorld = () => {
     console.log(
       'NEO•ONE initialized, run `neo-one build` to deploy the HelloWorld smart contract to a local development network.',
     );
-  });
+  }, argv.configPath);
 };

@@ -18,21 +18,25 @@ export const builder = (yargsBuilder: typeof yargs) =>
     .boolean('debug')
     .describe('debug', 'Output additional debug information.')
     .boolean('opcodes')
-    .describe('opcodes', 'Output the AVM in a human readable format for debugging (requires --debug).');
+    .describe('opcodes', 'Output the AVM in a human readable format for debugging (requires --debug).')
+    .string('configPath')
+    .describe('configPath', 'Optional path to the config file if not in the root of project directory.');
 
 export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
   start(async (_cmd, config) => {
     const configOptions = config.contracts;
     const path = argv.path ? argv.path : configOptions.path;
     const outDir = argv.outDir ? argv.outDir : configOptions.outDir;
+    const opcodes = argv.opcodes ? argv.opcodes : configOptions.opcodes;
+    const debugIn = argv.debug ? argv.debug : configOptions.debug;
     const options = {
       json: argv.json ? argv.json : configOptions.json,
       avm: argv.avm ? argv.avm : configOptions.avm,
-      debug: argv.debug ? argv.debug : configOptions.debug,
-      opcodes: argv.opcodes ? argv.opcodes : configOptions.opcodes,
+      debug: opcodes || debugIn,
+      opcodes,
     };
     if (options.opcodes && !options.debug) {
-      throw new Error('`opcodes` flag may only be specified alongside the `debug` flag');
+      throw new Error('`opcodes` flag may only be specified alongside the `debug` flag.');
     }
     await createTasks(path, outDir, {
       json: options.json ? options.json : !options.avm,
@@ -40,5 +44,5 @@ export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
       debug: options.debug ? options.debug : false,
       opcodes: options.opcodes ? options.opcodes : false,
     }).run();
-  });
+  }, argv.configPath);
 };
