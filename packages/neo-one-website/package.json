@@ -21,7 +21,7 @@
     "@emotion/styled-base": "^10.0.24",
     "@neo-one/editor": "^2.3.1",
     "@neo-one/react": "^2.7.0",
-    "@neo-one/react-common": "^3.0.0",
+    "@neo-one/react-common": "^3.0.0-preview3",
     "@reach/router": "^1.2.1",
     "@render-props/viewport": "^0.3.1",
     "babel-plugin-emotion": "^10.0.21",
