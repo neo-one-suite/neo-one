@@ -22,7 +22,7 @@ jobs:
       - name: Install Node
         run: brew update-reset && brew update && brew install node@10 && brew link node@10 --force
       - name: Install Chrome
-        run: brew cask install google-chrome
+        run: brew install --cask google-chrome
       - name: Install Rush
         run: npm i -g @microsoft/rush@latest
       - name: Rush Install
