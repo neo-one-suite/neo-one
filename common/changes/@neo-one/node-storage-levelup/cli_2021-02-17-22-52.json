@@ -2,7 +2,7 @@
   "changes": [
     {
       "packageName": "@neo-one/node-storage-levelup",
-      "comment": "Pin level-js and levelup deps.",
+      "comment": "Fix minor bugs.",
       "type": "patch"
     }
   ],

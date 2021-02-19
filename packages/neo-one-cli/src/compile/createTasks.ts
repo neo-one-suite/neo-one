@@ -8,7 +8,7 @@ import { CompileWriteOptions, writeContract } from './writeContract';
 export const createTasks = (path: string, outDir: string, options: CompileWriteOptions) =>
   new Listr([
     {
-      title: 'Find Contracts',
+      title: 'Find contracts',
       task: async (ctx) => {
         const contracts = await findContracts(path);
 
@@ -16,7 +16,7 @@ export const createTasks = (path: string, outDir: string, options: CompileWriteO
       },
     },
     {
-      title: 'Compile Contracts',
+      title: 'Compile contracts',
       task: (ctx) => {
         ctx.linked = {};
         ctx.sourceMaps = {};

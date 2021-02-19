@@ -4,6 +4,7 @@ import * as compile from './compile';
 import * as consoleCmd from './console';
 import * as convert from './convert';
 import * as deploy from './deploy';
+import * as generate from './generate';
 import * as info from './info';
 import * as init from './init';
 import * as newCmd from './new';
@@ -23,4 +24,5 @@ export const builder = (yargsBuilder: typeof yargs) =>
     .command(deploy)
     .command(info)
     .command(compile)
-    .command(init);
+    .command(init)
+    .command(generate);

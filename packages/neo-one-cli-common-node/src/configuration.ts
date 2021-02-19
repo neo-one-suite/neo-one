@@ -190,13 +190,13 @@ ${exportConfig} {
     // NEO•ONE will look for smart contracts in this directory.
     path: '${config.contracts.path}',
     // Set this to true if you want the compile command to output JSON.
-    // json: ${true},
+    json: ${true},
     // Set this to true if you want the compile command to output AVM.
-    // avm: ${false},
+    avm: ${false},
     // Set this to true if you want the compile command to output additional debug information.
-    // debug: ${false},
+    debug: ${false},
     // Set this to true if you want the compile command to output the AVM in a human-readable format for debugging (requires debug: true).
-    // opcodes: ${false},
+    opcodes: ${false},
   },
   artifacts: {
     // NEO•ONE will store build and deployment artifacts that should be checked in to vcs in this directory.
@@ -338,7 +338,19 @@ const validateConfig = async (rootDir: string, configIn: any): Promise<Configura
 // tslint:disable-next-line no-let
 let cachedConfig: Configuration | undefined;
 
-export const loadConfiguration = async (): Promise<Configuration> => {
+export const loadConfiguration = async (optionalConfigPath?: string): Promise<Configuration> => {
+  if (cachedConfig === undefined && optionalConfigPath !== undefined) {
+    register({
+      compilerOptions: {
+        module: 'commonjs',
+        allowJs: true,
+      },
+    });
+    const obj = await import(optionalConfigPath);
+    const output = obj.default === undefined ? obj : obj.default;
+
+    cachedConfig = await validateConfig(nodePath.dirname(optionalConfigPath), output === null ? {} : output);
+  }
   if (cachedConfig === undefined) {
     const explorer = cosmiconfig('neo-one', {
       loaders: {

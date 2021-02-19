@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/client-full-core",
+      "comment": "Fix minor bugs.",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/client-full-core",
+  "email": "spencercorwin@icloud.com"
+}

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/smart-contract-codegen",
+      "comment": "Fix minor bugs.",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/smart-contract-codegen",
+  "email": "spencercorwin@icloud.com"
+}

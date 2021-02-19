@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/client-switch",
+      "comment": "Fix minor bugs.",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/client-switch",
+  "email": "spencercorwin@icloud.com"
+}

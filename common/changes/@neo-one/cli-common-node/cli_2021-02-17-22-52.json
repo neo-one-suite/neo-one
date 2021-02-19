@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/cli-common-node",
+      "comment": "Fix minor bugs.",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/cli-common-node",
+  "email": "spencercorwin@icloud.com"
+}

@@ -11,7 +11,9 @@ export const builder = (yargsBuilder: typeof yargs) =>
   yargsBuilder
     .array('networks')
     .describe('networks', 'Networks to initialize before starting the REPL.')
-    .default('networks', defaultNetworks);
+    .default('networks', defaultNetworks)
+    .string('configPath')
+    .describe('configPath', 'Optional path to the config file if not in the root of project directory.');
 export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
-  start(async (_cmd, config) => startConsole(config, argv.networks));
+  start(async (_cmd, config) => startConsole(config, argv.networks), argv.configPath);
 };

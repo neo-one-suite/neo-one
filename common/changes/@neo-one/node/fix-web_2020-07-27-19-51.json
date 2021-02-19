@@ -3,7 +3,7 @@
     {
       "packageName": "@neo-one/node",
       "comment": "Pin level-js and levelup deps.",
-      "type": "none"
+      "type": "patch"
     }
   ],
   "packageName": "@neo-one/node",
