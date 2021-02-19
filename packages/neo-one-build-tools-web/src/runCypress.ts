@@ -91,12 +91,12 @@ const run = async () => {
   });
 
   // Uncomment (and build) to debug compile-website-prod command
-  // if (buildProc.stdout !== null) {
-  //   buildProc.stdout.pipe(process.stdout);
-  // }
-  // if (buildProc.stderr !== null) {
-  //   buildProc.stderr.pipe(process.stderr);
-  // }
+  if (buildProc.stdout !== null) {
+    buildProc.stdout.pipe(process.stdout);
+  }
+  if (buildProc.stderr !== null) {
+    buildProc.stderr.pipe(process.stderr);
+  }
 
   await buildProc;
   console.log('$ rush run-website-prod');
@@ -107,16 +107,16 @@ const run = async () => {
   });
 
   // Uncomment (and build) to debug run-website-prod command
-  // if (startProc.stdout !== null) {
-  //   startProc.stdout.pipe(process.stdout);
-  // }
-  // if (startProc.stderr !== null) {
-  //   startProc.stderr.pipe(process.stderr);
-  // }
+  if (startProc.stdout !== null) {
+    startProc.stdout.pipe(process.stdout);
+  }
+  if (startProc.stderr !== null) {
+    startProc.stderr.pipe(process.stderr);
+  }
 
-  const FIFTEEN_MINUTES = 15 * 60 * 1000;
+  const TWENTY_MINUTES = 20 * 60 * 1000;
   const EIGHT_MINUTES = 8 * 60 * 1000;
-  await timer(argv.local ? EIGHT_MINUTES : FIFTEEN_MINUTES).toPromise();
+  await timer(argv.local ? EIGHT_MINUTES : TWENTY_MINUTES).toPromise();
   await runCypress();
 };
 
