@@ -2,6 +2,13 @@ import fs from 'fs-extra';
 // tslint:disable-next-line: match-default-export-name
 import nodePath from 'path';
 
+const defaultCompilerOptions = {
+  avm: false,
+  debug: false,
+  opcodes: false,
+  json: true,
+};
+
 const getPackage = (dependency: string) => ({
   name: 'test-project',
   version: '0.0.0',
@@ -75,6 +82,7 @@ describe('init command - no framework', () => {
     });
 
     expect(contracts).toEqual({
+      ...defaultCompilerOptions,
       path: 'neo-one/contracts',
       outDir: 'neo-one/compiled',
     });
@@ -106,6 +114,7 @@ describe('init command - react', () => {
     });
 
     expect(contracts).toEqual({
+      ...defaultCompilerOptions,
       path: 'neo-one/contracts',
       outDir: 'neo-one/compiled',
     });
@@ -129,6 +138,7 @@ describe('init command - vue', () => {
     });
 
     expect(contracts).toEqual({
+      ...defaultCompilerOptions,
       path: 'neo-one/contracts',
       outDir: 'neo-one/compiled',
     });
@@ -152,6 +162,7 @@ describe('init command - angular', () => {
     });
 
     expect(contracts).toEqual({
+      ...defaultCompilerOptions,
       path: 'neo-one/contracts',
       outDir: 'neo-one/compiled',
     });
