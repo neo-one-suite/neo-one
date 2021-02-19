@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/cli",
+      "comment": "minor cli fixes",
+      "type": "none"
+    }
+  ],
+  "packageName": "@neo-one/cli",
+  "email": "ndhuutai1@gmail.com"
+}
