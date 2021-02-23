@@ -24,12 +24,46 @@
       ]
     },
     {
+      "login": "spencercorwin",
+      "name": "Spencer Corwin",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/29364457?v=4",
+      "profile": "https://spencercorwin.io",
+      "contributions": [
+        "code",
+        "doc",
+        "review"
+      ]
+    },
+    {
+      "login": "danwbyrne",
+      "name": "Daniel Byrne",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/9561608?v=4",
+      "profile": "https://github.com/danwbyrne",
+      "contributions": [
+        "code",
+        "doc",
+        "review"
+      ]
+    },
+    {
       "login": "afragapane",
       "name": "Alex Fragapane",
       "avatar_url": "https://avatars0.githubusercontent.com/u/34611820?v=4",
       "profile": "https://github.com/afragapane",
       "contributions": [
-        "code"
+        "code",
+        "doc",
+        "review"
+      ]
+    },
+    {
+      "login": "ndhuutai",
+      "name": "Tai Ng",
+      "avatar_url": "https://avatars.githubusercontent.com/u/30916803?s=400&v=4",
+      "profile": "http://github.com/ndhuutai",
+      "contributions": [
+        "code",
+        "doc"
       ]
     },
     {
@@ -40,24 +74,7 @@
       "contributions": [
         "code"
       ]
-    },
-    {
-      "login": "danwbyrne",
-      "name": "Daniel Byrne",
-      "avatar_url": "https://avatars1.githubusercontent.com/u/9561608?v=4",
-      "profile": "https://github.com/danwbyrne",
-      "contributions": [
-        "code"
-      ]
-    },
-    {
-      "login": "spencercorwin",
-      "name": "Spencer Corwin",
-      "avatar_url": "https://avatars1.githubusercontent.com/u/29364457?v=4",
-      "profile": "http://spencercorwin.com",
-      "contributions": [
-        "code"
-      ]
     }
-  ]
+  ],
+  "commitConvention": "none"
 }
