@@ -14,7 +14,7 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/logger": "^2.6.1",
-    "@neo-one/node-core": "^2.7.0",
+    "@neo-one/node-core": "^2.7.1",
     "@neo-one/utils": "^2.6.1",
     "lodash": "^4.17.15",
     "tslib": "^1.10.0"

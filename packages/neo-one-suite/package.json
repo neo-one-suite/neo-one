@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/suite",
-  "version": "2.6.1",
+  "version": "2.7.0",
   "description": "NEO•ONE core dependencies for easy installation",
   "scripts": {
     "build": "",
@@ -10,11 +10,11 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/cli": "^2.7.1",
-    "@neo-one/client": "^2.7.1",
+    "@neo-one/cli": "^2.8.0",
+    "@neo-one/client": "^2.7.2",
     "@neo-one/smart-contract": "^2.7.0",
-    "@neo-one/smart-contract-lib": "^2.7.0",
-    "@neo-one/smart-contract-test": "^2.7.0",
+    "@neo-one/smart-contract-lib": "^2.7.1",
+    "@neo-one/smart-contract-test": "^2.7.1",
     "@neo-one/smart-contract-typescript-plugin": "^2.7.0"
   },
   "devDependencies": {

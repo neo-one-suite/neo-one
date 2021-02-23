@@ -1,6 +1,13 @@
 # Change Log - @neo-one/node-blockchain
 
-This log was last generated on Thu, 23 Jul 2020 22:11:12 GMT and should not be manually modified.
+This log was last generated on Tue, 23 Feb 2021 23:29:30 GMT and should not be manually modified.
+
+## 2.7.1
+Tue, 23 Feb 2021 23:29:30 GMT
+
+### Patches
+
+- Fix minor bugs.
 
 ## 2.7.0
 Thu, 23 Jul 2020 22:11:12 GMT

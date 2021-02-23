@@ -2,6 +2,62 @@
   "name": "@neo-one/cli",
   "entries": [
     {
+      "version": "2.8.0",
+      "tag": "@neo-one/cli_v2.8.0",
+      "date": "Tue, 23 Feb 2021 23:29:30 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Add generate command, make more user friendly."
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/cli-common\" from `^2.7.0` to `^2.7.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/cli-common-node\" from `^2.7.0` to `^2.7.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client\" from `^2.7.1` to `^2.7.2`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-common\" from `^2.7.1` to `^2.7.2`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-core\" from `^2.7.1` to `^2.7.2`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-full\" from `^2.7.0` to `^2.7.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-full-core\" from `^2.7.0` to `^2.7.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-switch\" from `^2.7.0` to `^2.7.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node\" from `^2.7.0` to `^2.7.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-core\" from `^2.7.0` to `^2.7.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-neo-settings\" from `^2.7.0` to `^2.7.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/smart-contract-codegen\" from `^2.7.1` to `^2.7.2`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/smart-contract-compiler\" from `^2.7.0` to `^2.7.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/smart-contract-test\" from `^2.7.0` to `^2.7.1`"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.7.1",
       "tag": "@neo-one/cli_v2.7.1",
       "date": "Wed, 02 Dec 2020 21:05:40 GMT",
