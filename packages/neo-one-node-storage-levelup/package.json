@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-storage-levelup",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "description": "NEO•ONE levelup node storage.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -13,9 +13,9 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-common": "^2.7.1",
-    "@neo-one/node-core": "^2.7.0",
-    "@neo-one/node-storage-common": "^2.7.0",
+    "@neo-one/client-common": "^2.7.2",
+    "@neo-one/node-core": "^2.7.1",
+    "@neo-one/node-storage-common": "^2.7.1",
     "@neo-one/utils": "^2.6.1",
     "@types/levelup": "^3.1.1",
     "levelup": "4.1.0",

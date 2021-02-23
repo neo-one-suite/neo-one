@@ -2,6 +2,18 @@
   "name": "@neo-one/client-common",
   "entries": [
     {
+      "version": "2.7.2",
+      "tag": "@neo-one/client-common_v2.7.2",
+      "date": "Tue, 23 Feb 2021 23:29:30 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix minor bugs."
+          }
+        ]
+      }
+    },
+    {
       "version": "2.7.1",
       "tag": "@neo-one/client-common_v2.7.1",
       "date": "Wed, 02 Dec 2020 21:05:40 GMT",
