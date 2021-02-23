@@ -98,7 +98,7 @@ export const Footer = ({ content = false, ...props }: Props) => {
             Installation: '/docs/getting-started',
             'Main Concepts': '/docs/hello-world',
             'Advanced Guides': '/docs/native-assets',
-            'API Reference': '/docs/configuration',
+            'API Reference': '/reference/@neo-one/client',
             Contributing: '/docs/how-to-contribute',
           }}
         />
@@ -109,6 +109,7 @@ export const Footer = ({ content = false, ...props }: Props) => {
             'Stack Overflow': 'https://stackoverflow.com/questions/tagged/neo-one',
             'Discord Chat': 'https://discord.gg/S86PqDE',
             Twitter: 'https://twitter.com/neo_one_suite',
+            YouTube: 'https://www.youtube.com/channel/UCya5J1Tt2h-kX-I3a7LOvtw',
           }}
         />
         <LinkSection
