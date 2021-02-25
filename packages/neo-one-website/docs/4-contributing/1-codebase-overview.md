@@ -158,7 +158,7 @@ Creates the environment for compiling smart contracts, which is then used in the
 
 ### neo-one-smart-contract-lib
 
-Defines NEP5 tokens and ICOs.
+Defines NEP17 tokens and ICOs.
 
 ### neo-one-smart-contract-test
 

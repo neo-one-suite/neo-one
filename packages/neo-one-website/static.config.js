@@ -2,7 +2,7 @@ import path from 'path';
 import _ from 'lodash';
 
 require('ts-node/register/transpile-only');
-const { getCourses } = require('./src/loaders/coursesLoader');
+// const { getCourses } = require('./src/loaders/coursesLoader');
 const { getDocs } = require('./src/utils/getDocs');
 const { getTutorial } = require('./src/utils/getTutorial');
 const { getBlogs } = require('./src/utils/getBlogs');
@@ -24,13 +24,13 @@ export default {
   }),
   getRoutes: async () => {
     const [
-      courses,
+      // courses,
       docs,
       tutorial,
       { blogs, blogAll },
       references,
     ] = await Promise.all([
-      getCourses(),
+      // getCourses(),
       getDocs(),
       getTutorial(),
       getBlogs(),
@@ -42,22 +42,22 @@ export default {
         path: '/',
         template: getPagePath('index'),
       },
-      {
-        path: '/course',
-        template: getPagePath('course'),
-        children: _.flatMap(
-          Object.entries(courses).map(([slug, course]) =>
-            course.lessons.map((_lesson, lesson) => ({
-              path: `${slug}/${lesson + 1}`,
-              template: getPagePath('course'),
-              children: _lesson.chapters.map((_chapter, chapter) => ({
-                path: `${chapter + 1}`,
-                template: getPagePath('course'),
-              })),
-            })),
-          ),
-        ),
-      },
+      // {
+      //   path: '/course',
+      //   template: getPagePath('course'),
+      //   children: _.flatMap(
+      //     Object.entries(courses).map(([slug, course]) =>
+      //       course.lessons.map((_lesson, lesson) => ({
+      //         path: `${slug}/${lesson + 1}`,
+      //         template: getPagePath('course'),
+      //         children: _lesson.chapters.map((_chapter, chapter) => ({
+      //           path: `${chapter + 1}`,
+      //           template: getPagePath('course'),
+      //         })),
+      //       })),
+      //     ),
+      //   ),
+      // },
       {
         path: '/404',
         template: getPagePath('404'),

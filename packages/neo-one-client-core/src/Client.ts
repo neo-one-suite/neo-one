@@ -468,9 +468,6 @@ export class Client<
     return this.getNetworkProvider(id.network).getAccount(id.network, id.address);
   }
 
-  /**
-   * @internal
-   */
   // TODO: reimplement
   // public __iterActionsRaw(network: NetworkType, optionsIn?: IterOptions): AsyncIterable<RawAction> {
   //   args.assertString('network', network);

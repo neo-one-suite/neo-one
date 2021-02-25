@@ -114,11 +114,11 @@ export const Header = ({ path, ...props }: Props & React.ComponentProps<typeof W
             Docs
           </NavigationLink>
         </ToolbarFocusable>
-        <ToolbarFocusable>
+        {/* <ToolbarFocusable>
           <CourseLink linkColor="gray" active={path === 'course'} data-test="header-course" to="/course">
             Course
           </CourseLink>
-        </ToolbarFocusable>
+        </ToolbarFocusable> */}
         <ToolbarFocusable>
           <NavigationLink linkColor="gray" active={path === 'tutorial'} data-test="header-tutorial" to="/tutorial">
             Tutorial

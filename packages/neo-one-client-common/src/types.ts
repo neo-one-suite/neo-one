@@ -80,7 +80,7 @@ export interface AttributeBase {
   readonly type: AttributeTypeModel;
 }
 /**
- * `Attribute` whose transaction is "high priority".
+ * `Attribute` whose transaction is \"high priority\".
  */
 export interface HighPriorityAttribute extends AttributeBase {
   readonly type: AttributeTypeModel.HighPriority;
@@ -123,7 +123,7 @@ export interface Witness {
 }
 
 /**
- * `Signer` is the description of an `Address` and `WitnessScope` that "signs" a transaction.
+ * `Signer` is the description of an `Address` and `WitnessScope` that \"signs\" a transaction.
  */
 export interface Signer {
   /**
@@ -1498,7 +1498,7 @@ export interface ContractMethodDescriptorClient {
    */
   readonly offset: number;
   /**
-   * `true` if the function is "safe" to be called by any other contract
+   * `true` if the function is \"safe\" to be called by any other contract
    */
   readonly safe: boolean;
   /**
