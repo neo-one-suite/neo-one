@@ -114,7 +114,7 @@ export const Footer = ({ content = false, ...props }: Props) => {
         <LinkSection
           title="MORE"
           links={{
-            Courses: '/course',
+            // Courses: '/course',
             Tutorial: '/tutorial',
             Blog: '/blog',
           }}

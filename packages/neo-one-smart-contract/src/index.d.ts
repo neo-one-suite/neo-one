@@ -199,7 +199,7 @@ export interface ReservedAttribute extends AttributeBase {
 
 /**
  * `Attribute`s are used to store additional data on `Transaction`s. Most `Attribute`s are used to store arbitrary data, whereas some, like `AddressAttribute`, have specific uses in the NEO
- * protocol. The only attribute currently available in the Neo v3 protocol is the "HighPriority" attribute.
+ * protocol. The only attribute currently available in the Neo v3 protocol is the \"HighPriority\" attribute.
  */
 export type Attribute = HighPriorityAttribute | ReservedAttribute;
 
@@ -399,7 +399,7 @@ export interface ContractConstructor {
 //    */
 //   readonly scriptHash: Address;
 //   /**
-//    * The name of the notification event. "Transfer" in the event of a transfer.
+//    * The name of the notification event. \"Transfer\" in the event of a transfer.
 //    */
 //   readonly eventName: string;
 //   /**
@@ -1009,11 +1009,11 @@ export interface ContractPermission {
    * An object indicating the contract to be invoked. It can be the hash of a single contract or the public key of a contract group.
    * If it specifies the hash of a contract then the contract can be invoked.
    * If it specifies the public key of a group, then any contract in this group can be invoked
-   * If this object has hash and group as undefined then this will be considered a wildcard ("*") and any contract can be invoked.
+   * If this object has hash and group as undefined then this will be considered a wildcard (\"*\") and any contract can be invoked.
    */
   readonly contract: { readonly hash?: string; readonly group?: string };
   /**
-   * An array of methods that are allowed to be called. An empty array means that no methods will be allowed to be called. This can also be a wildcard string: "*", which means that any method can be called.
+   * An array of methods that are allowed to be called. An empty array means that no methods will be allowed to be called. This can also be a wildcard string: \"*\", which means that any method can be called.
    */
   readonly methods: string | readonly string[];
 }

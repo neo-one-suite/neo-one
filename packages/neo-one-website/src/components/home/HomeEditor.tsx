@@ -1,4 +1,4 @@
-import { FullEditor } from '@neo-one/editor';
+// import { FullEditor } from '@neo-one/editor';
 import * as React from 'react';
 
 const INITIAL_FILES: ReadonlyArray<{
@@ -227,19 +227,20 @@ describe('Token', () => {
 ];
 
 export const HomeEditor = () => (
-  <FullEditor
-    id="home"
-    createPreviewURL={() =>
-      process.env.NEO_ONE_PREVIEW_URL === undefined ? 'http://localhost:8080' : process.env.NEO_ONE_PREVIEW_URL
-    }
-    initialFiles={INITIAL_FILES}
-    initialOptions={{
-      preview: {
-        enabled: false,
-        open: false,
-      },
-    }}
-    build
-    clearFS
-  />
+  <></>
+  // <FullEditor
+  //   id="home"
+  //   createPreviewURL={() =>
+  //     process.env.NEO_ONE_PREVIEW_URL === undefined ? 'http://localhost:8080' : process.env.NEO_ONE_PREVIEW_URL
+  //   }
+  //   initialFiles={INITIAL_FILES}
+  //   initialOptions={{
+  //     preview: {
+  //       enabled: false,
+  //       open: false,
+  //     },
+  //   }}
+  //   build
+  //   clearFS
+  // />
 );

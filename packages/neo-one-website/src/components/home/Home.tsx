@@ -104,6 +104,12 @@ const Wrapper = styled(Box)`
   justify-items: center;
 `;
 
+const Divider = styled(Box)<{}, {}>`
+  height: 50px;
+  width: 100%;
+  background-color: ${prop('theme.black')};
+`;
+
 export const Home = (props: {}) => (
   <Wrapper {...props}>
     <StyledBackground>
@@ -113,9 +119,9 @@ export const Home = (props: {}) => (
         <StyledLinkButton linkColor="gray" to="docs/getting-started">
           Get Started
         </StyledLinkButton>
-        <StyledLink to="course" linkColor="primary">
+        {/* <StyledLink to="course" linkColor="primary">
           Take Course {'>'}
-        </StyledLink>
+        </StyledLink> */}
       </ButtonWrapper>
     </StyledBackground>
     <CenterContentWrapper>
@@ -138,14 +144,15 @@ export const Home = (props: {}) => (
           <Proof
             title="Approachable"
             lines={[
-              'NEO•ONE courses distill the essentials of dapp development into bite-sized interactive learning chapters. Build, test and write the UI for smart contracts with the NEO•ONE editor.',
+              // 'NEO•ONE courses distill the essentials of dapp development into bite-sized interactive learning chapters. Build, test and write the UI for smart contracts with the NEO•ONE editor.',
               "With the most comprehensive documentation available for NEO, you'll always have a resource to reference.",
             ]}
           />
         </ProofsInnerWrapper>
       </ProofsWrapper>
     </CenterContentWrapper>
-    <EditorContent />
+    {/* <EditorContent /> */}
+    <Divider />
     <FeaturesWrapper>
       <Authoring />
       <Testing />

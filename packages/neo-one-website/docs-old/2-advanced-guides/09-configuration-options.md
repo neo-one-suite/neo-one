@@ -39,7 +39,7 @@ export default {
   },
   migration: {
     // NEO•ONE will load the deployment migration from this path.
-    path: 'neo-one/migration.js',
+    path: 'neo-one/migration.ts',
   },
   codegen: {
     // NEO•ONE will write source artifacts to this directory. This directory should be committed.

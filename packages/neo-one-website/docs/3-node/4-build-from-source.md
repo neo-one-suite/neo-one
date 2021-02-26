@@ -57,7 +57,7 @@ When running the node locally it is quite easy to apply a configuration file com
 }
 ```
 
-can be run using
+Can be run using:
 
 ```bash
 node neo-one-node --config /path/to/config.json
@@ -69,4 +69,4 @@ Individual options can also be layered on top of our configuration:
 node neo-one-node --config /path/to/config.json --environment.logger.level=trace
 ```
 
-Finally you have the option of adding a `.neo-onerc` app configuration file anywhere in the app directory (recommended at `/neo-one/`) to apply your configuration by default. See [rc](https://github.com/dominictarr/rc#rc) for more information on `rc` files.
+Finally you have the option of adding a `.neo-onerc` app configuration file anywhere in the app directory (recommended at `/neo-one/`) to apply your configuration by default. See [rc](https://github.com/dominictarr/rc#rc) for more info on `rc` files.
