@@ -13,14 +13,14 @@ export const getSemanticDiagnostics = (
 
 export const compileContract = async (
   filePath: string,
-  _contractName: string,
+  contractName: string,
   host: CompilerHost,
   linked: LinkedContracts = {},
   ignoreWarnings = false,
 ): Promise<CompileContractResult> => {
   const result = await compileContractBase({ filePath, host, linked });
 
-  throwOnDiagnosticErrorOrWarning(result.diagnostics, ignoreWarnings);
+  throwOnDiagnosticErrorOrWarning(result.diagnostics, ignoreWarnings, `Error while compiling ${contractName}`);
 
   return result;
 };
