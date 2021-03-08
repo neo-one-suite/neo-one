@@ -19,6 +19,7 @@ This can be useful for local debugging and if you would like to make your own co
   - Linux and Mac: We recommend using [Node Version Manager](https://github.com/creationix/nvm).
   - Windows: We recommend using [Chocolatey](https://chocolatey.org/).
 - [Yarn](https://yarnpkg.com/) (recommended)
+- [RushJS](https://rushjs.io/)
 
 ---
 
@@ -28,12 +29,12 @@ Once you have cloned the [NEO•ONE repository](https://github.com/neo-one-suite
 
 ```bash
 cd neo-one
-yarn install
-yarn build:node
-cd  ./dist/neo-one/packages/neo-one-node-bin/bin/
+rush install
+rush build -t @neo-one/node-bin
+cd  ./packages/neo-one-node-bin/bin
 ```
 
-`yarn build:node` will build a bin for the node as well as the `@neo-one` packages that it depends on. For this tutorial we will `cd` into the entry point's build directory to save time. Running the new node then is as simple as
+`rush build -t @neo-one/node-bin` will build a bin for the node as well as the `@neo-one` packages that it depends on. For this tutorial we will `cd` into the entry point's build directory to save time. Running the new node then is as simple as
 
 ```bash
 node neo-one-node
