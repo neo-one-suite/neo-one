@@ -4,9 +4,9 @@ import pino from 'pino';
 
 const createLogger = (service: string, options: pino.LoggerOptions = {}) =>
   options.browser !== undefined
-    ? pino({ ...options, base: { service }, prettyPrint: getPretty() })
+    ? pino({ ...options, base: { service }, prettyPrint: service === 'cli' ? true : getPretty() })
     : pino(
-        { ...options, base: { service }, prettyPrint: getPretty() },
+        { ...options, base: { service }, prettyPrint: service === 'cli' ? true : getPretty() },
         // @ts-ignore
         process.env.NODE_ENV === 'production' ? pino.extreme(1) : pino.destination(1),
       );
