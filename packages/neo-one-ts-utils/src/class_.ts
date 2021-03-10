@@ -315,13 +315,11 @@ function getExtendorsWorker(
       }
 
       const clause = node_.getParent(parent) as ts.Node | undefined;
-      // if (clause === undefined || !ts.isHeritageClause(clause) || !heritage.isExtends(clause)) {
-      //   return acc;
-      // }
 
-      if (clause && ts.isExpressionWithTypeArguments(clause)) {
-        // do nothing and continue.
-      } else if (clause === undefined || !ts.isHeritageClause(clause) || !heritage.isExtends(clause)) {
+      if (
+        (clause === undefined || !ts.isHeritageClause(clause) || !heritage.isExtends(clause)) &&
+        !(clause && ts.isExpressionWithTypeArguments(clause))
+      ) {
         return acc;
       }
 
