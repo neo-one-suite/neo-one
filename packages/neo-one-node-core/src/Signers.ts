@@ -1,4 +1,5 @@
 import {
+  BinaryReader,
   BinaryWriter,
   createSerializeWire,
   InvalidFormatError,
@@ -13,7 +14,6 @@ import {
   SerializableContainerType,
 } from './Serializable';
 import { Signer } from './Signer';
-import { BinaryReader } from './utils';
 import { Witness } from './Witness';
 
 export interface SignersAdd {

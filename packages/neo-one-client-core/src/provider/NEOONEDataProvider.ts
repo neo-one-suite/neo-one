@@ -128,7 +128,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
   }
 
   public async testInvoke(script: Buffer): Promise<RawCallReceipt> {
-    const receipt = await this.mutableClient.testInvokeRaw(script.toString('hex'));
+    const receipt = await this.mutableClient.testInvokeRaw(script.toString('base64'));
 
     return convertCallReceipt(receipt);
   }
@@ -389,7 +389,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
   private convertContract(contract: ContractJSON): Contract {
     return {
       id: contract.id,
-      script: contract.script,
+      script: contract.nef.script,
       hash: contract.hash,
       manifest: this.convertContractManifest(contract.manifest),
     };

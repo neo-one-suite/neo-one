@@ -1,4 +1,5 @@
 import {
+  BinaryReader,
   BinaryWriter,
   createSerializeWire,
   HeaderJSON,
@@ -14,8 +15,7 @@ import {
   SerializableWire,
   SerializeJSONContext,
 } from './Serializable';
-import { TrimmedBlock } from './TrimmedBlock';
-import { BinaryReader, utils } from './utils';
+import { utils } from './utils';
 
 export type HeaderAdd = BlockBaseAdd;
 
@@ -50,19 +50,6 @@ export class Header extends BlockBase implements SerializableWire, SerializableJ
   public readonly serializeUnsigned = createSerializeWire(super.serializeUnsignedBase.bind(this));
 
   protected readonly sizeExclusive: () => number = utils.lazy(() => IOHelper.sizeOfUInt8);
-  public trim(): TrimmedBlock {
-    return new TrimmedBlock({
-      version: this.version,
-      previousHash: this.previousHash,
-      merkleRoot: this.merkleRoot,
-      timestamp: this.timestamp,
-      index: this.index,
-      nextConsensus: this.nextConsensus,
-      witness: this.witness,
-      hashes: [],
-      messageMagic: this.messageMagic,
-    });
-  }
 
   public serializeWireBase(writer: BinaryWriter): void {
     super.serializeWireBase(writer);

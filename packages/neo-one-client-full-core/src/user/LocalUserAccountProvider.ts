@@ -223,7 +223,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         if (deployFunc !== undefined) {
           // []
           sb.emitOp('DROP');
-          sb.emitAppCall(
+          sb.emitDynamicAppCall(
             hash,
             'deploy',
             ...convertParams({
@@ -293,10 +293,13 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     const contractHash = common.uInt160ToString(contractHashUInt160);
     const contract = contractRegisterToContractModel(contractIn, contractHashUInt160);
 
+    // TODO: create function to do this
     const writer = new BinaryWriter();
     writer.writeUInt32LE(0x3346454e); // TODO: abstract this number
-    writer.writeFixedString(contractIn.compilerName, 32);
-    writer.writeFixedString(contractIn.compilerVersion, 32);
+    writer.writeFixedString(contractIn.compilerName, 64);
+    writer.writeUInt16LE(0);
+    // writer.writeArray(contractIn.manifest.abi.methods);
+    writer.writeUInt16LE(0);
     writer.writeVarBytesLE(Buffer.from(contractIn.script, 'hex'));
     writer.writeBytes(crypto.sha256(crypto.sha256(writer.toBuffer())).slice(0, 4));
 
@@ -306,7 +309,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     sb.emitPushInt(2);
     sb.emitOp('PACK');
     sb.emitPushString('deploy');
-    sb.emitPush(common.nativeHashes.Management);
+    sb.emitPush(common.nativeHashes.ContractManagement);
     sb.emitSysCall('System.Contract.Call');
     const { from } = this.getTransactionOptions(options);
     emit(sb, from, contractHashUInt160);

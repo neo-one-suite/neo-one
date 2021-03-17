@@ -70,7 +70,6 @@ export class BlockBuilder {
 
   public getConsensusData() {
     if (this.consensusData === undefined || this.consensusData.primaryIndex === undefined) {
-      // TODO: real error
       throw new Error('We need at least primaryIndex');
     }
 

@@ -161,7 +161,7 @@ describe('RPC Call sendrawtransaction', () => {
     });
 
     const builder = new ScriptBuilder();
-    builder.emitAppCall(common.nativeHashes.NEO, 'transfer', multiScriptHash, scriptHash, 10);
+    builder.emitDynamicAppCall(common.nativeHashes.NEO, 'transfer', multiScriptHash, scriptHash, 10);
     const script = builder.build();
 
     const txUnsigned = new TransactionModel({

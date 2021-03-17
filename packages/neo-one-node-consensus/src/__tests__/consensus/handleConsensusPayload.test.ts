@@ -87,7 +87,7 @@ describe('handleConsensusPayload', () => {
 
     const standbyValidators = [publicKey];
 
-    const consensusAddress = crypto.getConsensusAddress(standbyValidators);
+    const consensusAddress = crypto.getBFTAddress(standbyValidators);
 
     const deployWitness = new Witness({
       invocation: Buffer.from([]),

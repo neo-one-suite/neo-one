@@ -1,7 +1,6 @@
-import { assertContractParameterType } from '@neo-one/client-common';
+import { assertContractParameterType, BinaryReader } from '@neo-one/client-common';
 import { utils } from '@neo-one/utils';
 import { DeserializeWire, DeserializeWireBase, DeserializeWireBaseOptions } from '../Serializable';
-import { BinaryReader } from '../utils';
 import { AnyContractParameter } from './AnyContractParameter';
 import { ArrayContractParameter } from './ArrayContractParameter';
 import { BooleanContractParameter } from './BooleanContractParameter';

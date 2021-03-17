@@ -1,5 +1,4 @@
-import { HighPriorityAttributeJSON, HighPriorityAttributeModel } from '@neo-one/client-common';
-import { BinaryReader } from '../../utils';
+import { BinaryReader, HighPriorityAttributeJSON, HighPriorityAttributeModel } from '@neo-one/client-common';
 import { VerifyOptions } from '../../Verifiable';
 import { Transaction } from '../Transaction';
 import { AttributeBase } from './AttributeBase';

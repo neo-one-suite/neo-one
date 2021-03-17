@@ -1,4 +1,4 @@
-import { BinaryWriter } from '@neo-one/client-common';
+import { BinaryReader, BinaryWriter } from '@neo-one/client-common';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,
@@ -7,7 +7,6 @@ import {
   SerializableWire,
   SerializeWire,
 } from '../Serializable';
-import { BinaryReader } from '../utils';
 import { ContractParameterType } from './ContractParameterType';
 
 export abstract class ContractParameterBase<

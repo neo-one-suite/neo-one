@@ -22,7 +22,7 @@ export enum Command {
   NotFound = 0x2a,
   Transaction = 0x2b,
   Block = 0x2c,
-  Consensus = 0x2d,
+  Extensible = 0x2e,
   Reject = 0x2f,
 
   // SPV Protocol
@@ -69,3 +69,5 @@ export const assertCommandJSON = (command: string): CommandJSON => {
 
   throw new InvalidCommandJSONError(command);
 };
+
+export const toCommandJSON = (command: Command) => assertCommandJSON(Command[command]);

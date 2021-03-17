@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/cli-common",
+      "comment": "Updates for Preview5",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@neo-one/cli-common",
+  "email": "spencercorwin@icloud.com"
+}

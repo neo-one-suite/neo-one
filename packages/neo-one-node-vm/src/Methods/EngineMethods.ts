@@ -1,5 +1,5 @@
-import { TriggerType, UInt160Hex, VMState } from '@neo-one/client-common';
-import { CallFlags, LoadContractOptions, SerializedScriptContainer, SnapshotName } from '@neo-one/node-core';
+import { CallFlags, TriggerType, UInt160Hex, VMState } from '@neo-one/client-common';
+import { LoadContractOptions, PushArgs, SerializedScriptContainer, SnapshotName } from '@neo-one/node-core';
 import { LogReturn, StackItemReturn } from '../converters';
 import { DefaultMethods, DispatchMethod } from '../types';
 
@@ -7,11 +7,13 @@ interface CreateEngineArgs {
   readonly trigger: TriggerType;
   readonly container?: SerializedScriptContainer;
   readonly gas: string;
+  readonly persistingBlock?: Buffer;
   readonly snapshot?: SnapshotName;
 }
 
 interface LoadScriptVMArgs {
   readonly script: Buffer;
+  readonly rvcount?: number;
   readonly flags: CallFlags;
   readonly scriptHash?: UInt160Hex;
   readonly initialPosition?: number;
@@ -27,8 +29,11 @@ export interface EngineMethods extends DefaultMethods {
   readonly getresultstack: DispatchMethod<readonly StackItemReturn[]>;
   readonly getnotifications: DispatchMethod<readonly StackItemReturn[]>;
   readonly getlogs: DispatchMethod<readonly LogReturn[]>;
+  readonly getfaultexception: DispatchMethod<string | undefined>;
   // methods
   readonly execute: DispatchMethod<keyof typeof VMState>;
   readonly loadscript: DispatchMethod<boolean, LoadScriptVMArgs>;
   readonly loadcontract: DispatchMethod<boolean, LoadContractOptions>;
+  readonly push: DispatchMethod<boolean, PushArgs>;
+  readonly stepOut: DispatchMethod<boolean>;
 }

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/node-blockchain",
+      "comment": "Updates for Preview5",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@neo-one/node-blockchain",
+  "email": "spencercorwin@icloud.com"
+}

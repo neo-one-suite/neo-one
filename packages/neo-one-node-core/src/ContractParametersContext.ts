@@ -131,8 +131,7 @@ export class ContractParametersContext {
 
         signatures.forEach((sig, idx) => {
           if (!this.addWithIndex(contract, idx, sig)) {
-            // TODO
-            throw new Error();
+            throw new Error('addWithIndex returned true in ContractParametersContext');
           }
         });
 
@@ -163,8 +162,7 @@ export class ContractParametersContext {
 
   public getWitnesses(): readonly Witness[] {
     if (!this.completed) {
-      // TODO
-      throw new Error();
+      throw new Error('ContractParametersContext is completed already.');
     }
 
     return this.scriptHashes.map((hash) => {
@@ -389,7 +387,7 @@ const emitPushContractParameter = (builder: ScriptBuilder, param: ContractParame
     case ContractParameterTypeModel.Array:
       const parameters = param.value as readonly ContractParameter[];
       // tslint:disable-next-line: no-loop-statement
-      for (let i = parameters.length - 1; i >= 0; i--) {
+      for (let i = parameters.length - 1; i >= 0; i -= 1) {
         emitPushContractParameter(builder, parameters[i]);
       }
       builder.emitPushInt(parameters.length);

@@ -9,10 +9,17 @@ import { Result } from './types';
 export const checkCommits = async (contextIn: ConsensusContext, node: Node) => {
   let context = contextIn;
   if (
-    context.commitPayloads.filter((p) => p?.consensusMessage.viewNumber === context.viewNumber).length >= context.M &&
+    context.commitPayloads.filter((p) => p !== undefined && context.getMessage(p).viewNumber === context.viewNumber)
+      .length >= context.M &&
     context.transactionHashes?.every((hash) => context.transactions[common.uInt256ToHex(hash)] !== undefined)
   ) {
-    const { context: newContext, block } = await createBlock(context, node.blockchain);
+    const { native, storage, headerCache } = node.blockchain.verifyOptions;
+    const { context: newContext, block } = await createBlock({
+      context,
+      native,
+      storage,
+      headerCache,
+    });
     context = newContext;
     await node.relayBlock(block);
   }

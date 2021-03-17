@@ -12,7 +12,6 @@ import {
 } from '@neo-one/client-common';
 import { DesignationRole } from '../../DesignationRole';
 import { InvalidOracleResultError } from '../../errors';
-import { BinaryReader } from '../../utils';
 import { VerifyOptions } from '../../Verifiable';
 import { Transaction } from '../Transaction';
 import { AttributeBase } from './AttributeBase';
@@ -21,7 +20,7 @@ const maxResultSize = 65535;
 
 const getFixedScript = utils.lazy(() => {
   const builder = new ScriptBuilder();
-  builder.emitAppCall(common.nativeHashes.Oracle, 'finish');
+  builder.emitDynamicAppCall(common.nativeHashes.Oracle, 'finish');
 
   return builder.build();
 });
@@ -53,7 +52,7 @@ export class OracleResponse extends OracleResponseModel implements AttributeBase
     };
   }
 
-  public async verify({ native, storage, height }: VerifyOptions, tx: Transaction) {
+  public async verify({ native, storage }: VerifyOptions, tx: Transaction) {
     if (tx.signers.some((signer) => signer.scopes !== WitnessScopeModel.None)) {
       return false;
     }
@@ -71,13 +70,15 @@ export class OracleResponse extends OracleResponseModel implements AttributeBase
       return false;
     }
 
-    const designated = await native.Designation.getDesignatedByRole(
+    const currentHeight = await native.Ledger.currentIndex(storage);
+
+    const designated = await native.RoleManagement.getDesignatedByRole(
       storage,
       DesignationRole.Oracle,
-      height,
-      height + 1,
+      currentHeight,
+      currentHeight + 1,
     );
-    const oracleAccount = crypto.getConsensusAddress(designated);
+    const oracleAccount = crypto.getBFTAddress(designated);
 
     return tx.signers.some((signer) => signer.account.equals(oracleAccount));
   }

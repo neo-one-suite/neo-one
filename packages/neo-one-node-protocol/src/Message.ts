@@ -8,10 +8,10 @@ import {
 import {
   BinaryReader,
   Block,
-  ConsensusPayload,
   DeserializeWireBaseOptions,
   DeserializeWireContext,
   DeserializeWireOptions,
+  ExtensiblePayload,
   Transaction,
 } from '@neo-one/node-core';
 import { makeErrorWithCode, utils } from '@neo-one/utils';
@@ -34,7 +34,7 @@ import {
 
 const tryCompression = ({ command }: MessageValue) =>
   command === Command.Block ||
-  command === Command.Consensus ||
+  command === Command.Extensible ||
   command === Command.Transaction ||
   command === Command.Headers ||
   command === Command.Addr ||
@@ -45,7 +45,7 @@ const tryCompression = ({ command }: MessageValue) =>
 export type MessageValue =
   | { readonly command: Command.Addr; readonly payload: AddrPayload }
   | { readonly command: Command.Block; readonly payload: Block }
-  | { readonly command: Command.Consensus; readonly payload: ConsensusPayload }
+  | { readonly command: Command.Extensible; readonly payload: ExtensiblePayload }
   | { readonly command: Command.FilterAdd; readonly payload: FilterAddPayload }
   | { readonly command: Command.FilterClear }
   | { readonly command: Command.FilterLoad; readonly payload: FilterLoadPayload }
@@ -91,10 +91,10 @@ export const deserializeMessageValue = (command: Command, options: DeserializeWi
         payload: Block.deserializeWire(options),
       };
 
-    case Command.Consensus:
+    case Command.Extensible:
       return {
-        command: Command.Consensus,
-        payload: ConsensusPayload.deserializeWire(options),
+        command: Command.Extensible,
+        payload: ExtensiblePayload.deserializeWire(options),
       };
 
     case Command.FilterAdd:

@@ -1,29 +1,20 @@
 import {
   ApplicationLogJSON,
+  BinaryReader,
   BinaryWriter,
   createSerializeWire,
   JSONHelper,
   SerializableWire,
   SerializeWire,
-  toTriggerTypeJSON,
-  toVMStateJSON,
-  TriggerType,
   UInt256,
-  VMState,
 } from '@neo-one/client-common';
-import { BN } from 'bn.js';
-import { Notification } from './Notification';
+import { Execution } from './Execution';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from './Serializable';
-import { StackItem, stackItemToJSON } from './StackItems';
-import { BinaryReader } from './utils';
 
 export interface ApplicationLogAdd {
   readonly txid?: UInt256;
-  readonly trigger: TriggerType;
-  readonly vmState: VMState;
-  readonly gasConsumed: BN;
-  readonly stack: readonly StackItem[];
-  readonly notifications: readonly Notification[];
+  readonly blockHash?: UInt256;
+  readonly executions: readonly Execution[];
 }
 
 export class ApplicationLog implements SerializableWire {
@@ -41,38 +32,21 @@ export class ApplicationLog implements SerializableWire {
   }
 
   public readonly txid?: UInt256;
-  public readonly trigger: TriggerType;
-  public readonly vmState: VMState;
-  public readonly gasConsumed: BN;
-  public readonly stack: readonly StackItem[];
-  public readonly notifications: readonly Notification[];
+  public readonly blockHash?: UInt256;
+  public readonly executions: readonly Execution[];
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
-  public constructor({ txid, trigger, vmState, gasConsumed, stack, notifications }: ApplicationLogAdd) {
+  public constructor({ txid, blockHash, executions }: ApplicationLogAdd) {
     this.txid = txid;
-    this.trigger = trigger;
-    this.vmState = vmState;
-    this.gasConsumed = gasConsumed;
-    this.stack = stack;
-    this.notifications = notifications;
+    this.blockHash = blockHash;
+    this.executions = executions;
   }
 
   public serializeJSON(): ApplicationLogJSON {
-    let stack;
-    try {
-      stack = this.stack.map((item) => stackItemToJSON(item, undefined));
-    } catch {
-      stack = 'error: recursive reference';
-    }
-
     return {
       txid: this.txid ? JSONHelper.writeUInt256(this.txid) : undefined,
-      trigger: toTriggerTypeJSON(this.trigger),
-      vmstate: toVMStateJSON(this.vmState),
-      gasconsumed: this.gasConsumed.toString(),
-      stack,
-      notifications: this.notifications.map((n) => n.serializeJSON()),
-      logs: [], // TODO: implement this
+      blockhash: this.blockHash ? JSONHelper.writeUInt256(this.blockHash) : undefined,
+      executions: this.executions.map((ex) => ex.serializeJSON()),
     };
   }
 

@@ -347,7 +347,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     const { addressVersion, blockCount, messageMagic } = await this.provider.getNetworkSettings(from.network);
 
     transfers.forEach((transfer) => {
-      sb.emitAppCall(
+      sb.emitDynamicAppCall(
         common.stringToUInt160(transfer.asset),
         'transfer',
         crypto.addressToScriptHash({ addressVersion, address: from.address }),

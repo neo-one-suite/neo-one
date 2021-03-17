@@ -69,4 +69,4 @@ Individual options can also be layered on top of our configuration:
 node neo-one-node --config /path/to/config.json --environment.logger.level=trace
 ```
 
-Finally you have the option of adding a `.neo-onerc` app configuration file anywhere in the app directory (recommended at `/neo-one/`) to apply your configuration by default. See [rc](https://github.com/dominictarr/rc#rc) for more information on `rc` files.
+You can also add a `.neo-onerc` configuration file anywhere in the app directory (recommended at the root of the repo directory) to apply your configuration by default. See [rc](https://github.com/dominictarr/rc#rc) for more informatio on how NEO•ONE will find and apply the node configuration with an `rc` file.

@@ -7,8 +7,10 @@ using Neo.Network.P2P.Payloads;
 using Neo.Persistence;
 using Neo.SmartContract;
 using Neo.SmartContract.Native;
+using Neo.SmartContract.Manifest;
 using Neo.VM;
 using Neo.VM.Types;
+using System.Threading;
 
 namespace NEOONE
 {
@@ -20,7 +22,7 @@ namespace NEOONE
       Block,
       Transaction,
       Signers,
-      ConsensusPayload,
+      ExtensiblePayload,
     }
 
     private IVerifiable deserializeContainer(dynamic args)
@@ -44,8 +46,8 @@ namespace NEOONE
           case ContainerType.Signers:
             container = new Signers();
             break;
-          case ContainerType.ConsensusPayload:
-            container = new ConsensusPayload();
+          case ContainerType.ExtensiblePayload:
+            container = new ExtensiblePayload();
             break;
           default:
             throw new ArgumentException($"{typeIn} is not a valid container type");
@@ -75,7 +77,10 @@ namespace NEOONE
       getgasconsumed,
       getnotifications,
       getlogs,
+      getfaultexception,
       dispose_engine,
+      push,
+      stepout,
     }
 
     private dynamic dispatchEngineMethod(EngineMethod method, dynamic args)
@@ -90,7 +95,18 @@ namespace NEOONE
           {
             container = deserializeContainer(args.container);
           }
-          return this._create(trigger, container, this.selectSnapshot(args.snapshot, false), gas);
+          Block persistingBlock = null;
+          if (args.persistingBlock != null)
+          {
+            persistingBlock = new Block();
+            using (MemoryStream ms = new MemoryStream(args.persistingBlock))
+            using (BinaryReader reader = new BinaryReader(ms))
+            {
+              persistingBlock.Deserialize(reader);
+            }
+          }
+
+          return this._create(trigger, container, this.selectSnapshot(args.snapshot, false), persistingBlock, gas);
 
         case EngineMethod.execute:
           return this._execute();
@@ -100,6 +116,7 @@ namespace NEOONE
           CallFlags flags = (CallFlags)((byte)args.flags);
           UInt160 scriptHash = null;
           int initialPosition = 0;
+          int rvcount = -1;
 
           if (args.scriptHash != null)
           {
@@ -111,15 +128,20 @@ namespace NEOONE
             initialPosition = (int)args.initialPosition;
           }
 
-          return this._loadScript(script, flags, scriptHash, initialPosition);
+          if (args.rvcount != null)
+          {
+            rvcount = (int)args.rvcount;
+          }
+
+          return this._loadScript(script, flags, scriptHash, rvcount, initialPosition);
 
         case EngineMethod.loadcontract:
           UInt160 contractHash = new UInt160((byte[])args.hash);
           string contractMethod = (string)args.method;
           CallFlags contractFlags = (CallFlags)((byte)args.flags);
-          bool packParameters = (bool)args.packParameters;
+          int pcount = (int)args.pcount;
 
-          return this._loadContract(contractHash, contractMethod, contractFlags, packParameters);
+          return this._loadContract(contractHash, contractMethod, pcount, contractFlags);
 
         case EngineMethod.getvmstate:
           return this._getVMState();
@@ -139,11 +161,21 @@ namespace NEOONE
         case EngineMethod.getlogs:
           return this._getLogs();
 
+        case EngineMethod.getfaultexception:
+          return this._getFaultException();
+
         case EngineMethod.dispose_engine:
           this.disposeEngine();
 
           return true;
 
+        case EngineMethod.push:
+          return this._push((string)args.item);
+
+        case EngineMethod.stepout:
+          this._stepOut();
+
+          return true;
         default:
           throw new InvalidOperationException();
       }
@@ -158,10 +190,10 @@ namespace NEOONE
       }
     }
 
-    private bool _create(TriggerType trigger, IVerifiable container, StoreView snapshot, long gas)
+    private bool _create(TriggerType trigger, IVerifiable container, DataCache snapshot, Block persistingBlock, long gas)
     {
       this.disposeEngine();
-      this.engine = ApplicationEngine.Create(trigger, container, snapshot, gas);
+      this.engine = ApplicationEngine.Create(trigger, container, snapshot, persistingBlock, gas); ;
 
       return true;
     }
@@ -172,20 +204,37 @@ namespace NEOONE
       return this.engine.Execute();
     }
 
-    private bool _loadScript(Script script, CallFlags flags, UInt160 hash = null, int initialPosition = 0)
+    private bool _loadScript(Script script, CallFlags flags, UInt160 hash = null, int rvcount = -1, int initialPosition = 0)
     {
       this.isEngineInitialized();
-      this.engine.LoadScript(script, flags, hash, initialPosition);
+      if (hash == null)
+      {
+        this.engine.LoadScript(script, rvcount, initialPosition, p =>
+        {
+          p.CallFlags = flags;
+        });
+
+        return true;
+      }
+
+      this.engine.LoadScript(script, rvcount, initialPosition, p =>
+      {
+        p.CallFlags = flags;
+        p.ScriptHash = hash;
+      });
+
+
       return true;
     }
 
-    private bool _loadContract(UInt160 hash, string method, CallFlags flags, bool packParameters)
+    private bool _loadContract(UInt160 hash, string method, int pcount, CallFlags flags)
     {
       this.isEngineInitialized();
-      ContractState cs = NativeContract.Management.GetContract(this.snapshot, hash);
+      ContractState cs = NativeContract.ContractManagement.GetContract(this.snapshot, hash);
       if (cs is null) return false;
+      ContractMethodDescriptor md = cs.Manifest.Abi.GetMethod(method, pcount);
 
-      this.engine.LoadContract(cs, method, flags, packParameters);
+      this.engine.LoadContract(cs, md, flags);
 
       return true;
     }
@@ -242,6 +291,25 @@ namespace NEOONE
       // return events.Select((p) => ReturnHelpers.convertLog(p)).ToArray();
     }
 
+    private string _getFaultException()
+    {
+      return this.engine.FaultException?.ToString();
+    }
+
+    private bool _push(string item)
+    {
+      this.engine.Push(item);
+
+      return true;
+    }
+
+    private bool _stepOut()
+    {
+      this.engine.StepOut();
+
+      return true;
+    }
+
     private bool isEngineInitialized()
     {
       if (this.engine == null)
@@ -284,7 +352,7 @@ namespace NEOONE
       throw new NotImplementedException();
     }
 
-    public Neo.UInt160[] GetScriptHashesForVerifying(StoreView snapshot)
+    public Neo.UInt160[] GetScriptHashesForVerifying(DataCache snapshot)
     {
       return _signers.Select(p => p.Account).ToArray();
     }

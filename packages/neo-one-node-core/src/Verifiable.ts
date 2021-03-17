@@ -1,5 +1,6 @@
 import { common, UInt160 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
+import { HeaderCache } from './HeaderCache';
 import { NativeContainer } from './Native';
 import { SerializableContainer } from './Serializable';
 import { BlockchainStorage } from './Storage';
@@ -11,6 +12,7 @@ export const maxVerificationGas = common.fixed8FromDecimal('0.5');
 export interface GetScriptHashesContext {
   readonly storage: BlockchainStorage;
   readonly native: NativeContainer;
+  readonly headerCache: HeaderCache;
 }
 
 export interface Verifiable {
@@ -30,6 +32,7 @@ export interface VerifyWitnessesOptions {
   readonly verifiable: SerializableContainer;
   readonly storage: BlockchainStorage;
   readonly native: NativeContainer;
+  readonly headerCache: HeaderCache;
   readonly gas: BN;
   readonly snapshot?: SnapshotName;
 }
@@ -48,8 +51,10 @@ export interface VerifyOptions {
   readonly vm: VM;
   readonly storage: BlockchainStorage;
   readonly native: NativeContainer;
+  readonly headerCache: HeaderCache;
   readonly verifyWitnesses: VerifyWitnesses;
   readonly verifyWitness: VerifyWitness;
+  readonly isExtensibleWitnessWhiteListed: (address: UInt160) => boolean;
 }
 
 /* I think all of this might be a useless abstraction of blockchain properties. */

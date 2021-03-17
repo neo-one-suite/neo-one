@@ -48,23 +48,23 @@ const convertAddChange = (change: AddChange): readonly PutBatch[] => {
         },
       ];
 
-    case 'block':
-      return [
-        {
-          type: 'put',
-          key: keys.createBlockKey(change.key),
-          value: change.value.serializeWire(),
-        },
-      ];
+    // case 'block':
+    //   return [
+    //     {
+    //       type: 'put',
+    //       key: keys.createBlockKey(change.key),
+    //       value: change.value.serializeWire(),
+    //     },
+    //   ];
 
-    case 'transaction':
-      return [
-        {
-          type: 'put',
-          key: keys.createTransactionKey(change.key),
-          value: change.value.serializeWire(),
-        },
-      ];
+    // case 'transaction':
+    //   return [
+    //     {
+    //       type: 'put',
+    //       key: keys.createTransactionKey(change.key),
+    //       value: change.value.serializeWire(),
+    //     },
+    //   ];
 
     // case 'contract':
     //   return [
@@ -84,32 +84,32 @@ const convertAddChange = (change: AddChange): readonly PutBatch[] => {
         },
       ];
 
-    case 'headerHashList':
-      return [
-        {
-          type: 'put',
-          key: keys.createHeaderHashListKey(change.key),
-          value: change.value.serializeWire(),
-        },
-      ];
+    // case 'headerHashList':
+    //   return [
+    //     {
+    //       type: 'put',
+    //       key: keys.createHeaderHashListKey(change.key),
+    //       value: change.value.serializeWire(),
+    //     },
+    //   ];
 
-    case 'blockHashIndex':
-      return [
-        {
-          type: 'put',
-          key: keys.blockHashIndexKey,
-          value: change.value.serializeWire(),
-        },
-      ];
+    // case 'blockHashIndex':
+    //   return [
+    //     {
+    //       type: 'put',
+    //       key: keys.blockHashIndexKey,
+    //       value: change.value.serializeWire(),
+    //     },
+    //   ];
 
-    case 'headerHashIndex':
-      return [
-        {
-          type: 'put',
-          key: keys.headerHashIndexKey,
-          value: change.value.serializeWire(),
-        },
-      ];
+    // case 'headerHashIndex':
+    //   return [
+    //     {
+    //       type: 'put',
+    //       key: keys.headerHashIndexKey,
+    //       value: change.value.serializeWire(),
+    //     },
+    //   ];
 
     // case 'contractID':
     //   return [

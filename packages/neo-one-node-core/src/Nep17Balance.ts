@@ -1,7 +1,7 @@
-import { createSerializeWire, IOHelper, Nep17BalanceModel } from '@neo-one/client-common';
+import { BinaryReader, createSerializeWire, IOHelper, Nep17BalanceModel } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from './Serializable';
-import { BinaryReader, utils } from './utils';
+import { utils } from './utils';
 
 export interface Nep17BalanceAdd {
   readonly balanceBuffer: Buffer;
@@ -38,12 +38,5 @@ export class Nep17Balance extends Nep17BalanceModel {
 
   public get size() {
     return this.sizeInternal();
-  }
-
-  public clone() {
-    return new Nep17Balance({
-      balanceBuffer: this.balanceInternal,
-      lastUpdatedBlock: this.lastUpdatedBlock,
-    });
   }
 }

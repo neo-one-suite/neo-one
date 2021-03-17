@@ -1,5 +1,4 @@
-import { UInt256, VMState } from '@neo-one/client-common';
-import { Block, SnapshotName, SnapshotPartial, Transaction } from '@neo-one/node-core';
+import { SnapshotName } from '@neo-one/node-core';
 import { parseChangeReturns } from './converters';
 import { SnapshotMethods } from './Methods';
 import { DispatcherFunc } from './types';
@@ -24,92 +23,10 @@ export class SnapshotHandler {
           };
   }
 
-  public addBlock(block: Block) {
-    const hash = block.hash;
-    const buffer = block.serializeWire();
-
-    return this.dispatch({
-      method: 'snapshot_blocks_add',
-      args: {
-        hash,
-        block: buffer,
-        snapshot: this.snapshot,
-      },
-    });
-  }
-
-  public addTransaction(transaction: Transaction, index: number, state = VMState.BREAK) {
-    const tx = transaction.serializeWire();
-
-    return this.dispatch({
-      method: 'snapshot_transactions_add',
-      args: {
-        tx,
-        index,
-        state,
-        snapshot: this.snapshot,
-      },
-    });
-  }
-
-  public deleteTransaction(hash: UInt256) {
-    return this.dispatch({
-      method: 'snapshot_transactions_delete',
-      args: {
-        hash,
-        snapshot: this.snapshot,
-      },
-    });
-  }
-
-  public changeBlockHashIndex(index: number, hash: UInt256) {
-    return this.dispatch({
-      method: 'snapshot_change_block_hash_index',
-      args: {
-        index,
-        hash,
-        snapshot: this.snapshot,
-      },
-    });
-  }
-
-  public changeHeaderHashIndex(index: number, hash: UInt256) {
-    return this.dispatch({
-      method: 'snapshot_change_header_hash_index',
-      args: {
-        index,
-        hash,
-        snapshot: this.snapshot,
-      },
-    });
-  }
-
-  public setPersistingBlock(block: Block) {
-    const buffer = block.serializeWire();
-
-    return this.dispatch({
-      method: 'snapshot_set_persisting_block',
-      args: {
-        snapshot: this.snapshot,
-        block: buffer,
-      },
-    });
-  }
-
-  public hasPersistingBlock() {
-    return this.dispatch({
-      method: 'snapshot_has_persisting_block',
-      args: {
-        snapshot: this.snapshot,
-      },
-    });
-  }
-
-  public commit(partial?: SnapshotPartial) {
+  public commit() {
     return this.dispatch({
       method: 'snapshot_commit',
       args: {
-        partial,
         snapshot: this.snapshot,
       },
     });

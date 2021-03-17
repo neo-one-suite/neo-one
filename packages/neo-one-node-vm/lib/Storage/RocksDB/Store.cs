@@ -1,4 +1,3 @@
-using Neo.IO.Caching;
 using Neo.Persistence;
 using RocksDbSharp;
 using System;
@@ -37,51 +36,43 @@ namespace NEOONE.Storage.RocksDB
       return new Snapshot(this, db);
     }
 
-    public byte[] getFullKey(byte table, byte[] keyOrPrefix)
-    {
-      byte[] fullKey = new byte[keyOrPrefix.Length + 1];
-      System.Buffer.SetByte(fullKey, 0, table);
-      System.Buffer.BlockCopy(keyOrPrefix, 0, fullKey, 1, keyOrPrefix.Length);
-      return fullKey;
-    }
-
-    public IEnumerable<(byte[] Key, byte[] Value)> Seek(byte table, byte[] keyOrPrefix, SeekDirection direction = SeekDirection.Forward)
+    public IEnumerable<(byte[] Key, byte[] Value)> Seek(byte[] keyOrPrefix, SeekDirection direction = SeekDirection.Forward)
     {
       if (keyOrPrefix == null) keyOrPrefix = Array.Empty<byte>();
 
-      byte[] fullKey = getFullKey(table, keyOrPrefix);
+      byte[] fullKey = keyOrPrefix;
       using var it = db.NewIterator(defaultFamily, Options.ReadDefault);
       if (direction == SeekDirection.Forward)
-        for (it.Seek(fullKey); it.Valid() && it.Key()[0] == table; it.Next())
+        for (it.Seek(fullKey); it.Valid(); it.Next())
           yield return (it.Key()[1..], it.Value());
       else
-        for (it.SeekForPrev(fullKey); it.Valid() && it.Key()[0] == table; it.Prev())
+        for (it.SeekForPrev(fullKey); it.Valid(); it.Prev())
           yield return (it.Key()[1..], it.Value());
     }
 
-    public bool Contains(byte table, byte[] key)
+    public bool Contains(byte[] key)
     {
-      byte[] fullKey = key == null ? new byte[] { table } : getFullKey(table, key);
+      byte[] fullKey = key == null ? new byte[] { } : key;
       return db.Get(fullKey ?? Array.Empty<byte>(), defaultFamily, Options.ReadDefault) != null;
     }
 
-    public byte[] TryGet(byte table, byte[] key)
+    public byte[] TryGet(byte[] key)
     {
-      byte[] fullKey = key == null ? new byte[] { table } : getFullKey(table, key);
+      byte[] fullKey = key == null ? new byte[] { } : key;
       return db.Get(fullKey ?? Array.Empty<byte>(), defaultFamily, Options.ReadDefault);
     }
 
-    public void Delete(byte table, byte[] key)
+    public void Delete(byte[] key)
     {
       throw new InvalidOperationException();
     }
 
-    public void Put(byte table, byte[] key, byte[] value)
+    public void Put(byte[] key, byte[] value)
     {
       throw new InvalidOperationException();
     }
 
-    public void PutSync(byte table, byte[] key, byte[] value)
+    public void PutSync(byte[] key, byte[] value)
     {
       throw new InvalidOperationException();
     }

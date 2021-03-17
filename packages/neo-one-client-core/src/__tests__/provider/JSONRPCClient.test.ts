@@ -111,7 +111,7 @@ describe('JSONRPCClient', () => {
     const value = true;
     mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
 
-    const result = await client.sendRawTransaction(data.buffers.a);
+    const result = await client.sendRawTransaction(data.buffers.base64.a);
 
     expect(result).toEqual(value);
     expect(mockRequest.mock.calls).toMatchSnapshot();

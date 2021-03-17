@@ -147,3 +147,7 @@ export const InvalidJumpError = makeErrorWithCode(
   'INVALID_JMP_OPCODE',
   (op: OpCode) => `Expected valid JMP instruction; got ${op}`,
 );
+export const InvalidScriptError = makeErrorWithCode(
+  'INVALID_SCRIPT',
+  (op: OpCode, ip: number) => `Invalid instruction ${op} at position: ${ip}.`,
+);

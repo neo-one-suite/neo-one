@@ -1,6 +1,5 @@
-import { BinaryWriter } from '@neo-one/client-common';
+import { BinaryReader, BinaryWriter } from '@neo-one/client-common';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from '../../Serializable';
-import { BinaryReader } from '../../utils';
 import { assertNodeCapabilityType, NodeCapabilityType } from './NodeCapabilityType';
 
 export interface NodeCapabilityBaseAdd {

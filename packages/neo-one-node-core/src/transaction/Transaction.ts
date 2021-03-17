@@ -1,5 +1,7 @@
 import {
+  assertValidScript,
   AttributeTypeModel,
+  BinaryReader,
   common,
   crypto,
   InvalidFormatError,
@@ -16,7 +18,6 @@ import {
   UInt160,
   VerboseTransactionJSON,
   VerifyResultModel,
-  VMStateJSON,
 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import _ from 'lodash';
@@ -28,7 +29,7 @@ import {
 } from '../Serializable';
 import { Signer } from '../Signer';
 import { TransactionVerificationContext } from '../TransactionVerificationContext';
-import { BinaryReader, utils } from '../utils';
+import { utils } from '../utils';
 import { maxVerificationGas, Verifiable, VerifyOptions } from '../Verifiable';
 import { Witness } from '../Witness';
 import { Attribute, deserializeAttribute } from './attributes';
@@ -40,7 +41,6 @@ export interface VerboseData {
   readonly blockhash: string;
   readonly confirmations: number;
   readonly blocktime: number;
-  readonly vmstate: VMStateJSON;
 }
 
 export class Transaction
@@ -181,8 +181,8 @@ export class Transaction
     verifyOptions: VerifyOptions,
     transactionContext?: TransactionVerificationContext,
   ): Promise<VerifyResultModel> {
-    const { storage, native, verifyWitness, vm } = verifyOptions;
-    const { index } = await storage.blockHashIndex.get();
+    const { storage, native, verifyWitness, vm, headerCache } = verifyOptions;
+    const index = await native.Ledger.currentIndex(storage);
     if (this.validUntilBlock <= index || this.validUntilBlock > index + MAX_VALID_UNTIL_BLOCK_INCREMENT) {
       return VerifyResultModel.Expired;
     }
@@ -238,6 +238,7 @@ export class Transaction
           hash: hashes[i],
           witness,
           gas: netFee,
+          headerCache,
         });
         if (!result) {
           return VerifyResultModel.InsufficientFunds;
@@ -253,8 +254,13 @@ export class Transaction
   }
 
   public async verifyStateIndependent(verifyOptions: VerifyOptions) {
-    const { storage, native, verifyWitness, vm } = verifyOptions;
+    const { storage, native, verifyWitness, vm, headerCache } = verifyOptions;
     if (this.size > MAX_TRANSACTION_SIZE) {
+      return VerifyResultModel.Invalid;
+    }
+    try {
+      assertValidScript(this.script);
+    } catch {
       return VerifyResultModel.Invalid;
     }
     const hashes = this.getScriptHashesForVerifying();
@@ -273,6 +279,7 @@ export class Transaction
           hash: hashes[i],
           witness: this.witnesses[i],
           gas: maxVerificationGas,
+          headerCache,
         });
         if (!result) {
           return VerifyResultModel.Invalid;
@@ -320,7 +327,6 @@ export class Transaction
       blockhash: data.blockhash,
       confirmations: data.confirmations,
       blocktime: data.blocktime,
-      vmstate: data.vmstate,
     };
   }
 }

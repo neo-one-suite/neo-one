@@ -8,7 +8,7 @@ import {
   Transaction,
   TransactionVerificationContext,
 } from '@neo-one/node-core';
-import _ from 'lodash';
+import { utils } from '@neo-one/utils';
 import { checkPreparations, checkPrepareResponse } from './checkPayload';
 import { getInitialContext, reset } from './context';
 import { makeChangeView, makePrepareRequest, makeRecoveryRequest } from './makePayload';
@@ -35,7 +35,7 @@ export const sendPrepareRequest = async ({
     context = checkPreparationContext;
   }
 
-  // TODO: it seems to me anything we would send the node here it already knows about
+  // Dan note: it seems to me anything we would send the node here it already knows about
   // since our mempool isn't as disjointed like C# land.
   // if ((context.transactionHashes ?? 0) > 0) {
   //   node.sendInv(/*...*/);
@@ -53,10 +53,8 @@ export const requestRecovery = async ({
   readonly privateKey: PrivateKey;
   readonly context: ConsensusContext;
 }) => {
-  if (context.blockBuilder.index === node.blockchain.currentHeaderIndex + 1) {
-    const payload = await makeRecoveryRequest({ node, context, privateKey });
-    node.relayConsensusPayload(payload);
-  }
+  const payload = await makeRecoveryRequest({ node, context, privateKey });
+  node.relayConsensusPayload(payload);
 };
 
 export const checkExpectedView = ({
@@ -65,11 +63,13 @@ export const checkExpectedView = ({
 }: {
   readonly context: ConsensusContext;
   readonly viewNumber: number;
-}) =>
-  context.viewNumber < viewNumber ||
-  context.changeViewPayloads.filter(
-    (p) => p !== undefined && p.getDeserializedMessage<ChangeViewConsensusMessage>().newViewNumber >= viewNumber,
-  ).length >= context.M;
+}) => {
+  const messages = context.changeViewPayloads
+    .filter(utils.notNull)
+    .map((p) => context.getMessage<ChangeViewConsensusMessage>(p));
+
+  return context.viewNumber < viewNumber || messages.filter((p) => p.newViewNumber >= viewNumber).length >= context.M;
+};
 
 export const requestChangeView = async ({
   node,
@@ -110,7 +110,10 @@ export const requestChangeView = async ({
   node.relayConsensusPayload(payload);
 
   if (checkExpectedView({ context, viewNumber: expectedView }) && !context.watchOnly) {
-    const message = context.changeViewPayloads[context.myIndex]?.getDeserializedMessage<ChangeViewConsensusMessage>();
+    const messages = context.changeViewPayloads.map((p) =>
+      p === undefined ? undefined : context.getMessage<ChangeViewConsensusMessage>(p),
+    );
+    const message = messages[context.myIndex];
     if (message === undefined || message.newViewNumber < expectedView) {
       const { context: moreChangeViewContext, payload: changeViewPayload } = await makeChangeView({
         node,
@@ -246,30 +249,21 @@ export const addTransaction = async ({
 }): Promise<Result> => {
   let context = contextIn;
   const { blockchain } = node;
-  const tx = await blockchain.transactions.tryGet(transaction.hash);
+  const tx = await blockchain.getTransaction(transaction.hash);
   if (tx !== undefined) {
     return { context };
   }
   if (verify) {
     const result = await blockchain.verifyTransaction(transaction, context.transactions, context.verificationContext);
 
-    if (result === VerifyResultModel.PolicyFail) {
-      return requestChangeView({
-        context,
-        node,
-        privateKey,
-        timerContext,
-        reason: ChangeViewReason.TxRejectedByPolicy,
-        isRecovering,
-      });
-    }
     if (result !== VerifyResultModel.Succeed) {
       return requestChangeView({
         context,
         node,
         privateKey,
         timerContext,
-        reason: ChangeViewReason.TxInvalid,
+        reason:
+          result === VerifyResultModel.PolicyFail ? ChangeViewReason.TxRejectedByPolicy : ChangeViewReason.TxInvalid,
         isRecovering,
       });
     }

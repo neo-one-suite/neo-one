@@ -4,8 +4,9 @@ import {
   ChangeViewReason,
   CommitConsensusMessage,
   ConsensusContext,
+  ConsensusMessageBase,
   ConsensusMessageType,
-  ConsensusPayload,
+  ExtensiblePayload,
   Node,
   PrepareRequestConsensusMessage,
   PrepareResponseConsensusMessage,
@@ -33,7 +34,7 @@ const handleChangeView = async ({
   readonly context: ConsensusContext;
   readonly node: Node;
   readonly knownHashes: Set<UInt256Hex>;
-  readonly payload: ConsensusPayload;
+  readonly payload: ExtensiblePayload;
   readonly privateKey: PrivateKey;
   readonly timerContext: TimerContext;
   readonly message: ChangeViewConsensusMessage;
@@ -48,6 +49,7 @@ const handleChangeView = async ({
       node,
       privateKey,
       payload,
+      message,
       knownHashes,
     });
     context = recoveryContext;
@@ -57,25 +59,25 @@ const handleChangeView = async ({
     return { context };
   }
 
-  const expectedView =
-    context.changeViewPayloads[payload.validatorIndex]?.getDeserializedMessage<ChangeViewConsensusMessage>()
-      .newViewNumber ?? 0;
+  const getMessageMessage = context.changeViewPayloads[message.validatorIndex];
+  const expectedView = getMessageMessage
+    ? context.getMessage<ChangeViewConsensusMessage>(getMessageMessage).newViewNumber
+    : 0;
   if (viewNumber <= expectedView) {
     return { context };
   }
 
   const mutableChangeViewPayloads = [...context.changeViewPayloads];
-  mutableChangeViewPayloads[payload.validatorIndex] = payload;
+  mutableChangeViewPayloads[message.validatorIndex] = payload;
   context = context.clone({
     changeViewPayloads: mutableChangeViewPayloads,
   });
 
   if (checkExpectedView({ context, viewNumber })) {
     if (!context.watchOnly) {
-      const viewMessage = context.changeViewPayloads[context.myIndex]?.getDeserializedMessage<
-        ChangeViewConsensusMessage
-      >();
-      // tslint:disable-next-line: strict-type-predicates
+      const getMessagePayload = context.changeViewPayloads[context.myIndex];
+      const viewMessage =
+        getMessagePayload === undefined ? undefined : context.getMessage<ChangeViewConsensusMessage>(getMessagePayload);
       if (viewMessage === undefined || viewMessage.newViewNumber < viewNumber) {
         const { context: changeViewContext, payload: changeViewPayload } = await makeChangeView({
           node,
@@ -101,8 +103,6 @@ const handleChangeView = async ({
   return { context };
 };
 
-const TEN_MINUTES_IN_MILLISECONDS = 10 * 60 * 1000;
-
 const handlePrepareRequest = async ({
   context: contextIn,
   node,
@@ -115,45 +115,57 @@ const handlePrepareRequest = async ({
   readonly context: ConsensusContext;
   readonly node: Node;
   readonly privateKey: PrivateKey;
-  readonly payload: ConsensusPayload;
+  readonly payload: ExtensiblePayload;
   readonly timerContext: TimerContext;
   readonly message: PrepareRequestConsensusMessage;
   readonly isRecovering: boolean;
 }): Promise<Result> => {
   let context = contextIn;
+  if (context.requestSentOrReceived || context.notAcceptingPayloadsDueToViewChanging) {
+    return { context };
+  }
   if (
-    context.requestSentOrReceived ||
-    context.notAcceptingPayloadsDueToViewChanging ||
-    payload.validatorIndex !== context.blockBuilder.consensusData?.primaryIndex ||
-    message.viewNumber !== context.viewNumber ||
-    message.timestamp.gtn(timerContext.nowMilliseconds() + TEN_MINUTES_IN_MILLISECONDS)
+    message.validatorIndex !== context.blockBuilder.consensusData?.primaryIndex ||
+    message.viewNumber !== context.viewNumber
   ) {
     return { context };
   }
-  const header = await node.blockchain.getHeader(commonUtils.nullthrows(context.blockBuilder.previousHash));
-  if (header === undefined) {
+  if (
+    message.version !== context.blockBuilder.version ||
+    (context.blockBuilder.previousHash !== undefined && !message.prevHash.equals(context.blockBuilder.previousHash))
+  ) {
     return { context };
   }
 
-  if (message.timestamp <= header.timestamp) {
+  const prevHeader = await node.blockchain.getHeader(commonUtils.nullthrows(context.blockBuilder.previousHash));
+  if (prevHeader === undefined) {
     return { context };
   }
 
-  const maybeStates = await Promise.all(message.transactionHashes.map(node.blockchain.transactions.tryGet));
-  if (maybeStates.some((value) => value !== undefined)) {
+  if (
+    message.timestamp.lte(prevHeader.timestamp) ||
+    message.timestamp.gtn(timerContext.nowMilliseconds() + node.blockchain.settings.millisecondsPerBlock * 8)
+  ) {
     return { context };
   }
 
-  const newPreparationPayloads = context.preparationPayloads.map((p) => {
-    if (p?.getDeserializedMessage<PrepareResponseConsensusMessage>().preparationHash.equals(payload.hash)) {
-      return p;
+  const maybeStates = await Promise.all(message.transactionHashes.map(node.blockchain.containsTransaction));
+  if (maybeStates.some((value) => value)) {
+    return { context };
+  }
+
+  const mutableNewPreparationPayloads = context.preparationPayloads.map((p) => {
+    if (
+      p !== undefined &&
+      !context.getMessage<PrepareResponseConsensusMessage>(p).preparationHash.equals(payload.hash)
+    ) {
+      return undefined;
     }
 
-    return undefined;
+    return p;
   });
 
-  const mutablePreparationPayloads = [...newPreparationPayloads];
-  mutablePreparationPayloads[payload.validatorIndex] = payload;
+  mutableNewPreparationPayloads[message.validatorIndex] = payload;
 
   const tempContextOptions = {
     timestamp: message.timestamp,
@@ -163,22 +175,23 @@ const handlePrepareRequest = async ({
     transactionHashes: message.transactionHashes,
     transactions: {},
     verificationContext: node.getNewVerificationContext(),
-    preparationPayloads: mutablePreparationPayloads,
+    preparationPayloads: mutableNewPreparationPayloads,
   };
 
   const { context: headerContext, block } = ensureHeader(context.clone(tempContextOptions));
   context = headerContext;
   const hashData = block?.getBlock().message;
   if (hashData === undefined) {
-    throw new Error('block should have hashData');
+    throw new Error('Block should be defined and have hashdata');
   }
 
   const newCommitPayloads = [...context.commitPayloads].map((p, idx) => {
     if (
-      p?.consensusMessage.viewNumber === context.viewNumber &&
+      p !== undefined &&
+      context.getMessage<PrepareResponseConsensusMessage>(p).viewNumber === context.viewNumber &&
       !crypto.verify({
         message: hashData,
-        signature: p.getDeserializedMessage<CommitConsensusMessage>().signature,
+        signature: context.getMessage<CommitConsensusMessage>(p).signature,
         publicKey: context.validators[idx],
       })
     ) {
@@ -191,10 +204,10 @@ const handlePrepareRequest = async ({
   context = context.clone({ commitPayloads: newCommitPayloads });
 
   if (context.transactionHashes === undefined) {
-    throw new Error('we set this explicitly');
+    throw new Error('Context transactionHashes should be defined');
   }
 
-  if (context.transactionHashes?.length === 0) {
+  if (context.transactionHashes.length === 0) {
     return checkPrepareResponse({
       context,
       node,
@@ -226,12 +239,12 @@ const handlePrepareRequest = async ({
         return { context: nextContext };
       }
     } else {
-      throw new Error('yep guess we need to implement the mempool stuff');
+      throw new Error('Need to implement mempool with verified and unverified transactions');
     }
   }
 
   if (Object.values(context.transactions).length < context.transactionHashes.length) {
-    throw new Error('is this actually happening tho?');
+    throw new Error('Need to create Inv payload with transaction hashes');
   }
 
   node.syncMemPool();
@@ -247,11 +260,11 @@ const handleCommit = async ({
 }: {
   readonly context: ConsensusContext;
   readonly node: Node;
-  readonly payload: ConsensusPayload;
+  readonly payload: ExtensiblePayload;
   readonly commit: CommitConsensusMessage;
 }) => {
   let context = contextIn;
-  const idx = payload.validatorIndex;
+  const idx = commit.validatorIndex;
   const existingCommitPayload = context.commitPayloads[idx];
   if (!existingCommitPayload?.hash.equals(payload.hash)) {
     return { context };
@@ -266,7 +279,7 @@ const handleCommit = async ({
       mutableExistingCommitPayloads[idx] = payload;
       context = context.clone({ commitPayloads: mutableExistingCommitPayloads });
     } else if (
-      crypto.verify({ message, signature: commit.signature, publicKey: context.validators[payload.validatorIndex] })
+      crypto.verify({ message, signature: commit.signature, publicKey: context.validators[commit.validatorIndex] })
     ) {
       mutableExistingCommitPayloads[idx] = payload;
       context = context.clone({ commitPayloads: mutableExistingCommitPayloads });
@@ -293,13 +306,13 @@ const handlePrepareResponse = async ({
   readonly context: ConsensusContext;
   readonly node: Node;
   readonly privateKey: PrivateKey;
-  readonly payload: ConsensusPayload;
+  readonly payload: ExtensiblePayload;
   readonly message: PrepareResponseConsensusMessage;
 }): Promise<Result> => {
   let context = contextIn;
   if (
     message.viewNumber !== context.viewNumber ||
-    context.preparationPayloads[payload.validatorIndex] !== undefined ||
+    context.preparationPayloads[message.validatorIndex] !== undefined ||
     context.notAcceptingPayloadsDueToViewChanging
   ) {
     return { context };
@@ -317,7 +330,7 @@ const handlePrepareResponse = async ({
   }
 
   const mutablePreparationPayloads = [...context.preparationPayloads];
-  mutablePreparationPayloads[payload.validatorIndex] = payload;
+  mutablePreparationPayloads[message.validatorIndex] = payload;
   context = context.clone({ preparationPayloads: mutablePreparationPayloads });
   if (context.watchOnly || context.commitSent) {
     return { context };
@@ -335,12 +348,14 @@ const handleRecoveryRequest = async ({
   privateKey,
   context: contextIn,
   payload,
+  message,
   knownHashes,
 }: {
   readonly node: Node;
   readonly privateKey: PrivateKey;
   readonly context: ConsensusContext;
-  readonly payload: ConsensusPayload;
+  readonly payload: ExtensiblePayload;
+  readonly message: ConsensusMessageBase;
   readonly knownHashes: Set<UInt256Hex>;
 }): Promise<Result> => {
   const context = contextIn;
@@ -355,7 +370,7 @@ const handleRecoveryRequest = async ({
 
   if (!context.commitSent) {
     const shouldSendRecovery = _.range(1, context.M + 1).some((i) => {
-      const chosenIndex = (payload.validatorIndex + i) % context.validators.length;
+      const chosenIndex = (message.validatorIndex + i) % context.validators.length;
 
       return chosenIndex === context.myIndex;
     });
@@ -377,7 +392,6 @@ const handleRecoveryMessage = async ({
   context: contextIn,
   knownHashes,
   privateKey,
-  payload,
   message,
   timerContext,
 }: {
@@ -385,17 +399,17 @@ const handleRecoveryMessage = async ({
   readonly context: ConsensusContext;
   readonly knownHashes: Set<UInt256Hex>;
   readonly privateKey: PrivateKey;
-  readonly payload: ConsensusPayload;
   readonly message: RecoveryConsensusMessage;
   readonly timerContext: TimerContext;
 }): Promise<Result> => {
   let context = contextIn;
+  const messageMagic = node.blockchain.deserializeWireContext.messageMagic;
   if (message.viewNumber > context.viewNumber) {
     if (context.commitSent) {
       return { context };
     }
 
-    const changeViewPayloads = message.getChangeViewPayloads(context, payload);
+    const changeViewPayloads = message.getChangeViewPayloads(context, messageMagic);
     const { context: postChangeViewsContext } = await reverifyAndProcessPayloads({
       context,
       node,
@@ -414,7 +428,7 @@ const handleRecoveryMessage = async ({
     !context.commitSent
   ) {
     if (!context.requestSentOrReceived) {
-      const prepareRequestPayload = message.getPrepareRequestPayload(context, payload);
+      const prepareRequestPayload = message.getPrepareRequestPayload(context, messageMagic);
       if (prepareRequestPayload !== undefined) {
         const { context: postPrepareRequestContext } = await reverifyAndProcessPayload({
           context,
@@ -432,7 +446,7 @@ const handleRecoveryMessage = async ({
       }
     }
 
-    const prepareResponsePayloads = message.getPrepareResponsePayloads(context, payload);
+    const prepareResponsePayloads = message.getPrepareResponsePayloads(context, messageMagic);
     const { context: postPrepareResponsesContext } = await reverifyAndProcessPayloads({
       context,
       node,
@@ -446,7 +460,7 @@ const handleRecoveryMessage = async ({
   }
 
   if (message.viewNumber <= context.viewNumber) {
-    const commitPayloads = message.getCommitPayloads(context, payload);
+    const commitPayloads = message.getCommitPayloadsFromRecoveryMessage(context, messageMagic);
     const { context: postCommitsContext } = await reverifyAndProcessPayloads({
       context,
       node,
@@ -479,12 +493,11 @@ const reverifyAndProcessPayload = async ({
   readonly node: Node;
   readonly knownHashes: Set<UInt256Hex>;
   readonly privateKey: PrivateKey;
-  readonly payload: ConsensusPayload;
+  readonly payload: ExtensiblePayload;
   readonly timerContext: TimerContext;
 }): Promise<ReverifyPayloadResult> => {
-  const { blockchain } = node;
   try {
-    await blockchain.verifyConsensusPayload(payload);
+    await node.blockchain.verifyConsensusPayload(payload);
   } catch {
     return { context, verified: false };
   }
@@ -514,19 +527,19 @@ const reverifyAndProcessPayloads = async ({
   readonly node: Node;
   readonly knownHashes: Set<UInt256Hex>;
   readonly privateKey: PrivateKey;
-  readonly payloads: readonly ConsensusPayload[];
+  readonly payloads: readonly ExtensiblePayload[];
   readonly timerContext: TimerContext;
 }): Promise<{ readonly context: ConsensusContext; readonly valid: number }> => {
   let valid = 0;
   let context = contextIn;
   // tslint:disable-next-line: no-loop-statement
-  for (const p of payloads) {
+  for (const payload of payloads) {
     const { context: nextContext, verified } = await reverifyAndProcessPayload({
       context,
       node,
       knownHashes,
       privateKey,
-      payload: p,
+      payload,
       timerContext,
     });
 
@@ -541,7 +554,7 @@ const reverifyAndProcessPayloads = async ({
 };
 
 export const handleConsensusPayload = async ({
-  context,
+  context: contextIn,
   node,
   knownHashes,
   privateKey,
@@ -553,21 +566,28 @@ export const handleConsensusPayload = async ({
   readonly node: Node;
   readonly knownHashes: Set<UInt256Hex>;
   readonly privateKey: PrivateKey;
-  readonly payload: ConsensusPayload;
+  readonly payload: ExtensiblePayload;
   readonly timerContext: TimerContext;
   readonly isRecovering?: boolean;
 }): Promise<Result> => {
-  const { consensusMessage } = payload;
+  const consensusMessage = contextIn.getMessage(payload);
   if (
-    payload.validatorIndex === context.myIndex ||
-    payload.version !== context.blockBuilder.version ||
-    !common.uInt256Equal(payload.previousHash, context.blockBuilder.previousHash ?? common.ZERO_UINT256) ||
-    payload.blockIndex !== (context.blockBuilder.index ?? -1) ||
-    payload.validatorIndex >= context.validators.length ||
-    (consensusMessage.type !== ConsensusMessageType.ChangeView && consensusMessage.viewNumber !== context.viewNumber)
+    consensusMessage.blockIndex !== contextIn.myIndex ||
+    consensusMessage.validatorIndex >= contextIn.validators.length ||
+    !common.uInt160Equal(
+      payload.sender,
+      common.bufferToUInt160(crypto.createSignatureRedeemScript(contextIn.validators[consensusMessage.validatorIndex])),
+    )
   ) {
-    return { context };
+    return { context: contextIn };
   }
+
+  const context = contextIn.clone({
+    lastSeenMessage: {
+      ...contextIn.lastSeenMessage,
+      [common.ecPointToHex(contextIn.validators[consensusMessage.validatorIndex])]: consensusMessage.blockIndex,
+    },
+  });
 
   switch (consensusMessage.type) {
     case ConsensusMessageType.ChangeView:
@@ -616,6 +636,7 @@ export const handleConsensusPayload = async ({
         privateKey,
         context,
         payload,
+        message: consensusMessage,
         knownHashes,
       });
 
@@ -625,7 +646,6 @@ export const handleConsensusPayload = async ({
         context,
         knownHashes,
         privateKey,
-        payload,
         message: consensusMessage as RecoveryConsensusMessage,
         timerContext,
       });

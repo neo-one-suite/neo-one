@@ -7,7 +7,7 @@ export interface ContractsConfiguration {
   readonly outDir: string;
   readonly path: string;
   readonly json?: boolean;
-  readonly avm?: boolean;
+  readonly nef?: boolean;
   readonly debug?: boolean;
   readonly opcodes?: boolean;
 }

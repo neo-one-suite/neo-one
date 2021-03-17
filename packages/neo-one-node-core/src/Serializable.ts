@@ -4,18 +4,17 @@
 // import { Contract } from './Contract';
 // import { InvocationResult } from './invocationResult';
 // import { StorageChange } from './storageChange';
-import { SerializableWire } from '@neo-one/client-common';
+import { BinaryReader, SerializableWire } from '@neo-one/client-common';
 import { utils } from '@neo-one/utils';
 import { Block } from './Block';
-import { ConsensusPayload } from './payload';
+import { ExtensiblePayload } from './payload';
 import { Signers } from './Signers';
 import { Transaction } from './transaction';
-import { BinaryReader } from './utils';
 import { Verifiable } from './Verifiable';
 
 export { SerializeWire, SerializableWire, createSerializeWire } from '@neo-one/client-common';
 
-export type SerializableContainerType = 'Block' | 'Signers' | 'Transaction' | 'ConsensusPayload';
+export type SerializableContainerType = 'Block' | 'Signers' | 'Transaction' | 'ExtensiblePayload';
 
 export interface SerializableContainer extends SerializableWire, Verifiable {
   readonly type: SerializableContainerType;
@@ -36,8 +35,8 @@ export const deserializeScriptContainer = (
       return Block.deserializeWire({ buffer, context });
     case 'Transaction':
       return Transaction.deserializeWire({ buffer, context });
-    case 'ConsensusPayload':
-      return ConsensusPayload.deserializeWire({ buffer, context });
+    case 'ExtensiblePayload':
+      return ExtensiblePayload.deserializeWire({ buffer, context });
     case 'Signers':
       return Signers.deserializeWire({ buffer, context });
     default:
@@ -77,18 +76,6 @@ export function createDeserializeWire<T>(deserializeWireBase: DeserializeWireBas
     });
 }
 
-// export interface SerializableInvocationData {
-//   readonly asset: Asset | undefined;
-//   readonly contracts: readonly Contract[];
-//   readonly deletedContractHashes: readonly UInt160[];
-//   readonly migratedContractHashes: ReadonlyArray<readonly [UInt160, UInt160]>;
-//   readonly voteUpdates: ReadonlyArray<readonly [UInt160, ReadonlyArray<ECPoint>]>;
-//   readonly result: InvocationResult;
-//   readonly actions: readonly Action[];
-//   readonly storageChanges: readonly StorageChange[];
-// }
-
-// TODO: what did all of these `TransactionData` helpers do? How should we re implement?
 export interface SerializeJSONContext {
   readonly addressVersion: number;
   readonly messageMagic: number;

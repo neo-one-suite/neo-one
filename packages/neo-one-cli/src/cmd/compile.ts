@@ -13,8 +13,8 @@ export const builder = (yargsBuilder: typeof yargs) =>
     .describe('path', 'Contract directory.')
     .boolean('json')
     .describe('json', 'Output the contract with the JSON format.')
-    .boolean('avm')
-    .describe('avm', 'Output the contract with the AVM format.')
+    .boolean('nef')
+    .describe('nef', 'Output the contract with the Nef file format.')
     .boolean('debug')
     .describe('debug', 'Output additional debug information.')
     .boolean('opcodes')
@@ -31,7 +31,7 @@ export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
     const debugIn = argv.debug ? argv.debug : configOptions.debug;
     const options = {
       json: argv.json ? argv.json : configOptions.json,
-      avm: argv.avm ? argv.avm : configOptions.avm,
+      nef: argv.nef ? argv.nef : configOptions.nef,
       debug: opcodes || debugIn,
       opcodes,
     };
@@ -39,8 +39,8 @@ export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
       throw new Error('`opcodes` flag may only be specified alongside the `debug` flag.');
     }
     await createTasks(path, outDir, {
-      json: options.json ? options.json : !options.avm,
-      avm: options.avm ? options.avm : false,
+      json: options.json ? options.json : !options.nef,
+      nef: options.nef ? options.nef : false,
       debug: options.debug ? options.debug : false,
       opcodes: options.opcodes ? options.opcodes : false,
     }).run();

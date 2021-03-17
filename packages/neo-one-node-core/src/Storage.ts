@@ -1,10 +1,7 @@
 import { ApplicationLogJSON } from '@neo-one/client-common';
 import { Observable } from 'rxjs';
 import { ApplicationLog } from './ApplicationLog';
-import { ContractIDState } from './ContractIDState';
-import { ContractKey, ContractState } from './ContractState';
 import { HashIndexState } from './HashIndexState';
-import { HeaderHashList, HeaderKey } from './HeaderHashList';
 import { Nep17Balance } from './Nep17Balance';
 import { Nep17BalanceKey } from './Nep17BalanceKey';
 import { Nep17Transfer } from './Nep17Transfer';
@@ -101,14 +98,14 @@ export interface LatestReadStorage<Key, Value> extends ReadStorage<Key, Value> {
 }
 
 export type AddChange =
-  | { readonly type: 'block'; readonly key: BlockKey; readonly value: TrimmedBlock }
-  | { readonly type: 'transaction'; readonly key: TransactionKey; readonly value: TransactionState }
+  // | { readonly type: 'block'; readonly key: BlockKey; readonly value: TrimmedBlock }
+  // | { readonly type: 'transaction'; readonly key: TransactionKey; readonly value: TransactionState }
   // | { readonly type: 'contract'; readonly key: ContractKey; readonly value: ContractState }
-  | { readonly type: 'storage'; readonly key: StorageKey; readonly value: StorageItem }
-  | { readonly type: 'headerHashList'; readonly key: HeaderKey; readonly value: HeaderHashList }
-  | { readonly type: 'blockHashIndex'; readonly value: HashIndexState }
-  | { readonly type: 'headerHashIndex'; readonly value: HashIndexState }
+  // | { readonly type: 'headerHashList'; readonly key: HeaderKey; readonly value: HeaderHashList }
+  // | { readonly type: 'blockHashIndex'; readonly value: HashIndexState }
+  // | { readonly type: 'headerHashIndex'; readonly value: HashIndexState }
   // | { readonly type: 'contractID'; readonly value: ContractIDState }
+  | { readonly type: 'storage'; readonly key: StorageKey; readonly value: StorageItem }
   | { readonly type: 'nep17Balance'; readonly key: Nep17BalanceKey; readonly value: Nep17Balance }
   | { readonly type: 'nep17TransferSent'; readonly key: Nep17TransferKey; readonly value: Nep17Transfer }
   | { readonly type: 'nep17TransferReceived'; readonly key: Nep17TransferKey; readonly value: Nep17Transfer }
@@ -126,21 +123,15 @@ export type Change =
 export type ChangeSet = readonly Change[];
 
 export interface BlockchainStorage {
-  readonly blocks: ReadStorage<BlockKey, TrimmedBlock>;
   readonly nep17Balances: ReadAllFindStorage<Nep17BalanceKey, Nep17Balance>;
   readonly nep17TransfersSent: ReadFindStorage<Nep17TransferKey, Nep17Transfer>;
   readonly nep17TransfersReceived: ReadFindStorage<Nep17TransferKey, Nep17Transfer>;
   readonly applicationLogs: ReadStorage<TransactionKey, ApplicationLogJSON>;
-  // readonly consensusState: ReadMetadataStorage<ConsensusContext>;
-  readonly transactions: ReadStorage<TransactionKey, TransactionState>;
   readonly storages: ReadFindStorage<StorageKey, StorageItem>;
-  readonly headerHashList: ReadStorage<HeaderKey, HeaderHashList>;
-  readonly blockHashIndex: ReadMetadataStorage<HashIndexState>;
-  readonly headerHashIndex: ReadMetadataStorage<HashIndexState>;
+  // readonly consensusState: ReadMetadataStorage<ConsensusContext>;
 }
 
 export interface Storage extends BlockchainStorage {
-  readonly blocks: ReadAllStorage<BlockKey, TrimmedBlock>;
   readonly commit: (changeSet: ChangeSet) => Promise<void>;
   // tslint:disable-next-line: readonly-array
   readonly commitBatch: (batch: AbstractBatch[]) => Promise<void>;

@@ -5,7 +5,7 @@ import { getDiagnosticMessage } from './getDiagnosticMessage';
 export function throwOnDiagnosticErrorOrWarning(
   diagnostics: ReadonlyArray<ts.Diagnostic>,
   ignoreWarnings = false,
-  message: string = '',
+  message = '',
 ) {
   const errors = diagnostics.filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error);
   const warnings = diagnostics.filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Warning);
@@ -19,7 +19,9 @@ export function throwOnDiagnosticErrorOrWarning(
       : warnings.map((warning) => `Compilation warning: ${getDiagnosticMessage(warning)}`).join('\n');
   if (errorMessage !== undefined) {
     const error = new Error(`${errorMessage}${warningMessage === undefined ? '' : warningMessage}`);
+    // tslint:disable-next-line: no-object-mutation
     error.message = message;
+    // tslint:disable-next-line: no-object-mutation
     error.stack = errorMessage;
     throw error;
   }

@@ -1,13 +1,16 @@
-import { NEP17NativeContract } from './Nep17';
+import { BlockchainSettings, GASContract } from '@neo-one/node-core';
+import { FungibleToken } from './FungibleToken';
+import { gasTokenMethods } from './methods';
 
-export class GASToken extends NEP17NativeContract {
+export class GASToken extends FungibleToken implements GASContract {
   public static readonly decimals: number = 8;
-  public constructor() {
+  public constructor(settings: BlockchainSettings) {
     super({
-      id: -2,
       name: 'GasToken',
       symbol: 'GAS',
       decimals: 8,
+      methods: gasTokenMethods,
+      settings,
     });
   }
 }

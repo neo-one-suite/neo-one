@@ -2,6 +2,7 @@ import {
   AddressString,
   addressToScriptHash,
   ApplicationLogJSON,
+  Base64String,
   BlockJSON,
   BufferString,
   CallReceiptJSON,
@@ -10,6 +11,7 @@ import {
   Hash256String,
   HeaderJSON,
   InvocationDataJSON,
+  NativeContractJSON,
   Nep17BalancesJSON,
   Nep17TransfersJSON,
   NetworkSettingsJSON,
@@ -19,6 +21,7 @@ import {
   SendRawTransactionResultJSON,
   StorageItemJSON,
   TransactionReceiptJSON,
+  TriggerTypeJSON,
   UnclaimedGASJSON,
   ValidatorJSON,
   VerboseTransactionJSON,
@@ -77,6 +80,10 @@ export class JSONRPCClient {
     return this.withInstance(async (provider) => provider.request({ method: 'getblockcount' }));
   }
 
+  public async getBlockHeaderCount(): Promise<number> {
+    return this.withInstance(async (provider) => provider.request({ method: 'getblockheadercount' }));
+  }
+
   public async getFeePerByte(): Promise<string> {
     return this.withInstance(async (provider) => provider.request({ method: 'getfeeperbyte' }));
   }
@@ -108,7 +115,7 @@ export class JSONRPCClient {
   }
 
   public async testInvokeRaw(
-    script: BufferString,
+    script: Base64String,
     verifications: readonly BufferString[] = [],
   ): Promise<CallReceiptJSON> {
     return this.withInstance(async (provider) =>
@@ -155,7 +162,7 @@ export class JSONRPCClient {
     );
   }
 
-  public async sendRawTransaction(value: BufferString): Promise<SendRawTransactionResultJSON> {
+  public async sendRawTransaction(value: Base64String): Promise<SendRawTransactionResultJSON> {
     return this.withInstance(async (provider) =>
       provider
         .request({
@@ -231,7 +238,7 @@ export class JSONRPCClient {
   }
 
   public async getValidators(): Promise<readonly ValidatorJSON[]> {
-    return this.withInstance(async (provider) => provider.request({ method: 'getvalidators' }));
+    return this.withInstance(async (provider) => provider.request({ method: 'getnextblockvalidators' }));
   }
 
   public async validateAddress(address: string): Promise<{ readonly address: string; readonly isvalid: boolean }> {
@@ -243,18 +250,18 @@ export class JSONRPCClient {
   }
 
   public async getStorage(address: AddressString, key: BufferString): Promise<StorageItemJSON> {
-    return this.withInstance(async (provider) => provider.request({ method: 'getstorage', params: [address, key] }));
+    return this.withInstance(async (provider) => provider.request({ method: 'getstorage', params: [address, key, 1] }));
   }
 
   public async getVersion(): Promise<VersionJSON> {
     return this.withInstance(async (provider) => provider.request({ method: 'getversion' }));
   }
 
-  public async getApplicationLog(hash: Hash256String): Promise<ApplicationLogJSON> {
+  public async getApplicationLog(hash: Hash256String, trigger?: TriggerTypeJSON): Promise<ApplicationLogJSON> {
     return this.withInstance(async (provider) =>
       provider.request({
         method: 'getapplicationlog',
-        params: [hash],
+        params: [hash, trigger],
       }),
     );
   }
@@ -275,6 +282,22 @@ export class JSONRPCClient {
           method: 'getpeers',
         })
         .then((result) => result.connected),
+    );
+  }
+
+  public async getCommittee(): Promise<readonly string[]> {
+    return this.withInstance(async (provider) =>
+      provider.request({
+        method: 'getcommittee',
+      }),
+    );
+  }
+
+  public async getNativeContracts(): Promise<readonly NativeContractJSON[]> {
+    return this.withInstance(async (provider) =>
+      provider.request({
+        method: 'getnativecontracts',
+      }),
     );
   }
 

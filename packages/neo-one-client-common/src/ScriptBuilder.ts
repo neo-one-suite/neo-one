@@ -1,5 +1,6 @@
 import { BaseScriptBuilder } from './BaseScriptBuilder';
 import { common, UInt160 } from './common';
+import { CallFlags } from './models';
 import { getSysCallHash, SysCallName } from './models/vm';
 import { scriptBuilderParamTo } from './paramUtils';
 import { ScriptBuilderParam, ScriptBuilderParamToCallbacks } from './types';
@@ -62,6 +63,7 @@ export class ScriptBuilder extends BaseScriptBuilder {
   // tslint:disable-next-line readonly-array
   public emitAppCallInvocation(operation: string, ...params: ScriptBuilderParam[]): this {
     this.emitPushArray(params);
+    this.emitPushInt(CallFlags.All);
 
     return this.emitPushParam(operation);
   }
@@ -73,7 +75,7 @@ export class ScriptBuilder extends BaseScriptBuilder {
   }
 
   // tslint:disable-next-line readonly-array
-  public emitAppCall(scriptHash: UInt160, operation: string, ...params: ScriptBuilderParam[]): this {
+  public emitDynamicAppCall(scriptHash: UInt160, operation: string, ...params: ScriptBuilderParam[]): this {
     this.emitAppCallInvocation(operation, ...params);
 
     return this.emitAppCallVerification(scriptHash);

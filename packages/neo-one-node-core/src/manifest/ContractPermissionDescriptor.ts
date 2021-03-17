@@ -14,6 +14,6 @@ export class ContractPermissionDescriptor extends ContractPermissionDescriptorMo
       return new ContractPermissionDescriptor();
     }
 
-    throw new InvalidFormatError();
+    throw new InvalidFormatError('Invalid contract permission descriptor');
   }
 }

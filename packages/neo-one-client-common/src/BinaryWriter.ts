@@ -49,7 +49,7 @@ const writeFromBuffer = (source: Buffer, target: Buffer, offset = 0) => {
 const writeUInt160 = (value: UInt160 | UInt160Hex, buffer: Buffer, position: number) => {
   const result = common.uInt160ToBuffer(value);
   if (result.length !== common.UINT160_BUFFER_BYTES) {
-    throw new Error('is this working?');
+    throw new Error('Invalid UInt160');
   }
   writeFromBuffer(result, buffer, position);
 };
@@ -57,7 +57,7 @@ const writeUInt160 = (value: UInt160 | UInt160Hex, buffer: Buffer, position: num
 const writeUInt256 = (value: UInt256 | UInt256Hex, buffer: Buffer, position: number) => {
   const result = common.uInt256ToBuffer(value);
   if (result.length !== common.UINT256_BUFFER_BYTES) {
-    throw new Error('is this working?');
+    throw new Error('Invalid UInt256');
   }
   writeFromBuffer(result, buffer, position);
 };
@@ -65,7 +65,7 @@ const writeUInt256 = (value: UInt256 | UInt256Hex, buffer: Buffer, position: num
 const writeECPoint = (value: ECPoint | ECPointHex, buffer: Buffer, position: number) => {
   const result = common.ecPointToBuffer(value);
   if (result.length !== common.ECPOINT_BUFFER_BYTES) {
-    throw new Error('is this working?');
+    throw new Error('Invalid ECPoint');
   }
 
   writeFromBuffer(result, buffer, position);

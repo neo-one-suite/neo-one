@@ -1,8 +1,15 @@
-import { common, InvalidFormatError, IOHelper, ScriptBuilder, TriggerType, VMState } from '@neo-one/client-common';
+import {
+  CallFlags,
+  common,
+  InvalidFormatError,
+  IOHelper,
+  ScriptBuilder,
+  TriggerType,
+  VMState,
+} from '@neo-one/client-common';
 import {
   ApplicationEngine,
   BlockBase,
-  CallFlags,
   ContractState,
   Notification,
   Transaction,
@@ -14,19 +21,13 @@ import { ScriptVerifyError } from './errors';
 
 const hashListBatchSize = 2000;
 
-const getOnPersistNativeContractScript = coreUtils.lazy(() => {
-  const builder = new ScriptBuilder();
-  builder.emitSysCall('System.Contract.NativeOnPersist');
+const getOnPersistNativeContractScript = coreUtils.lazy(() =>
+  new ScriptBuilder().emitSysCall('System.Contract.NativeOnPersist').build(),
+);
 
-  return builder.build();
-});
-
-const getPostPersistNativeContractScript = coreUtils.lazy(() => {
-  const builder = new ScriptBuilder();
-  builder.emitSysCall('System.Contract.NativePostPersist');
-
-  return builder.build();
-});
+const getPostPersistNativeContractScript = coreUtils.lazy(() =>
+  new ScriptBuilder().emitSysCall('System.Contract.NativePostPersist').build(),
+);
 
 // tslint:disable-next-line: no-any
 const isTransaction = (value: any): value is Transaction => value?.type === 'Transaction';
@@ -36,6 +37,7 @@ const getApplicationExecuted = (engine: ApplicationEngine, container?: Verifiabl
   trigger: engine.trigger,
   state: engine.state,
   gasConsumed: engine.gasConsumed,
+  exception: engine.faultException,
   stack: engine.resultStack,
   notifications: engine.notifications.map((item) => Notification.fromStackItem(item, container)),
   logs: engine.logs,
@@ -45,6 +47,7 @@ const getCallReceipt = (engine: ApplicationEngine, container?: Verifiable) => ({
   state: engine.state,
   gasConsumed: engine.gasConsumed,
   stack: engine.resultStack,
+  exception: engine.faultException,
   notifications: engine.notifications.map((item) => Notification.fromStackItem(item, container)),
   logs: engine.logs,
 });
@@ -62,7 +65,7 @@ const verifyContract = async (contract: ContractState, vm: VM, transaction: Tran
         hash: contract.hash,
         flags: CallFlags.None,
         method: 'verify',
-        packParameters: true,
+        pcount: -1, // TODO: verify this
       });
 
       if (!loaded) {

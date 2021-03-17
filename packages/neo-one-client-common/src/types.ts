@@ -8,9 +8,7 @@ import { ECPoint, UInt160, UInt160Hex, UInt256 } from './common';
 import {
   AccountContract,
   AttributeTypeModel,
-  NotificationJSON,
   OracleResponseCode,
-  StackItemJSON,
   TriggerTypeJSON,
   VerifyResultModel,
   VMState,
@@ -42,6 +40,12 @@ export type Hash256String = string;
  * @example '908d323aa7f92656a77ec26e8861699ef'
  */
 export type BufferString = string;
+/**
+ * Base64 encoded string that represents a buffer.
+ *
+ * @example 'CQjTI6p/kmVqd+wm6IYWme8='
+ */
+export type Base64String = string;
 /**
  * Hex encoded string that represents a public key.
  *
@@ -2237,6 +2241,7 @@ export interface RawCallReceipt {
   readonly state: keyof typeof VMState;
   readonly script: Buffer;
   readonly gasConsumed: BigNumber;
+  readonly exception?: string;
   readonly stack: readonly ContractParameter[] | string;
   readonly notifications: readonly RawNotification[];
   readonly logs: readonly RawLog[];

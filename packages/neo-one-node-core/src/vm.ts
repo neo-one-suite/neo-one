@@ -1,7 +1,6 @@
-import { TriggerType, UInt160, UInt256, VMState } from '@neo-one/client-common';
+import { CallFlags, TriggerType, UInt160, UInt256, VMState } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { Block } from './Block';
-import { CallFlags } from './CallFlags';
 import { Notification } from './Notification';
 import { SerializableContainer } from './Serializable';
 import { StackItem } from './StackItems';
@@ -26,6 +25,7 @@ export interface VMLog {
 export interface CallReceipt {
   readonly state: VMState;
   readonly gasConsumed: BN;
+  readonly exception?: string;
   readonly stack: readonly StackItem[];
   readonly notifications: readonly Notification[];
   readonly logs: readonly VMLog[];
@@ -37,6 +37,7 @@ export interface ApplicationEngineOptions {
   readonly trigger: TriggerType;
   readonly container?: SerializableContainer;
   readonly snapshot?: SnapshotName;
+  readonly persistingBlock?: Block;
   readonly gas: BN;
 }
 
@@ -51,6 +52,7 @@ export interface RunEngineOptions {
 
 export interface LoadScriptOptions {
   readonly script: Buffer;
+  readonly rvcount?: number;
   readonly flags?: CallFlags;
   readonly scriptHash?: UInt160;
   readonly initialPosition?: number;
@@ -60,7 +62,11 @@ export interface LoadContractOptions {
   readonly hash: UInt160;
   readonly flags: CallFlags;
   readonly method: string;
-  readonly packParameters?: boolean;
+  readonly pcount: number;
+}
+
+export interface PushArgs {
+  readonly item: string;
 }
 
 export interface ApplicationEngine {
@@ -68,28 +74,34 @@ export interface ApplicationEngine {
   readonly gasConsumed: BN;
   readonly resultStack: readonly StackItem[];
   readonly state: VMState;
+  readonly faultException?: string;
   readonly notifications: readonly StackItem[];
   readonly logs: readonly VMLog[];
   readonly loadScript: (options: LoadScriptOptions) => boolean;
   readonly loadContract: (options: LoadContractOptions) => boolean;
   readonly execute: () => VMState;
+  readonly push: (item: string) => boolean;
+  readonly stepOut: () => boolean;
 }
 
-export type SnapshotPartial = 'blocks' | 'transactions';
+export interface PutBatch {
+  readonly type: 'put';
+  readonly key: Buffer;
+  readonly value: Buffer;
+}
+
+export interface DeleteBatch {
+  readonly type: 'del';
+  readonly key: Buffer;
+}
+
+export type Batch = PutBatch | DeleteBatch;
 
 export interface SnapshotHandler {
-  readonly addBlock: (block: Block) => boolean;
-  readonly addTransaction: (transaction: Transaction, index: number, state?: VMState) => boolean;
-  readonly deleteTransaction: (hash: UInt256) => boolean;
-  readonly commit: (partial?: SnapshotPartial) => boolean;
+  readonly commit: () => boolean;
   // readonly reset: () => boolean;
-  readonly changeBlockHashIndex: (index: number, hash: UInt256) => boolean;
-  readonly changeHeaderHashIndex: (index: number, hash: UInt256) => boolean;
-  readonly setPersistingBlock: (block: Block) => boolean;
-  readonly hasPersistingBlock: () => boolean;
-  // TODO: type the returning changeSet
-  // tslint:disable-next-line: no-any
-  readonly getChangeSet: () => any;
+  // tslint:disable-next-line: readonly-array
+  readonly getChangeSet: () => Batch[];
   readonly clone: () => void;
 }
 
@@ -97,6 +109,7 @@ export interface ApplicationExecuted {
   readonly transaction?: Transaction;
   readonly trigger: TriggerType;
   readonly state: VMState;
+  readonly exception?: string;
   readonly gasConsumed: BN;
   readonly stack: readonly StackItem[];
   readonly notifications: readonly Notification[];

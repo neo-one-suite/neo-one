@@ -1,4 +1,4 @@
-import { BinaryWriter, IOHelper, UInt256 } from '@neo-one/client-common';
+import { BinaryReader, BinaryWriter, IOHelper, UInt256 } from '@neo-one/client-common';
 import { BaseState } from '@neo-one/client-full-common';
 import { BN } from 'bn.js';
 import {
@@ -8,7 +8,7 @@ import {
   SerializableWire,
   SerializeWire,
 } from './Serializable';
-import { BinaryReader, utils } from './utils';
+import { utils } from './utils';
 
 export interface TransactionDataAdd {
   readonly version?: number;

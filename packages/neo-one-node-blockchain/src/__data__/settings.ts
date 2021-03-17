@@ -73,7 +73,7 @@ export const settings: Settings = {
     timestamp: 1468595301,
     index: 0,
     consensusData: new BN(2083236893),
-    nextConsensus: crypto.getConsensusAddress(standbyValidators),
+    nextConsensus: crypto.getBFTAddress(standbyValidators),
     script: new Witness({
       invocation: Buffer.from([]),
       verification: Buffer.from([Op.PUSH1]),

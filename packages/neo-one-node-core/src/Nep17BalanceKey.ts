@@ -1,6 +1,6 @@
-import { createSerializeWire, IOHelper, Nep17BalanceKeyModel, UInt160 } from '@neo-one/client-common';
+import { BinaryReader, createSerializeWire, IOHelper, Nep17BalanceKeyModel, UInt160 } from '@neo-one/client-common';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from './Serializable';
-import { BinaryReader, utils } from './utils';
+import { utils } from './utils';
 
 export interface Nep17BalanceKeyAdd {
   readonly userScriptHash: UInt160;

@@ -1,7 +1,7 @@
-import { BinaryWriter, createSerializeWire, IOHelper } from '@neo-one/client-common';
+import { BinaryReader, BinaryWriter, createSerializeWire, IOHelper } from '@neo-one/client-common';
 import { Equals, Equatable } from './Equatable';
 import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableWire } from './Serializable';
-import { BinaryReader, utils } from './utils';
+import { utils } from './utils';
 
 export interface StorageKeyAdd {
   readonly id: number;

@@ -19,6 +19,7 @@ export interface ProtocolSettings {
   readonly validatorsCount: number;
   readonly millisecondsPerBlock: number;
   readonly memoryPoolMaxTransactions: number;
+  readonly nativeActivations: { readonly [key: string]: number };
 }
 
 export interface NetworkSettings {

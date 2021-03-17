@@ -40,6 +40,12 @@ export class KeyBuilder {
     return this.addBuffer(buffer);
   }
 
+  public addUInt64BE(value: BN): this {
+    const buffer = value.toArrayLike(Buffer, 'be', 8);
+
+    return this.addBuffer(buffer);
+  }
+
   public toSearchPrefix(): Buffer {
     return StorageKey.createSearchPrefix(this.id, this.mutableBuffer);
   }

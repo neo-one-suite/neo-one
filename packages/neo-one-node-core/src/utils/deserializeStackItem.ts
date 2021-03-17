@@ -15,7 +15,6 @@ import {
   StackItem,
   StructStackItem,
 } from '../StackItems';
-import { BinaryReader } from './BinaryReader';
 
 interface ContainerPlaceholderAdd {
   readonly type: StackItemType;

@@ -220,10 +220,9 @@ export type ActionJSON = NotificationActionJSON | LogActionJSON;
 export type ActionTypeJSON = ActionJSON['type'];
 
 export interface StorageItemJSON {
-  readonly hash: string;
   readonly key: string;
   readonly value: string;
-  readonly flags: StorageFlagsJSON;
+  readonly isConstant: boolean;
 }
 
 export type StorageFlagsJSON = keyof typeof StorageFlagsModel;
@@ -285,14 +284,20 @@ export interface ExecutionResultJSON {
   readonly notifications: readonly NotificationActionJSON[];
 }
 
-export interface ApplicationLogJSON {
-  readonly txid?: string;
+export interface ExecutionJSON {
   readonly trigger: TriggerTypeJSON;
   readonly vmstate: VMStateJSON;
   readonly gasconsumed: string;
+  readonly exception?: string;
   readonly stack: readonly StackItemJSON[] | string;
   readonly notifications: readonly NotificationJSON[];
   readonly logs: readonly LogJSON[];
+}
+
+export interface ApplicationLogJSON {
+  readonly txid?: string;
+  readonly blockhash?: string;
+  readonly executions: readonly ExecutionJSON[];
 }
 
 export interface AccountContractJSON {
@@ -318,12 +323,10 @@ export interface TransactionJSON {
   readonly receipt?: TransactionReceiptJSON;
 }
 
-// Just for Neo returns, don't think we need it for anything
 export interface VerboseTransactionJSON extends TransactionJSON {
   readonly blockhash: UInt256Hex;
   readonly confirmations: number;
   readonly blocktime: number;
-  readonly vmstate: VMStateJSON;
 }
 
 export interface TransactionWithInvocationDataJSON extends TransactionJSON {
@@ -392,12 +395,36 @@ export interface ContractParameterDefinitionJSON {
   readonly type: ContractParameterTypeJSON;
 }
 
+export interface MethodTokenJSON {
+  readonly hash: string;
+  readonly method: string;
+  readonly paramcount: number;
+  readonly hasreturnvalue: boolean;
+  readonly callflags: number;
+}
+
+export interface NefFileJSON {
+  readonly magic: number;
+  readonly compiler: string;
+  readonly tokens: readonly MethodTokenJSON[];
+  readonly script: string;
+  readonly checksum: number;
+}
+
 export interface ContractJSON {
   readonly id: number;
   readonly updatecounter: number;
   readonly hash: string;
-  readonly script: string;
+  readonly nef: NefFileJSON;
   readonly manifest: ContractManifestJSON;
+}
+
+export interface NativeContractJSON {
+  readonly id: number;
+  readonly hash: string;
+  readonly nef: NefFileJSON;
+  readonly manifest: ContractManifestJSON;
+  readonly activeblockindex: number;
 }
 
 export interface Nep17TransfersJSON {
@@ -490,6 +517,7 @@ export interface CallReceiptJSON {
   readonly script: string;
   readonly state: keyof typeof VMState;
   readonly gasconsumed: string;
+  readonly exception?: string;
   readonly stack: readonly ContractParameterJSON[] | string;
   readonly notifications: readonly NotificationJSON[];
   readonly logs: readonly LogJSON[];
@@ -529,6 +557,7 @@ export interface PluginJSON {
 }
 
 export interface VersionJSON {
+  readonly magic: number;
   readonly tcpport: number;
   readonly wsport: number;
   readonly nonce: number;

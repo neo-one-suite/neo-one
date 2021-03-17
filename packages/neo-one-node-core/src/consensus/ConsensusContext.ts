@@ -1,8 +1,9 @@
-import { common, ECPoint, UInt256, UInt256Hex } from '@neo-one/client-common';
-import { ChangeViewConsensusMessage, ConsensusPayload } from '../payload';
+import { common, crypto, ECPoint, UInt256, UInt256Hex } from '@neo-one/client-common';
+import { ConsensusMessage, deserializeConsensusMessageWire, ExtensiblePayload } from '../payload';
 import { DeserializeWireBaseOptions } from '../Serializable';
 import { Transaction } from '../transaction';
 import { TransactionVerificationContext } from '../TransactionVerificationContext';
+import { Witness } from '../Witness';
 import { BlockBuilder, BlockPartial } from './BlockBuilder';
 
 export const getF = (validatorsLength: number) => Math.floor((validatorsLength - 1) / 3);
@@ -15,10 +16,10 @@ export interface ConsensusContextAdd {
   readonly blockReceivedTimeMS: number;
   readonly verificationContext: TransactionVerificationContext;
   readonly blockOptions: BlockPartial;
-  readonly preparationPayloads?: ReadonlyArray<ConsensusPayload | undefined>;
-  readonly commitPayloads?: ReadonlyArray<ConsensusPayload | undefined>;
-  readonly changeViewPayloads?: ReadonlyArray<ConsensusPayload | undefined>;
-  readonly lastChangeViewPayloads?: ReadonlyArray<ConsensusPayload | undefined>;
+  readonly preparationPayloads?: ReadonlyArray<ExtensiblePayload | undefined>;
+  readonly commitPayloads?: ReadonlyArray<ExtensiblePayload | undefined>;
+  readonly changeViewPayloads?: ReadonlyArray<ExtensiblePayload | undefined>;
+  readonly lastChangeViewPayloads?: ReadonlyArray<ExtensiblePayload | undefined>;
   readonly lastSeenMessage?: { readonly [key: string]: number | undefined };
   readonly transactions?: { readonly [hash: string]: Transaction | undefined };
   readonly transactionHashes?: readonly UInt256[];
@@ -27,58 +28,6 @@ export interface ConsensusContextAdd {
 
 // tslint:disable-next-line no-any
 export class ConsensusContext {
-  public static deserializeWireBase(_options: DeserializeWireBaseOptions) {
-    throw new Error('not yet implemented');
-  }
-  public readonly viewNumber: number;
-  public readonly myIndex: number;
-  public readonly validators: readonly ECPoint[];
-  public readonly blockReceivedTimeMS: number;
-  public readonly verificationContext: TransactionVerificationContext;
-  public readonly preparationPayloads: ReadonlyArray<ConsensusPayload | undefined>;
-  public readonly commitPayloads: ReadonlyArray<ConsensusPayload | undefined>;
-  public readonly changeViewPayloads: ReadonlyArray<ConsensusPayload | undefined>;
-  public readonly lastChangeViewPayloads: ReadonlyArray<ConsensusPayload | undefined>;
-  public readonly lastSeenMessage: { readonly [key: string]: number | undefined };
-  public readonly transactions: { readonly [hash: string]: Transaction | undefined };
-  public readonly transactionHashes?: readonly UInt256[];
-  public readonly transactionHashesSet: Set<UInt256Hex>;
-  public readonly blockBuilder: BlockBuilder;
-  public readonly witnessSize: number;
-
-  public constructor({
-    viewNumber,
-    myIndex,
-    validators,
-    blockReceivedTimeMS,
-    verificationContext,
-    blockOptions,
-    preparationPayloads = [],
-    commitPayloads = [],
-    changeViewPayloads = [],
-    lastChangeViewPayloads = [],
-    lastSeenMessage = {},
-    transactions = {},
-    transactionHashes,
-    witnessSize = 0,
-  }: ConsensusContextAdd) {
-    this.viewNumber = viewNumber;
-    this.myIndex = myIndex;
-    this.validators = validators;
-    this.blockReceivedTimeMS = blockReceivedTimeMS;
-    this.verificationContext = verificationContext;
-    this.blockBuilder = new BlockBuilder(blockOptions);
-    this.preparationPayloads = preparationPayloads;
-    this.commitPayloads = commitPayloads;
-    this.changeViewPayloads = changeViewPayloads;
-    this.lastChangeViewPayloads = lastChangeViewPayloads;
-    this.lastSeenMessage = lastSeenMessage;
-    this.transactions = transactions;
-    this.transactionHashes = transactionHashes;
-    this.transactionHashesSet = new Set(transactionHashes?.map(common.uInt256ToHex));
-    this.witnessSize = witnessSize;
-  }
-
   public get F(): number {
     return getF(this.validators.length);
   }
@@ -144,18 +93,105 @@ export class ConsensusContext {
   }
 
   public get viewChanging(): boolean {
-    const newViewNumber = this.changeViewPayloads[this.myIndex]?.getDeserializedMessage<ChangeViewConsensusMessage>()
-      .newViewNumber;
-
-    if (newViewNumber === undefined) {
+    const messageIn = this.changeViewPayloads[this.myIndex];
+    if (messageIn === undefined) {
       return false;
     }
+    const newViewNumber = this.getMessage(messageIn).viewNumber;
 
     return !this.watchOnly && newViewNumber > this.viewNumber;
   }
 
   public get notAcceptingPayloadsDueToViewChanging() {
     return this.viewChanging && !this.moreThanFNodesCommittedOrLost;
+  }
+  public static deserializeWireBase(_options: DeserializeWireBaseOptions) {
+    throw new Error('ConsensusContext deserialize not yet implemented');
+  }
+  public readonly viewNumber: number;
+  public readonly myIndex: number;
+  public readonly validators: readonly ECPoint[];
+  public readonly blockReceivedTimeMS: number;
+  public readonly verificationContext: TransactionVerificationContext;
+  public readonly preparationPayloads: ReadonlyArray<ExtensiblePayload | undefined>;
+  public readonly commitPayloads: ReadonlyArray<ExtensiblePayload | undefined>;
+  public readonly changeViewPayloads: ReadonlyArray<ExtensiblePayload | undefined>;
+  public readonly lastChangeViewPayloads: ReadonlyArray<ExtensiblePayload | undefined>;
+  public readonly lastSeenMessage: { readonly [key: string]: number | undefined };
+  public readonly transactions: { readonly [hash: string]: Transaction | undefined };
+  public readonly transactionHashes?: readonly UInt256[];
+  public readonly transactionHashesSet: Set<UInt256Hex>;
+  public readonly blockBuilder: BlockBuilder;
+  public readonly witnessSize: number;
+  // tslint:disable-next-line: readonly-keyword
+  private readonly mutableCachedMessages: { [hash: string]: ConsensusMessage | undefined } = {};
+
+  public constructor({
+    viewNumber,
+    myIndex,
+    validators,
+    blockReceivedTimeMS,
+    verificationContext,
+    blockOptions,
+    preparationPayloads = [],
+    commitPayloads = [],
+    changeViewPayloads = [],
+    lastChangeViewPayloads = [],
+    lastSeenMessage = {},
+    transactions = {},
+    transactionHashes,
+    witnessSize = 0,
+  }: ConsensusContextAdd) {
+    this.viewNumber = viewNumber;
+    this.myIndex = myIndex;
+    this.validators = validators;
+    this.blockReceivedTimeMS = blockReceivedTimeMS;
+    this.verificationContext = verificationContext;
+    this.blockBuilder = new BlockBuilder(blockOptions);
+    this.preparationPayloads = preparationPayloads;
+    this.commitPayloads = commitPayloads;
+    this.changeViewPayloads = changeViewPayloads;
+    this.lastChangeViewPayloads = lastChangeViewPayloads;
+    this.lastSeenMessage = lastSeenMessage;
+    this.transactions = transactions;
+    this.transactionHashes = transactionHashes;
+    this.transactionHashesSet = new Set(transactionHashes?.map(common.uInt256ToHex));
+    this.witnessSize = witnessSize;
+  }
+
+  public getMessage<T extends ConsensusMessage>(payload: ExtensiblePayload): T {
+    const maybeMessage = this.mutableCachedMessages[common.uInt256ToString(payload.hash)];
+    if (maybeMessage !== undefined) {
+      return maybeMessage as T;
+    }
+
+    const message = deserializeConsensusMessageWire({
+      buffer: payload.data,
+      context: { messageMagic: payload.magic, validatorsCount: this.validators.length },
+    });
+    // tslint:disable-next-line: no-object-mutation
+    this.mutableCachedMessages[common.uInt256ToString(payload.hash)] = message;
+
+    return message as T;
+  }
+
+  public createPayload(message: ConsensusMessage, magic: number, invocationScript: Buffer) {
+    const payload = new ExtensiblePayload({
+      category: 'dBFT',
+      validBlockStart: 0,
+      validBlockEnd: message.blockIndex,
+      sender: this.getSender(message.validatorIndex),
+      data: message.serializeWire(),
+      witness: new Witness({
+        invocation: invocationScript,
+        verification: crypto.createSignatureRedeemScript(this.validators[message.validatorIndex]),
+      }),
+      messageMagic: magic,
+    });
+
+    this.mutableCachedMessages[common.uInt256ToString(payload.hash)] = message;
+
+    return payload;
   }
 
   public clone(options: Partial<ConsensusContextAdd>) {
@@ -193,7 +229,11 @@ export class ConsensusContext {
     });
   }
 
+  public getSender(index: number) {
+    return common.bufferToUInt160(crypto.createSignatureRedeemScript(this.validators[index]));
+  }
+
   public toJSON(): object {
-    throw new Error('not implemented');
+    throw new Error('ConsensusContext.toJSON not implemented');
   }
 }

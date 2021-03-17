@@ -51,3 +51,5 @@ describe('NativeContract correct data', () => {
     expect(NativeContracts.Policy.scriptHash).toEqual(policyContractHardCoded.scriptHash);
   });
 });
+
+describe('NativeContract hashes', () => {});

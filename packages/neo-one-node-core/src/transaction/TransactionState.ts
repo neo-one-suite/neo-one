@@ -1,36 +1,34 @@
-import { IOHelper, TransactionStateModel, UInt256 } from '@neo-one/client-common';
-import { DeserializeWireBaseOptions, DeserializeWireOptions } from '../Serializable';
-import { BinaryReader, utils } from '../utils';
+import { UInt256 } from '@neo-one/client-common';
+import { assertStructStackItem, StackItem } from '../StackItems';
 import { Transaction } from './Transaction';
 
 export type TransactionKey = UInt256;
 
-export class TransactionState extends TransactionStateModel<Transaction> {
-  public static deserializeWireBase(options: DeserializeWireBaseOptions): TransactionState {
-    const { reader } = options;
-    const blockIndex = reader.readUInt32LE();
-    const state = reader.readUInt8();
-    const transaction = Transaction.deserializeWireBase(options);
+export interface TransactionStateAdd {
+  readonly blockIndex: number;
+  readonly transaction: Transaction;
+}
 
-    return new this({
-      blockIndex,
-      state,
+export class TransactionState {
+  public static fromStackItem(stackItem: StackItem): TransactionState {
+    const { array } = assertStructStackItem(stackItem);
+    const blockIndex = array[0].getInteger();
+    const transaction = Transaction.deserializeWire({
+      buffer: array[1].getBuffer(),
+      context: { messageMagic: 0, validatorsCount: 0 }, // TODO: Fix this
+    });
+
+    return new TransactionState({
+      blockIndex: blockIndex.toNumber(),
       transaction,
     });
   }
 
-  public static deserializeWire(options: DeserializeWireOptions): TransactionState {
-    return this.deserializeWireBase({
-      context: options.context,
-      reader: new BinaryReader(options.buffer),
-    });
-  }
+  public readonly blockIndex: number;
+  public readonly transaction: Transaction;
 
-  private readonly sizeInternal = utils.lazy(
-    () => IOHelper.sizeOfUInt32LE + IOHelper.sizeOfUInt8 + this.transaction.size,
-  );
-
-  public get size() {
-    return this.sizeInternal();
+  public constructor({ blockIndex, transaction }: TransactionStateAdd) {
+    this.blockIndex = blockIndex;
+    this.transaction = transaction;
   }
 }

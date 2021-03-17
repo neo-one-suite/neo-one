@@ -1,6 +1,13 @@
-import { crypto, TriggerType, UInt160, VMState } from '@neo-one/client-common';
 import {
+  assertValidScript,
   CallFlags,
+  ContractParameterTypeModel,
+  crypto,
+  TriggerType,
+  UInt160,
+  VMState,
+} from '@neo-one/client-common';
+import {
   ContractState,
   ExecuteScriptResult,
   maxVerificationGas,
@@ -16,6 +23,7 @@ export const verifyWitnesses = async ({
   native,
   gas: gasIn,
   snapshot,
+  headerCache,
 }: VerifyWitnessesOptions): Promise<boolean> => {
   if (gasIn.ltn(0)) {
     return false;
@@ -25,7 +33,7 @@ export const verifyWitnesses = async ({
 
   let hashes: readonly UInt160[];
   try {
-    hashes = await verifiable.getScriptHashesForVerifying({ storage, native });
+    hashes = await verifiable.getScriptHashesForVerifying({ storage, native, headerCache });
   } catch {
     return false;
   }
@@ -41,6 +49,7 @@ export const verifyWitnesses = async ({
       verifiable,
       storage,
       native,
+      headerCache,
       hash: hashes[i],
       snapshot,
       witness: verifiable.witnesses[i],
@@ -69,11 +78,18 @@ export const verifyWitness = async ({
 }: VerifyWitnessOptions): Promise<ExecuteScriptResult> => {
   const initFee = new BN(0);
   const { verification, invocation } = witness;
+
+  try {
+    assertValidScript(invocation);
+  } catch {
+    return { result: false, gas: initFee };
+  }
+
   const callFlags = !crypto.isStandardContract(verification) ? CallFlags.ReadStates : CallFlags.None;
 
   let contract: ContractState | undefined;
   if (verification.length === 0) {
-    contract = await native.Management.getContract(storage, hash);
+    contract = await native.ContractManagement.getContract(storage, hash);
     if (contract === undefined) {
       return { result: false, gas: initFee };
     }
@@ -95,18 +111,29 @@ export const verifyWitness = async ({
     },
     async (engine) => {
       if (contract !== undefined) {
-        const loadContractResult = engine.loadContract({
-          hash,
-          method: 'verify',
-          flags: callFlags,
-          packParameters: true,
-        });
-        if (!loadContractResult) {
+        const methodDescriptor = contract.manifest.abi.getMethod('verify', -1);
+        if (methodDescriptor?.returnType !== ContractParameterTypeModel.Boolean) {
           return { result: false, gas: initFee };
         }
+
+        engine.loadContract({
+          hash,
+          method: 'verify',
+          pcount: -1,
+          flags: callFlags,
+        });
       } else {
-        // tslint:disable-next-line: possible-timing-attack
-        if (native.isNative(hash) || !hash.equals(witness.scriptHash)) {
+        if (native.isNative(hash)) {
+          return { result: false, gas: initFee };
+        }
+
+        if (!hash.equals(witness.scriptHash)) {
+          return { result: false, gas: initFee };
+        }
+
+        try {
+          assertValidScript(verification);
+        } catch {
           return { result: false, gas: initFee };
         }
 
@@ -114,13 +141,21 @@ export const verifyWitness = async ({
       }
 
       engine.loadScript({ script: invocation, flags: CallFlags.None });
+      if (native.isNative(hash)) {
+        try {
+          engine.stepOut();
+          engine.push('verify');
+        } catch {
+          // do nothing
+        }
+      }
       const result = engine.execute();
 
       if (result === VMState.FAULT) {
         return { result: false, gas: initFee };
       }
 
-      if (engine.resultStack.length !== 1 || !engine.resultStack[0].getBoolean()) {
+      if (!engine.resultStack[0].getBoolean()) {
         return { result: false, gas: initFee };
       }
 

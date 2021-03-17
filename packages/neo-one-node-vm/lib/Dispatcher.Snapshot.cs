@@ -1,115 +1,40 @@
 using System;
 using System.IO;
-using Neo;
-using Neo.Ledger;
 using Neo.Network.P2P.Payloads;
 using Neo.Persistence;
-using Neo.VM;
 using NEOONE.Storage;
-using System.Threading;
-using Neo.IO.Caching;
 
 namespace NEOONE
 {
   partial class Dispatcher
   {
 
-    private StoreView snapshot;
-    private StoreView clonedSnapshot;
+    private DataCache snapshot;
+    private DataCache clonedSnapshot;
 
     enum SnapshotMethod
     {
-      snapshot_blocks_add,
-      snapshot_transactions_add,
       snapshot_clone,
       snapshot_commit,
       snapshot_reset,
-      snapshot_change_block_hash_index,
-      snapshot_change_header_hash_index,
-      snapshot_set_persisting_block,
-      snapshot_has_persisting_block,
       snapshot_get_change_set,
-      snapshot_transactions_delete,
     }
 
     private dynamic dispatchSnapshotMethod(SnapshotMethod method, dynamic args)
     {
       switch (method)
       {
-        case SnapshotMethod.snapshot_blocks_add:
-          UInt256 blockHash = new UInt256((byte[])args.hash);
-          byte[] blockSerialized = (byte[])args.block;
-          Block block = new Block();
-          using (MemoryStream ms = new MemoryStream(blockSerialized))
-          using (BinaryReader reader = new BinaryReader(ms))
-          {
-            block.Deserialize(reader);
-          }
-
-          return this._snapshotBlocksAdd(this.selectSnapshot(args.snapshot), blockHash, block);
-
-        case SnapshotMethod.snapshot_transactions_add:
-          uint blockIndex = (uint)args.index;
-          byte[] txSerialized = (byte[])args.tx;
-          VMState vmState = (VMState)args.state;
-          Transaction tx = new Transaction();
-          using (MemoryStream ms = new MemoryStream(txSerialized))
-          using (BinaryReader reader = new BinaryReader(ms))
-          {
-
-            ((IVerifiable)tx).Deserialize(reader);
-          }
-
-          return this._snapshotTransactionsAdd(this.selectSnapshot(args.snapshot), tx, blockIndex, vmState);
-
-        case SnapshotMethod.snapshot_transactions_delete:
-          UInt256 transactionHash = new UInt256((byte[])args.hash);
-
-          return this._snapshotTransactionsDelete(this.selectSnapshot(args.snapshot), transactionHash);
-
         case SnapshotMethod.snapshot_clone:
           return this._snapshotClone();
-
-        case SnapshotMethod.snapshot_change_block_hash_index:
-          uint bIndex = (uint)args.index;
-          UInt256 blockChangeHash = new UInt256((byte[])args.hash);
-
-          return this._snapshotChangeBlockHashIndex(this.selectSnapshot(args.snapshot), bIndex, blockChangeHash);
-
-        case SnapshotMethod.snapshot_change_header_hash_index:
-          uint hIndex = (uint)args.index;
-          UInt256 headerChangeHash = new UInt256((byte[])args.hash);
-
-          return this._snapshotChangeHeaderHashIndex(this.selectSnapshot(args.snapshot), hIndex, headerChangeHash);
 
         case SnapshotMethod.snapshot_get_change_set:
           return this._snapshotGetChangeSet(this.selectSnapshot(args.snapshot, true));
 
 
         case SnapshotMethod.snapshot_commit:
-          this._snapshotCommit(
-            this.selectSnapshot(args.snapshot),
-            args.partial
-          );
+          this._snapshotCommit(this.selectSnapshot(args.snapshot));
 
           return true;
-
-        case SnapshotMethod.snapshot_set_persisting_block:
-          byte[] persistingBlockSerialized = (byte[])args.block;
-          Block persisting = new Block();
-          using (MemoryStream ms = new MemoryStream(persistingBlockSerialized))
-          using (BinaryReader reader = new BinaryReader(ms))
-          {
-            persisting.Deserialize(reader);
-          }
-
-          this.selectSnapshot(args.snapshot).PersistingBlock = persisting;
-
-          return true;
-
-        case SnapshotMethod.snapshot_has_persisting_block:
-          return this.selectSnapshot(args.snapshot).PersistingBlock != null;
-
 
         case SnapshotMethod.snapshot_reset:
           this.resetSnapshots();
@@ -127,11 +52,11 @@ namespace NEOONE
       this.store?.Dispose();
       this.store = null;
       this.store = this.path != null ? new RocksDBStore(this.path).GetStore() : new MemoryStore();
-      this.snapshot = new SnapshotView(this.store);
-      this.clonedSnapshot = this.snapshot.Clone();
+      this.snapshot = new SnapshotCache(this.store);
+      this.clonedSnapshot = this.snapshot.CreateSnapshot();
     }
 
-    private StoreView selectSnapshot(string snapshot, bool required = true)
+    private DataCache selectSnapshot(string snapshot, bool required = true)
     {
       switch (snapshot)
       {
@@ -145,70 +70,19 @@ namespace NEOONE
       }
     }
 
-    private void _snapshotCommit(StoreView snapshot, string partial)
+    private void _snapshotCommit(DataCache snapshot)
     {
-      switch (partial)
-      {
-        case "blocks":
-          snapshot.Blocks.Commit();
-          break;
-        case "transactions":
-          snapshot.Transactions.Commit();
-          break;
-        default:
-          snapshot.Commit();
-          break;
-      }
+      snapshot.Commit();
     }
 
-    private bool _snapshotBlocksAdd(StoreView snapshot, UInt256 hash, Block block)
-    {
-      snapshot.Blocks.Add(hash, block.Trim());
-
-      return true;
-    }
-
-    private bool _snapshotTransactionsAdd(StoreView snapshot, Transaction tx, uint index, VMState vmState = VMState.BREAK)
-    {
-      var state = new TransactionState { BlockIndex = index, Transaction = tx, VMState = vmState };
-      snapshot.Transactions.Add(tx.Hash, state);
-
-      return true;
-    }
-
-    private bool _snapshotTransactionsDelete(StoreView snapshot, UInt256 hash)
-    {
-      snapshot.Transactions.Delete(hash);
-
-      return true;
-    }
-
-    private bool _snapshotChangeBlockHashIndex(StoreView snapshot, uint index, UInt256 hash)
-    {
-      HashIndexState hashIndex = snapshot.BlockHashIndex.GetAndChange();
-      hashIndex.Index = index;
-      hashIndex.Hash = hash;
-
-      return true;
-    }
-
-    private bool _snapshotChangeHeaderHashIndex(StoreView snapshot, uint index, UInt256 hash)
-    {
-      HashIndexState hashIndex = snapshot.HeaderHashIndex.GetAndChange();
-      hashIndex.Index = index;
-      hashIndex.Hash = hash;
-
-      return true;
-    }
-
-    private dynamic _snapshotGetChangeSet(StoreView snapshot)
+    private dynamic _snapshotGetChangeSet(DataCache snapshot)
     {
       return new ChangeSet(snapshot).set.ToArray();
     }
 
     private bool _snapshotClone()
     {
-      this.clonedSnapshot = this.snapshot.Clone();
+      this.clonedSnapshot = this.snapshot.CreateSnapshot();
 
       return true;
     }

@@ -1,6 +1,6 @@
+import { BinaryReader } from '@neo-one/client-common';
 import { utils } from '@neo-one/utils';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from '../../Serializable';
-import { BinaryReader } from '../../utils';
 import { ChangeViewConsensusMessage } from './ChangeViewConsensusMessage';
 import { CommitConsensusMessage } from './CommitConsensusMessage';
 import { assertConsensusMessageType, ConsensusMessageType } from './ConsensusMessageType';
