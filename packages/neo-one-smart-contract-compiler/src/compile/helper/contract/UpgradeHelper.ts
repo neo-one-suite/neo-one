@@ -48,7 +48,7 @@ export class UpgradeHelper extends Helper {
           // ['update', arg]
           sb.emitPushString(node, 'update');
           // [buffer, 'update', arg]
-          sb.emitPushBuffer(node, common.nativeHashes.Management);
+          sb.emitPushBuffer(node, common.nativeHashes.ContractManagement);
           // [conract]
           sb.emitSysCall(node, 'System.Contract.Call');
           // []

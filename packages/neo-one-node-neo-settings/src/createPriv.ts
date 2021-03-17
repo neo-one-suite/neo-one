@@ -20,7 +20,7 @@ export const createPriv = ({
   const standbyMembers = extraCommitteeMembersIn.map((value) => clientCommon.stringToECPoint(value));
   const standbyCommittee = standbyValidators.concat(standbyMembers);
 
-  const consensusAddress = crypto.getConsensusAddress(standbyValidators);
+  const consensusAddress = crypto.getBFTAddress(standbyValidators);
 
   const commonSettings = common({
     privateNet: true,
@@ -42,5 +42,6 @@ export const createPriv = ({
     addressVersion: clientCommon.NEO_ADDRESS_VERSION,
     privateKeyVersion: clientCommon.NEO_PRIVATE_KEY_VERSION,
     standbyValidators,
+    nativeActivations: commonSettings.nativeActivations,
   };
 };

@@ -12,5 +12,5 @@ export const assertMessageFlags = (value: number): MessageFlags => {
     return value;
   }
 
-  throw new InvalidFormatError(`expected flag to be 0x00 or 0x01, found: ${value}`);
+  throw new InvalidFormatError(`Expected flag to be 0x00 or 0x01, found: ${value}`);
 };

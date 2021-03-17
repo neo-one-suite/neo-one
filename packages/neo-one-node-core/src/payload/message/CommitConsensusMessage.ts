@@ -10,21 +10,25 @@ export interface CommitConsensusMessageAdd extends ConsensusMessageBaseAdd {
 export class CommitConsensusMessage extends ConsensusMessageBase {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): CommitConsensusMessage {
     const { reader } = options;
-    const { viewNumber } = super.deserializeConsensusMessageBaseWireBase(options);
+    const { viewNumber, blockIndex, validatorIndex } = super.deserializeConsensusMessageBaseWireBase(options);
     const signature = reader.readBytes(64);
 
     return new CommitConsensusMessage({
       viewNumber,
+      blockIndex,
+      validatorIndex,
       signature,
     });
   }
 
   public readonly signature: Buffer;
 
-  public constructor({ viewNumber, signature }: CommitConsensusMessageAdd) {
+  public constructor({ viewNumber, blockIndex, validatorIndex, signature }: CommitConsensusMessageAdd) {
     const options = {
       type: ConsensusMessageType.Commit,
       viewNumber,
+      blockIndex,
+      validatorIndex,
     };
     super(options);
     this.signature = signature;

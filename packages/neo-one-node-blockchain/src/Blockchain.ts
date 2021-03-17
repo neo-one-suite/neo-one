@@ -1,5 +1,6 @@
 import {
   common,
+  crypto,
   ECPoint,
   ScriptBuilder,
   TriggerType,
@@ -15,12 +16,12 @@ import {
   Blockchain as BlockchainType,
   BlockchainSettings,
   CallReceipt,
-  Change,
   ChangeSet,
   ConsensusData,
-  ConsensusPayload,
   DeserializeWireContext,
-  HashIndexState,
+  DesignationRole,
+  Execution,
+  ExtensiblePayload,
   Header,
   Mempool,
   NativeContainer,
@@ -31,24 +32,20 @@ import {
   Signers,
   Storage,
   Transaction,
+  TransactionState,
   TransactionVerificationContext,
   VerifyOptions,
   VM,
   Witness,
 } from '@neo-one/node-core';
-import { Labels } from '@neo-one/utils';
+import { Labels, utils as neoOneUtils } from '@neo-one/utils';
 import { BN } from 'bn.js';
 import PriorityQueue from 'js-priority-queue';
 import { Observable, Subject } from 'rxjs';
-import { map, toArray } from 'rxjs/operators';
-import {
-  BlockVerifyError,
-  ConsensusPayloadVerifyError,
-  GenesisBlockNotRegisteredError,
-  RecoverBlockchainError,
-} from './errors';
+import { BlockVerifyError, ConsensusPayloadVerifyError, GenesisBlockNotRegisteredError } from './errors';
 import { getNep17UpdateOptions } from './getNep17UpdateOptions';
-import { HeaderIndexCache } from './HeaderIndexCache';
+import { HeaderCache } from './HeaderCache';
+import { ImmutableHashSet, ImmutableHashSetBuilder } from './ImmutableHashSet';
 import { PersistingBlockchain } from './PersistingBlockchain';
 import { utils } from './utils';
 import { verifyWitness, verifyWitnesses } from './verify';
@@ -66,8 +63,6 @@ export interface CreateBlockchainOptions {
 }
 
 export interface BlockchainOptions extends CreateBlockchainOptions {
-  // tslint:disable-next-line: readonly-array
-  readonly headerIndexCache: HeaderIndexCache;
   readonly currentBlock?: Block;
   readonly previousBlock?: Block;
 }
@@ -79,143 +74,7 @@ interface Entry {
   readonly verify: boolean;
 }
 
-export const recoverHeaderIndex = async (storage: Storage) => {
-  const maybeHeaderHashIndex = await storage.headerHashIndex.tryGet();
-  const initHeaderListIndex =
-    maybeHeaderHashIndex === undefined ? 0 : Math.floor(maybeHeaderHashIndex.index / utils.hashListBatchSize);
-  const storedHeaderCount = initHeaderListIndex * utils.hashListBatchSize;
-  if (storedHeaderCount !== 0) {
-    const { hashes: latestStoredHashes } = await storage.headerHashList.get(
-      storedHeaderCount - utils.hashListBatchSize,
-    );
-    const hashIndex = await storage.headerHashIndex.get();
-    let currentHashes: readonly UInt256[] = [];
-    if (hashIndex.index >= storedHeaderCount) {
-      let hash = hashIndex.hash;
-      const finalHash = latestStoredHashes[latestStoredHashes.length - 1];
-      // tslint:disable-next-line: no-loop-statement
-      while (!hash.equals(finalHash)) {
-        currentHashes = [hash].concat(currentHashes);
-        const { previousHash } = await storage.blocks.get({ hashOrIndex: hash });
-        hash = previousHash;
-      }
-    }
-
-    return new HeaderIndexCache({
-      storage,
-      initStorageCount: storedHeaderCount,
-      initCurrentHeaderHashes: currentHashes,
-    });
-  }
-
-  const sortedTrimmedBlocks = await storage.blocks.all$
-    .pipe(
-      toArray(),
-      map((blocks) => blocks.slice().sort(utils.blockComparator)),
-    )
-    .toPromise();
-
-  return new HeaderIndexCache({
-    storage,
-    initStorageCount: 0,
-    initCurrentHeaderHashes: sortedTrimmedBlocks.map((block) => block.hash),
-  });
-};
 export class Blockchain {
-  public static async create({
-    settings,
-    storage,
-    native,
-    vm,
-    onPersist,
-  }: CreateBlockchainOptions): Promise<BlockchainType> {
-    const headerIndexCache = await recoverHeaderIndex(storage);
-    if (headerIndexCache.length > 0) {
-      const currentHeaderHash = await headerIndexCache.get(headerIndexCache.length - 1);
-      const currentBlockTrimmed = await storage.blocks.tryGet({ hashOrIndex: currentHeaderHash });
-      if (currentBlockTrimmed === undefined) {
-        throw new RecoverBlockchainError(headerIndexCache.length);
-      }
-
-      const currentBlock = await currentBlockTrimmed.getBlock(storage.transactions);
-
-      const prevHeaderHash = await headerIndexCache.get(headerIndexCache.length - 2);
-      const prevBlockTrimmed = await storage.blocks.tryGet({ hashOrIndex: prevHeaderHash });
-      const previousBlock = await prevBlockTrimmed?.getBlock(storage.transactions);
-
-      return new Blockchain({
-        headerIndexCache,
-        settings,
-        storage,
-        native,
-        vm,
-        currentBlock,
-        previousBlock,
-        onPersist,
-      });
-    }
-
-    const blockchain = new Blockchain({
-      headerIndexCache,
-      settings,
-      storage,
-      native,
-      vm,
-      onPersist,
-    });
-
-    await blockchain.persistBlock({ block: settings.genesisBlock });
-
-    return blockchain;
-  }
-
-  public readonly deserializeWireContext: DeserializeWireContext;
-
-  public readonly verifyWitness = verifyWitness;
-  public readonly verifyWitnesses = verifyWitnesses;
-  public readonly settings: BlockchainSettings;
-  public readonly onPersistNativeContractScript: Buffer;
-  public readonly postPersistNativeContractScript: Buffer;
-
-  // tslint:disable-next-line: readonly-array
-  private readonly headerIndexCache: HeaderIndexCache;
-  private readonly storage: Storage;
-  private readonly native: NativeContainer;
-  private readonly vm: VM;
-  private readonly onPersist: () => void | Promise<void>;
-
-  private mutableBlockQueue: PriorityQueue<Entry> = new PriorityQueue({
-    comparator: (a, b) => a.block.index - b.block.index,
-  });
-  private mutableCurrentBlock: Block | undefined;
-  private mutablePreviousBlock: Block | undefined;
-  private mutableCurrentHeader: Header | undefined;
-  private mutablePersistingBlocks = false;
-  private mutableInQueue: Set<string> = new Set();
-  private mutableRunning = false;
-  private mutableDoneRunningResolve: (() => void) | undefined;
-  private mutableBlock$: Subject<Block> = new Subject();
-
-  public constructor(options: BlockchainOptions) {
-    this.headerIndexCache = options.headerIndexCache;
-    this.settings = options.settings;
-    this.storage = options.storage;
-    this.native = options.native;
-    this.vm = options.vm;
-    this.onPersistNativeContractScript =
-      options.onPersistNativeContractScript ?? utils.getOnPersistNativeContractScript();
-    this.postPersistNativeContractScript =
-      options.postPersistNativeContractScript ?? utils.getPostPersistNativeContractScript();
-    this.deserializeWireContext = {
-      messageMagic: this.settings.messageMagic,
-      validatorsCount: this.settings.validatorsCount,
-    };
-    this.mutableCurrentBlock = options.currentBlock;
-    this.mutablePreviousBlock = options.previousBlock;
-    this.onPersist = options.onPersist === undefined ? () => this.vm.updateSnapshots() : options.onPersist;
-    this.start();
-  }
-
   public get currentBlock(): Block {
     if (this.mutableCurrentBlock === undefined) {
       throw new GenesisBlockNotRegisteredError();
@@ -232,9 +91,9 @@ export class Blockchain {
     return this.mutableCurrentBlock === undefined ? -1 : this.currentBlock.index;
   }
 
-  public get currentHeaderIndex(): number {
-    return this.headerIndexCache.length;
-  }
+  // public get currentHeaderIndex(): number {
+  //   return this.headerCache.last.index;
+  // }
 
   public get block$(): Observable<Block> {
     return this.mutableBlock$;
@@ -249,14 +108,12 @@ export class Blockchain {
       vm: this.vm,
       storage: this.storage,
       native: this.native,
+      headerCache: this.headerCache,
       verifyWitnesses: this.verifyWitnesses,
       verifyWitness: this.verifyWitness,
       height: this.currentBlockIndex,
+      isExtensibleWitnessWhiteListed: this.isExtensibleWitnessWhiteListed,
     };
-  }
-
-  public get blocks() {
-    return this.storage.blocks;
   }
 
   public get nep17Balances() {
@@ -275,35 +132,93 @@ export class Blockchain {
     return this.storage.applicationLogs;
   }
 
-  public get transactions() {
-    return this.storage.transactions;
-  }
-
   public get storages() {
     return this.storage.storages;
   }
-
-  public get headerHashList() {
-    return this.storage.headerHashList;
-  }
-
-  public get blockHashIndex() {
-    return this.storage.blockHashIndex;
-  }
-
-  public get headerHashIndex() {
-    return this.storage.headerHashIndex;
-  }
-
-  // public get consensusState() {
-  //   return this.storage.consensusState;
-  // }
 
   public get serializeJSONContext(): SerializeJSONContext {
     return {
       addressVersion: this.settings.addressVersion,
       messageMagic: this.settings.messageMagic,
     };
+  }
+  public static async create({
+    settings,
+    storage,
+    native,
+    vm,
+    onPersist,
+  }: CreateBlockchainOptions): Promise<BlockchainType> {
+    let currentBlock;
+    const getInitialized = async () => native.Ledger.isInitialized(storage);
+    if (await getInitialized()) {
+      const currentIndex = await native.Ledger.currentIndex(storage);
+      currentBlock = await native.Ledger.getBlock(storage, currentIndex);
+    }
+
+    const blockchain = new Blockchain({
+      settings,
+      storage,
+      native,
+      vm,
+      onPersist,
+      currentBlock,
+    });
+
+    if (!(await getInitialized())) {
+      await blockchain.persistBlock({ block: settings.genesisBlock });
+    } else {
+      await blockchain.updateExtensibleWitnessWhiteList(storage);
+    }
+
+    return blockchain;
+  }
+
+  public readonly deserializeWireContext: DeserializeWireContext;
+
+  public readonly verifyWitness = verifyWitness;
+  public readonly verifyWitnesses = verifyWitnesses;
+  public readonly settings: BlockchainSettings;
+  public readonly onPersistNativeContractScript: Buffer;
+  public readonly postPersistNativeContractScript: Buffer;
+  public readonly headerCache = new HeaderCache();
+
+  private readonly storage: Storage;
+  private readonly native: NativeContainer;
+  private readonly vm: VM;
+  private readonly onPersist: () => void | Promise<void>;
+
+  private mutableBlockQueue: PriorityQueue<Entry> = new PriorityQueue({
+    comparator: (a, b) => a.block.index - b.block.index,
+  });
+  private mutableCurrentBlock: Block | undefined;
+  private mutablePreviousBlock: Block | undefined;
+  private mutableCurrentHeader: Header | undefined;
+  private mutableExtensibleWitnessWhiteList: ImmutableHashSet<UInt160>;
+  private mutablePersistingBlocks = false;
+  private mutableInQueue: Set<string> = new Set();
+  private mutableRunning = false;
+  private mutableDoneRunningResolve: (() => void) | undefined;
+  private mutableBlock$: Subject<Block> = new Subject();
+
+  public constructor(options: BlockchainOptions) {
+    this.settings = options.settings;
+    this.storage = options.storage;
+    this.native = options.native;
+    this.vm = options.vm;
+    this.onPersistNativeContractScript =
+      options.onPersistNativeContractScript ?? utils.getOnPersistNativeContractScript();
+    this.postPersistNativeContractScript =
+      options.postPersistNativeContractScript ?? utils.getPostPersistNativeContractScript();
+    this.deserializeWireContext = {
+      messageMagic: this.settings.messageMagic,
+      validatorsCount: this.settings.validatorsCount,
+    };
+    this.mutableCurrentBlock = options.currentBlock;
+    this.mutablePreviousBlock = options.previousBlock;
+    this.mutableExtensibleWitnessWhiteList = new ImmutableHashSetBuilder<UInt160>().toImmutable();
+    this.onPersist = options.onPersist === undefined ? () => this.vm.updateSnapshots() : options.onPersist;
+    this.start();
   }
 
   public async stop(): Promise<void> {
@@ -324,7 +239,7 @@ export class Blockchain {
       this.mutableRunning = false;
     }
 
-    logger.info({ name: 'neo_blockchain_stop' }, 'NEO blockchain stopped.');
+    logger.info({ name: 'neo_blockchain_stop' }, 'Neo blockchain stopped.');
   }
 
   public async reset(): Promise<void> {
@@ -349,7 +264,7 @@ export class Blockchain {
     mempool: Mempool,
     context?: TransactionVerificationContext,
   ): Promise<VerifyResultModel> {
-    const containsTransaction = await this.containsTransaction(transaction.hash, mempool);
+    const containsTransaction = await this.containsTransactionInternal(transaction.hash, mempool);
     if (containsTransaction) {
       return VerifyResultModel.AlreadyExists;
     }
@@ -357,11 +272,23 @@ export class Blockchain {
     return transaction.verify(this.verifyOptions, context);
   }
 
-  public async verifyConsensusPayload(payload: ConsensusPayload) {
+  public async verifyConsensusPayload(payload: ExtensiblePayload) {
     const verification = await payload.verify(this.verifyOptions);
     if (!verification) {
       throw new ConsensusPayloadVerifyError(payload.hashHex);
     }
+  }
+
+  public async getCurrentIndex() {
+    return this.native.Ledger.currentIndex(this.storage);
+  }
+
+  public async getCurrentHash() {
+    return this.native.Ledger.currentHash(this.storage);
+  }
+
+  public async getCurrentBlock() {
+    return this.native.Ledger.getBlock(this.storage, await this.getCurrentHash());
   }
 
   public async getBlock(hashOrIndex: UInt256 | number): Promise<Block | undefined> {
@@ -379,44 +306,27 @@ export class Blockchain {
       return this.previousBlock;
     }
 
-    const trimmedBlock = await this.blocks.tryGet({ hashOrIndex: hash });
-    if (trimmedBlock === undefined) {
-      return undefined;
-    }
+    return this.native.Ledger.getBlock(this.storage, hash);
+  }
 
-    if (!trimmedBlock.isBlock) {
-      return undefined;
-    }
-
-    return trimmedBlock.getBlock(this.transactions);
+  public async getTrimmedBlock(hash: UInt256) {
+    return this.native.Ledger.getTrimmedBlock(this.storage, hash);
   }
 
   public async getBlockHash(index: number): Promise<UInt256 | undefined> {
-    if (this.headerIndexCache.length <= index) {
-      return undefined;
-    }
-
-    return this.headerIndexCache.get(index);
+    return this.native.Ledger.getBlockHash(this.storage, index);
   }
 
   public async getHeader(hashOrIndex: UInt256 | number): Promise<Header | undefined> {
-    const hashPromise = typeof hashOrIndex === 'number' ? this.getBlockHash(hashOrIndex) : Promise.resolve(hashOrIndex);
-    const hash = await hashPromise;
-    if (hash === undefined) {
-      return undefined;
-    }
+    return this.native.Ledger.getHeader(this.storage, hashOrIndex);
+  }
 
-    if (this.currentBlock.hash.equals(hash)) {
-      return this.currentBlock.header;
-    }
+  public async getTransaction(hash: UInt256): Promise<TransactionState | undefined> {
+    return this.native.Ledger.getTransactionState(this.storage, hash);
+  }
 
-    if (this.previousBlock?.hash.equals(hash)) {
-      return this.previousBlock.header;
-    }
-
-    const block = await this.blocks.tryGet({ hashOrIndex: hash });
-
-    return block?.header;
+  public async containsTransaction(hash: UInt256): Promise<boolean> {
+    return this.native.Ledger.containsTransaction(this.storage, hash);
   }
 
   public async getNextBlockHash(hash: UInt256): Promise<UInt256 | undefined> {
@@ -484,7 +394,7 @@ export class Blockchain {
   }
 
   public async getVerificationCost(contractHash: UInt160, transaction: Transaction) {
-    const contract = await this.native.Management.getContract(this.storage, contractHash);
+    const contract = await this.native.ContractManagement.getContract(this.storage, contractHash);
     if (contract === undefined) {
       return { fee: utils.ZERO, size: 0 };
     }
@@ -501,56 +411,88 @@ export class Blockchain {
     });
   }
 
-  public invokeScript(script: Buffer, signers?: Signers): CallReceipt {
+  public invokeScript(script: Buffer, signers?: Signers, gas?: BN): CallReceipt {
     return this.runEngineWrapper({
       script,
       snapshot: 'main',
       container: signers,
+      gas,
     });
+  }
+
+  // TODO: set to private?
+  public async updateExtensibleWitnessWhiteList(storage: Storage) {
+    const currentHeight = await this.native.Ledger.currentIndex(storage);
+    const builder = new ImmutableHashSetBuilder<UInt160>();
+    builder.add(await this.native.NEO.getCommitteeAddress(storage));
+    const validators = await this.native.NEO.getNextBlockValidators(storage);
+    builder.add(crypto.getBFTAddress(validators));
+    builder.unionWith(validators.map((val) => crypto.toScriptHash(crypto.createSignatureRedeemScript(val))));
+    const oracles = await this.native.RoleManagement.getDesignatedByRole(
+      storage,
+      DesignationRole.Oracle,
+      currentHeight, // TODO: check this
+      currentHeight,
+    );
+    if (oracles.length > 0) {
+      builder.add(crypto.getBFTAddress(oracles));
+      builder.unionWith(oracles.map((or) => crypto.toScriptHash(crypto.createSignatureRedeemScript(or))));
+    }
+    const stateValidators = await this.native.RoleManagement.getDesignatedByRole(
+      storage,
+      DesignationRole.StateValidator,
+      currentHeight, // TODO: check this
+      currentHeight,
+    );
+    if (stateValidators.length > 0) {
+      builder.add(crypto.getBFTAddress(stateValidators));
+      builder.unionWith(stateValidators.map((val) => crypto.toScriptHash(crypto.createSignatureRedeemScript(val))));
+    }
+
+    this.mutableExtensibleWitnessWhiteList = builder.toImmutable();
+  }
+
+  public isExtensibleWitnessWhiteListed(address: UInt160) {
+    return this.mutableExtensibleWitnessWhiteList.contains(address);
   }
 
   private runEngineWrapper({
     script,
     snapshot,
     container,
-    persistingBlock,
+    persistingBlock: blockIn,
     offset = 0,
     gas = common.TEN_FIXED8,
   }: RunEngineOptions): CallReceipt {
-    return this.vm.withSnapshots(({ main, clone }) => {
-      const handler = snapshot === 'main' ? main : clone;
-      if (persistingBlock !== undefined) {
-        handler.setPersistingBlock(persistingBlock);
-      } else if (!handler.hasPersistingBlock()) {
-        handler.setPersistingBlock(this.createDummyBlock());
-      }
+    let persistingBlock = blockIn;
+    if (persistingBlock === undefined) {
+      persistingBlock = this.createDummyBlock();
+    }
 
-      return this.vm.withApplicationEngine(
-        {
-          trigger: TriggerType.Application,
-          container,
-          snapshot,
-          gas,
-        },
-        (engine) => {
-          engine.loadScript({ script, initialPosition: offset });
-          engine.execute();
+    return this.vm.withApplicationEngine(
+      {
+        trigger: TriggerType.Application,
+        container,
+        snapshot,
+        gas,
+        persistingBlock,
+      },
+      (engine) => {
+        engine.loadScript({ script, initialPosition: offset });
+        engine.execute();
 
-          return utils.getCallReceipt(engine, container);
-        },
-      );
-    });
+        return utils.getCallReceipt(engine, container);
+      },
+    );
   }
 
-  private async containsTransaction(hash: UInt256, mempool: Mempool) {
+  private async containsTransactionInternal(hash: UInt256, mempool: Mempool) {
     const hashHex = common.uInt256ToHex(hash);
     if (mempool[hashHex] !== undefined) {
       return true;
     }
 
-    const state = await this.transactions.tryGet(hash);
-
-    return state !== undefined;
+    return this.native.Ledger.containsTransaction(this.storage, hash);
   }
 
   private async persistBlocksAsync(): Promise<void> {
@@ -631,25 +573,10 @@ export class Blockchain {
     logger.info({ name: 'neo_blockchain_start' }, 'Neo blockchain started.');
   }
 
-  private updateBlockMetadata(block: Block): ChangeSet {
-    const newHashIndexState = new HashIndexState({ hash: block.hash, index: block.index });
-    const updateBlockHashIndex: Change = {
-      type: 'add',
-      change: { type: 'blockHashIndex', value: newHashIndexState },
-      subType: 'update',
-    };
-
-    const updateHeaderHashIndex: Change = {
-      type: 'add',
-      change: { type: 'headerHashIndex', value: newHashIndexState },
-      subType: 'update',
-    };
-
+  private updateBlockMetadata(block: Block): void {
     this.mutablePreviousBlock = this.mutableCurrentBlock;
     this.mutableCurrentBlock = block;
     this.mutableCurrentHeader = block.header;
-
-    return [updateBlockHashIndex, updateHeaderHashIndex];
   }
 
   private updateNep17Balances({
@@ -665,7 +592,9 @@ export class Blockchain {
     });
 
     const nep17BalancePairs = assetKeys.map((key) => {
-      const script = new ScriptBuilder().emitAppCall(key.assetScriptHash, 'balanceOf', key.userScriptHash).build();
+      const script = new ScriptBuilder()
+        .emitDynamicAppCall(key.assetScriptHash, 'balanceOf', key.userScriptHash)
+        .build();
       const callReceipt = this.invokeScript(script);
       const balanceBuffer = callReceipt.stack[0].getInteger().toBuffer();
 
@@ -717,44 +646,106 @@ export class Blockchain {
     return nep17BalanceChangeSet.concat(nep17TransfersReceivedChangeSet, nep17TransfersSentChangeSet);
   }
 
-  private updateApplicationLogs({
+  private updateBlockLog({
     applicationsExecuted,
     block,
   }: {
     readonly applicationsExecuted: readonly ApplicationExecuted[];
     readonly block: Block;
   }): ChangeSet {
-    return applicationsExecuted.map(
-      ({ transaction, trigger, state: vmState, gasConsumed, stack, notifications: notificationsIn }) => {
-        const notifications = notificationsIn.map(
-          ({ scriptHash, eventName, state }) =>
-            new Notification({
-              scriptHash,
-              eventName,
-              state,
-            }),
-        );
+    const executions = applicationsExecuted
+      .filter(({ transaction }) => transaction === undefined)
+      .map(
+        ({ trigger, state: vmState, gasConsumed, stack, notifications: notificationsIn, exception }) =>
+          new Execution({
+            vmState,
+            trigger,
+            exception,
+            gasConsumed,
+            stack,
+            notifications: notificationsIn.map(
+              ({ scriptHash, eventName, state }) =>
+                new Notification({
+                  scriptHash,
+                  eventName,
+                  state,
+                }),
+            ),
+          }),
+      );
 
-        const value = new ApplicationLog({
-          txid: transaction?.hash,
+    const value = new ApplicationLog({
+      blockHash: block.hash,
+      executions,
+    });
+
+    return [
+      {
+        type: 'add',
+        subType: 'add',
+        change: {
+          type: 'applicationLog',
+          key: block.hash,
+          value,
+        },
+      },
+    ];
+  }
+
+  private updateApplicationLogs({
+    applicationsExecuted,
+  }: {
+    readonly applicationsExecuted: readonly ApplicationExecuted[];
+  }): ChangeSet {
+    return applicationsExecuted
+      .filter(({ transaction }) => neoOneUtils.notNull(transaction))
+      .map(
+        ({
+          transaction: txIn,
           trigger,
-          vmState,
+          state: vmState,
           gasConsumed,
           stack,
-          notifications,
-        });
+          notifications: notificationsIn,
+          exception,
+        }) => {
+          const transaction = txIn as Transaction;
+          const notifications = notificationsIn.map(
+            ({ scriptHash, eventName, state }) =>
+              new Notification({
+                scriptHash,
+                eventName,
+                state,
+              }),
+          );
 
-        return {
-          type: 'add',
-          subType: 'add',
-          change: {
-            type: 'applicationLog',
-            key: transaction?.hash ?? block.hash,
-            value,
-          },
-        };
-      },
-    );
+          const executions = [
+            new Execution({
+              vmState,
+              trigger,
+              exception,
+              gasConsumed,
+              stack,
+              notifications,
+            }),
+          ];
+
+          const value = new ApplicationLog({
+            txid: transaction.hash,
+            executions,
+          });
+
+          return {
+            type: 'add',
+            subType: 'add',
+            change: {
+              type: 'applicationLog',
+              key: transaction.hash,
+              value,
+            },
+          };
+        },
+      );
   }
 
   private async persistBlockInternal(block: Block, verify?: boolean): Promise<void> {
@@ -764,24 +755,33 @@ export class Blockchain {
 
     const blockchain = this.createPersistingBlockchain();
 
-    const currentHeaderCount = this.headerIndexCache.length;
-    if (block.index === currentHeaderCount) {
-      await this.headerIndexCache.push(block.hash);
-    }
-
-    const { changeBatch: persistBatch, applicationsExecuted } = blockchain.persistBlock(block, currentHeaderCount);
+    const { changeBatch: persistBatch, applicationsExecuted } = blockchain.persistBlock(block);
     await this.storage.commitBatch(persistBatch);
 
-    const blockMetadataBatch = this.updateBlockMetadata(block);
-    await this.storage.commit(blockMetadataBatch);
+    this.updateBlockMetadata(block);
 
     const nep17Updates = this.updateNep17Balances({ applicationsExecuted, block });
     await this.storage.commit(nep17Updates);
 
-    const applicationLogUpdates = this.updateApplicationLogs({ applicationsExecuted, block });
+    const applicationLogUpdates = this.updateApplicationLogs({ applicationsExecuted });
     await this.storage.commit(applicationLogUpdates);
 
+    const blockLogUpdate = this.updateBlockLog({ applicationsExecuted, block });
+    if (blockLogUpdate.length > 0) {
+      await this.storage.commit(blockLogUpdate);
+    }
+
+    await this.updateExtensibleWitnessWhiteList(this.storage);
+
     await this.onPersist();
+
+    const firstHeader = this.headerCache.tryRemoveFirst();
+    if (firstHeader !== undefined && firstHeader.index !== block.index) {
+      logger.error({
+        name: 'neo_blockchain',
+        message: 'Header cache index does not match block index when persisting new block',
+      });
+    }
   }
 
   private createPersistingBlockchain(): PersistingBlockchain {
@@ -797,7 +797,7 @@ export class Blockchain {
       version: 0,
       previousHash: this.currentBlock.hash,
       timestamp: this.currentBlock.timestamp.addn(this.settings.millisecondsPerBlock),
-      index: this.currentBlockIndex + 1,
+      index: this.currentBlockIndex + 0,
       nextConsensus: this.currentBlock.nextConsensus,
       witness: new Witness({
         invocation: Buffer.from([]),

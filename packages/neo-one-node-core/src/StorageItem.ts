@@ -1,8 +1,13 @@
-import { BinaryWriter, createSerializeWire, InvalidFormatError, JSONHelper } from '@neo-one/client-common';
+import {
+  BinaryReader,
+  BinaryWriter,
+  createSerializeWire,
+  InvalidFormatError,
+  JSONHelper,
+} from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableWire } from './Serializable';
 import { StorageKey } from './StorageKey';
-import { BinaryReader } from './utils';
 
 // TODO: Cache can also be 2 other things, we should definitely revisit this when we have more context
 export interface StorageItemCacheAdd {
@@ -101,8 +106,8 @@ export class StorageItem implements SerializableWire {
 
   public serializeJSON(key: StorageKey) {
     return {
-      key: JSONHelper.writeBuffer(key.serializeWire()),
-      value: JSONHelper.writeBuffer(this.value),
+      key: JSONHelper.writeBase64Buffer(key.serializeWire()),
+      value: JSONHelper.writeBase64Buffer(this.value),
       isConstant: this.isConstant,
     };
   }

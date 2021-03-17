@@ -1,7 +1,7 @@
 /// <reference types="@reactivex/ix-es2015-cjs" />
 import { common, crypto, ECPoint, PrivateKey, UInt160, UInt256Hex } from '@neo-one/client-common';
 import { createChild, nodeLogger } from '@neo-one/logger';
-import { ConsensusContext, ConsensusPayload, Node, Transaction } from '@neo-one/node-core';
+import { ConsensusContext, ExtensiblePayload, Node, Transaction } from '@neo-one/node-core';
 import { composeDisposables, Disposable, noopDisposable, utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { scan } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/scan';
@@ -74,7 +74,7 @@ export class Consensus {
     this.mutableQueue.write({ type: 'handlePersistBlock' });
   }
 
-  public onConsensusPayloadReceived(payload: ConsensusPayload): void {
+  public onConsensusPayloadReceived(payload: ExtensiblePayload): void {
     this.mutableQueue.write({
       type: 'handleConsensusPayload',
       payload,

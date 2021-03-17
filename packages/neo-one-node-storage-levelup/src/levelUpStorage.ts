@@ -6,8 +6,7 @@ import {
   // ContractIDState,
   DeserializeWireContext,
   // InvocationData,
-  HashIndexState,
-  HeaderHashList,
+  // HashIndexState,
   // TransactionData,
   Nep17Balance,
   Nep17BalanceKey,
@@ -16,7 +15,7 @@ import {
   Storage,
   StorageItem,
   StorageKey,
-  TransactionState,
+  // TransactionState,
   TrimmedBlock,
 } from '@neo-one/node-core';
 import { keys } from '@neo-one/node-storage-common';
@@ -85,7 +84,7 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
   };
 
   return {
-    blocks,
+    // blocks,
 
     nep17Balances: read.createReadAllFindStorage({
       db,
@@ -130,15 +129,15 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
       deserializeValue: (buffer) => ApplicationLog.deserializeWire({ context, buffer }),
     }),
 
-    transactions: read.createReadStorage({
-      db,
-      serializeKey: keys.createTransactionKey,
-      deserializeValue: (buffer) =>
-        TransactionState.deserializeWire({
-          context,
-          buffer,
-        }),
-    }),
+    // transactions: read.createReadStorage({
+    //   db,
+    //   serializeKey: keys.createTransactionKey,
+    //   deserializeValue: (buffer) =>
+    //     TransactionState.deserializeWire({
+    //       context,
+    //       buffer,
+    //     }),
+    // }),
 
     storages: read.createReadFindStorage({
       db,
@@ -156,27 +155,27 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
         }),
     }),
 
-    headerHashList: read.createReadStorage({
-      db,
-      serializeKey: keys.createHeaderHashListKey,
-      deserializeValue: (buffer) =>
-        HeaderHashList.deserializeWire({
-          context,
-          buffer,
-        }),
-    }),
+    // headerHashList: read.createReadStorage({
+    //   db,
+    //   serializeKey: keys.createHeaderHashListKey,
+    //   deserializeValue: (buffer) =>
+    //     HeaderHashList.deserializeWire({
+    //       context,
+    //       buffer,
+    //     }),
+    // }),
 
-    blockHashIndex: read.createReadMetadataStorage({
-      db,
-      key: keys.blockHashIndexKey,
-      deserializeValue: (buffer) => HashIndexState.deserializeWire({ context, buffer }),
-    }),
+    // blockHashIndex: read.createReadMetadataStorage({
+    //   db,
+    //   key: keys.blockHashIndexKey,
+    //   deserializeValue: (buffer) => HashIndexState.deserializeWire({ context, buffer }),
+    // }),
 
-    headerHashIndex: read.createReadMetadataStorage({
-      db,
-      key: keys.headerHashIndexKey,
-      deserializeValue: (buffer) => HashIndexState.deserializeWire({ context, buffer }),
-    }),
+    // headerHashIndex: read.createReadMetadataStorage({
+    //   db,
+    //   key: keys.headerHashIndexKey,
+    //   deserializeValue: (buffer) => HashIndexState.deserializeWire({ context, buffer }),
+    // }),
 
     // contractID: read.createReadMetadataStorage({
     //   db,

@@ -97,7 +97,7 @@ const configurationSchema = {
         outDir: { type: 'string' },
         path: { type: 'string' },
         json: { type: 'boolean' },
-        avm: { type: 'boolean' },
+        nef: { type: 'boolean' },
         debug: { type: 'boolean' },
         opcodes: { type: 'boolean' },
       },
@@ -191,11 +191,11 @@ ${exportConfig} {
     path: '${config.contracts.path}',
     // Set this to true if you want the compile command to output JSON.
     json: ${true},
-    // Set this to true if you want the compile command to output AVM.
-    avm: ${false},
+    // Set this to true if you want the compile command to output a Nef (Neo Executable Format 3) file.
+    nef: ${false},
     // Set this to true if you want the compile command to output additional debug information.
     debug: ${false},
-    // Set this to true if you want the compile command to output the AVM in a human-readable format for debugging (requires debug: true).
+    // Set this to true if you want the compile command to output the contract's script in a human-readable format for debugging (requires debug: true).
     opcodes: ${false},
   },
   artifacts: {

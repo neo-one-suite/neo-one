@@ -1,6 +1,5 @@
-import { BinaryWriter, createSerializeWire, InvalidFormatError } from '@neo-one/client-common';
+import { BinaryReader, BinaryWriter, createSerializeWire, InvalidFormatError } from '@neo-one/client-common';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from '../../Serializable';
-import { BinaryReader } from '../../utils';
 import { NodeCapabilityBase } from './NodeCapabilityBase';
 import { NodeCapabilityType } from './NodeCapabilityType';
 

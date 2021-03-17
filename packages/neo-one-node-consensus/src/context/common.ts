@@ -17,7 +17,9 @@ import {
   ContractParametersContext,
   getBlockScriptHashesForVerifying,
   getM,
+  HeaderCache,
   MerkleTree,
+  NativeContainer,
   Node,
   Transaction,
   TransactionVerificationContext,
@@ -72,15 +74,33 @@ const getPrimaryIndex = ({
   return primaryIndex;
 };
 
-export const createBlock = async (contextIn: ConsensusContext, storage: BlockchainStorage) => {
+export const createBlock = async ({
+  context: contextIn,
+  storage,
+  headerCache,
+  native,
+}: {
+  readonly context: ConsensusContext;
+  readonly storage: BlockchainStorage;
+  readonly headerCache: HeaderCache;
+  readonly native: NativeContainer;
+}) => {
   let { context } = ensureHeader(contextIn);
   const contract = AccountContract.createMultiSigContract(context.M, context.validators);
   const scriptHashOptions = {
     previousHash: utils.nullthrows(context.blockBuilder.previousHash),
     witness: context.blockBuilder.witness,
+    index: utils.nullthrows(context.blockBuilder.index),
   };
-  const scriptHashes = await getBlockScriptHashesForVerifying(scriptHashOptions, storage);
-  if (scriptHashes === [undefined]) {
+  const scriptHashes = await getBlockScriptHashesForVerifying({
+    storage,
+    block: scriptHashOptions,
+    headerCache,
+    native,
+  });
+  // TODO: this might be wrong
+  // tslint:disable-next-line: strict-type-predicates
+  if (scriptHashes[0] === undefined) {
     // getBlockScriptHashesForVerifying can only return this when prevHash = UINT256_ZERO, so on genesis block
     // when a witness SHOULD already be defined on the block.
     throw new Error();
@@ -93,12 +113,13 @@ export const createBlock = async (contextIn: ConsensusContext, storage: Blockcha
       continue;
     }
 
-    if (commitPayload.consensusMessage.viewNumber !== context.viewNumber) {
+    const message = context.getMessage<CommitConsensusMessage>(commitPayload);
+    if (message.viewNumber !== context.viewNumber) {
       continue;
     }
 
     const validator = context.validators[i];
-    const signature = commitPayload.getDeserializedMessage<CommitConsensusMessage>().signature;
+    const signature = message.signature;
     sc.addSignature(contract, validator, signature);
     j += 1;
   }
@@ -108,7 +129,7 @@ export const createBlock = async (contextIn: ConsensusContext, storage: Blockcha
     ?.map((p) => context.transactions[common.uInt256ToHex(p)])
     .filter(utils.notNull);
   if (transactions === undefined) {
-    throw new Error('this should have already been defined');
+    throw new Error('Transactions in createBlock should be defined');
   }
   context = context.clone({ blockOptions: { witness, transactions } });
 
@@ -197,16 +218,21 @@ export const ensureMaxBlockLimitation = async (
   };
 };
 
-const validatorsChanged = (blockchain: Blockchain) => {
-  if (blockchain.currentBlockIndex === 0) {
+const validatorsChanged = async (blockchain: Blockchain) => {
+  const currentIndex = await blockchain.getCurrentIndex();
+  if (currentIndex === 0) {
     return false;
   }
 
-  const currentBlock = blockchain.currentBlock;
-  const prevBlock = blockchain.previousBlock;
+  const hash = await blockchain.getCurrentHash();
+  const currentBlock = await blockchain.getBlock(hash);
+  if (currentBlock === undefined) {
+    throw new Error('validatorsChanged function expected currentBlock to be defined');
+  }
+  const prevBlock = await blockchain.getBlock(currentBlock?.previousHash);
 
   if (prevBlock === undefined) {
-    throw new Error('expected previous block');
+    throw new Error('validatorsChanged function expected previousBlock to be defined');
   }
 
   return !currentBlock.nextConsensus.equals(prevBlock.nextConsensus);
@@ -224,15 +250,17 @@ export const reset = async ({
   readonly viewNumber: number;
 }): Promise<Result> => {
   if (viewNumber === 0) {
-    const [validators, nextValidators] = await Promise.all([
+    const [validators, nextValidators, currentIndex, currentHash] = await Promise.all([
       blockchain.getValidators(),
       blockchain.getNextBlockValidators(),
+      blockchain.getCurrentIndex(),
+      blockchain.getCurrentHash(),
     ]);
 
     const initialBlockOptions = {
-      previousHash: blockchain.currentBlock.hash,
-      index: blockchain.currentBlockIndex + 1,
-      nextConsensus: crypto.getConsensusAddress(blockchain.shouldRefreshCommittee(1) ? validators : nextValidators),
+      previousHash: currentHash,
+      index: currentIndex + 1,
+      nextConsensus: crypto.getBFTAddress(blockchain.shouldRefreshCommittee(1) ? validators : nextValidators),
       merkleRoot: undefined,
       messageMagic: blockchain.settings.messageMagic,
     };
@@ -256,7 +284,7 @@ export const reset = async ({
     const commitPayloads = _.range(nextValidators.length).map(() => undefined);
     const prevLastSeenMessage = context.lastSeenMessage;
     let lastSeenMessage = prevLastSeenMessage;
-    if (validatorsChanged(blockchain) || Object.values(context.lastSeenMessage).length === 0) {
+    if ((await validatorsChanged(blockchain)) || Object.values(context.lastSeenMessage).length === 0) {
       lastSeenMessage = nextValidators.reduce<{ readonly [k: string]: number | undefined }>((acc, validator) => {
         const validatorHex = common.ecPointToHex(validator);
         const prevIndex = prevLastSeenMessage[validatorHex];
@@ -292,11 +320,9 @@ export const reset = async ({
   }
   const mutableLastChangeViewPayloads = [...context.lastChangeViewPayloads];
   _.range(mutableLastChangeViewPayloads.length).forEach((i) => {
+    const payload = mutableLastChangeViewPayloads[i];
     // tslint:disable-next-line: prefer-conditional-expression
-    if (
-      (context.changeViewPayloads[i]?.getDeserializedMessage<ChangeViewConsensusMessage>().newViewNumber ?? -1) >=
-      viewNumber
-    ) {
+    if (payload !== undefined && context.getMessage<ChangeViewConsensusMessage>(payload).newViewNumber >= viewNumber) {
       mutableLastChangeViewPayloads[i] = context.changeViewPayloads[i];
     } else {
       mutableLastChangeViewPayloads[i] = undefined;
@@ -333,7 +359,7 @@ export const reset = async ({
 };
 
 export const saveContext = async (_context: ConsensusContext) => {
-  throw new Error('not implemented');
+  throw new Error('saveContext function not implemented');
 };
 
 export const getInitialContext = ({

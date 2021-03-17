@@ -34,8 +34,8 @@ export class ContractMethodDescriptorModel<
   public serializeJSON(): ContractMethodDescriptorJSON {
     return {
       ...super.serializeJSON(),
-      offset: this.offset,
       returntype: toJSONContractParameterType(this.returnType),
+      offset: this.offset,
       safe: this.safe,
     };
   }

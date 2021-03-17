@@ -11,21 +11,25 @@ export interface RecoveryRequestConsensusMessageAdd extends ConsensusMessageBase
 export class RecoveryRequestConsensusMessage extends ConsensusMessageBase {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): RecoveryRequestConsensusMessage {
     const { reader } = options;
-    const { viewNumber } = super.deserializeConsensusMessageBaseWireBase(options);
+    const { viewNumber, blockIndex, validatorIndex } = super.deserializeConsensusMessageBaseWireBase(options);
     const timestamp = reader.readUInt64LE();
 
     return new RecoveryRequestConsensusMessage({
       viewNumber,
+      blockIndex,
+      validatorIndex,
       timestamp,
     });
   }
 
   public readonly timestamp: BN;
 
-  public constructor({ viewNumber, timestamp }: RecoveryRequestConsensusMessageAdd) {
+  public constructor({ viewNumber, blockIndex, validatorIndex, timestamp }: RecoveryRequestConsensusMessageAdd) {
     const options = {
       type: ConsensusMessageType.RecoveryRequest,
       viewNumber,
+      blockIndex,
+      validatorIndex,
     };
     super(options);
     this.timestamp = timestamp;

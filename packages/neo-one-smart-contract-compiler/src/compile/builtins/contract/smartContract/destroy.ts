@@ -31,7 +31,7 @@ export class SmartContractDestroy extends BuiltinInstanceMemberCall {
     // ['destroy', [buffer], buffer]
     sb.emitPushString(node, 'destroy');
     // [buffer, 'destroy', [buffer]]
-    sb.emitPushBuffer(node, common.nativeHashes.Management);
+    sb.emitPushBuffer(node, common.nativeHashes.ContractManagement);
     // [conract]
     sb.emitSysCall(node, 'System.Contract.Call');
 

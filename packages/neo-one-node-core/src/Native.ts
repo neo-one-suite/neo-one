@@ -1,11 +1,18 @@
-import { ECPoint, UInt160 } from '@neo-one/client-common';
+import { ECPoint, NativeContractJSON, UInt160, UInt256 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
+import { Block } from './Block';
 import { ContractState } from './ContractState';
 import { DesignationRole } from './DesignationRole';
+import { Header } from './Header';
+import { ContractManifest } from './manifest';
+import { NefFile } from './NefFile';
 import { OracleRequest } from './OracleRequest';
 import { ReadFindStorage } from './Storage';
 import { StorageItem } from './StorageItem';
 import { StorageKey } from './StorageKey';
+import { Transaction } from './transaction/Transaction';
+import { TransactionState } from './transaction/TransactionState';
+import { TrimmedBlock } from './TrimmedBlock';
 
 export type OracleRequestResults = ReadonlyArray<readonly [BN, OracleRequest]>;
 
@@ -16,9 +23,15 @@ export interface NativeContractStorageContext {
 export interface NativeContract {
   readonly id: number;
   readonly name: string;
+  readonly nef: NefFile;
+  readonly hash: UInt160;
+  readonly script: Buffer;
+  readonly manifest: ContractManifest;
+  readonly activeBlockIndex: number;
+  readonly serializeJSON: () => NativeContractJSON;
 }
 
-export interface NEP17NativeContract extends NativeContract {
+export interface FungibleToken extends NativeContract {
   readonly symbol: string;
   readonly decimals: number;
 
@@ -26,7 +39,7 @@ export interface NEP17NativeContract extends NativeContract {
   readonly balanceOf: (storage: NativeContractStorageContext, account: UInt160) => Promise<BN>;
 }
 
-export interface GASContract extends NEP17NativeContract {}
+export interface GASContract extends FungibleToken {}
 
 export interface PolicyContract extends NativeContract {
   readonly getMaxTransactionsPerBlock: (storage: NativeContractStorageContext) => Promise<number>;
@@ -43,7 +56,7 @@ export interface Candidate {
   readonly votes: BN;
 }
 
-export interface NEOContract extends NEP17NativeContract {
+export interface NEOContract extends FungibleToken {
   readonly totalAmount: BN;
   readonly effectiveVoterTurnout: number;
 
@@ -56,12 +69,12 @@ export interface NEOContract extends NEP17NativeContract {
   readonly computeNextBlockValidators: (storage: NativeContractStorageContext) => Promise<readonly ECPoint[]>;
 }
 
-export interface ManagementContract extends NativeContract {
+export interface ContractManagement extends NativeContract {
   readonly getContract: (storage: NativeContractStorageContext, hash: UInt160) => Promise<ContractState | undefined>;
   readonly listContracts: (storage: NativeContractStorageContext) => Promise<readonly ContractState[]>;
 }
 
-export interface DesignationContract extends NativeContract {
+export interface RoleManagement extends NativeContract {
   readonly getDesignatedByRole: (
     storage: NativeContractStorageContext,
     role: DesignationRole,
@@ -76,12 +89,76 @@ export interface OracleContract extends NativeContract {
   readonly getRequestsByUrl: (storage: NativeContractStorageContext, url: string) => Promise<readonly OracleRequest[]>;
 }
 
+export interface NonfungibleToken {
+  readonly symbol: string;
+  readonly decimals: number;
+  readonly totalSupply: (storage: NativeContractStorageContext) => Promise<BN>;
+  readonly ownerOf: (storage: NativeContractStorageContext, tokenId: Buffer) => Promise<UInt160>; // TODO: check input
+  readonly balanceOf: (storage: NativeContractStorageContext, owner: UInt160) => Promise<BN>;
+  readonly tokens: (storage: NativeContractStorageContext) => Promise<ReadonlyArray<StorageItem>>; // TODO: check return
+  readonly tokensOf: (storage: NativeContractStorageContext, owner: UInt160) => Promise<readonly Buffer[]>; // TODO: check return
+}
+
+export interface LedgerContract extends NativeContract {
+  readonly isInitialized: (storage: NativeContractStorageContext) => Promise<boolean>;
+  readonly getBlockHash: (storage: NativeContractStorageContext, index: number) => Promise<UInt256 | undefined>;
+  readonly currentHash: (storage: NativeContractStorageContext) => Promise<UInt256>;
+  readonly currentIndex: (storage: NativeContractStorageContext) => Promise<number>;
+  readonly containsBlock: (storage: NativeContractStorageContext, hash: UInt256) => Promise<boolean>;
+  readonly containsTransaction: (storage: NativeContractStorageContext, hash: UInt256) => Promise<boolean>;
+  readonly getTrimmedBlock: (storage: NativeContractStorageContext, hash: UInt256) => Promise<TrimmedBlock | undefined>;
+  readonly getBlock: (
+    storage: NativeContractStorageContext,
+    hashOrIndex: UInt256 | number,
+  ) => Promise<Block | undefined>;
+  readonly getHeader: (
+    storage: NativeContractStorageContext,
+    hashOrIndex: UInt256 | number,
+  ) => Promise<Header | undefined>;
+  readonly getTransactionState: (
+    storage: NativeContractStorageContext,
+    hash: UInt256,
+  ) => Promise<TransactionState | undefined>;
+  readonly getTransaction: (storage: NativeContractStorageContext, hash: UInt256) => Promise<Transaction | undefined>;
+}
+
+export enum RecordType {
+  A = 1,
+  CNAME = 5,
+  TXT = 16,
+  AAAA = 28,
+}
+
+export interface NameService extends NonfungibleToken {
+  readonly getRoots: (storage: NativeContractStorageContext) => Promise<readonly string[]>;
+  readonly getPrice: (storage: NativeContractStorageContext) => Promise<BN>;
+  readonly isAvailable: (storage: NativeContractStorageContext, name: string) => Promise<boolean>;
+  readonly getRecord: (
+    storage: NativeContractStorageContext,
+    name: string,
+    record: RecordType,
+  ) => Promise<string | undefined>;
+  readonly getRecords: (
+    storage: NativeContractStorageContext,
+    name: string,
+  ) => Promise<ReadonlyArray<readonly [RecordType, string]>>;
+  readonly resolve: (
+    storage: NativeContractStorageContext,
+    name: string,
+    type: RecordType,
+  ) => Promise<string | undefined>;
+}
+
 export interface NativeContainer {
-  readonly GAS: GASContract;
+  readonly ContractManagement: ContractManagement;
+  readonly Ledger: LedgerContract;
   readonly NEO: NEOContract;
+  readonly GAS: GASContract;
   readonly Policy: PolicyContract;
-  readonly Management: ManagementContract;
-  readonly Designation: DesignationContract;
+  readonly RoleManagement: RoleManagement;
   readonly Oracle: OracleContract;
+  readonly NameService: NameService;
+  readonly nativeHashes: readonly UInt160[];
+  readonly nativeContracts: readonly NativeContract[];
   readonly isNative: (hash: UInt160) => boolean;
 }

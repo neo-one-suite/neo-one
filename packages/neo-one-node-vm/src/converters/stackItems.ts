@@ -1,3 +1,4 @@
+import { StackItemType } from '@neo-one/client-common';
 import {
   ArrayStackItem,
   BooleanStackItem,
@@ -10,7 +11,6 @@ import {
   PointerStackItem,
   PrimitiveStackItem,
   StackItem,
-  StackItemType,
   StructStackItem,
 } from '@neo-one/node-core';
 import { BN } from 'bn.js';

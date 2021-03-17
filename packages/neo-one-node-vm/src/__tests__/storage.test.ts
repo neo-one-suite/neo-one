@@ -4,18 +4,17 @@ import { BN } from 'bn.js';
 import { Dispatcher } from '../Dispatcher';
 
 const createGetBlockScript = (hash: UInt256) => {
-  const script = new ScriptBuilder();
-  script.emitPushUInt256(hash);
-  script.emitSysCall('System.Blockchain.GetBlock');
+  const sb = new ScriptBuilder();
+  sb.emitDynamicAppCall(common.nativeHashes.Ledger, 'getBlock', hash);
 
-  return script.build();
+  return sb.build();
 };
 
 // if these tests break when we go to mainnet it is likely the message magic
 describe('TS <--> C# Storage Test', () => {
   const messageMagic = 5195086;
   test('add a block to the snapshot -- returns Block StackItems -- memory', () => {
-    const dispatcher = new Dispatcher();
+    const dispatcher = new Dispatcher(); // initialization creates store using MemoryStore()
     const tx = new Transaction({
       script: Buffer.from([0x01]),
       attributes: [],
@@ -51,15 +50,16 @@ describe('TS <--> C# Storage Test', () => {
 
     const script = createGetBlockScript(block.hash);
     dispatcher.withSnapshots(({ main }) => {
-      main.addBlock(block);
-      main.addTransaction(tx, block.index);
-      main.changeBlockHashIndex(block.index, block.hash);
+      // main.addBlock(block);
+      // main.addTransaction(tx, block.index);
+      // main.changeBlockHashIndex(block.index, block.hash);
 
       dispatcher.withApplicationEngine(
         {
           trigger: TriggerType.Application,
           snapshot: 'main',
           gas: common.TWENTY_FIXED8,
+          persistingBlock: block,
         },
         (engine) => {
           engine.loadScript({ script });
@@ -76,7 +76,7 @@ describe('TS <--> C# Storage Test', () => {
   });
 
   test.skip('add a block to the snapshot -- returns Block StackItems -- leveldb', () => {
-    const dispatcher = new Dispatcher({ levelDBPath: '/Users/danielbyrne/Desktop/test-location' });
+    const dispatcher = new Dispatcher({ levelDBPath: '/Users/spencercorwin/Desktop/test-location' });
     const tx = new Transaction({
       script: Buffer.from([0x01]),
       attributes: [],
@@ -112,9 +112,9 @@ describe('TS <--> C# Storage Test', () => {
 
     const script = createGetBlockScript(block.hash);
     dispatcher.withSnapshots(({ main }) => {
-      main.addBlock(block);
-      main.addTransaction(tx, block.index);
-      main.changeBlockHashIndex(block.index, block.hash);
+      // main.addBlock(block);
+      // main.addTransaction(tx, block.index);
+      // main.changeBlockHashIndex(block.index, block.hash);
 
       dispatcher.withApplicationEngine(
         {

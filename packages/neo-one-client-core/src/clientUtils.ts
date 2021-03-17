@@ -23,7 +23,7 @@ const getInvokeMethodScript = ({
   readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
 }): Buffer => {
   const sb = new ScriptBuilder();
-  sb.emitAppCall(common.stringToUInt160(scriptHash), method, ...params);
+  sb.emitDynamicAppCall(common.stringToUInt160(scriptHash), method, ...params);
 
   return sb.build();
 };

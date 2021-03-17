@@ -94,17 +94,41 @@ export class Dispatcher {
     });
   }
 
-  public updateStore(storage: ReadonlyArray<{ readonly key: Buffer; readonly value: Buffer }>): void {
-    const tableChanges = storage.map((change) => ({
-      table: change.key[0],
-      key: change.key.slice(1),
-      value: change.value,
-    }));
+  public updateSnapshot(key: Buffer, id: number, value: Buffer) {
+    return this.dispatch({
+      method: 'test_snapshot_add',
+      args: {
+        key,
+        id,
+        value,
+      },
+    });
+  }
 
+  public readSnapshot(key: Buffer, id: number) {
+    return this.dispatch({
+      method: 'test_snapshot_get',
+      args: {
+        key,
+        id,
+      },
+    });
+  }
+
+  public updateStore(storage: ReadonlyArray<{ readonly key: Buffer; readonly value: Buffer }>): void {
     this.dispatch({
       method: 'test_update_store',
       args: {
-        changes: tableChanges,
+        changes: storage,
+      },
+    });
+  }
+
+  public readStore(key: Buffer): Buffer {
+    return this.dispatch({
+      method: 'test_read_store',
+      args: {
+        key,
       },
     });
   }

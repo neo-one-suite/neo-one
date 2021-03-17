@@ -10,21 +10,25 @@ export interface PrepareResponseAdd extends ConsensusMessageBaseAdd {
 export class PrepareResponseConsensusMessage extends ConsensusMessageBase {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): PrepareResponseConsensusMessage {
     const { reader } = options;
-    const { viewNumber } = super.deserializeConsensusMessageBaseWireBase(options);
+    const { viewNumber, blockIndex, validatorIndex } = super.deserializeConsensusMessageBaseWireBase(options);
     const preparationHash = reader.readUInt256();
 
     return new this({
       viewNumber,
+      blockIndex,
+      validatorIndex,
       preparationHash,
     });
   }
 
   public readonly preparationHash: UInt256;
 
-  public constructor({ viewNumber, preparationHash }: PrepareResponseAdd) {
+  public constructor({ viewNumber, blockIndex, validatorIndex, preparationHash }: PrepareResponseAdd) {
     const options = {
       type: ConsensusMessageType.PrepareResponse,
       viewNumber,
+      blockIndex,
+      validatorIndex,
     };
     super(options);
 

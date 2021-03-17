@@ -1,7 +1,14 @@
-import { createSerializeWire, IOHelper, Nep17TransferModel, UInt160, UInt256 } from '@neo-one/client-common';
+import {
+  BinaryReader,
+  createSerializeWire,
+  IOHelper,
+  Nep17TransferModel,
+  UInt160,
+  UInt256,
+} from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from './Serializable';
-import { BinaryReader, utils } from './utils';
+import { utils } from './utils';
 
 export interface Nep17TransferAdd {
   readonly userScriptHash: UInt160;
@@ -48,14 +55,5 @@ export class Nep17Transfer extends Nep17TransferModel {
 
   public get size() {
     return this.sizeInternal();
-  }
-
-  public clone() {
-    return new Nep17Transfer({
-      userScriptHash: this.userScriptHash,
-      blockIndex: this.blockIndex,
-      txHash: this.txHash,
-      amountBuffer: this.amountInternal,
-    });
   }
 }

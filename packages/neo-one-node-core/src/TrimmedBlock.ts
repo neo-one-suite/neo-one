@@ -1,4 +1,5 @@
 import {
+  BinaryReader,
   BinaryWriter,
   createSerializeWire,
   InvalidFormatError,
@@ -11,11 +12,11 @@ import {
 import { Block } from './Block';
 import { BlockBase, BlockBaseAdd } from './BlockBase';
 import { ConsensusData } from './ConsensusData';
+import { NotSupportedError } from './errors';
 import { Header } from './Header';
 import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializeJSONContext } from './Serializable';
-import { ReadStorage } from './Storage';
-import { TransactionKey, TransactionState } from './transaction';
-import { BinaryReader, utils } from './utils';
+import { StackItem } from './StackItems';
+import { utils } from './utils';
 
 export interface TrimmedBlockAdd extends BlockBaseAdd {
   readonly consensusData?: ConsensusData;
@@ -57,11 +58,14 @@ export class TrimmedBlock extends BlockBase implements SerializableWire {
     });
   }
 
+  public static fromStackItem(_stackItem: StackItem) {
+    throw new NotSupportedError('fromStackItem');
+  }
+
   public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   public readonly serializeUnsigned = createSerializeWire(super.serializeUnsignedBase.bind(this));
   public readonly consensusData?: ConsensusData;
   public readonly hashes: readonly UInt256[];
-  public readonly isBlock: boolean;
   protected readonly sizeExclusive = utils.lazy(
     () =>
       IOHelper.sizeOfArray(this.hashes, () => IOHelper.sizeOfUInt256) +
@@ -107,49 +111,10 @@ export class TrimmedBlock extends BlockBase implements SerializableWire {
     });
     this.consensusData = consensusData;
     this.hashes = hashes;
-    this.isBlock = this.hashes.length > 0;
   }
 
   public get header() {
     return this.headerInternal();
-  }
-
-  public async getBlock(storage: ReadStorage<TransactionKey, TransactionState>) {
-    return new Block({
-      version: this.version,
-      previousHash: this.previousHash,
-      merkleRoot: this.merkleRoot,
-      timestamp: this.timestamp,
-      index: this.index,
-      nextConsensus: this.nextConsensus,
-      witness: this.witness,
-      consensusData: this.consensusData,
-      transactions: await Promise.all(
-        this.hashes.slice(1).map(async (hash) => {
-          const state = await storage.get(hash);
-
-          return state.transaction;
-        }),
-      ),
-      messageMagic: this.messageMagic,
-    });
-  }
-
-  // TODO: review this
-  public clone(options: Partial<TrimmedBlockAdd>): TrimmedBlock {
-    return new TrimmedBlock({
-      version: this.version,
-      previousHash: this.previousHash,
-      merkleRoot: this.merkleRoot,
-      timestamp: this.timestamp,
-      index: this.index,
-      nextConsensus: this.nextConsensus,
-      witness: this.witness,
-      hashes: this.hashes,
-      consensusData: this.consensusData,
-      messageMagic: this.messageMagic,
-      ...options,
-    });
   }
 
   public serializeWireBase(writer: BinaryWriter): void {

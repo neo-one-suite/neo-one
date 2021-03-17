@@ -1,4 +1,4 @@
-import { TriggerType, common, VMState } from '@neo-one/client-common';
+import { common, TriggerType, VMState } from '@neo-one/client-common';
 import { ApplicationEngine } from '../ApplicationEngine';
 import { Dispatcher } from '../Dispatcher';
 

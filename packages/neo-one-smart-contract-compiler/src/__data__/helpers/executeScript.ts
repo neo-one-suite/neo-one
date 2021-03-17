@@ -51,7 +51,8 @@ export const executeScript = async (
   throwOnDiagnosticErrorOrWarning(diagnostics, ignoreWarnings);
 
   const code = Buffer.concat([prelude, Buffer.from(compiledCode, 'hex')]);
-  const [receipt, resolvedSourceMap] = await Promise.all([blockchain.invokeScript(code), sourceMap]);
+  const receipt = blockchain.invokeScript(code);
+  const resolvedSourceMap = await sourceMap;
 
   const address = scriptHashToAddress(common.uInt160ToString(crypto.toScriptHash(code)));
   await blockchain.stop();
@@ -61,7 +62,7 @@ export const executeScript = async (
       script: compiledCode,
       state: toVMStateJSON(receipt.state),
       gasconsumed: receipt.gasConsumed.toString(),
-      stack: receipt.stack.map((stackItem, _) => stackItem.toContractParameter().serializeJSON()),
+      stack: receipt.stack.map((stackItem) => stackItem.toContractParameter().serializeJSON()),
       notifications: receipt.notifications.map((n) => n.serializeJSON()),
       logs: receipt.logs.map((log) => ({
         message: log.message,

@@ -10,6 +10,20 @@ export const DECREMENT_INTERVAL = 2000000;
 export const MILLISECONDS_PER_BLOCK = 15000;
 export const MAX_TRANSACTION_PER_BLOCK = 500;
 
+// TODO: these names should be abstracted somewhere and put here and then in the
+// name constructors of the native contract classes
+// TODO: not sure what the actual nativeActivation values are supposed to be
+const nativeActivations = {
+  LedgerContract: 0,
+  NameService: 0,
+  RoleManagement: 0,
+  ContractManagement: 0,
+  PolicyContract: 0,
+  OracleContract: 0,
+  NeoToken: 0,
+  GasToken: 0,
+};
+
 interface Options {
   readonly privateNet?: boolean;
   readonly consensusAddress: UInt160;
@@ -21,6 +35,7 @@ const getDeployWitness = () =>
     invocation: Buffer.from([]),
     verification: Buffer.from([Op.PUSH1]),
   });
+
 interface GetGenesisBlockOptions {
   readonly consensusAddress: UInt160;
   readonly messageMagic: number;
@@ -53,4 +68,5 @@ export const common = ({ privateNet, consensusAddress, messageMagic }: Options) 
   millisecondsPerBlock: MILLISECONDS_PER_BLOCK,
   maxTransactionsPerBlock: MAX_TRANSACTION_PER_BLOCK,
   memoryPoolMaxTransactions: 50000,
+  nativeActivations,
 });

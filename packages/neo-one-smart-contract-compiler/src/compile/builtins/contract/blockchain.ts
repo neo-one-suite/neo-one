@@ -28,7 +28,7 @@ class BlockchainCurrentCallerContract extends BuiltinMemberValue {
       // ['getContract', [buffer], buffer]
       sb.emitPushString(node, 'getContract');
       // [buffer, 'getContract', [buffer], buffer]
-      sb.emitPushBuffer(node, common.nativeHashes.Management);
+      sb.emitPushBuffer(node, common.nativeHashes.ContractManagement);
       // [conract, buffer]
       sb.emitSysCall(node, 'System.Contract.Call');
       sb.emitHelper(

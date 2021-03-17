@@ -1,4 +1,4 @@
-import { BinaryWriter } from '@neo-one/client-common';
+import { BinaryReader, BinaryWriter } from '@neo-one/client-common';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,
@@ -6,11 +6,12 @@ import {
   SerializableWire,
   SerializeWire,
 } from '../../Serializable';
-import { BinaryReader } from '../../utils';
 import { ConsensusMessageType } from './ConsensusMessageType';
 
 export interface ConsensusMessageBaseAdd {
   readonly viewNumber: number;
+  readonly validatorIndex: number;
+  readonly blockIndex: number;
 }
 
 export interface ConsensusMessageBaseAddWithType extends ConsensusMessageBaseAdd {
@@ -19,18 +20,28 @@ export interface ConsensusMessageBaseAddWithType extends ConsensusMessageBaseAdd
 
 export class ConsensusMessageBase implements SerializableWire {
   public static readonly VERSION = 0;
-  public static readonly deserializeConsensusMessageBaseWireBase = ({ reader }: DeserializeWireBaseOptions) => {
+  public static readonly deserializeConsensusMessageBaseWireBase = ({
+    reader,
+    context,
+  }: DeserializeWireBaseOptions) => {
     const type = reader.readUInt8();
+    const blockIndex = reader.readUInt32LE();
+    const validatorIndex = reader.readUInt8();
+    if (validatorIndex >= context.validatorsCount) {
+      throw new Error('Validator index greater than validators count');
+    }
     const viewNumber = reader.readUInt8();
 
     return {
       type,
       viewNumber,
+      blockIndex,
+      validatorIndex,
     };
   };
 
   public static deserializeWireBase(_options: DeserializeWireBaseOptions): ConsensusMessageBase {
-    throw new Error('Not Implemented');
+    throw new Error('ConsensusMessageBase deserializeWireBase not implemented');
   }
 
   public static deserializeWire(options: DeserializeWireOptions): ConsensusMessageBase {
@@ -42,15 +53,21 @@ export class ConsensusMessageBase implements SerializableWire {
 
   public readonly type: ConsensusMessageType;
   public readonly viewNumber: number;
+  public readonly blockIndex: number;
+  public readonly validatorIndex: number;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
-  public constructor({ type, viewNumber }: ConsensusMessageBaseAddWithType) {
+  public constructor({ type, viewNumber, blockIndex, validatorIndex }: ConsensusMessageBaseAddWithType) {
     this.type = type;
     this.viewNumber = viewNumber;
+    this.blockIndex = blockIndex;
+    this.validatorIndex = validatorIndex;
   }
 
   public serializeWireBase(writer: BinaryWriter): void {
     writer.writeUInt8(this.type);
+    writer.writeUInt32LE(this.blockIndex);
+    writer.writeUInt8(this.validatorIndex);
     writer.writeUInt8(this.viewNumber);
   }
 }

@@ -48,6 +48,28 @@ describe('Blockchain invocation / storage tests', () => {
   });
 });
 
+describe('Update and read dispatcher store and snapshot', () => {
+  test('Can update store then read same key', async () => {
+    const dispatcher = new Dispatcher();
+    const key = Buffer.from([0x09]);
+    const value = Buffer.from([0xfa]);
+    dispatcher.updateStore([{ key, value }]);
+
+    expect(dispatcher.readStore(key)).toEqual(value);
+  });
+
+  test('Can update snapshot and then read same key', async () => {
+    const dispatcher = new Dispatcher();
+    const id = 11;
+    const key = Buffer.from([0x09]);
+    const value = Buffer.from([0xfa]);
+
+    dispatcher.updateSnapshot(key, id, value);
+
+    expect(dispatcher.readSnapshot(key, id)).toEqual(value);
+  });
+});
+
 describe('VM memory store for testing', () => {
   test('can persist 2 blocks in memory', async () => {
     const settings = createTest();

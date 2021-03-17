@@ -265,16 +265,16 @@ function getImplementorsWorker(
 
       const clause = node_.getParent(parent) as ts.Node | undefined;
       if (
-        clause === undefined ||
-        !ts.isHeritageClause(clause) ||
-        (!heritage.isImplements(clause) && !heritage.isExtends(clause))
+        (clause === undefined || !ts.isHeritageClause(clause) || !heritage.isExtends(clause)) &&
+        !(clause && ts.isExpressionWithTypeArguments(clause))
       ) {
         return acc;
       }
 
-      let derived: ts.ClassDeclaration | ts.InterfaceDeclaration | undefined = node_.getFirstAncestorByKind<
-        ts.ClassDeclaration
-      >(clause, ts.SyntaxKind.ClassDeclaration);
+      let derived:
+        | ts.ClassDeclaration
+        | ts.InterfaceDeclaration
+        | undefined = node_.getFirstAncestorByKind<ts.ClassDeclaration>(clause, ts.SyntaxKind.ClassDeclaration);
       if (derived === undefined) {
         derived = node_.getFirstAncestorByKindOrThrow<ts.InterfaceDeclaration>(
           clause,

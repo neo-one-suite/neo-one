@@ -1,7 +1,9 @@
 import { crypto } from '@neo-one/client-common';
 import {
   assertArrayStackItem,
+  BlockchainSettings,
   NativeContractStorageContext,
+  OracleContract as OracleContractNode,
   OracleRequest,
   OracleRequestResults,
   StackItem,
@@ -9,31 +11,26 @@ import {
 } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import { map, toArray } from 'rxjs/operators';
+import { oracleMethods } from './methods';
 import { NativeContract } from './NativeContract';
 
-export class OracleContract extends NativeContract {
+export class OracleContract extends NativeContract implements OracleContractNode {
   private readonly prefixes = {
     requestId: Buffer.from([9]),
     request: Buffer.from([7]),
     idList: Buffer.from([6]),
   };
 
-  // applicationEngine constants that might be used later
-  // private maxUrlLength = 256 as const;
-  // private maxFilterLength = 128 as const;
-  // private maxCallbackLength = 32 as const;
-  // private maxUserDataLength = 512 as const;
-  // private oracleRequestPrice = common.fixed8FromDecimal('.5');
-
-  public constructor() {
+  public constructor(settings: BlockchainSettings) {
     super({
-      id: -4,
       name: 'OracleContract',
+      methods: oracleMethods,
+      settings,
     });
   }
 
   public async getRequest({ storages }: NativeContractStorageContext, id: BN) {
-    const item = await storages.tryGet(this.createStorageKey(this.prefixes.request).addUInt64LE(id).toStorageKey());
+    const item = await storages.tryGet(this.createStorageKey(this.prefixes.request).addUInt64BE(id).toStorageKey());
 
     if (item === undefined) {
       return undefined;
@@ -49,7 +46,7 @@ export class OracleContract extends NativeContract {
         map(
           ({ key, value }) =>
             // tslint:disable-next-line: no-useless-cast
-            [new BN(key.key.slice(1), 'le'), utils.getInteroperable(value, OracleRequest.fromStackItem)] as const,
+            [new BN(key.key.slice(1), 'be'), utils.getInteroperable(value, OracleRequest.fromStackItem)] as const,
         ),
         toArray(),
       )
@@ -68,7 +65,7 @@ export class OracleContract extends NativeContract {
 
     return Promise.all(
       list.map(async (id) => {
-        const request = await storages.get(this.createStorageKey(this.prefixes.request).addUInt64LE(id).toStorageKey());
+        const request = await storages.get(this.createStorageKey(this.prefixes.request).addUInt64BE(id).toStorageKey());
 
         return utils.getInteroperable(request, OracleRequest.fromStackItem);
       }),

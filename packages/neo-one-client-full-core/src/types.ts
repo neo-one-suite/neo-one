@@ -25,7 +25,6 @@ export interface ContractRegister {
   readonly script: BufferString;
   readonly manifest: ContractManifestClient;
   readonly compilerName: string;
-  readonly compilerVersion: string;
 }
 
 export interface PublishReceipt extends TransactionReceipt {

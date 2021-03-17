@@ -1,4 +1,10 @@
-import { BinaryWriter, createSerializeWire, SerializableWire, SerializeWire } from '@neo-one/client-common';
+import {
+  BinaryWriter,
+  createSerializeWire,
+  InvalidFormatError,
+  SerializableWire,
+  SerializeWire,
+} from '@neo-one/client-common';
 import { BinaryReader, DeserializeWireBaseOptions, DeserializeWireOptions, Header } from '@neo-one/node-core';
 export interface HeadersPayloadAdd {
   readonly headers: readonly Header[];
@@ -9,6 +15,9 @@ export class HeadersPayload implements SerializableWire {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): HeadersPayload {
     const { reader } = options;
     const headers = reader.readArray(() => Header.deserializeWireBase(options));
+    if (headers.length === 0) {
+      throw new InvalidFormatError('Expected headers length to not be 0');
+    }
 
     return new this({ headers });
   }

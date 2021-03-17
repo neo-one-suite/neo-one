@@ -1,4 +1,5 @@
 export * from './BinaryWriter';
+export * from './BinaryReader';
 export * from './common';
 export * from './contractParameters';
 export * from './crypto';
@@ -14,3 +15,5 @@ export * from './ScriptBuilder';
 export * from './types';
 export * from './utils';
 export * from './StackItemType';
+export * from './disassembleByteCode';
+export * from './script';

@@ -735,6 +735,10 @@
       "allowedCategories": [ "web" ]
     },
     {
+      "name": "immutable",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "import-local",
       "allowedCategories": [ "production" ]
     },

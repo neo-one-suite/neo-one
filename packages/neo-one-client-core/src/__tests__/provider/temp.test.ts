@@ -68,7 +68,7 @@ describe('JSONRPCClient Tests', async () => {
   // TODO: needs to be looked into
   test('getStorage - Policy', async () => {
     const getStorageByNum = (hashIn: UInt160, num: number) =>
-      client.getStorage(common.uInt160ToString(hashIn), Buffer.from([num]).toString('hex'));
+      client.getStorage(common.uInt160ToString(hashIn), Buffer.from([num]).toString('base64'));
 
     const hash = common.nativeHashes.Policy;
     // 0xce06595079cd69583126dbfd1d2e25cca74cffe9

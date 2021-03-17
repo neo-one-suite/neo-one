@@ -1,15 +1,14 @@
-import { BinaryWriter, common, createSerializeWire, crypto, UInt256 } from '@neo-one/client-common';
+import { BinaryReader, BinaryWriter, common, createSerializeWire, UInt256 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import { ConsensusContext } from '../../consensus/ConsensusContext';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from '../../Serializable';
-import { BinaryReader } from '../../utils';
-import { Witness } from '../../Witness';
 import { ChangeViewPayloadCompact } from '../ChangeViewPayloadCompact';
 import { CommitPayloadCompact } from '../CommitPayloadCompact';
-import { ConsensusPayload } from '../ConsensusPayload';
+import { ExtensiblePayload } from '../ExtensiblePayload';
 import { PreparationPayloadCompact } from '../PreparationPayloadCompact';
 import { ChangeViewConsensusMessage } from './ChangeViewConsensusMessage';
+import { ChangeViewReason } from './ChangeViewReason';
 import { CommitConsensusMessage } from './CommitConsensusMessage';
 import { ConsensusMessageBase, ConsensusMessageBaseAdd } from './ConsensusMessageBase';
 import { ConsensusMessageType } from './ConsensusMessageType';
@@ -29,7 +28,7 @@ export class RecoveryConsensusMessage extends ConsensusMessageBase {
     options: DeserializeWireBaseOptions & { readonly validatorsCount: number },
   ): RecoveryConsensusMessage {
     const { reader } = options;
-    const { viewNumber } = super.deserializeConsensusMessageBaseWireBase(options);
+    const { viewNumber, blockIndex, validatorIndex } = super.deserializeConsensusMessageBaseWireBase(options);
     const changeViewMessagesIn = reader.readArray(
       () => ChangeViewPayloadCompact.deserializeWireBase(options),
       options.validatorsCount,
@@ -61,6 +60,8 @@ export class RecoveryConsensusMessage extends ConsensusMessageBase {
 
     return new RecoveryConsensusMessage({
       viewNumber,
+      blockIndex,
+      validatorIndex,
       prepareRequestMessage,
       preparationHash,
       changeViewMessages,
@@ -88,13 +89,15 @@ export class RecoveryConsensusMessage extends ConsensusMessageBase {
 
   public constructor({
     viewNumber,
+    blockIndex,
+    validatorIndex,
     prepareRequestMessage,
     preparationHash,
     changeViewMessages,
     preparationMessages,
     commitMessages,
   }: RecoveryConsensusMessageAdd) {
-    super({ type: ConsensusMessageType.RecoveryMessage, viewNumber });
+    super({ type: ConsensusMessageType.RecoveryMessage, viewNumber, blockIndex, validatorIndex });
 
     this.prepareRequestMessage = prepareRequestMessage;
     this.preparationHash = preparationHash;
@@ -119,48 +122,38 @@ export class RecoveryConsensusMessage extends ConsensusMessageBase {
     writer.writeArray(Object.values(this.commitMessages), (message) => message.serializeWireBase(writer));
   }
 
-  public getChangeViewPayloads(context: ConsensusContext, payload: ConsensusPayload) {
-    return Object.values(this.changeViewMessages).map(
-      (item) =>
-        new ConsensusPayload({
-          version: payload.version,
-          previousHash: payload.previousHash,
-          blockIndex: payload.blockIndex,
+  public getChangeViewPayloads(context: ConsensusContext, magic: number): readonly ExtensiblePayload[] {
+    return Object.values(this.changeViewMessages).map((item: ChangeViewPayloadCompact) =>
+      context.createPayload(
+        new ChangeViewConsensusMessage({
+          blockIndex: this.blockIndex,
           validatorIndex: item.validatorIndex,
-          consensusMessage: new ChangeViewConsensusMessage({
-            viewNumber: item.originalViewNumber,
-            timestamp: item.timestamp,
-            reason,
-          }),
-          witness: new Witness({
-            invocation: item.invocationScript,
-            verification: crypto.createSignatureRedeemScript(context.validators[item.validatorIndex]),
-          }),
+          viewNumber: item.originalViewNumber,
+          timestamp: item.timestamp,
+          reason: ChangeViewReason.Timeout, // TODO: pretty sure this is wrong but also possible that this doesn't matter anyway
         }),
+        magic,
+        item.invocationScript,
+      ),
     );
   }
 
-  public getCommitPayloads(context: ConsensusContext, payload: ConsensusPayload) {
-    return Object.values(this.commitMessages).map(
-      (item) =>
-        new ConsensusPayload({
-          version: payload.version,
-          previousHash: payload.previousHash,
-          blockIndex: payload.blockIndex,
+  public getCommitPayloadsFromRecoveryMessage(context: ConsensusContext, magic: number): readonly ExtensiblePayload[] {
+    return Object.values(this.commitMessages).map((item: CommitPayloadCompact) =>
+      context.createPayload(
+        new CommitConsensusMessage({
+          blockIndex: this.blockIndex,
           validatorIndex: item.validatorIndex,
-          consensusMessage: new CommitConsensusMessage({
-            viewNumber: item.viewNumber,
-            signature: item.signature,
-          }),
-          witness: new Witness({
-            invocation: item.invocationScript,
-            verification: crypto.createSignatureRedeemScript(context.validators[item.validatorIndex]),
-          }),
+          viewNumber: item.viewNumber,
+          signature: item.signature,
         }),
+        magic,
+        item.invocationScript,
+      ),
     );
   }
 
-  public getPrepareRequestPayload(context: ConsensusContext, payload: ConsensusPayload): ConsensusPayload | undefined {
+  public getPrepareRequestPayload(context: ConsensusContext, magic: number): ExtensiblePayload | undefined {
     if (this.prepareRequestMessage === undefined) {
       return undefined;
     }
@@ -172,42 +165,27 @@ export class RecoveryConsensusMessage extends ConsensusMessageBase {
       return undefined;
     }
 
-    return new ConsensusPayload({
-      version: payload.version,
-      previousHash: payload.previousHash,
-      blockIndex: payload.blockIndex,
-      validatorIndex: index,
-      consensusMessage: this.prepareRequestMessage,
-      witness: new Witness({
-        invocation: maybePreparationMessage.invocationScript,
-        verification: crypto.createSignatureRedeemScript(context.validators[index]),
-      }),
-    });
+    return context.createPayload(this.prepareRequestMessage, magic, maybePreparationMessage.invocationScript);
   }
 
-  public getPrepareResponsePayloads(context: ConsensusContext, payload: ConsensusPayload): readonly ConsensusPayload[] {
+  public getPrepareResponsePayloads(context: ConsensusContext, magic: number): readonly ExtensiblePayload[] {
     const index = context.blockBuilder.getConsensusData().primaryIndex;
     const preparationHash = this.preparationHash ?? context.preparationPayloads[index]?.hash;
     if (preparationHash === undefined) {
       return [];
     }
 
-    return Object.values(this.preparationMessages).map(
-      (item) =>
-        new ConsensusPayload({
-          version: payload.version,
-          previousHash: payload.previousHash,
-          blockIndex: payload.blockIndex,
+    return Object.values(this.preparationMessages).map((item: PreparationPayloadCompact) =>
+      context.createPayload(
+        new PrepareResponseConsensusMessage({
+          blockIndex: this.blockIndex,
           validatorIndex: item.validatorIndex,
-          consensusMessage: new PrepareResponseConsensusMessage({
-            viewNumber: this.viewNumber,
-            preparationHash,
-          }),
-          witness: new Witness({
-            invocation: item.invocationScript,
-            verification: crypto.createSignatureRedeemScript(context.validators[index]),
-          }),
+          viewNumber: this.viewNumber,
+          preparationHash,
         }),
+        magic,
+        item.invocationScript,
+      ),
     );
   }
 }

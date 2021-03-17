@@ -1,4 +1,4 @@
-import { InvalidFormatError, utils as clientUtils, WildcardContainerJSON } from '@neo-one/client-common';
+import { BinaryReader, InvalidFormatError, utils as clientUtils, WildcardContainerJSON } from '@neo-one/client-common';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
 import { randomBytes } from 'crypto';
@@ -6,7 +6,6 @@ import _ from 'lodash';
 import { StackItem } from '../StackItems';
 import { StorageItem } from '../StorageItem';
 import { executionLimits } from '../vm';
-import { BinaryReader } from './BinaryReader';
 import { deserializeStackItem } from './deserializeStackItem';
 
 const toASCII = (bytes: Buffer) => {

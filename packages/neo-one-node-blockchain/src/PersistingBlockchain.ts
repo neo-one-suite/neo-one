@@ -1,6 +1,6 @@
 // tslint:disable no-array-mutation no-object-mutation
 import { common, TriggerType, VMState } from '@neo-one/client-common';
-import { ApplicationExecuted, Block, SnapshotHandler, Transaction, VM } from '@neo-one/node-core';
+import { ApplicationExecuted, Batch, Block, SnapshotHandler, Transaction, VM } from '@neo-one/node-core';
 import { PersistNativeContractsError, PostPersistError } from './errors';
 import { utils } from './utils';
 
@@ -23,22 +23,17 @@ export class PersistingBlockchain {
 
   public persistBlock(
     block: Block,
-    currentHeaderIndexCount: number,
-    // tslint:disable-next-line: readonly-array no-any
-  ): { readonly changeBatch: any[]; readonly applicationsExecuted: readonly ApplicationExecuted[] } {
+    // tslint:disable-next-line: readonly-array
+  ): { readonly changeBatch: Batch[]; readonly applicationsExecuted: readonly ApplicationExecuted[] } {
     return this.vm.withSnapshots(({ main, clone }) => {
-      if (block.index === currentHeaderIndexCount) {
-        main.changeHeaderHashIndex(block.index, block.hash);
-      }
-
       const appsExecuted: ApplicationExecuted[] = [];
 
-      main.setPersistingBlock(block);
       const executed = this.vm.withApplicationEngine<ApplicationExecuted>(
         {
           trigger: TriggerType.OnPersist,
           snapshot: 'main',
           gas: common.TWENTY_FIXED8,
+          persistingBlock: block,
         },
         (engine) => {
           engine.loadScript({ script: this.onPersistNativeContractScript });
@@ -53,14 +48,11 @@ export class PersistingBlockchain {
 
       appsExecuted.push(executed);
 
-      main.addBlock(block);
       main.clone();
 
       const executedTransactions = this.persistTransactions(block, main, clone);
 
-      main.changeBlockHashIndex(block.index, block.hash);
-
-      const postPersistExecuted = this.postPersist();
+      const postPersistExecuted = this.postPersist(block);
 
       return {
         changeBatch: main.getChangeSet(),
@@ -75,7 +67,7 @@ export class PersistingBlockchain {
     clone: Omit<SnapshotHandler, 'clone'>,
   ): readonly ApplicationExecuted[] {
     return block.transactions.reduce<readonly ApplicationExecuted[]>((acc, transaction) => {
-      const appExecuted = this.persistTransaction(transaction, block.index, main, clone);
+      const appExecuted = this.persistTransaction(transaction, main, clone, block);
 
       return acc.concat(appExecuted);
     }, []);
@@ -83,26 +75,22 @@ export class PersistingBlockchain {
 
   private persistTransaction(
     transaction: Transaction,
-    index: number,
     main: SnapshotHandler,
     clone: Omit<SnapshotHandler, 'clone'>,
+    block: Block,
   ): ApplicationExecuted {
-    clone.addTransaction(transaction, index);
-    clone.commit('transactions');
-
     return this.vm.withApplicationEngine(
       {
         trigger: TriggerType.Application,
         container: transaction,
         snapshot: 'clone',
         gas: transaction.systemFee,
+        persistingBlock: block,
       },
       (engine) => {
         engine.loadScript({ script: transaction.script });
         const state = engine.execute();
         if (state === VMState.HALT) {
-          clone.deleteTransaction(transaction.hash);
-          clone.addTransaction(transaction, index, VMState.HALT);
           clone.commit();
         } else {
           main.clone();
@@ -113,13 +101,14 @@ export class PersistingBlockchain {
     );
   }
 
-  private postPersist(): ApplicationExecuted {
+  private postPersist(block: Block): ApplicationExecuted {
     return this.vm.withApplicationEngine(
       {
         trigger: TriggerType.PostPersist,
         container: undefined,
         gas: common.TWENTY_FIXED8,
         snapshot: 'main',
+        persistingBlock: block,
       },
       (engine) => {
         engine.loadScript({ script: this.postPersistNativeContractScript });

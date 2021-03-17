@@ -1,11 +1,12 @@
 import { common, crypto, ECPoint, InvalidFormatError, UInt160 } from '@neo-one/client-common';
-import { BlockchainSettings, Candidate, NativeContractStorageContext, utils } from '@neo-one/node-core';
+import { BlockchainSettings, Candidate, NativeContractStorageContext, NEOContract, utils } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import { filter, map, toArray } from 'rxjs/operators';
 import { CandidateState, NEOAccountState } from './AccountStates';
 import { CachedCommittee } from './CachedCommittee';
-import { NEP17NativeContract } from './Nep17';
+import { FungibleToken } from './FungibleToken';
+import { neoTokenMethods } from './methods';
 
 type Storages = NativeContractStorageContext['storages'];
 
@@ -31,9 +32,8 @@ const candidateSort = (a: Candidate, b: Candidate) => {
   return a.publicKey.compare(b.publicKey);
 };
 
-export class NEOToken extends NEP17NativeContract {
+export class NEOToken extends FungibleToken implements NEOContract {
   public readonly totalAmount: BN;
-  // TODO: investigate this usage, its a strange decimal value in C# world. `0.2M`. Something to do with rounding.
   public readonly effectiveVoterTurnout = 0.2;
 
   private readonly settings: BlockchainSettings;
@@ -48,15 +48,16 @@ export class NEOToken extends NEP17NativeContract {
   private readonly ratios = {
     neoHolderReward: 10,
     committeeReward: 10,
-    voterReward: 10,
+    voterReward: 80,
   };
 
   public constructor(settings: BlockchainSettings) {
     super({
-      id: -1,
       name: 'NeoToken',
       symbol: 'NEO',
       decimals: 0,
+      methods: neoTokenMethods,
+      settings,
     });
 
     this.totalAmount = common.fixedFromDecimal(100000000, this.decimals);

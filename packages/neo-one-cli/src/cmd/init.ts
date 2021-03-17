@@ -190,7 +190,7 @@ export const ExampleHelloWorld = () => {
           rootTSConfig = JSON.parse(rootTSConfigContents);
         } catch (e) {
           console.log(
-            `Problem parsing the root tsconfig found at ${rootTSConfigPath}. Using NEO•ONE defaults. Make sure your tsconfig is JSON and try again. Parse error: ${e.message}`,
+            `Problem parsing the root tsconfig found at ${rootTSConfigPath}. Creating a default tsconfig. Make sure your tsconfig is JSON and try again. Parse error: ${e.message}`,
           );
         }
       }

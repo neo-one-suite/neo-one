@@ -1,6 +1,6 @@
-import { common, TriggerType, VMState } from '@neo-one/client-common';
+import { CallFlags, common, TriggerType, VMState } from '@neo-one/client-common';
 import {
-  CallFlags,
+  Block,
   LoadContractOptions,
   LoadScriptOptions,
   SerializableContainer,
@@ -17,6 +17,7 @@ export interface CreateOptions {
   readonly trigger: TriggerType;
   readonly container?: SerializableContainer;
   readonly snapshot?: SnapshotName;
+  readonly persistingBlock?: Block;
   readonly gas: BN;
 }
 
@@ -83,13 +84,20 @@ export class ApplicationEngine {
     }).map(convertLog);
   }
 
-  public create({ trigger, container, gas, snapshot }: CreateOptions) {
+  public get faultException() {
+    return this.dispatch({
+      method: 'getfaultexception',
+    });
+  }
+
+  public create({ trigger, container, persistingBlock, gas, snapshot }: CreateOptions) {
     return this.dispatch({
       method: 'create',
       args: {
         trigger,
         container: container ? serializeScriptContainer(container) : undefined,
         gas: gas.toString(),
+        persistingBlock: persistingBlock === undefined ? undefined : persistingBlock.serializeWire(),
         snapshot,
       },
     });
@@ -103,11 +111,12 @@ export class ApplicationEngine {
     ];
   }
 
-  public loadScript({ script, flags = CallFlags.All, scriptHash, initialPosition }: LoadScriptOptions) {
+  public loadScript({ script, rvcount, flags = CallFlags.All, scriptHash, initialPosition }: LoadScriptOptions) {
     return this.dispatch({
       method: 'loadscript',
       args: {
         script,
+        rvcount,
         flags,
         scriptHash: scriptHash ? common.uInt160ToHex(scriptHash) : undefined,
         initialPosition,
@@ -115,14 +124,29 @@ export class ApplicationEngine {
     });
   }
 
-  public loadContract({ hash, method, flags, packParameters = false }: LoadContractOptions) {
+  public push(item: string) {
+    return this.dispatch({
+      method: 'push',
+      args: {
+        item,
+      },
+    });
+  }
+
+  public stepOut() {
+    return this.dispatch({
+      method: 'stepout',
+    });
+  }
+
+  public loadContract({ hash, method, pcount, flags }: LoadContractOptions) {
     return this.dispatch({
       method: 'loadcontract',
       args: {
         hash,
         method,
+        pcount,
         flags,
-        packParameters,
       },
     });
   }

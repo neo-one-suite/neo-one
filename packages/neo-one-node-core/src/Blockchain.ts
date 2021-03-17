@@ -3,13 +3,15 @@ import { BN } from 'bn.js';
 import { Observable } from 'rxjs';
 import { Block } from './Block';
 import { Header } from './Header';
-import { ConsensusPayload } from './payload';
+import { HeaderCache } from './HeaderCache';
+import { ExtensiblePayload } from './payload';
 import { DeserializeWireContext, SerializeJSONContext } from './Serializable';
 import { BlockchainSettings } from './Settings';
 import { Signers } from './Signers';
-import { BlockchainStorage } from './Storage';
-import { Transaction } from './transaction';
+import { BlockchainStorage, Storage } from './Storage';
+import { Transaction, TransactionState } from './transaction';
 import { TransactionVerificationContext } from './TransactionVerificationContext';
+import { TrimmedBlock } from './TrimmedBlock';
 import { VerifyOptions, VerifyWitnesses } from './Verifiable';
 import { CallReceipt } from './vm';
 
@@ -24,12 +26,12 @@ export interface Blockchain extends BlockchainStorage {
 
   readonly currentBlock: Block;
   readonly previousBlock: Block | undefined;
-  readonly currentHeaderIndex: number;
   readonly currentBlockIndex: number;
   readonly block$: Observable<Block>;
   readonly isPersistingBlock: boolean;
   readonly verifyOptions: VerifyOptions;
   readonly onPersistNativeContractScript: Buffer;
+  readonly headerCache: HeaderCache;
 
   readonly persistBlock: (options: { readonly block: Block; readonly verify?: boolean }) => Promise<void>;
 
@@ -40,12 +42,18 @@ export interface Blockchain extends BlockchainStorage {
     mempool: Mempool,
     context?: TransactionVerificationContext,
   ) => Promise<VerifyResultModel>;
-  readonly verifyConsensusPayload: (payload: ConsensusPayload) => Promise<void>;
+  readonly verifyConsensusPayload: (payload: ExtensiblePayload) => Promise<void>;
 
   readonly getBlock: (hashOrIndex: UInt256 | number) => Promise<Block | undefined>;
   readonly getHeader: (hashOrIndex: UInt256 | number) => Promise<Header | undefined>;
   readonly getBlockHash: (index: number) => Promise<UInt256 | undefined>;
   readonly getNextBlockHash: (hash: UInt256) => Promise<UInt256 | undefined>;
+  readonly getTransaction: (hash: UInt256) => Promise<TransactionState | undefined>;
+  readonly getCurrentIndex: () => Promise<number>;
+  readonly getCurrentHash: () => Promise<UInt256>;
+  readonly getCurrentBlock: () => Promise<Block | undefined>;
+  readonly getTrimmedBlock: (hash: UInt256) => Promise<TrimmedBlock | undefined>;
+  readonly containsTransaction: (hash: UInt256) => Promise<boolean>;
 
   readonly getValidators: () => Promise<readonly ECPoint[]>;
   readonly getNextBlockValidators: () => Promise<readonly ECPoint[]>;
@@ -54,8 +62,9 @@ export interface Blockchain extends BlockchainStorage {
   readonly getMaxTransactionsPerBlock: () => Promise<number>;
   readonly getFeePerByte: () => Promise<BN>;
   readonly shouldRefreshCommittee: (offset?: number) => boolean;
+  readonly updateExtensibleWitnessWhiteList: (storage: Storage) => Promise<void>;
 
-  readonly invokeScript: (script: Buffer, signers?: Signers) => CallReceipt;
+  readonly invokeScript: (script: Buffer, signers?: Signers, gas?: BN) => CallReceipt;
   readonly testTransaction: (transaction: Transaction) => CallReceipt;
   readonly getVerificationCost: (
     contractHash: UInt160,

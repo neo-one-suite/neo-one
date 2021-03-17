@@ -14,6 +14,8 @@ import {
 import { BN } from 'bn.js';
 import { Equals, EquatableKey } from './Equatable';
 import { InvalidPreviousHeaderError, UnsignedBlockError } from './errors';
+import { HeaderCache } from './HeaderCache';
+import { NativeContainer } from './Native';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,
@@ -39,13 +41,17 @@ export interface BlockBaseAdd {
   readonly hash?: UInt256;
 }
 
-export const getBlockScriptHashesForVerifying = async (
-  block: {
-    readonly previousHash: UInt256;
-    readonly witness?: Witness;
-  },
-  storage: BlockchainStorage,
-) => {
+export const getBlockScriptHashesForVerifying = async ({
+  block,
+  storage,
+  native,
+  headerCache,
+}: {
+  readonly block: { readonly previousHash: UInt256; readonly witness?: Witness; readonly index: number };
+  readonly storage: BlockchainStorage;
+  readonly native: NativeContainer;
+  readonly headerCache: HeaderCache;
+}) => {
   if (block.previousHash === common.ZERO_UINT256) {
     const witnessHash = block.witness?.scriptHash;
     if (witnessHash === undefined) {
@@ -55,13 +61,13 @@ export const getBlockScriptHashesForVerifying = async (
     return [witnessHash];
   }
 
-  const prevBlock = await storage.blocks.tryGet({ hashOrIndex: block.previousHash });
-  const prevHeader = prevBlock?.header;
-  if (prevHeader === undefined) {
+  const prev =
+    headerCache.tryGet(block.index - 1) ?? (await native.Ledger.getTrimmedBlock(storage, block.previousHash));
+  if (prev === undefined) {
     throw new InvalidPreviousHeaderError(common.uInt256ToHex(block.previousHash));
   }
 
-  return [prevHeader.nextConsensus];
+  return [prev.nextConsensus];
 };
 
 export abstract class BlockBase implements EquatableKey, SerializableContainer, Verifiable {
@@ -117,7 +123,17 @@ export abstract class BlockBase implements EquatableKey, SerializableContainer, 
   public readonly nextConsensus: UInt160;
   public readonly messageMagic: number;
   public readonly getScriptHashesForVerifying = utils.lazyAsync(
-    async (context: { readonly storage: BlockchainStorage }) => getBlockScriptHashesForVerifying(this, context.storage),
+    async (context: {
+      readonly storage: BlockchainStorage;
+      readonly headerCache: HeaderCache;
+      readonly native: NativeContainer;
+    }) =>
+      getBlockScriptHashesForVerifying({
+        block: this,
+        storage: context.storage,
+        native: context.native,
+        headerCache: context.headerCache,
+      }),
   );
   // tslint:disable-next-line no-any
   public readonly equals: Equals = utils.equals(this.constructor as any, this, (other: any) =>
@@ -237,18 +253,17 @@ export abstract class BlockBase implements EquatableKey, SerializableContainer, 
     };
   }
 
-  public async verify({ vm, storage, verifyWitnesses, native }: VerifyOptions): Promise<boolean> {
-    const prevBlock = await storage.blocks.tryGet({ hashOrIndex: this.previousHash });
-    const prevHeader = prevBlock?.header;
-    if (prevHeader === undefined) {
+  public async verify({ vm, storage, verifyWitnesses, native, headerCache }: VerifyOptions): Promise<boolean> {
+    const prev = headerCache.tryGet(this.index - 1) ?? (await native.Ledger.getHeader(storage, this.index - 1));
+    if (prev === undefined) {
       return false;
     }
 
-    if (prevHeader.index + 1 !== this.index) {
+    if (!prev.hash.equals(this.previousHash)) {
       return false;
     }
 
-    if (prevHeader.timestamp.gte(this.timestamp)) {
+    if (prev.timestamp.gte(this.timestamp)) {
       return false;
     }
 
@@ -257,6 +272,7 @@ export abstract class BlockBase implements EquatableKey, SerializableContainer, 
       verifiable: this,
       storage,
       native,
+      headerCache,
       gas: utils.ONE,
     });
   }

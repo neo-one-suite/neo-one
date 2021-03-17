@@ -1,48 +1,39 @@
-import { common, ContractJSON, IOHelper, JSONHelper, UInt160 } from '@neo-one/client-common';
+import { common, ContractJSON, JSONHelper, UInt160 } from '@neo-one/client-common';
 import { ContractStateModel } from '@neo-one/client-full-common';
 import { ContractManifest } from './manifest';
+import { NefFile } from './NefFile';
 import { assertArrayStackItem, StackItem } from './StackItems';
-import { utils } from './utils';
 
 export interface ContractStateAdd {
   readonly id: number;
   readonly updateCounter: number;
   readonly hash: UInt160;
-  readonly script: Buffer;
+  readonly nef: NefFile;
   readonly manifest: ContractManifest;
 }
 
 export type ContractKey = UInt160;
 
-export class ContractState extends ContractStateModel<ContractManifest> {
+export class ContractState extends ContractStateModel<ContractManifest, NefFile> {
   public static fromStackItem(stackItem: StackItem): ContractState {
     const { array } = assertArrayStackItem(stackItem);
     const id = array[0].getInteger().toNumber();
     const updateCounter = array[1].getInteger().toNumber();
     const hash = common.bufferToUInt160(array[2].getBuffer());
-    const script = array[3].getBuffer();
-    const manifest = ContractManifest.parseBytes(array[4].getBuffer());
+    const nef = NefFile.deserializeWire({
+      buffer: array[3].getBuffer(),
+      // TODO: fix this
+      context: { validatorsCount: 0, messageMagic: 0 },
+    });
+    const manifest = ContractManifest.fromStackItem(array[4]);
 
     return new ContractState({
       id,
       updateCounter,
       hash,
-      script,
+      nef,
       manifest,
     });
-  }
-
-  private readonly sizeInternal = utils.lazy(
-    () =>
-      IOHelper.sizeOfUInt32LE +
-      IOHelper.sizeOfUInt16LE +
-      IOHelper.sizeOfUInt160 +
-      IOHelper.sizeOfVarBytesLE(this.script) +
-      this.manifest.size,
-  );
-
-  public get size() {
-    return this.sizeInternal();
   }
 
   public clone() {
@@ -50,7 +41,7 @@ export class ContractState extends ContractStateModel<ContractManifest> {
       id: this.id,
       updateCounter: this.updateCounter,
       hash: this.hash,
-      script: this.script,
+      nef: this.nef,
       manifest: this.manifest,
     });
   }
@@ -64,7 +55,7 @@ export class ContractState extends ContractStateModel<ContractManifest> {
       id: this.id,
       updatecounter: this.updateCounter,
       hash: JSONHelper.writeUInt160(this.hash),
-      script: JSONHelper.writeBase64Buffer(this.script),
+      nef: this.nef.serializeJSON(),
       manifest: this.manifest.serializeJSON(),
     };
   }

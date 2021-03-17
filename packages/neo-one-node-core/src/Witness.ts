@@ -1,7 +1,7 @@
-import { crypto, IOHelper, JSONHelper, WitnessJSON, WitnessModel } from '@neo-one/client-common';
+import { BinaryReader, crypto, IOHelper, JSONHelper, WitnessJSON, WitnessModel } from '@neo-one/client-common';
 import { WITNESS_INVOCATION_SIZE, WITNESS_VERIFICATION_SIZE } from './constants';
 import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableJSON } from './Serializable';
-import { BinaryReader, utils } from './utils';
+import { utils } from './utils';
 
 export interface WitnessAdd {
   readonly verification: Buffer;

@@ -2,15 +2,16 @@ import { common, InvalidFormatError, UInt160, UInt256 } from '@neo-one/client-co
 import { BlockKey, Nep17BalanceKey, Nep17TransferKey, StorageKey, StreamOptions } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 
+// TODO: these are deleted in Neo3
 export enum Prefix {
-  Block = 0x01,
-  Transaction = 0x02,
-  Contract = 0x50,
-  Storage = 0x70,
-  HeaderHashList = 0x80,
-  CurrentBlock = 0xc0,
-  CurrentHeader = 0xc1,
-  ContractID = 0xc2,
+  Block = 0x01, // Removed
+  Transaction = 0x02, // Removed
+  Contract = 0x50, // Removed?
+  Storage = 0x70, // Removed
+  HeaderHashList = 0x80, // Removed
+  CurrentBlock = 0xc0, // Removed?
+  CurrentHeader = 0xc1, // Removed?
+  ContractID = 0xc2, // Removed?
   ConsensusState = 0xf4,
   Nep17Balance = 0xf8,
   Nep17TransferSent = 0xf9,
@@ -75,6 +76,24 @@ const createGetSearchRange = (prefix: Prefix) => {
   };
 };
 
+const createGetSearchRangeWithoutPrefix = () => (
+  lookupKey: Buffer,
+  secondaryLookupKey?: Buffer,
+): Required<StreamOptions> => {
+  if (secondaryLookupKey) {
+    return {
+      gte: lookupKey,
+      lte: secondaryLookupKey,
+    };
+  }
+  const { gte: initGte, lte: initLte } = generateSearchRange(lookupKey);
+
+  return {
+    gte: initGte,
+    lte: initLte,
+  };
+};
+
 const createBlockKey = getCreateKey<BlockKey>({
   serializeKey: ({ hashOrIndex }) => {
     if (typeof hashOrIndex === 'number') {
@@ -96,10 +115,7 @@ const createContractKey = getCreateKey<UInt160>({
   prefix: Prefix.Contract,
 });
 
-const createStorageKey = getCreateKey<StorageKey>({
-  serializeKey: (key) => key.serializeWire(),
-  prefix: Prefix.Storage,
-});
+const createStorageKey = (key: StorageKey) => key.serializeWire();
 
 const createNep17BalanceKey = getCreateKey<Nep17BalanceKey>({
   serializeKey: (key) => key.serializeWire(),
@@ -140,7 +156,7 @@ const consensusStateKey = getMetadataKey({
 const minBlockKey = createBlockKey({ hashOrIndex: common.ZERO_UINT256 });
 const maxBlockKey = createBlockKey({ hashOrIndex: common.MAX_UINT256 });
 
-const getStorageSearchRange = createGetSearchRange(Prefix.Storage);
+const getStorageSearchRange = createGetSearchRangeWithoutPrefix();
 
 const getAllNep17BalanceSearchRange = {
   gte: Buffer.from([Prefix.Nep17Balance]),

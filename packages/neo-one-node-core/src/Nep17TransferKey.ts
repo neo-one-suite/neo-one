@@ -1,7 +1,7 @@
-import { createSerializeWire, IOHelper, Nep17TransferKeyModel, UInt160 } from '@neo-one/client-common';
+import { BinaryReader, createSerializeWire, IOHelper, Nep17TransferKeyModel, UInt160 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from './Serializable';
-import { BinaryReader, utils } from './utils';
+import { utils } from './utils';
 
 export interface Nep17TransferKeyAdd {
   readonly userScriptHash: UInt160;

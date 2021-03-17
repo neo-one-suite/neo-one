@@ -11,3 +11,6 @@ export * from './nep17';
 export * from './types';
 export * from './vm';
 export * from './trigger';
+export * from './NefFileModel';
+export * from './CallFlags';
+export * from './MethodTokenModel';

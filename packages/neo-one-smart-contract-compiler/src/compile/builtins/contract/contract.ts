@@ -31,7 +31,7 @@ export const add = (builtins: Builtins): void => {
         // ['getContract', [buffer]]
         sb.emitPushString(node, 'getContract');
         // [buffer, 'getContract', [buffer]]
-        sb.emitPushBuffer(node, common.nativeHashes.Management);
+        sb.emitPushBuffer(node, common.nativeHashes.ContractManagement);
         // [conract]
         sb.emitSysCall(node, 'System.Contract.Call');
       },

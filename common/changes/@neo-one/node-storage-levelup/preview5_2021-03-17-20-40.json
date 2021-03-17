@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/node-storage-levelup",
+      "comment": "Updates for Preview5",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@neo-one/node-storage-levelup",
+  "email": "spencercorwin@icloud.com"
+}

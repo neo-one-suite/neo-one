@@ -1,6 +1,6 @@
-import { UInt256, UInt160, common } from '@neo-one/client-common';
+import { common, UInt160, UInt256 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
-import { StackItem, assertArrayStackItem } from './StackItems';
+import { assertArrayStackItem, StackItem } from './StackItems';
 
 interface OracleRequestAdd {
   readonly originalTxid: UInt256;
@@ -34,13 +34,13 @@ export class OracleRequest {
     });
   }
 
-  public originalTxid: UInt256;
-  public gasForResponse: BN;
-  public url: string;
-  public filter: string;
-  public callbackContract: UInt160;
-  public callbackMethod: string;
-  public userData: Buffer;
+  public readonly originalTxid: UInt256;
+  public readonly gasForResponse: BN;
+  public readonly url: string;
+  public readonly filter: string;
+  public readonly callbackContract: UInt160;
+  public readonly callbackMethod: string;
+  public readonly userData: Buffer;
 
   public constructor({
     originalTxid,

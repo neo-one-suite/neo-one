@@ -1,11 +1,10 @@
-import { BinaryWriter, InvalidFormatError, IOHelper } from '@neo-one/client-common';
+import { BinaryReader, BinaryWriter, InvalidFormatError, IOHelper } from '@neo-one/client-common';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
   SerializableWire,
 } from './Serializable';
-import { BinaryReader } from './utils';
 
 export interface ContractIDStateAdd {
   readonly nextId: number;

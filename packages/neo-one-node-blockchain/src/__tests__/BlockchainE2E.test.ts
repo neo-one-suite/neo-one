@@ -14,7 +14,7 @@ describe('blockchain persist genesis block test', () => {
     const db = LevelUp(LevelDOWN(levelDBPath));
     const storage = levelupStorage({
       db,
-      context: { messageMagic: blockchainSettings.messageMagic },
+      context: { messageMagic: blockchainSettings.messageMagic, validatorsCount: blockchainSettings.validatorsCount },
     });
 
     const dispatcher = new Dispatcher({ levelDBPath });
@@ -23,9 +23,10 @@ describe('blockchain persist genesis block test', () => {
       settings: blockchainSettings,
       storage,
       vm: dispatcher,
+      native: new NativeContainer(blockchainSettings),
     });
 
-    const genesis = await blockchain.blocks.tryGet({ hashOrIndex: genesisHash });
+    const genesis = await blockchain.getBlock(genesisHash);
     expect(genesis).toBeDefined();
   });
 });

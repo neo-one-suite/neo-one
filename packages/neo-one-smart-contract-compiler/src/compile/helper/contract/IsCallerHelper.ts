@@ -40,7 +40,7 @@ export class IsCallerHelper extends Helper {
           // ['getContract', [addressBuffer], addressBuffer]
           sb.emitPushString(node, 'getContract');
           // [buffer, 'getContract', [addressBuffer], addressBuffer]
-          sb.emitPushBuffer(node, common.nativeHashes.Management);
+          sb.emitPushBuffer(node, common.nativeHashes.ContractManagement);
           // [maybeContract, addressBuffer]
           sb.emitSysCall(node, 'System.Contract.Call');
           sb.emitHelper(

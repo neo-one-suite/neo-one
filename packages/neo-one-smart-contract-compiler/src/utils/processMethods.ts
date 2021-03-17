@@ -1,4 +1,4 @@
-import { ContractMethodDescriptorClient } from '@neo-one/client-common';
+import { ContractMethodDescriptorClient, disassembleByteCode } from '@neo-one/client-common';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import { SourceMapConsumer } from 'source-map';
@@ -6,7 +6,6 @@ import { SmartContractInfoManifest, SmartContractInfoMethodDescriptor } from '..
 import { ScriptBuilderResult } from '../compile/types';
 import { Context } from '../Context';
 import { DebugInfo, DebugMethod } from '../contract';
-import { disassembleByteCode } from './disassembleByteCode';
 
 export const getJumpLength = (value: string): number => {
   const [, unknownOp] = value.split(':');

@@ -2,7 +2,7 @@ import { VerifyResultModel } from '@neo-one/client-common';
 import { Block } from './Block';
 import { Blockchain } from './Blockchain';
 import { Endpoint } from './network';
-import { ConsensusPayload } from './payload';
+import { ExtensiblePayload } from './payload';
 import { Transaction } from './transaction';
 import { TransactionVerificationContext } from './TransactionVerificationContext';
 
@@ -35,7 +35,7 @@ export interface Node {
     transaction: Transaction,
     options?: { readonly throwVerifyError?: boolean; readonly forceAdd?: boolean },
   ) => Promise<RelayTransactionResult>;
-  readonly relayConsensusPayload: (payload: ConsensusPayload) => void;
+  readonly relayConsensusPayload: (payload: ExtensiblePayload) => void;
   readonly relayBlock: (block: Block) => Promise<void>;
   readonly connectedPeers: readonly Endpoint[];
   readonly memPool: { readonly [hash: string]: Transaction };

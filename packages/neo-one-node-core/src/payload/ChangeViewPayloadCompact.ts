@@ -1,9 +1,6 @@
-import { BinaryWriter, createSerializeWire, SerializableWire } from '@neo-one/client-common';
+import { BinaryReader, BinaryWriter, createSerializeWire, SerializableWire } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from '../Serializable';
-import { BinaryReader } from '../utils';
-import { ConsensusPayload } from './ConsensusPayload';
-import { ChangeViewConsensusMessage } from './message';
 
 export interface ChangeViewPayloadCompactAdd {
   readonly validatorIndex: number;
@@ -13,17 +10,6 @@ export interface ChangeViewPayloadCompactAdd {
 }
 
 export class ChangeViewPayloadCompact implements SerializableWire {
-  public static fromPayload(payload: ConsensusPayload): ChangeViewPayloadCompact {
-    const message = payload.getDeserializedMessage<ChangeViewConsensusMessage>();
-
-    return new ChangeViewPayloadCompact({
-      validatorIndex: payload.validatorIndex,
-      originalViewNumber: message.viewNumber,
-      timestamp: message.timestamp,
-      invocationScript: payload.witness.invocation,
-    });
-  }
-
   public static deserializeWireBase(options: DeserializeWireBaseOptions): ChangeViewPayloadCompact {
     const { reader } = options;
     const validatorIndex = reader.readUInt16LE();

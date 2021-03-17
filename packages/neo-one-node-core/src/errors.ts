@@ -18,6 +18,14 @@ export const VerifyError = makeErrorWithCode(
   'VERIFY',
   (reason?: string) => `Verification failed${reason === undefined ? '.' : `: ${reason}`}`,
 );
+export const InvalidViewChangingError = makeErrorWithCode(
+  'INVALID_VIEW_CHANGING',
+  (index: number) => `Expected ExtensiblePayload in changeViewPayloads for index: ${index}`,
+);
+export const NotSupportedError = makeErrorWithCode(
+  'NOT_SUPPORTED',
+  (method: string) => `Method ${method} not supported here`,
+);
 export const InvalidConsensusMessageTypeError = makeErrorWithCode(
   'INVALID_CONSENSUS_MESSAGE_TYPE',
   (value: number) => `Expected ConsensusMessageType, found: ${value.toString(16)}`,

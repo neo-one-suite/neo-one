@@ -1,4 +1,5 @@
 import {
+  BinaryReader,
   BinaryWriter,
   BlockJSON,
   common,
@@ -20,8 +21,7 @@ import {
   SerializeJSONContext,
 } from './Serializable';
 import { Transaction } from './transaction';
-import { TrimmedBlock } from './TrimmedBlock';
-import { BinaryReader, utils } from './utils';
+import { utils } from './utils';
 import { Witness } from './Witness';
 
 export interface BlockAdd extends Omit<BlockBaseAdd, 'merkleRoot'> {
@@ -65,11 +65,6 @@ const getCombinedModels = (
 export class Block extends BlockBase implements SerializableContainer, SerializableJSON<BlockJSON> {
   public static readonly MaxContentsPerBlock = utils.USHORT_MAX;
   public static readonly MaxTransactionsPerBlock = utils.USHORT_MAX.subn(1);
-  // public static async calculateNetworkFee(context: FeeContext, transactions: readonly Transaction[]): Promise<BN> {
-  //   const fees = await Promise.all(transactions.map(async (transaction) => transaction.getNetworkFee(context)));
-
-  //   return fees.reduce((acc, fee) => acc.add(fee), utils.ZERO);
-  // }
 
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Block {
     const { reader } = options;
@@ -211,20 +206,5 @@ export class Block extends BlockBase implements SerializableContainer, Serializa
       consensusdata: this.consensusData ? this.consensusData.serializeJSON() : undefined,
       tx: this.transactions.map((transaction) => transaction.serializeJSON()),
     };
-  }
-
-  public trim(): TrimmedBlock {
-    return new TrimmedBlock({
-      version: this.version,
-      previousHash: this.previousHash,
-      merkleRoot: this.merkleRoot,
-      timestamp: this.timestamp,
-      index: this.index,
-      nextConsensus: this.nextConsensus,
-      witness: this.witness,
-      hashes: this.allHashes,
-      consensusData: this.consensusData,
-      messageMagic: this.messageMagic,
-    });
   }
 }

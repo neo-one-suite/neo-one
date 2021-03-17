@@ -20,6 +20,10 @@ const signatures = {
 const buffers = {
   a: 'b500',
   b: '5f8d70',
+  base64: {
+    a: 'tQA=',
+    b: 'X41w',
+  },
 };
 
 const attributes = {

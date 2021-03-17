@@ -1,3 +1,4 @@
+import { BinaryWriter } from '@neo-one/client-common';
 import { disassembleByteCode } from '@neo-one/node-core';
 import { CompileContractResult } from '@neo-one/smart-contract-compiler';
 import { utils } from '@neo-one/utils';
@@ -10,7 +11,7 @@ import { convertABI, getDispatcherMethodDefinition, getJmpMethodDefinition, NEOO
 
 export interface CompileWriteOptions {
   readonly json: boolean;
-  readonly avm: boolean;
+  readonly nef: boolean;
   readonly debug: boolean;
   readonly opcodes: boolean;
 }
@@ -29,7 +30,7 @@ export const writeContract = async (
   filePath: string,
   contractIn: CompileContractResult,
   outDir: string,
-  { json: jsonFlag, avm: avmFlag, debug: debugFlag, opcodes: opcodesFlag }: CompileWriteOptions,
+  { json: jsonFlag, nef: nefFlag, debug: debugFlag, opcodes: opcodesFlag }: CompileWriteOptions,
 ) => {
   await fs.ensureDir(outDir);
   const outputPath = path.resolve(outDir, `${contractIn.contract.manifest.name}.contract.json`);
@@ -64,9 +65,14 @@ export const writeContract = async (
   }
 
   const byteCode = Buffer.from(contract.script, 'hex');
-  if (avmFlag) {
+
+  const writer = new BinaryWriter();
+  writer.writeUInt32LE();
+  writer.writeFixedString(contractIn.contract.compilerName, 64);
+
+  if (nefFlag) {
     await Promise.all([
-      fs.writeFile(outputPath.replace('.contract.json', '.avm'), byteCode),
+      fs.writeFile(outputPath.replace('.contract.json', '.nef'), byteCode),
       fs.writeFile(
         outputPath.replace('.contract.json', '.abi.json'),
         JSON.stringify(convertABI(manifest.abi, metadata, byteCode), undefined, 2),
@@ -154,7 +160,7 @@ export const writeContract = async (
       })),
     };
 
-    if (avmFlag) {
+    if (nefFlag) {
       const zip = new JSZip();
       zip.file<'text'>(`${contract.manifest.name}.debug.json`, JSON.stringify(debugJSON, undefined, 2));
       await new Promise((resolve) =>

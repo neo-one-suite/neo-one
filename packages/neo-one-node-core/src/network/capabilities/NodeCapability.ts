@@ -1,7 +1,6 @@
 import { InvalidFormatError } from '@neo-one/client-common';
 import { utils } from '@neo-one/utils';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from '../../Serializable';
-import { BinaryReader } from '../../utils';
 import { FullNodeCapability } from './FullNodeCapability';
 import { assertNodeCapabilityType, NodeCapabilityType } from './NodeCapabilityType';
 import { ServerCapability } from './ServerCapability';

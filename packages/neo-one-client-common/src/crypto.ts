@@ -187,11 +187,12 @@ const createPrivateKey = (): PrivateKey => common.bufferToPrivateKey(randomBytes
 
 const toScriptHash = hash160;
 
-const getContractHash = (sender: UInt160, script: Buffer) => {
+const getContractHash = (sender: UInt160, nefCheckSum: number, name: string) => {
   const builder = new ScriptBuilder();
   builder.emitOp('ABORT');
   builder.emitPushUInt160(sender);
-  builder.emitPush(script);
+  builder.emitPushInt(nefCheckSum);
+  builder.emitPushString(name);
 
   return toScriptHash(builder.build());
 };
@@ -365,6 +366,9 @@ const createMultiSignatureWitness = <TWitness extends WitnessModel>(
 
   return new Witness({ verification, invocation });
 };
+
+const getBFTAddress = (publicKeys: readonly ECPoint[]): UInt160 =>
+  toScriptHash(createMultiSignatureRedeemScript(publicKeys.length - (publicKeys.length - 1) / 3, publicKeys));
 
 const createMultiSignatureRedeemScript = (mIn: number, publicKeys: readonly ECPoint[]) => {
   const m = Math.floor(mIn);
@@ -917,6 +921,7 @@ export const crypto = {
   createMultiSignatureWitness,
   createMultiSignatureRedeemScript,
   getConsensusAddress,
+  getBFTAddress,
   privateKeyToWIF,
   wifToPrivateKey,
   publicKeyToScriptHash,
