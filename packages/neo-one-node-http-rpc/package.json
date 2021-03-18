@@ -18,7 +18,7 @@
     "@neo-one/http-context": "^2.7.1",
     "@neo-one/logger": "^2.6.1",
     "@neo-one/node-core": "^3.1.0",
-    "@neo-one/node-native": "^3.1.0",
+    "@neo-one/node-native": "^3.2.0-preview5",
     "@neo-one/node-rpc-handler": "^3.1.0",
     "@neo-one/utils": "^3.1.0",
     "@types/koa": "^2.0.49",
