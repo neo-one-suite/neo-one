@@ -17,11 +17,11 @@ This guide will walk you through how to use a mixin.
 
 Install the following packages if you have not done so:
 
-```zsh
+```bash
 yarn add @neo-one/client @neo-one/cli @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
 ```
 
-```zsh
+```bash
 npm install @neo-one/client @neo-one/cli @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
 ```
 
