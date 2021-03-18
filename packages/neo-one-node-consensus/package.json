@@ -15,7 +15,7 @@
   "dependencies": {
     "@neo-one/client-common": "^3.1.0",
     "@neo-one/logger": "^2.6.1",
-    "@neo-one/node-core": "^3.1.0",
+    "@neo-one/node-core": "^3.2.0-preview5",
     "@neo-one/utils": "^3.1.0",
     "@reactivex/ix-es2015-cjs": "^2.5.3",
     "@reactivex/ix-esnext-esm": "^2.5.3",
