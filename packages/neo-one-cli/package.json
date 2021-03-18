@@ -59,7 +59,7 @@
     "@angular/core": "^8.2.7",
     "@neo-one/build-tools": "^1.0.0",
     "@neo-one/smart-contract": "^3.1.0",
-    "@neo-one/smart-contract-test": "^3.1.0",
+    "@neo-one/smart-contract-test": "^3.1.1-preview5",
     "@neotracker/core": "1.4.1",
     "@types/bn.js": "^4.11.5",
     "@types/fs-extra": "^8.0.0",
