@@ -22,7 +22,7 @@ yarn add @neo-one/client @neo-one/cli @neo-one/smart-contract @neo-one/smart-con
 ```
 
 ```zsh
-npm add @neo-one/client @neo-one/cli @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
+npm install @neo-one/client @neo-one/cli @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
 ```
 
 ::: warning
