@@ -664,7 +664,7 @@ export const createHandler = ({
     [RPC_METHODS.getapplicationlog]: async (args): Promise<ApplicationLogJSON> => {
       const hash = JSONHelper.readUInt256(args[0]);
       let trigger: TriggerTypeJSON | undefined;
-      if (args.length >= 2) {
+      if (args.length >= 2 && args[1] != undefined) {
         try {
           trigger = assertTriggerTypeJSON(args[1]);
         } catch {
@@ -733,8 +733,8 @@ export const createHandler = ({
       const { address, scriptHash } = getScriptHashAndAddress(args[0], addressVersion);
 
       const SEVEN_DAYS_IN_MS = 7 * 24 * 60 * 60 * 1000;
-      const startTime = args[1] === undefined ? Date.now() - SEVEN_DAYS_IN_MS : args[1];
-      const endTime = args[2] === undefined ? Date.now() : args[2];
+      const startTime = args[1] == undefined ? Date.now() - SEVEN_DAYS_IN_MS : args[1];
+      const endTime = args[2] == undefined ? Date.now() : args[2];
 
       if (endTime < startTime) {
         throw new JSONRPCError(-32602, 'Invalid params');
