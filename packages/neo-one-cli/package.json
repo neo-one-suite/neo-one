@@ -29,7 +29,7 @@
     "@neo-one/logger-config": "^2.6.1",
     "@neo-one/node": "^3.1.0",
     "@neo-one/node-core": "^3.1.0",
-    "@neo-one/node-neo-settings": "^3.1.0",
+    "@neo-one/node-neo-settings": "^3.2.0-preview5",
     "@neo-one/smart-contract-codegen": "^3.1.0",
     "@neo-one/smart-contract-compiler": "^3.1.0",
     "@neo-one/smart-contract-compiler-node": "^2.7.2",

@@ -35,7 +35,7 @@
     "@neo-one/client-switch": "^3.1.0",
     "@neo-one/node-blockchain": "^3.1.0",
     "@neo-one/node-native": "^3.1.0",
-    "@neo-one/node-neo-settings": "^3.1.0",
+    "@neo-one/node-neo-settings": "^3.2.0-preview5",
     "@neo-one/node-storage-levelup": "^3.1.0",
     "@neo-one/node-vm": "^3.1.0",
     "@neo-one/smart-contract-compiler-node": "^2.7.2",
