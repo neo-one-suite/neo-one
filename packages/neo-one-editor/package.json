@@ -28,7 +28,7 @@
     "@emotion/core": "^10.0.22",
     "@emotion/styled": "^10.0.23",
     "@jest/types": "^24.8.0",
-    "@neo-one/client": "^3.1.0",
+    "@neo-one/client": "^3.1.1-preview5",
     "@neo-one/client-switch": "^3.1.0",
     "@neo-one/local-browser": "^2.3.1",
     "@neo-one/local-browser-worker": "^2.3.1",

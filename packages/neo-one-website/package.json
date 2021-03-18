@@ -70,7 +70,7 @@
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
-    "@neo-one/client": "^3.1.0",
+    "@neo-one/client": "^3.1.1-preview5",
     "@neo-one/react-core": "^2.7.0",
     "@types/clipboard": "^2.0.1",
     "@types/fs-extra": "^8.0.0",
