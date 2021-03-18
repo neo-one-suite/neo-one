@@ -32,7 +32,7 @@
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
     "@neo-one/client": "^3.1.0",
-    "@neo-one/client-common": "^3.1.0",
+    "@neo-one/client-common": "^3.2.0-preview5",
     "@types/fs-extra": "^8.0.0",
     "@types/jest": "^24.0.18",
     "@types/rc": "^1.1.0",

@@ -13,7 +13,7 @@
     "@neo-one/smart-contract": "^3.1.0"
   },
   "devDependencies": {
-    "@neo-one/client-common": "^3.1.0",
+    "@neo-one/client-common": "^3.2.0-preview5",
     "@neo-one/client-core": "^3.1.0",
     "@types/jest": "^24.0.18",
     "bignumber.js": "^9.0.0",
