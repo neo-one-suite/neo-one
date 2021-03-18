@@ -26,7 +26,7 @@
     "@neo-one/build-tools": "^1.0.0",
     "@neo-one/node-neo-settings": "^3.1.0",
     "@neo-one/node-storage-levelup": "^3.1.0",
-    "@neo-one/node-vm": "^3.1.0",
+    "@neo-one/node-vm": "^3.2.0-preview5",
     "@types/jest": "^24.0.18",
     "@types/js-priority-queue": "^0.0.5",
     "@types/levelup": "^3.1.1",
