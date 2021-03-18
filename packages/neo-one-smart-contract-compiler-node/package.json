@@ -14,7 +14,7 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/smart-contract": "^3.1.0",
-    "@neo-one/smart-contract-lib": "^3.1.0",
+    "@neo-one/smart-contract-lib": "^3.2.0-preview5",
     "@neo-one/utils": "^3.1.0",
     "app-root-dir": "^1.0.2",
     "glob": "^7.1.4",
