@@ -148,50 +148,50 @@
     {
       "commandKind": "global",
       "name": "compile-all-live",
-      "summary": "Only compile all website pieces for live deployment to NOW",
+      "summary": "Only compile all website pieces for live deployment to Vercel",
       "description": "Compile all website pieces and do nothing else",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "rm -rf ./dist && rm -rf ./packages/neo-one-website/dist && rush compile-website-prod && node ./packages/neo-one-build-tools-web/dist/compile --bundle testRunner && node ./packages/neo-one-build-tools-web/dist/compile --bundle server && node ./packages/neo-one-build-tools-web/dist/compile --bundle preview && rm -rf ./packages/neo-one-website/publicOut && cp -r ./dist/workers ./packages/neo-one-website/publicOut && cp -r ./packages/neo-one-website/public/* ./packages/neo-one-website/publicOut && cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=./packages/neo-one-build-tools/includes/build-configs/tsconfig.es2017.cjs.json react-static build --config ./packages/neo-one-website/static.config.js && sh ./scripts/rm-cruft"
+      "shellCommand": "rm -rf ./dist && rm -rf ./packages/neo-one-website/dist && rush compile-website-prod && node ./packages/neo-one-build-tools-web/dist/compile --bundle testRunner && node ./packages/neo-one-build-tools-web/dist/compile --bundle server && node ./packages/neo-one-build-tools-web/dist/compile --bundle preview && rm -rf ./packages/neo-one-website/publicOut && cp -r ./dist/workers ./packages/neo-one-website/publicOut && cp -r ./packages/neo-one-website/public/* ./packages/neo-one-website/publicOut && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" TS_NODE_PROJECT=./packages/neo-one-build-tools/includes/build-configs/tsconfig.es2017.cjs.json react-static build --config ./packages/neo-one-website/static.config.js && sh ./scripts/rm-cruft"
     },
     {
       "commandKind": "global",
       "name": "deploy-all-live",
-      "summary": "Deploy all website pieces to NOW (run compile-all-live first)",
-      "description": "Deploy static, test-runner, preview, and server each to NOW",
+      "summary": "Deploy all website pieces to Vercel (run compile-all-live first)",
+      "description": "Deploy static, test-runner, preview, and server each to Vercel's preview",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "rush compile-all-live && rush deploy-static-live && rush deploy-test-runner-live && rush deploy-preview-live && rush deploy-server-live"
+      "shellCommand": "rush deploy-static-live && rush deploy-test-runner-live && rush deploy-preview-live && rush deploy-server-live"
     },
     {
       "commandKind": "global",
       "name": "deploy-static-live",
-      "summary": "Deploy website front end to NOW",
-      "description": "Deploy website front end to NOW",
+      "summary": "Deploy website front end to Vercel",
+      "description": "Deploy website front end to Vercel. Defaults to preview deployment",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "cp ./packages/neo-one-build-tools-web/includes/now/static.now.json ./packages/neo-one-website/dist/now.json && cd ./packages/neo-one-website/dist && now --target production"
+      "shellCommand": "cp ./packages/neo-one-build-tools-web/includes/vercel/static.vercel.json ./packages/neo-one-website/dist/vercel.json && cd ./packages/neo-one-website/dist && vercel --confirm"
     },
     {
       "commandKind": "global",
       "name": "deploy-test-runner-live",
-      "summary": "Deploy test runner to NOW",
-      "description": "Deploy the test runner to now",
+      "summary": "Deploy test runner to Vercel",
+      "description": "Deploy the test runner to Vercel. Defaults to preview deployment",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "cp ./packages/neo-one-build-tools-web/includes/now/testRunner.now.json ./dist/testRunner/now.json && cd ./dist/testRunner && now --target production"
+      "shellCommand": "cp ./packages/neo-one-build-tools-web/includes/vercel/testRunner.vercel.json ./dist/testRunner/vercel.json && cd ./dist/testRunner && vercel --confirm"
     },
     {
       "commandKind": "global",
       "name": "deploy-preview-live",
-      "summary": "Deploy preview to NOW",
-      "description": "Deploy the preview to NOW",
+      "summary": "Deploy preview to Vercel",
+      "description": "Deploy the preview to Vercel. Defaults to preview deployment",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "cp -r ./dist/overlay/* ./dist/preview && cp ./packages/neo-one-build-tools-web/includes/now/preview.now.json ./dist/preview/now.json && cd ./dist/preview && now --target production"
+      "shellCommand": "cp -r ./dist/overlay/* ./dist/preview && cp ./packages/neo-one-build-tools-web/includes/vercel/preview.vercel.json ./dist/preview/vercel.json && cd ./dist/preview && vercel --confirm"
     },
     {
       "commandKind": "global",
       "name": "deploy-server-live",
-      "summary": "Deploy the server to NOW",
-      "description": "Deploy the server to NOW",
+      "summary": "Deploy the server to Vercel",
+      "description": "Deploy the server to Vercel. Defaults to preview deployment",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "cp ./packages/neo-one-build-tools-web/includes/now/server.now.json ./dist/server/now.json && cd ./dist/server && now --target production"
+      "shellCommand": "cp ./packages/neo-one-build-tools-web/includes/vercel/server.vercel.json ./dist/server/vercel.json && cd ./dist/server && vercel --confirm"
     },
     {
       "commandKind": "global",
@@ -480,6 +480,13 @@
           "description": "flag for e2e test coverage"
         }
       ]
+    },
+    {
+      "parameterKind": "flag",
+      "longName": "--prod",
+      "shortName": "-P",
+      "description": "Deploy to production",
+      "associatedCommands": ["deploy-all-live", "deploy-static-live", "deploy-preview-live", "deploy-server-live", "deploy-test-runner-live"]
     }
   ]
 }

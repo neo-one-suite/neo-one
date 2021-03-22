@@ -1,9 +1,9 @@
 {
-  "version": 2,
-  "alias": ["api.neo-one.io"],
+  "scope": "neo-one",
+  "name": "server",
   "builds": [
-    { "src": "resolve.js", "use": "@now/node" },
-    { "src": "pkg.js", "use": "@now/node" }
+    { "src": "resolve.js", "use": "@vercel/node" },
+    { "src": "pkg.js", "use": "@vercel/node" }
   ],
   "routes": [
     { "src": "/resolve", "dest": "/resolve.js", "headers":

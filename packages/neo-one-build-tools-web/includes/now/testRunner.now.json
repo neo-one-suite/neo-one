@@ -1,7 +1,0 @@
-{
-  "version": 2,
-  "alias": ["test-runner.neo-one.io"],
-  "builds": [
-    { "src": "**/*", "use": "@now/static" }
-  ]
-}
