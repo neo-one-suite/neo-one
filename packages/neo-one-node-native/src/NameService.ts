@@ -28,6 +28,7 @@ export class NameService extends NonfungibleToken implements NameServiceNode {
   public constructor(settings: BlockchainSettings) {
     super({
       name: 'NameService',
+      id: -8,
       symbol: 'NNS',
       methods: nameServiceMethods,
       settings,

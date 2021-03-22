@@ -26,6 +26,7 @@ export class LedgerContract extends NativeContract implements LedgerContractNode
   public constructor(settings: BlockchainSettings) {
     super({
       name: 'LedgerContract',
+      id: -2,
       methods: ledgerMethods,
       settings,
     });

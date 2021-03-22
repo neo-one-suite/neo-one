@@ -13,12 +13,10 @@ import { contractMethodFromJSON, ContractMethodJSON } from './methods';
 
 export interface NativeContractAdd {
   readonly name: string;
+  readonly id: number;
   readonly methods: readonly ContractMethodJSON[];
   readonly settings: BlockchainSettings;
 }
-
-// tslint:disable-next-line: no-let
-let mutableIdCounter = 0;
 
 export abstract class NativeContract implements NativeContractNode {
   public get script(): Buffer {
@@ -31,9 +29,9 @@ export abstract class NativeContract implements NativeContractNode {
   public readonly manifest: ContractManifest;
   public readonly activeBlockIndex: number;
 
-  public constructor({ name, methods, settings }: NativeContractAdd) {
+  public constructor({ name, id, methods, settings }: NativeContractAdd) {
     this.name = name;
-    this.id = mutableIdCounter -= 1;
+    this.id = id;
 
     const builder = new ScriptBuilder();
     builder.emitPushInt(this.id);

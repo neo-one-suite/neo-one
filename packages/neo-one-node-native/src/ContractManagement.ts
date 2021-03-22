@@ -20,6 +20,7 @@ export class ContractManagement extends NativeContract implements ContractManage
   public constructor(settings: BlockchainSettings) {
     super({
       name: 'ContractManagement',
+      id: -1,
       methods: contractManagementMethods,
       settings,
     });

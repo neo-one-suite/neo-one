@@ -23,6 +23,7 @@ export class PolicyContract extends NativeContract implements PolicyContractNode
   public constructor(settings: BlockchainSettings) {
     super({
       name: 'PolicyContract',
+      id: -5,
       methods: policyMethods,
       settings,
     });
