@@ -1,0 +1,7 @@
+{
+  "scope": "neo-one",
+  "name": "dist",
+  "builds": [
+    { "src": "**/*", "use": "@vercel/static" }
+  ]
+}
