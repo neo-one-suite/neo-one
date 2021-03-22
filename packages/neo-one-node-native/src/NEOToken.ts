@@ -54,6 +54,7 @@ export class NEOToken extends FungibleToken implements NEOContract {
   public constructor(settings: BlockchainSettings) {
     super({
       name: 'NeoToken',
+      id: -3,
       symbol: 'NEO',
       decimals: 0,
       methods: neoTokenMethods,

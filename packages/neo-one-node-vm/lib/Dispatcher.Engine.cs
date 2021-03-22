@@ -193,7 +193,7 @@ namespace NEOONE
     private bool _create(TriggerType trigger, IVerifiable container, DataCache snapshot, Block persistingBlock, long gas)
     {
       this.disposeEngine();
-      this.engine = ApplicationEngine.Create(trigger, container, snapshot, persistingBlock, gas); ;
+      this.engine = ApplicationEngine.Create(trigger, container, snapshot, persistingBlock, gas);
 
       return true;
     }

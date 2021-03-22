@@ -24,6 +24,7 @@ export class OracleContract extends NativeContract implements OracleContractNode
   public constructor(settings: BlockchainSettings) {
     super({
       name: 'OracleContract',
+      id: -7,
       methods: oracleMethods,
       settings,
     });
