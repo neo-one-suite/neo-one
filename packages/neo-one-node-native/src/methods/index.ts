@@ -7,3 +7,5 @@ export * from './neoTokenMethods';
 export * from './oracleMethods';
 export * from './policyMethods';
 export * from './roleManagementMethods';
+export * from './cryptoLibMethods';
+export * from './stdLibMethods';

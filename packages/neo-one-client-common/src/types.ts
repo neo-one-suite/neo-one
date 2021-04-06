@@ -258,26 +258,11 @@ export interface Header {
   readonly size: number;
 }
 
-export interface ConsensusData {
-  /**
-   * Primary index of the `ConsensusData`.
-   */
-  readonly primaryIndex: number;
-  /**
-   * Unique number in order to ensure the hash for this `ConsensusData` is unique.
-   */
-  readonly nonce: BufferString;
-}
-
 export interface Block extends Header {
   /**
    * `Transaction`s contained in the `Block`.
    */
   readonly transactions: readonly ConfirmedTransaction[];
-  /**
-   * `Transaction`s contained in the `Block`.
-   */
-  readonly consensusData?: ConsensusData;
 }
 
 /**

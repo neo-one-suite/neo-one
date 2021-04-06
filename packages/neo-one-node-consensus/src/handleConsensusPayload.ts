@@ -124,16 +124,16 @@ const handlePrepareRequest = async ({
   if (context.requestSentOrReceived || context.notAcceptingPayloadsDueToViewChanging) {
     return { context };
   }
-  if (
-    message.validatorIndex !== context.blockBuilder.consensusData?.primaryIndex ||
-    message.viewNumber !== context.viewNumber
-  ) {
+  if (message.validatorIndex !== context.blockBuilder?.primaryIndex || message.viewNumber !== context.viewNumber) {
     return { context };
   }
   if (
     message.version !== context.blockBuilder.version ||
     (context.blockBuilder.previousHash !== undefined && !message.prevHash.equals(context.blockBuilder.previousHash))
   ) {
+    return { context };
+  }
+  if (message.transactionHashes.length > node.blockchain.settings.maxTransactionsPerBlock) {
     return { context };
   }
 
@@ -169,9 +169,6 @@ const handlePrepareRequest = async ({
 
   const tempContextOptions = {
     timestamp: message.timestamp,
-    consensusData: {
-      nonce: message.nonce,
-    },
     transactionHashes: message.transactionHashes,
     transactions: {},
     verificationContext: node.getNewVerificationContext(),
@@ -318,7 +315,7 @@ const handlePrepareResponse = async ({
     return { context };
   }
 
-  const index = context.blockBuilder.consensusData?.primaryIndex;
+  const index = context.blockBuilder?.primaryIndex;
   if (index === undefined) {
     return { context };
   }
@@ -511,6 +508,9 @@ const reverifyAndProcessPayload = async ({
     timerContext,
     isRecovering: true,
   });
+
+  // TODO: see ConsensusService.cs. Should we be relaying new "reverify" payload here?
+  // node.relayConsensusPayload(payload);
 
   return { context: result.context, verified: true };
 };

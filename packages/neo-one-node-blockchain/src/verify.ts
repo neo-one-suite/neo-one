@@ -2,7 +2,6 @@ import {
   assertValidScript,
   CallFlags,
   ContractParameterTypeModel,
-  crypto,
   TriggerType,
   UInt160,
   VMState,
@@ -24,6 +23,7 @@ export const verifyWitnesses = async ({
   gas: gasIn,
   snapshot,
   headerCache,
+  settings,
 }: VerifyWitnessesOptions): Promise<boolean> => {
   if (gasIn.ltn(0)) {
     return false;
@@ -54,6 +54,7 @@ export const verifyWitnesses = async ({
       snapshot,
       witness: verifiable.witnesses[i],
       gas,
+      settings,
     });
 
     if (!result) {
@@ -75,6 +76,7 @@ export const verifyWitness = async ({
   hash,
   witness,
   gas,
+  settings,
 }: VerifyWitnessOptions): Promise<ExecuteScriptResult> => {
   const initFee = new BN(0);
   const { verification, invocation } = witness;
@@ -84,8 +86,6 @@ export const verifyWitness = async ({
   } catch {
     return { result: false, gas: initFee };
   }
-
-  const callFlags = !crypto.isStandardContract(verification) ? CallFlags.ReadStates : CallFlags.None;
 
   let contract: ContractState | undefined;
   if (verification.length === 0) {
@@ -108,6 +108,7 @@ export const verifyWitness = async ({
       container: verifiable,
       snapshot,
       gas,
+      settings,
     },
     async (engine) => {
       if (contract !== undefined) {
@@ -120,7 +121,7 @@ export const verifyWitness = async ({
           hash,
           method: 'verify',
           pcount: -1,
-          flags: callFlags,
+          flags: CallFlags.ReadOnly,
         });
       } else {
         if (native.isNative(hash)) {
@@ -137,18 +138,10 @@ export const verifyWitness = async ({
           return { result: false, gas: initFee };
         }
 
-        engine.loadScript({ script: verification, flags: callFlags, scriptHash: hash, initialPosition: 0 });
+        engine.loadScript({ script: verification, flags: CallFlags.ReadOnly, scriptHash: hash, initialPosition: 0 });
       }
 
       engine.loadScript({ script: invocation, flags: CallFlags.None });
-      if (native.isNative(hash)) {
-        try {
-          engine.stepOut();
-          engine.push('verify');
-        } catch {
-          // do nothing
-        }
-      }
       const result = engine.execute();
 
       if (result === VMState.FAULT) {

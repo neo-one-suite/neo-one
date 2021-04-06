@@ -1,4 +1,10 @@
-import { BinaryReader, BinaryWriter, createSerializeWire, SerializableWire } from '@neo-one/client-common';
+import {
+  BinaryReader,
+  BinaryWriter,
+  createSerializeWire,
+  InvalidFormatError,
+  SerializableWire,
+} from '@neo-one/client-common';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from '../Serializable';
 
 export interface CommitPayloadCompactAdd {
@@ -13,6 +19,9 @@ export class CommitPayloadCompact implements SerializableWire {
     const { reader } = options;
     const viewNumber = reader.readUInt8();
     const validatorIndex = reader.readUInt16LE();
+    if (validatorIndex >= options.context.validatorsCount) {
+      throw new InvalidFormatError('Validator index cannot be greater than validators count');
+    }
     const signature = reader.readBytes(64);
     const invocationScript = reader.readVarBytesLE(1024);
 

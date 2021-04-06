@@ -3,7 +3,6 @@ export * from './ContractParameterTypeModel';
 export * from './SignerModel';
 export * from './VerifyResultModel';
 export * from './Serializable';
-export * from './StorageFlagsModel';
 export * from './WitnessModel';
 export * from './WitnessScopeModel';
 export * from './transaction';

@@ -50,6 +50,8 @@ const hash160 = (value: Buffer): UInt160 => common.bufferToUInt160(rmd160(sha256
 
 const hash256 = (value: Buffer): UInt256 => common.bufferToUInt256(sha256(sha256(value)));
 
+const calculateHash = (value: Buffer): UInt256 => common.bufferToUInt256(sha256(value));
+
 const hmacSha512 = (key: Buffer | string, data: Buffer) => createHmac('sha512', key).update(data).digest();
 
 const sign = ({ message, privateKey }: { readonly message: Buffer; readonly privateKey: PrivateKey }): Buffer => {
@@ -262,8 +264,7 @@ const createInvocationScript = (message: Buffer, privateKey: PrivateKey): Buffer
 const createVerificationScript = (publicKey: ECPoint): Buffer => {
   const builder = new ScriptBuilder();
   builder.emitPushECPoint(publicKey);
-  builder.emitOp('PUSHNULL');
-  builder.emitSysCall('Neo.Crypto.VerifyWithECDsaSecp256r1');
+  builder.emitSysCall('Neo.Crypto.CheckSig');
 
   return builder.build();
 };
@@ -282,8 +283,7 @@ const createWitnessForSignature = <TWitness extends WitnessModel>(
 const createSignatureRedeemScript = (publicKey: ECPoint): Buffer => {
   const builder = new ScriptBuilder();
   builder.emitPushECPoint(publicKey);
-  builder.emitOp('PUSHNULL');
-  builder.emitSysCall('Neo.Crypto.VerifyWithECDsaSecp256r1');
+  builder.emitSysCall('Neo.Crypto.CheckSig');
 
   return builder.build();
 };
@@ -331,8 +331,7 @@ const createMultiSignatureVerificationScript = (mIn: number, publicKeys: readonl
     builder.emitPushECPoint(ecPoint);
   });
   builder.emitPushInt(publicKeysSorted.length);
-  builder.emitOp('PUSHNULL');
-  builder.emitSysCall('Neo.Crypto.CheckMultisigWithECDsaSecp256r1');
+  builder.emitSysCall('Neo.Crypto.CheckMultisig');
 
   return builder.build();
 };
@@ -385,8 +384,7 @@ const createMultiSignatureRedeemScript = (mIn: number, publicKeys: readonly ECPo
   builder.emitPushInt(m);
   publicKeysSorted.forEach((key) => builder.emitPushECPoint(key));
   builder.emitPushInt(publicKeysSorted.length);
-  builder.emitOp('PUSHNULL');
-  builder.emitSysCall('Neo.Crypto.CheckMultisigWithECDsaSecp256r1');
+  builder.emitSysCall('Neo.Crypto.CheckMultisig');
 
   return builder.build();
 };
@@ -569,15 +567,16 @@ const decryptNEP2 = async ({
   return common.bufferToPrivateKey(privateKey);
 };
 
-const checkMultisigWithECDsaSecp256r1 = Buffer.from('138defaf', 'hex');
-const verifyECDsaSecp256r1 = Buffer.from('95440d78', 'hex');
+// TODO: find a way to not hard-code these. they should come directly from the SysCallHashNum enum ideally
+const checkMultisig = Buffer.from(common.strip0x(`${0x7bce6ca5}`), 'hex');
+const checkSig = Buffer.from(common.strip0x(`${0x747476aa}`), 'hex');
 
 // tslint:disable
 const isMultiSigContract = (script: Buffer) => {
   let m = 0;
   let n = 0;
   let i = 0;
-  if (script.length < 43) return false;
+  if (script.length < 42) return false;
   if (script[i] > Op.PUSH16) return false;
   if (script[i] < Op.PUSH1 && script[i] !== 1 && script[i] !== 2) return false;
   switch (script[i]) {
@@ -602,7 +601,8 @@ const isMultiSigContract = (script: Buffer) => {
   while (script[i] == Op.PUSHDATA1) {
     if (script.length <= i + 35) return false;
     if (script[++i] !== 33) return false;
-    // points?.push(script.slice(i + 1, i + 1 + 33)); // TODO: add "points" List from C#
+    // TODO: add "points" list from C#
+    // points?.push(script.slice(i + 1, i + 1 + 33));
 
     i += 34;
     ++n;
@@ -626,10 +626,9 @@ const isMultiSigContract = (script: Buffer) => {
       }
       return false;
   }
-  if (script[i++] !== Op.PUSHNULL) return false;
   if (script[i++] !== Op.SYSCALL) return false;
-  if (script.length !== i + 4) return false;
-  if (!script.slice(i).equals(checkMultisigWithECDsaSecp256r1)) return false;
+  if (script.length !== i + 5) return false;
+  if (!script.slice(i).equals(checkMultisig)) return false;
   return true;
 };
 // tslint:enable
@@ -643,7 +642,7 @@ const isMultiSigContractWithResult = (script: Buffer): MultiSigResult => {
   let n = 0;
   let i = 0;
   let points = [];
-  if (script.length < 43) return { result: false };
+  if (script.length < 42) return { result: false };
   if (script[i] > Op.PUSH16) return { result: false };
   if (script[i] < Op.PUSH1 && script[i] !== 1 && script[i] !== 2) return { result: false };
   switch (script[i]) {
@@ -693,21 +692,19 @@ const isMultiSigContractWithResult = (script: Buffer): MultiSigResult => {
       }
       return { result: false };
   }
-  if (script[i++] !== Op.PUSHNULL) return { result: false };
   if (script[i++] !== Op.SYSCALL) return { result: false };
-  if (script.length !== i + 4) return { result: false };
-  if (!script.slice(i).equals(checkMultisigWithECDsaSecp256r1)) return { result: false };
+  if (script.length !== i + 5) return { result: false };
+  if (!script.slice(i).equals(checkMultisig)) return { result: false };
   return { result: true, m, n, points };
 };
 // tslint:enable
 
 const isSignatureContract = (script: Buffer) =>
-  script.length === 41 &&
+  script.length === 40 &&
   script[0] === Op.PUSHDATA1 &&
   script[1] === 33 &&
-  script[35] === Op.PUSHNULL &&
-  script[36] === Op.SYSCALL &&
-  script.slice(37).equals(verifyECDsaSecp256r1);
+  script[35] === Op.SYSCALL &&
+  script.slice(36).equals(checkSig);
 
 const isStandardContract = (script: Buffer) => isSignatureContract(script) || isMultiSigContract(script);
 
@@ -901,6 +898,7 @@ export const crypto = {
   sha256,
   hash160,
   hash256,
+  calculateHash,
   sign,
   verify,
   privateKeyToPublicKey,

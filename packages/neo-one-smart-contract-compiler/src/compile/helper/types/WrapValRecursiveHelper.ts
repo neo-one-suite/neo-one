@@ -49,7 +49,7 @@ export class WrapValRecursiveHelper extends Helper {
 
       body(innerOptions);
       if (this.serializeFinalVal) {
-        sb.emitSysCall(node, 'System.Binary.Serialize');
+        sb.emitHelper(node, options, sb.helpers.binarySerialize);
       }
     };
 

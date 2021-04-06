@@ -1,11 +1,19 @@
-import { common, ScriptBuilder, TriggerType, UInt256, VMState, WitnessScopeModel } from '@neo-one/client-common';
-import { assertArrayStackItem, Block, ConsensusData, Signer, Transaction, Witness } from '@neo-one/node-core';
+import {
+  CallFlags,
+  common,
+  ScriptBuilder,
+  TriggerType,
+  UInt256,
+  VMState,
+  WitnessScopeModel,
+} from '@neo-one/client-common';
+import { assertArrayStackItem, Block, Signer, Transaction, Witness } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import { Dispatcher } from '../Dispatcher';
 
 const createGetBlockScript = (hash: UInt256) => {
   const sb = new ScriptBuilder();
-  sb.emitDynamicAppCall(common.nativeHashes.Ledger, 'getBlock', hash);
+  sb.emitDynamicAppCall(common.nativeHashes.Ledger, 'getBlock', CallFlags.All, hash);
 
   return sb.build();
 };

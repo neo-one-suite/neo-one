@@ -27,10 +27,10 @@ export class RawIteratorForEachKeyHelper extends Helper {
       sb.helpers.rawIteratorForEachBase({
         each: (innerOptions) => {
           // [key]
-          sb.emitSysCall(node, 'System.Iterator.Key');
+          sb.emitHelper(node, options, sb.helpers.getMapIteratorKey);
           if (this.deserializeKey) {
             // [key]
-            sb.emitSysCall(node, 'System.Binary.Deserialize');
+            sb.emitHelper(node, options, sb.helpers.binaryDeserialize);
           }
           // []
           this.each(innerOptions);

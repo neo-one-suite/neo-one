@@ -58,7 +58,7 @@ class SetValue extends BuiltinNew {
             // [val, map, map]
             sb.emitOp(node, 'SWAP');
             // [val, map, map]
-            sb.emitSysCall(node, 'System.Binary.Serialize');
+            sb.emitHelper(node, options, sb.helpers.binarySerialize);
             // [boolean, val, map, map]
             sb.emitPushBoolean(node, true);
             // [map]

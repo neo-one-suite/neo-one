@@ -80,24 +80,15 @@ export class ContractParametersContext {
     const multiResult = crypto.isMultiSigContractWithResult(contract.script);
     if (multiResult.result) {
       const { points } = multiResult;
+      if (!points.some((pt) => pt.equals(publicKey))) {
+        return false;
+      }
       let item = this.createItemInternal(contract);
       if (item === undefined) {
         return false;
       }
 
-      if (item.signatures === undefined) {
-        item = item.clone({ signatures: {} });
-      }
-
-      if (item.signatures === undefined) {
-        throw new Error('for TS');
-      }
-
-      if (item.signatures[publicKeyHex]) {
-        return false;
-      }
-
-      if (!points.some((pt) => pt.equals(publicKey))) {
+      if (item.signatures[publicKeyHex] !== undefined) {
         return false;
       }
 
@@ -135,7 +126,6 @@ export class ContractParametersContext {
           }
         });
 
-        item = item.clone({ signatures: undefined });
         this.addItemInternal(scriptHashHex, item);
       }
 
@@ -156,8 +146,38 @@ export class ContractParametersContext {
         return false;
       }
 
-      return this.addWithIndex(contract, index, signature);
+      let item = this.createItemInternal(contract);
+      if (item === undefined) {
+        return false;
+      }
+      if (item.signatures[publicKeyHex] !== undefined) {
+        return false;
+      }
+      // TODO: not sure why they mutated this context item in place. But we do it here just for consistency
+      const newParam = item.parameters[index];
+      newParam.setValue(signature);
+      const newParams = item.parameters
+        .slice(0, index)
+        .concat(newParam)
+        .concat(item.parameters.slice(index + 1));
+      item = item.clone({
+        signatures: { ...item.signatures, publicKeyHex: signature },
+        parameters: newParams,
+      });
+
+      return true;
     }
+  }
+
+  public getSignatures(scriptHash: UInt160) {
+    const hashHex = common.uInt160ToHex(scriptHash);
+    const item = this.mutableContextItems[hashHex];
+
+    if (item === undefined) {
+      return undefined;
+    }
+
+    return item.signatures;
   }
 
   public getWitnesses(): readonly Witness[] {
@@ -221,12 +241,12 @@ class ContextItem {
   }
   public readonly script: Buffer;
   public readonly parameters: readonly ContractParameter[];
-  public readonly signatures?: { readonly [k in ECPointHex]: Buffer | undefined };
+  public readonly signatures: { readonly [k in ECPointHex]: Buffer | undefined };
 
   public constructor({ script, parameters, signatures }: ContextItemAdd) {
     this.script = script;
     this.parameters = parameters;
-    this.signatures = signatures;
+    this.signatures = signatures ?? {};
   }
 
   public clone({ script, parameters, signatures }: Partial<ContextItemAdd>) {

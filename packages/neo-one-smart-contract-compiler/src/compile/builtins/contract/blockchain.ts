@@ -7,6 +7,7 @@ import { BuiltinMemberValue } from '../BuiltinMemberValue';
 import { Builtins } from '../Builtins';
 import { BuiltinValueObject } from '../BuiltinValueObject';
 import { MemberLikeExpression } from '../types';
+import { NativeContractCallValue } from './NativeContractCallValue';
 import { SysCallMemberValue } from './SysCallMemberValue';
 
 class BlockchainValue extends BuiltinValueObject {
@@ -69,7 +70,7 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractMember(
     'BlockchainConstructor',
     'currentHeight',
-    new SysCallMemberValue('System.Blockchain.GetHeight', Types.Number),
+    new NativeContractCallValue('currentIndex', common.nativeHashes.Ledger, Types.Number),
   );
   builtins.addContractMember(
     'BlockchainConstructor',

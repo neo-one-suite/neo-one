@@ -1,4 +1,4 @@
-import { assertStackItemType, InvalidFormatError, StackItemType } from '@neo-one/client-common';
+import { assertStackItemType, BinaryReader, InvalidFormatError, StackItemType } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import {

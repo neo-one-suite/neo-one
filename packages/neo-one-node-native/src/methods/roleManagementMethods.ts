@@ -30,7 +30,7 @@ export const roleManagementMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Array',
-    offset: 0,
+    offset: 7,
     safe: true,
   },
 ];

@@ -6,12 +6,14 @@ import {
   SerializableContainer,
   serializeScriptContainer,
   SnapshotName,
+  VMProtocolSettingsIn,
 } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import { convertLog, parseStackItems } from './converters';
 import { EngineMethods } from './Methods';
 import { DispatcherFunc } from './types';
+import { validateProtocolSettings } from './utils';
 
 export interface CreateOptions {
   readonly trigger: TriggerType;
@@ -19,6 +21,7 @@ export interface CreateOptions {
   readonly snapshot?: SnapshotName;
   readonly persistingBlock?: Block;
   readonly gas: BN;
+  readonly settings: VMProtocolSettingsIn;
 }
 
 interface ApplicationEngineDispatcher {
@@ -90,7 +93,7 @@ export class ApplicationEngine {
     });
   }
 
-  public create({ trigger, container, persistingBlock, gas, snapshot }: CreateOptions) {
+  public create({ trigger, container, persistingBlock, gas, snapshot, settings }: CreateOptions) {
     return this.dispatch({
       method: 'create',
       args: {
@@ -99,6 +102,7 @@ export class ApplicationEngine {
         gas: gas.toString(),
         persistingBlock: persistingBlock === undefined ? undefined : persistingBlock.serializeWire(),
         snapshot,
+        settings: validateProtocolSettings(settings),
       },
     });
   }
@@ -130,12 +134,6 @@ export class ApplicationEngine {
       args: {
         item,
       },
-    });
-  }
-
-  public stepOut() {
-    return this.dispatch({
-      method: 'stepout',
     });
   }
 

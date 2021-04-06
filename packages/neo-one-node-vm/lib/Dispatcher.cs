@@ -59,11 +59,11 @@ namespace NEOONE
       }
     }
 
-    private bool _init(string path, IConfiguration config)
+    private bool _init(string path, IConfigurationSection config)
     {
       if (!this.init)
       {
-        Neo.ProtocolSettings.Initialize(config);
+        Neo.ProtocolSettings.Load(config);
         this.path = path;
         this.resetSnapshots();
 
@@ -73,11 +73,11 @@ namespace NEOONE
       return this.init;
     }
 
-    private bool _init(IConfiguration config)
+    private bool _init(IConfigurationSection config)
     {
       if (!this.init)
       {
-        Neo.ProtocolSettings.Initialize(config);
+        Neo.ProtocolSettings.Load(config);
         this.resetSnapshots();
 
         this.init = true;
@@ -99,7 +99,7 @@ namespace NEOONE
       return this.init;
     }
 
-    private bool _init()
+    public bool _init()
     {
       if (!this.init)
       {
@@ -123,7 +123,7 @@ namespace NEOONE
       return true;
     }
 
-    private dynamic _test()
+    public dynamic _test()
     {
       return NativeContract.NEO.Name;
     }
@@ -183,7 +183,7 @@ namespace NEOONE
       return inputType.GetProperty("args") != null;
     }
 
-    private IConfiguration parseConfig(dynamic input)
+    private IConfigurationSection parseConfig(dynamic input)
     {
       Dictionary<string, string> config = new Dictionary<string, string> { };
       if (input.magic != null)
@@ -226,8 +226,18 @@ namespace NEOONE
         int MemoryPoolMaxTransactions = (int)input.memoryPoolMaxTransactions;
         config.Add("ProtocolConfiguration:MemoryPoolMaxTransactions", MemoryPoolMaxTransactions.ToString());
       }
+      if (input.maxTraceableBlocks != null)
+      {
+        int MaxTraceableBlocks = (int)input.maxTraceableBlocks;
+        config.Add("ProtocolConfiguration:MaxTraceableBlocks", MaxTraceableBlocks.ToString());
+      }
+      if (input.maxTransactionsPerBlock != null)
+      {
+        int MaxTransactionsPerBlock = (int)input.maxTransactionsPerBlock;
+        config.Add("ProtocolConfiguration:MaxTransactionsPerBlock", MaxTransactionsPerBlock.ToString());
+      }
 
-      return new ConfigurationBuilder().AddInMemoryCollection(config).Build();
+      return new ConfigurationBuilder().AddInMemoryCollection(config).Build().GetSection("ProtocolConfiguration");
     }
   }
 }

@@ -7,7 +7,7 @@ export class GASToken extends FungibleToken implements GASContract {
   public constructor(settings: BlockchainSettings) {
     super({
       name: 'GasToken',
-      id: -4,
+      id: -6,
       symbol: 'GAS',
       decimals: 8,
       methods: gasTokenMethods,

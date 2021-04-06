@@ -32,16 +32,16 @@ export class RawEnumeratorForEachFuncHelper extends Helper {
           // [enumerator, enumerator, callable]
           sb.emitOp(node, 'DUP');
           // [boolean, enumerator, callable]
-          sb.emitSysCall(node, 'System.Enumerator.Next');
+          sb.emitSysCall(node, 'System.Iterator.Next');
         },
         each: (innerOptions) => {
           // [enumerator, enumerator, callable]
           sb.emitOp(node, 'DUP');
           // [key, enumerator, callable]
-          sb.emitSysCall(node, 'System.Enumerator.Value');
+          sb.emitHelper(node, options, sb.helpers.getMapIteratorValue);
           if (this.deserializeKey) {
             // [key, enumerator, callable]
-            sb.emitSysCall(node, 'System.Binary.Deserialize');
+            sb.emitHelper(node, options, sb.helpers.binaryDeserialize);
           }
           // [1, value, enumerator, callable]
           sb.emitPushInt(node, 1);

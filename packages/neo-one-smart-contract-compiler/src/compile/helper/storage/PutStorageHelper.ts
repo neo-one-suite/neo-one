@@ -16,7 +16,7 @@ export class PutStorageHelper extends Helper {
     sb.emitOp(node, 'SWAP');
     // [valBuffer, keyBuffer, map, keyBuffer]
     sb.emitOp(node, 'ROT');
-    // []
+    // [keyBuffer]
     sb.emitOp(node, 'SETITEM');
     // [map, keyBuffer]
     sb.emitHelper(node, options, sb.helpers.deleteCacheStorage);

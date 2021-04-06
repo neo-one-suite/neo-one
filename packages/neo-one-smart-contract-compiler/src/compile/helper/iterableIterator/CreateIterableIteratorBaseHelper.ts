@@ -103,7 +103,7 @@ export class CreateIterableIteratorBaseHelper extends Helper {
                         // [iterator, iterator]
                         sb.emitOp(node, 'DUP');
                         // [boolean, iterator]
-                        sb.emitSysCall(node, 'System.Enumerator.Next');
+                        sb.emitSysCall(node, 'System.Iterator.Next');
                       },
                       whenTrue: () => {
                         sb.emitHelper(
@@ -167,7 +167,7 @@ export class CreateIterableIteratorBaseHelper extends Helper {
                   // [iterator, iterator]
                   sb.emitOp(node, 'DUP');
                   // [boolean, iterator]
-                  sb.emitSysCall(node, 'System.Enumerator.Next');
+                  sb.emitSysCall(node, 'System.Iterator.Next');
                 },
                 whenTrue: () => {
                   // [valueVal]

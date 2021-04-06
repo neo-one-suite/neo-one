@@ -1,5 +1,7 @@
 import {
   assertOracleResponseCode,
+  BinaryReader,
+  CallFlags,
   common,
   crypto,
   JSONHelper,
@@ -20,7 +22,7 @@ const maxResultSize = 65535;
 
 const getFixedScript = utils.lazy(() => {
   const builder = new ScriptBuilder();
-  builder.emitDynamicAppCall(common.nativeHashes.Oracle, 'finish');
+  builder.emitDynamicAppCall(common.nativeHashes.Oracle, 'finish', CallFlags.All);
 
   return builder.build();
 });

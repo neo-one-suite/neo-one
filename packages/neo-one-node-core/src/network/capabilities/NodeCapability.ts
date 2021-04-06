@@ -1,4 +1,4 @@
-import { InvalidFormatError } from '@neo-one/client-common';
+import { BinaryReader, InvalidFormatError } from '@neo-one/client-common';
 import { utils } from '@neo-one/utils';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from '../../Serializable';
 import { FullNodeCapability } from './FullNodeCapability';

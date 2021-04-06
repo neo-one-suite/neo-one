@@ -17,42 +17,21 @@ export const policyMethods: ReadonlyArray<ContractMethodJSON> = [
     name: 'getExecFeeFactor',
     parameters: [],
     returntype: 'Integer',
-    offset: 0,
+    offset: 7,
     safe: true,
   },
   {
     name: 'getFeePerByte',
     parameters: [],
     returntype: 'Integer',
-    offset: 0,
-    safe: true,
-  },
-  {
-    name: 'getMaxBlockSize',
-    parameters: [],
-    returntype: 'Integer',
-    offset: 0,
-    safe: true,
-  },
-  {
-    name: 'getMaxBlockSystemFee',
-    parameters: [],
-    returntype: 'Integer',
-    offset: 0,
-    safe: true,
-  },
-  {
-    name: 'getMaxTransactionsPerBlock',
-    parameters: [],
-    returntype: 'Integer',
-    offset: 0,
+    offset: 14,
     safe: true,
   },
   {
     name: 'getStoragePrice',
     parameters: [],
     returntype: 'Integer',
-    offset: 0,
+    offset: 21,
     safe: true,
   },
   {
@@ -64,7 +43,7 @@ export const policyMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Boolean',
-    offset: 0,
+    offset: 28,
     safe: true,
   },
   {
@@ -76,7 +55,7 @@ export const policyMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Void',
-    offset: 0,
+    offset: 35,
     safe: false,
   },
   {
@@ -88,43 +67,7 @@ export const policyMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Void',
-    offset: 0,
-    safe: false,
-  },
-  {
-    name: 'setMaxBlockSize',
-    parameters: [
-      {
-        name: 'value',
-        type: 'Integer',
-      },
-    ],
-    returntype: 'Void',
-    offset: 0,
-    safe: false,
-  },
-  {
-    name: 'setMaxBlockSystemFee',
-    parameters: [
-      {
-        name: 'value',
-        type: 'Integer',
-      },
-    ],
-    returntype: 'Void',
-    offset: 0,
-    safe: false,
-  },
-  {
-    name: 'setMaxTransactionsPerBlock',
-    parameters: [
-      {
-        name: 'value',
-        type: 'Integer',
-      },
-    ],
-    returntype: 'Void',
-    offset: 0,
+    offset: 42,
     safe: false,
   },
   {
@@ -136,7 +79,7 @@ export const policyMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Void',
-    offset: 0,
+    offset: 49,
     safe: false,
   },
   {
@@ -148,7 +91,7 @@ export const policyMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Boolean',
-    offset: 0,
+    offset: 56,
     safe: false,
   },
 ];

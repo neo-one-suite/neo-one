@@ -108,7 +108,7 @@ export function getNep17UpdateOptions({
           mutableTransfersSent.push({
             key: new Nep17TransferKey({
               userScriptHash: from,
-              timestampMS: block.timestamp,
+              timestampMS: block.header.timestamp,
               assetScriptHash: scriptHash,
               blockTransferNotificationIndex: transferIndex,
             }),
@@ -125,7 +125,7 @@ export function getNep17UpdateOptions({
           mutableTransfersReceived.push({
             key: new Nep17TransferKey({
               userScriptHash: to,
-              timestampMS: block.timestamp,
+              timestampMS: block.header.timestamp,
               assetScriptHash: scriptHash,
               blockTransferNotificationIndex: transferIndex,
             }),

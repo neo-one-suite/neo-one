@@ -142,19 +142,19 @@ export class ArrayBindingHelper extends TypedHelper<ts.ArrayBindingPattern> {
         // [iterator, iterator]
         sb.emitOp(element, 'DUP');
         // [boolean, iterator]
-        sb.emitSysCall(element, 'System.Enumerator.Next');
+        sb.emitSysCall(element, 'System.Iterator.Next');
         // [iterator]
         sb.emitOp(element, 'DROP');
         // [iterator, iterator]
         sb.emitOp(element, 'DUP');
         // [val, iterator]
-        sb.emitSysCall(element, 'System.Enumerator.Value');
+        sb.emitHelper(node, options, sb.helpers.getMapIteratorValue);
         // [iterator, val]
         sb.emitOp(element, 'SWAP');
         // [key, val]
-        sb.emitSysCall(element, 'System.Iterator.Key');
+        sb.emitHelper(node, options, sb.helpers.getMapIteratorKey);
         // [key, val]
-        sb.emitSysCall(element, 'System.Binary.Deserialize');
+        sb.emitHelper(element, options, sb.helpers.binaryDeserialize);
         // [2, key, val]
         sb.emitPushInt(element, 2);
         // [arr]
@@ -203,13 +203,13 @@ export class ArrayBindingHelper extends TypedHelper<ts.ArrayBindingPattern> {
         // [iterator, iterator]
         sb.emitOp(element, 'DUP');
         // [boolean, iterator]
-        sb.emitSysCall(element, 'System.Enumerator.Next');
+        sb.emitSysCall(element, 'System.Iterator.Next');
         // [iterator]
         sb.emitOp(element, 'DROP');
         // [val]
-        sb.emitSysCall(element, 'System.Iterator.Key');
+        sb.emitHelper(element, options, sb.helpers.getMapIteratorKey);
         // [val]
-        sb.emitSysCall(element, 'System.Binary.Deserialize');
+        sb.emitHelper(element, options, sb.helpers.binaryDeserialize);
       },
       (element, innerOptions) => {
         // [0, iterator]

@@ -33,6 +33,8 @@ export class ArrayEntries extends BuiltinInstanceMemberCall {
 
     // [arr]
     sb.emitHelper(node, options, sb.helpers.unwrapArray);
+    // [map]
+    sb.emitHelper(node, options, sb.helpers.arrToMap);
     // [iterator]
     sb.emitSysCall(node, 'System.Iterator.Create');
     // [val]

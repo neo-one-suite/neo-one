@@ -4,6 +4,7 @@ import { common } from './common';
 
 const testNetMessageMagic = 1951352142;
 
+const DEFAULT_VALIDATORS_COUNT = 7;
 const DEFAULT_VALIDATORS: readonly string[] = [
   '023e9b32ea89b94d066e649b124fd50e396ee91369e8e2a6ae1b11c170d022256d',
   '03009b7540e10f2562e5fd8fac9eaec25166a58b26e412348ff5a86927bfac22a2',
@@ -19,13 +20,17 @@ export const createTest = ({
   standbyValidators: standbyValidatorsIn = DEFAULT_VALIDATORS,
   extraCommitteeMembers: extraCommitteeMembersIn = [],
   millisecondsPerBlock,
+  validatorsCount = DEFAULT_VALIDATORS_COUNT,
 }: {
   readonly privateNet?: boolean;
   readonly standbyValidators?: readonly string[];
   readonly extraCommitteeMembers?: readonly string[];
   readonly millisecondsPerBlock?: number;
+  readonly validatorsCount?: number;
 } = {}): Settings => {
-  const standbyValidators = standbyValidatorsIn.map((value) => clientCommon.stringToECPoint(value));
+  const standbyValidators = standbyValidatorsIn
+    .map((value) => clientCommon.stringToECPoint(value))
+    .slice(0, validatorsCount);
   const standbyMembers = extraCommitteeMembersIn.map((value) => clientCommon.stringToECPoint(value));
   const standbyCommittee = standbyValidators.concat(standbyMembers);
 
@@ -46,11 +51,15 @@ export const createTest = ({
     standbyCommittee,
     committeeMembersCount: standbyCommittee.length,
     memoryPoolMaxTransactions: commonSettings.memoryPoolMaxTransactions,
-    validatorsCount: standbyValidators.length,
+    validatorsCount,
     messageMagic: testNetMessageMagic,
     addressVersion: clientCommon.NEO_ADDRESS_VERSION,
     privateKeyVersion: clientCommon.NEO_PRIVATE_KEY_VERSION,
     standbyValidators,
-    nativeActivations: commonSettings.nativeActivations,
+    maxBlockSize: commonSettings.maxBlockSize,
+    maxBlockSystemFee: commonSettings.maxBlockSystemFee,
+    nativeUpdateHistory: commonSettings.nativeUpdateHistory,
+    maxTransactionsPerBlock: commonSettings.maxTransactionsPerBlock,
+    maxTraceableBlocks: commonSettings.maxTraceableBlocks,
   };
 };

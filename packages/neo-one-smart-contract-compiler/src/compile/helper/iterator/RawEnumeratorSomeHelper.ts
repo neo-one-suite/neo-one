@@ -24,7 +24,7 @@ export class RawEnumeratorSomeHelper extends Helper {
       sb.helpers.rawIteratorSomeBase({
         each: (innerOptions) => {
           // [value]
-          sb.emitSysCall(node, 'System.Enumerator.Value');
+          sb.emitHelper(node, options, sb.helpers.getMapIteratorValue);
           // [result]
           this.each(innerOptions);
         },

@@ -1,8 +1,6 @@
 export * from './Block';
-export * from './BlockBase';
 export * from './Blockchain';
 export * from './consensus';
-export * from './ConsensusData';
 export * from './ContractParametersContext';
 export * from './manifest';
 export * from './ContractIDState';
@@ -46,6 +44,7 @@ export * from './NefFile';
 export * from './MethodToken';
 export * from './HeaderCache';
 export * from './Execution';
+export * from './ImmutableHashSet';
 
 import { BinaryReader, disassembleByteCode } from '@neo-one/client-common';
 export { BinaryReader, disassembleByteCode };

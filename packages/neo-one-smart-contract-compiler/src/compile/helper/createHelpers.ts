@@ -24,10 +24,12 @@ import {
   ArrSomeFuncHelper,
   ArrSomeHelper,
   ArrSomeHelperOptions,
+  ArrToMapHelper,
   ArrToStringHelper,
   ArrToStringHelperOptions,
   ExtendArrHelper,
 } from './arr';
+import { BinaryDeserializeHelper, BinarySerializeHelper } from './binary';
 import { ArrayBindingHelper, ArrayBindingHelperOptions, ObjectBindingHelper, ObjectBindingHelperOptions } from './bind';
 import { BufferSliceHelper, BufferSliceHelperOptions } from './buffer';
 import { GetCachedValueHelper, GetCachedValueHelperOptions, GetCacheHelper } from './cache';
@@ -72,6 +74,7 @@ import {
   UpgradeHelper,
   UpgradeHelperOptions,
 } from './contract';
+import { RIPEMD160Helper, SHA256Helper } from './crypto';
 import { ThrowTypeErrorHelper } from './error';
 import {
   ArgumentsHelper,
@@ -121,6 +124,8 @@ import {
   IterableIteratorReduceHelperOptions,
 } from './iterableIterator';
 import {
+  GetMapIteratorKeyHelper,
+  GetMapIteratorValueHelper,
   RawEnumeratorEveryHelper,
   RawEnumeratorEveryHelperOptions,
   RawEnumeratorFilterHelper,
@@ -418,6 +423,11 @@ export interface Helpers {
   readonly arrSome: (options: ArrSomeHelperOptions) => ArrSomeHelper;
   readonly arrToString: (options: ArrToStringHelperOptions) => ArrToStringHelper;
   readonly extendArr: ExtendArrHelper;
+  readonly arrToMap: ArrToMapHelper;
+
+  // binary
+  readonly binaryDeserialize: BinaryDeserializeHelper;
+  readonly binarySerialize: BinarySerializeHelper;
 
   // bind
   readonly arrayBinding: (options: ArrayBindingHelperOptions) => ArrayBindingHelper;
@@ -454,6 +464,10 @@ export interface Helpers {
   readonly upgrade: (options: UpgradeHelperOptions) => UpgradeHelper;
   readonly handleNormal: (options: HandleNormalHelperOptions) => HandleNormalHelper;
   readonly applicationMatchesVerification: ApplicationMatchesVerificationHelper;
+
+  // crypto
+  readonly RIPEMD160: RIPEMD160Helper;
+  readonly SHA256: SHA256Helper;
 
   // types/contract
   readonly isContract: IsContractHelper;
@@ -603,6 +617,8 @@ export interface Helpers {
   readonly rawEnumeratorSome: (options: RawEnumeratorSomeHelperOptions) => RawEnumeratorSomeHelper;
   readonly rawIteratorReduce: (options: RawIteratorReduceHelperOptions) => RawIteratorReduceHelper;
   readonly rawIteratorReduceBase: (options: RawIteratorReduceBaseHelperOptions) => RawIteratorReduceBaseHelper;
+  readonly getMapIteratorKey: GetMapIteratorKeyHelper;
+  readonly getMapIteratorValue: GetMapIteratorValueHelper;
 
   // iteratorResult
   readonly createIteratorResult: CreateIteratorResultHelper;
@@ -839,6 +855,11 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     arrSome: (options) => new ArrSomeHelper(options),
     arrToString: (options) => new ArrToStringHelper(options),
     extendArr: new ExtendArrHelper(),
+    arrToMap: new ArrToMapHelper(),
+
+    // binary
+    binaryDeserialize: new BinaryDeserializeHelper(),
+    binarySerialize: new BinarySerializeHelper(),
 
     // bind
     arrayBinding: (options) => new ArrayBindingHelper(options),
@@ -873,6 +894,10 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     upgrade: (options) => new UpgradeHelper(options),
     handleNormal: memoizedUnique(HandleNormalHelper),
     applicationMatchesVerification: new ApplicationMatchesVerificationHelper(),
+
+    // crypto
+    RIPEMD160: new RIPEMD160Helper(),
+    SHA256: new SHA256Helper(),
 
     // types/contract
     isContract: new IsContractHelper(),
@@ -1010,6 +1035,8 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     rawEnumeratorSome: (options) => new RawEnumeratorSomeHelper(options),
     rawIteratorReduce: (options) => new RawIteratorReduceHelper(options),
     rawIteratorReduceBase: (options) => new RawIteratorReduceBaseHelper(options),
+    getMapIteratorKey: new GetMapIteratorKeyHelper(),
+    getMapIteratorValue: new GetMapIteratorValueHelper(),
 
     // iteratorResult
     createIteratorResult: new CreateIteratorResultHelper(),

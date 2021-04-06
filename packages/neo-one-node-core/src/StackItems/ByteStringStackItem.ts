@@ -1,4 +1,4 @@
-import { StackItemType } from '@neo-one/client-common';
+import { StackItemType, utils } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { ByteArrayContractParameter, ContractParameter } from '../contractParameter';
 import { InvalidIntegerStackItemError } from '../errors';
@@ -6,6 +6,8 @@ import { IntegerStackItem } from './IntegerStackItem';
 import { PrimitiveStackItemBase } from './PrimitiveStackItemBase';
 import { StackItemBase } from './StackItemBase';
 import { isByteStringStackItem, StackItem } from './StackItems';
+
+const maxComparableSize = utils.USHORT_MAX_NUMBER;
 
 export class ByteStringStackItem extends PrimitiveStackItemBase {
   public static readonly empty = new ByteStringStackItem(Buffer.from([]));
@@ -19,19 +21,30 @@ export class ByteStringStackItem extends PrimitiveStackItemBase {
   }
 
   public equals(other: StackItem): boolean {
-    if (isByteStringStackItem(other)) {
-      return this.memory.equals(other.getBuffer());
+    if (this.size > maxComparableSize) {
+      throw new Error('The operand exceeds the maximum comparable size.');
     }
 
-    return false;
+    if (!isByteStringStackItem(other)) {
+      return false;
+    }
+
+    if (other.size > maxComparableSize) {
+      throw new Error('The operand exceeds the maximum comparable size.');
+    }
+
+    return this.memory.equals(other.getBuffer());
   }
 
   public getBoolean() {
     if (this.size > IntegerStackItem.maxSize) {
-      return true;
+      throw new Error('Invalid cast exception');
     }
 
-    // TODO: verify, their implementation of this is awful to figure out
+    if (this.size === 0) {
+      return false;
+    }
+
     return this.memory.some((value) => value !== 0);
   }
 

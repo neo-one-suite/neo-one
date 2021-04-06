@@ -62,7 +62,7 @@ export class SetStructuredStorageHelper extends KeyStructuredStorageBaseHelper {
     // [arr, keyBuffer]
     sb.emitOp(node, 'PACK');
     // [bufferValue, keyBuffer]
-    sb.emitSysCall(node, 'System.Binary.Serialize');
+    sb.emitHelper(node, options, sb.helpers.binarySerialize);
     // [keyBuffer, bufferValue]
     sb.emitOp(node, 'SWAP');
     // []

@@ -9,6 +9,13 @@ export const oracleMethods: ReadonlyArray<ContractMethodJSON> = [
     safe: false,
   },
   {
+    name: 'getPrice',
+    parameters: [],
+    returntype: 'Integer',
+    offset: 7,
+    safe: true,
+  },
+  {
     name: 'request',
     parameters: [
       {
@@ -33,14 +40,26 @@ export const oracleMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Void',
-    offset: 0,
+    offset: 14,
+    safe: false,
+  },
+  {
+    name: 'setPrice',
+    parameters: [
+      {
+        name: 'price',
+        type: 'Integer',
+      },
+    ],
+    returntype: 'Void',
+    offset: 21,
     safe: false,
   },
   {
     name: 'verify',
     parameters: [],
     returntype: 'Boolean',
-    offset: 0,
+    offset: 28,
     safe: true,
   },
 ];

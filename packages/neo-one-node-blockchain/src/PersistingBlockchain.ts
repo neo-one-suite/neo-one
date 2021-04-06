@@ -1,6 +1,15 @@
 // tslint:disable no-array-mutation no-object-mutation
-import { common, TriggerType, VMState } from '@neo-one/client-common';
-import { ApplicationExecuted, Batch, Block, SnapshotHandler, Transaction, VM } from '@neo-one/node-core';
+import { TriggerType, VMState } from '@neo-one/client-common';
+import {
+  ApplicationExecuted,
+  Batch,
+  Block,
+  SnapshotHandler,
+  Transaction,
+  VM,
+  VMProtocolSettingsIn,
+} from '@neo-one/node-core';
+import { BN } from 'bn.js';
 import { PersistNativeContractsError, PostPersistError } from './errors';
 import { utils } from './utils';
 
@@ -8,17 +17,25 @@ interface PersistingBlockchainOptions {
   readonly vm: VM;
   readonly onPersistNativeContractScript: Buffer;
   readonly postPersistNativeContractScript: Buffer;
+  readonly protocolSettings: VMProtocolSettingsIn;
 }
 
 export class PersistingBlockchain {
   private readonly vm: VM;
   private readonly onPersistNativeContractScript: Buffer;
   private readonly postPersistNativeContractScript: Buffer;
+  private readonly protocolSettings: VMProtocolSettingsIn;
 
-  public constructor(options: PersistingBlockchainOptions) {
-    this.vm = options.vm;
-    this.onPersistNativeContractScript = options.onPersistNativeContractScript;
-    this.postPersistNativeContractScript = options.postPersistNativeContractScript;
+  public constructor({
+    vm,
+    onPersistNativeContractScript,
+    postPersistNativeContractScript,
+    protocolSettings,
+  }: PersistingBlockchainOptions) {
+    this.vm = vm;
+    this.onPersistNativeContractScript = onPersistNativeContractScript;
+    this.postPersistNativeContractScript = postPersistNativeContractScript;
+    this.protocolSettings = protocolSettings;
   }
 
   public persistBlock(
@@ -32,8 +49,9 @@ export class PersistingBlockchain {
         {
           trigger: TriggerType.OnPersist,
           snapshot: 'main',
-          gas: common.TWENTY_FIXED8,
+          gas: new BN(0),
           persistingBlock: block,
+          settings: this.protocolSettings,
         },
         (engine) => {
           engine.loadScript({ script: this.onPersistNativeContractScript });
@@ -86,6 +104,7 @@ export class PersistingBlockchain {
         snapshot: 'clone',
         gas: transaction.systemFee,
         persistingBlock: block,
+        settings: this.protocolSettings,
       },
       (engine) => {
         engine.loadScript({ script: transaction.script });
@@ -106,9 +125,10 @@ export class PersistingBlockchain {
       {
         trigger: TriggerType.PostPersist,
         container: undefined,
-        gas: common.TWENTY_FIXED8,
+        gas: new BN(0),
         snapshot: 'main',
         persistingBlock: block,
+        settings: this.protocolSettings,
       },
       (engine) => {
         engine.loadScript({ script: this.postPersistNativeContractScript });

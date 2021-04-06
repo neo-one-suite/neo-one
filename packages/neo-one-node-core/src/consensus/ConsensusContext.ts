@@ -37,7 +37,7 @@ export class ConsensusContext {
   }
 
   public get isPrimary(): boolean {
-    return this.myIndex === this.blockBuilder.consensusData?.primaryIndex;
+    return this.myIndex === this.blockBuilder.primaryIndex;
   }
 
   public get isBackup(): boolean {
@@ -72,7 +72,7 @@ export class ConsensusContext {
   }
 
   public get requestSentOrReceived(): boolean {
-    const maybeIndex = this.blockBuilder.consensusData?.primaryIndex;
+    const maybeIndex = this.blockBuilder.primaryIndex;
     if (maybeIndex === undefined) {
       return false;
     }
@@ -196,13 +196,6 @@ export class ConsensusContext {
 
   public clone(options: Partial<ConsensusContextAdd>) {
     const { blockOptions, ...rest } = options;
-    const consensusData = blockOptions?.consensusData;
-    const newConsensusData = consensusData
-      ? {
-          ...this.blockBuilder.consensusData,
-          ...consensusData,
-        }
-      : this.blockBuilder.consensusData;
 
     return new ConsensusContext({
       viewNumber: this.viewNumber,
@@ -216,7 +209,6 @@ export class ConsensusContext {
           : {
               ...this.blockBuilder,
               ...blockOptions,
-              consensusData: newConsensusData,
             },
       preparationPayloads: this.preparationPayloads,
       commitPayloads: this.commitPayloads,

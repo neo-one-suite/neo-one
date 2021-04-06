@@ -17,3 +17,4 @@ export * from './ArrSomeFuncHelper';
 export * from './ArrSomeHelper';
 export * from './ArrToStringHelper';
 export * from './ExtendArrHelper';
+export * from './ArrToMapHelper';

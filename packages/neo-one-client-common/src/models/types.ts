@@ -2,7 +2,6 @@ import { JSONObject } from '@neo-one/utils';
 import { UInt256Hex } from '../common';
 import { UserAccount } from '../types';
 import { ContractParameterTypeModel } from './ContractParameterTypeModel';
-import { StorageFlagsModel } from './StorageFlagsModel';
 import { AttributeTypeModel } from './transaction';
 import { TriggerType, TriggerTypeJSON } from './trigger';
 import { VerifyResultModel } from './VerifyResultModel';
@@ -225,8 +224,6 @@ export interface StorageItemJSON {
   readonly isConstant: boolean;
 }
 
-export type StorageFlagsJSON = keyof typeof StorageFlagsModel;
-
 export interface WitnessJSON {
   readonly invocation: string;
   readonly verification: string;
@@ -424,7 +421,7 @@ export interface NativeContractJSON {
   readonly hash: string;
   readonly nef: NefFileJSON;
   readonly manifest: ContractManifestJSON;
-  readonly activeblockindex: number;
+  readonly updatehistory: readonly number[];
 }
 
 export interface Nep17TransfersJSON {
@@ -454,35 +451,23 @@ export interface Nep17TransferJSON {
   readonly txhash: string;
 }
 
-export interface BlockBaseJSON {
+export interface HeaderJSON {
+  readonly hash: string;
+  readonly size: number;
   readonly version: number;
   readonly previousblockhash: string;
   readonly merkleroot: string;
   readonly time: number;
   readonly index: number;
+  readonly primary: number;
   readonly nextconsensus: string;
-  readonly nextblockhash?: string;
   readonly witnesses: readonly WitnessJSON[];
-  readonly hash: string;
-  readonly size: number;
+  readonly nextblockhash?: string;
   readonly confirmations?: number;
 }
 
-export interface ConsensusDataJSON {
-  readonly primary: number;
-  readonly nonce: string;
-}
-
-export interface HeaderJSON extends BlockBaseJSON {}
-
-export interface BlockJSON extends BlockBaseJSON {
+export interface BlockJSON extends HeaderJSON {
   readonly tx: readonly TransactionJSON[];
-  readonly consensusdata?: ConsensusDataJSON;
-}
-
-export interface TrimmedBlockJSON extends BlockBaseJSON {
-  readonly consensusdata?: ConsensusDataJSON;
-  readonly hashes: readonly string[];
 }
 
 export interface NetworkSettingsJSON {

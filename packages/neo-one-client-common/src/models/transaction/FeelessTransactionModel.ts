@@ -1,10 +1,10 @@
 import { Constructor } from '@neo-one/utils';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { BinaryWriter } from '../../BinaryWriter';
 import { common, ECPoint, InvalidFormatError, PrivateKey, UInt160, UInt256, UInt256Hex } from '../../common';
 import { crypto } from '../../crypto';
 import { utils } from '../../utils';
-import { createSerializeWire, getHashData, SerializableWire, SerializeWire } from '../Serializable';
+import { createSerializeWire, getSignData, SerializableWire, SerializeWire } from '../Serializable';
 import { SignerModel } from '../SignerModel';
 import { WitnessModel } from '../WitnessModel';
 import { AttributeModel } from './attribute';
@@ -66,7 +66,7 @@ export class FeelessTransactionModel<
   public readonly serializeUnsigned: SerializeWire = createSerializeWire(this.serializeUnsignedBase.bind(this));
   private readonly hashInternal: () => UInt256;
   private readonly hashHexInternal = utils.lazy(() => common.uInt256ToHex(this.hash));
-  private readonly messageInternal = utils.lazy(() => getHashData(this.serializeUnsigned(), this.messageMagic));
+  private readonly messageInternal = utils.lazy(() => getSignData(this.hash, this.messageMagic));
 
   public constructor({
     version,
@@ -89,7 +89,8 @@ export class FeelessTransactionModel<
     this.script = script;
     this.messageMagic = messageMagic;
     const hashIn = hash;
-    this.hashInternal = hashIn === undefined ? utils.lazy(() => crypto.hash256(this.message)) : () => hashIn;
+    this.hashInternal =
+      hashIn === undefined ? utils.lazy(() => crypto.calculateHash(this.serializeUnsigned())) : () => hashIn;
 
     if (this.attributes.length > MAX_TRANSACTION_ATTRIBUTES) {
       throw new InvalidFormatError(
@@ -98,16 +99,16 @@ export class FeelessTransactionModel<
     }
   }
 
+  public get message(): Buffer {
+    return this.messageInternal();
+  }
+
   public get hash(): UInt256 {
     return this.hashInternal();
   }
 
   public get hashHex(): UInt256Hex {
     return this.hashHexInternal();
-  }
-
-  public get message(): Buffer {
-    return this.messageInternal();
   }
 
   public cloneWithConsensusOptions(

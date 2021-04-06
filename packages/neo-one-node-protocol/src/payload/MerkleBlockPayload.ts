@@ -1,21 +1,29 @@
-import { BinaryWriter, createSerializeWire, IOHelper, SerializableWire, UInt256 } from '@neo-one/client-common';
+import {
+  BinaryWriter,
+  createSerializeWire,
+  IOHelper,
+  SerializableWire,
+  UInt256,
+  utils as clientCommonUtils,
+} from '@neo-one/client-common';
 import {
   BinaryReader,
   Block,
-  BlockBase,
-  BlockBaseAdd,
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
+  Header,
   MerkleTree,
   utils,
 } from '@neo-one/node-core';
-export interface MerkleBlockPayloadAdd extends BlockBaseAdd {
-  readonly contentCount: number;
+
+export interface MerkleBlockPayloadAdd {
+  readonly header: Header;
+  readonly txCount: number;
   readonly hashes: readonly UInt256[];
   readonly flags: Buffer;
 }
 
-export class MerkleBlockPayload extends BlockBase implements SerializableWire {
+export class MerkleBlockPayload implements SerializableWire {
   public static create({
     block,
     flags,
@@ -35,34 +43,22 @@ export class MerkleBlockPayload extends BlockBase implements SerializableWire {
     }
 
     return new MerkleBlockPayload({
-      version: block.version,
-      previousHash: block.previousHash,
-      merkleRoot: block.merkleRoot,
-      timestamp: block.timestamp,
-      index: block.index,
-      nextConsensus: block.nextConsensus,
-      witness: block.witness,
-      contentCount: block.transactions.length + 1,
+      header: block.header,
+      txCount: block.transactions.length,
       hashes: tree.toHashArray(),
       flags: mutableBuffer,
     });
   }
   public static deserializeWireBase(options: DeserializeWireBaseOptions): MerkleBlockPayload {
     const { reader } = options;
-    const blockBase = super.deserializeWireBase(options);
-    const contentCount = reader.readVarUIntLE(Block.MaxTransactionsPerBlock.addn(1)).toNumber();
-    const hashes = reader.readArray(() => reader.readUInt256(), contentCount);
-    const flags = reader.readVarBytesLE((contentCount + 7) / 8);
+    const header = Header.deserializeWireBase(options);
+    const txCount = reader.readVarUIntLE(clientCommonUtils.USHORT_MAX_NUMBER).toNumber();
+    const hashes = reader.readArray(() => reader.readUInt256(), txCount);
+    const flags = reader.readVarBytesLE((Math.max(txCount, 1) + 7) / 8);
 
     return new this({
-      version: blockBase.version,
-      previousHash: blockBase.previousHash,
-      merkleRoot: blockBase.merkleRoot,
-      timestamp: blockBase.timestamp,
-      index: blockBase.index,
-      nextConsensus: blockBase.nextConsensus,
-      witness: blockBase.witness,
-      contentCount,
+      header,
+      txCount,
       hashes,
       flags,
     });
@@ -76,40 +72,21 @@ export class MerkleBlockPayload extends BlockBase implements SerializableWire {
   }
 
   public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
-  public readonly contentCount: number;
   public readonly hashes: readonly UInt256[];
+  public readonly txCount: number;
+  public readonly header: Header;
   public readonly flags: Buffer;
   private readonly merkleBlockPayloadSizeInternal: () => number;
 
-  public constructor({
-    version,
-    previousHash,
-    merkleRoot,
-    timestamp,
-    index,
-    nextConsensus,
-    witness,
-    contentCount,
-    hashes,
-    flags,
-  }: MerkleBlockPayloadAdd) {
-    super({
-      version,
-      previousHash,
-      merkleRoot,
-      timestamp,
-      index,
-      nextConsensus,
-      witness,
-    });
-
-    this.contentCount = contentCount;
+  public constructor({ header, txCount, hashes, flags }: MerkleBlockPayloadAdd) {
+    this.header = header;
+    this.txCount = txCount;
     this.hashes = hashes;
     this.flags = flags;
 
     this.merkleBlockPayloadSizeInternal = utils.lazy(
       () =>
-        super.size +
+        this.header.size +
         IOHelper.sizeOfUInt32LE +
         IOHelper.sizeOfArray(this.hashes, () => IOHelper.sizeOfUInt256) +
         IOHelper.sizeOfVarBytesLE(this.flags),
@@ -121,8 +98,8 @@ export class MerkleBlockPayload extends BlockBase implements SerializableWire {
   }
 
   public serializeWireBase(writer: BinaryWriter): void {
-    super.serializeWireBase(writer);
-    writer.writeVarUIntLE(this.contentCount);
+    this.header.serializeWireBase(writer);
+    writer.writeVarUIntLE(this.txCount);
     writer.writeArray(this.hashes, (hash) => {
       writer.writeUInt256(hash);
     });

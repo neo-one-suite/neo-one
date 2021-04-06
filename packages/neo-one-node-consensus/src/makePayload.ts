@@ -1,4 +1,4 @@
-import { common, crypto, PrivateKey, UInt256, utils as commonUtils } from '@neo-one/client-common';
+import { common, crypto, PrivateKey, UInt256 } from '@neo-one/client-common';
 import {
   ChangeViewConsensusMessage,
   ChangeViewPayloadCompact,
@@ -71,7 +71,7 @@ export const makeCommit = async ({
 }) => {
   let context = contextIn;
   const maybePayload = context.commitPayloads[context.myIndex];
-  if (maybePayload) {
+  if (maybePayload !== undefined) {
     return { context, payload: maybePayload };
   }
 
@@ -112,7 +112,7 @@ export const makePrepareResponse = async ({
   readonly privateKey: PrivateKey;
 }) => {
   let context = contextIn;
-  const payload = context.preparationPayloads[utils.nullthrows(context.blockBuilder?.consensusData?.primaryIndex)];
+  const payload = context.preparationPayloads[utils.nullthrows(context.blockBuilder.primaryIndex)];
   if (payload === undefined) {
     throw new Error('makePrepareResponse expected payload to be defined');
   }
@@ -157,7 +157,6 @@ export const makeRecovery = async ({
           blockIndex: utils.nullthrows(context.blockBuilder.index),
           viewNumber: context.viewNumber,
           timestamp: utils.nullthrows(context.blockBuilder.timestamp),
-          nonce: utils.nullthrows(context.blockBuilder.consensusData?.nonce),
           transactionHashes: context.transactionHashes,
         })
       : undefined;
@@ -217,7 +216,6 @@ export const makePrepareRequest = async ({
   readonly context: ConsensusContext;
 }) => {
   let context = contextIn;
-  const nonce = commonUtils.randomUInt();
 
   const { context: maxBlockContext } = await ensureMaxBlockLimitation(node, context, Object.values(node.memPool));
   context = maxBlockContext;
@@ -229,7 +227,7 @@ export const makePrepareRequest = async ({
   }
 
   const timestamp = BN.max(new BN(Date.now()), previousHeader.timestamp.addn(1));
-  context = context.clone({ blockOptions: { timestamp, consensusData: { nonce: new BN(nonce) } } });
+  context = context.clone({ blockOptions: { timestamp } });
 
   const preparationPayload = await makeSignedPayload({
     node,
@@ -242,7 +240,6 @@ export const makePrepareRequest = async ({
       blockIndex: utils.nullthrows(context.blockBuilder.index),
       viewNumber: context.viewNumber,
       timestamp,
-      nonce: new BN(nonce),
       transactionHashes: context.transactionHashes ?? [],
     }),
   });

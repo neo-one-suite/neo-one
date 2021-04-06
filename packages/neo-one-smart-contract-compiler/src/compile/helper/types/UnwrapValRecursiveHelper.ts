@@ -33,7 +33,7 @@ export class UnwrapValRecursiveHelper extends Helper {
     const type = tsUtils.type_.getNonNullableType(this.type);
 
     if (this.deserializeBeforeUnwrap) {
-      sb.emitSysCall(node, 'System.Binary.Deserialize');
+      sb.emitHelper(node, options, sb.helpers.binaryDeserialize);
     }
     sb.emitHelper(
       node,

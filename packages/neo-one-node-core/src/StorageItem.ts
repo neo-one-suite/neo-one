@@ -12,12 +12,10 @@ import { StorageKey } from './StorageKey';
 // TODO: Cache can also be 2 other things, we should definitely revisit this when we have more context
 export interface StorageItemCacheAdd {
   readonly cache: BN;
-  readonly isConstant: boolean;
 }
 
 export interface StorageItemValueAdd {
   readonly value: Buffer;
-  readonly isConstant: boolean;
 }
 
 // tslint:disable-next-line: no-any
@@ -29,12 +27,10 @@ type StorageItemAdd = StorageItemCacheAdd | StorageItemValueAdd;
 export class StorageItem implements SerializableWire {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): StorageItem {
     const { reader } = options;
-    const value = reader.readVarBytesLE();
-    const isConstant = reader.readBoolean();
+    const value = reader.readBytes(reader.buffer.length);
 
     return new this({
       value,
-      isConstant,
     });
   }
 
@@ -46,13 +42,11 @@ export class StorageItem implements SerializableWire {
   }
 
   public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
-  public readonly isConstant: boolean;
 
   private mutableValue: Buffer | undefined;
   private mutableCache: BN | undefined;
 
   public constructor(options: StorageItemAdd) {
-    this.isConstant = options.isConstant;
     this.mutableValue = isStorageItemCacheAdd(options) ? undefined : options.value;
     this.mutableCache = isStorageItemCacheAdd(options) ? options.cache : undefined;
   }
@@ -93,14 +87,12 @@ export class StorageItem implements SerializableWire {
   }
 
   public serializeWireBase(writer: BinaryWriter) {
-    writer.writeVarBytesLE(this.value);
-    writer.writeBoolean(this.isConstant);
+    writer.writeBytes(this.value);
   }
 
   public clone() {
     return new StorageItem({
       value: this.value,
-      isConstant: this.isConstant,
     });
   }
 
@@ -108,7 +100,6 @@ export class StorageItem implements SerializableWire {
     return {
       key: JSONHelper.writeBase64Buffer(key.serializeWire()),
       value: JSONHelper.writeBase64Buffer(this.value),
-      isConstant: this.isConstant,
     };
   }
 }

@@ -4,9 +4,10 @@ import { Observable } from 'rxjs';
 import { Block } from './Block';
 import { Header } from './Header';
 import { HeaderCache } from './HeaderCache';
+import { ImmutableHashSet } from './ImmutableHashSet';
 import { ExtensiblePayload } from './payload';
 import { DeserializeWireContext, SerializeJSONContext } from './Serializable';
-import { BlockchainSettings } from './Settings';
+import { BlockchainSettings, VMProtocolSettingsIn } from './Settings';
 import { Signers } from './Signers';
 import { BlockchainStorage, Storage } from './Storage';
 import { Transaction, TransactionState } from './transaction';
@@ -21,6 +22,7 @@ export interface Mempool {
 
 export interface Blockchain extends BlockchainStorage {
   readonly settings: BlockchainSettings;
+  readonly protocolSettings: VMProtocolSettingsIn;
   readonly deserializeWireContext: DeserializeWireContext;
   readonly serializeJSONContext: SerializeJSONContext;
 
@@ -57,14 +59,16 @@ export interface Blockchain extends BlockchainStorage {
 
   readonly getValidators: () => Promise<readonly ECPoint[]>;
   readonly getNextBlockValidators: () => Promise<readonly ECPoint[]>;
-  readonly getMaxBlockSize: () => Promise<number>;
-  readonly getMaxBlockSystemFee: () => Promise<BN>;
-  readonly getMaxTransactionsPerBlock: () => Promise<number>;
   readonly getFeePerByte: () => Promise<BN>;
   readonly shouldRefreshCommittee: (offset?: number) => boolean;
-  readonly updateExtensibleWitnessWhiteList: (storage: Storage) => Promise<void>;
+  readonly updateExtensibleWitnessWhiteList: (storage: Storage) => Promise<ImmutableHashSet<UInt160>>;
 
-  readonly invokeScript: (script: Buffer, signers?: Signers, gas?: BN) => CallReceipt;
+  readonly invokeScript: (options: {
+    readonly script: Buffer;
+    readonly signers?: Signers;
+    readonly gas?: BN;
+    readonly rvcount?: number;
+  }) => CallReceipt;
   readonly testTransaction: (transaction: Transaction) => CallReceipt;
   readonly getVerificationCost: (
     contractHash: UInt160,

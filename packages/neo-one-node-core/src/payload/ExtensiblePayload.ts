@@ -5,7 +5,7 @@ import {
   common,
   createSerializeWire,
   crypto,
-  getHashData,
+  getSignData,
   InvalidFormatError,
   PrivateKey,
 } from '@neo-one/client-common';
@@ -30,7 +30,7 @@ export class ExtensiblePayload extends UnsignedExtensiblePayload implements Seri
     messageMagic: number,
   ): ExtensiblePayload {
     const context = new ContractParametersContext(payload.getScriptHashesForVerifying());
-    const hashData = getHashData(payload.serializeWire(), messageMagic);
+    const hashData = getSignData(payload.hash, messageMagic);
     const publicKey = crypto.privateKeyToPublicKey(privateKey);
     const signatureContract = AccountContract.createSignatureContract(publicKey);
     const signature = crypto.sign({ message: hashData, privateKey });
@@ -109,7 +109,7 @@ export class ExtensiblePayload extends UnsignedExtensiblePayload implements Seri
       return false;
     }
 
-    if (!options.isExtensibleWitnessWhiteListed(this.sender)) {
+    if (!options.extensibleWitnessWhiteList.contains(this.sender)) {
       return false;
     }
 
@@ -120,6 +120,7 @@ export class ExtensiblePayload extends UnsignedExtensiblePayload implements Seri
       native: options.native,
       headerCache: options.headerCache,
       gas: common.fixed8FromDecimal('0.02'),
+      settings: options.settings,
     });
   }
 }

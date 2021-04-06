@@ -14,7 +14,7 @@ class CryptoValue extends BuiltinValueObject {
   public readonly type = 'CryptoConstructor';
 }
 
-type hashSysCall = 'Neo.Crypto.RIPEMD160' | 'Neo.Crypto.SHA256';
+type hashSysCall = 'RIPEMD160' | 'SHA256';
 
 class HashSysCall extends BuiltinMemberCall {
   public constructor(private readonly firstHash: hashSysCall, private readonly secondHash?: hashSysCall) {
@@ -77,9 +77,9 @@ class HashSysCall extends BuiltinMemberCall {
       }),
     );
     // [buffer]
-    sb.emitSysCall(node, this.firstHash);
+    sb.emitHelper(node, options, sb.helpers[this.firstHash]);
     if (this.secondHash !== undefined) {
-      sb.emitSysCall(node, this.secondHash);
+      sb.emitHelper(node, options, sb.helpers[this.secondHash]);
     }
     // [val]
     sb.emitHelper(node, optionsIn, sb.helpers.wrapBuffer);
@@ -89,13 +89,9 @@ class HashSysCall extends BuiltinMemberCall {
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {
   builtins.addContractInterface('CryptoConstructor', new CryptoInterface());
-  builtins.addContractMember('CryptoConstructor', 'ripemd160', new HashSysCall('Neo.Crypto.RIPEMD160'));
-  builtins.addContractMember('CryptoConstructor', 'sha256', new HashSysCall('Neo.Crypto.SHA256'));
-  builtins.addContractMember(
-    'CryptoConstructor',
-    'hash160',
-    new HashSysCall('Neo.Crypto.SHA256', 'Neo.Crypto.RIPEMD160'),
-  );
-  builtins.addContractMember('CryptoConstructor', 'hash256', new HashSysCall('Neo.Crypto.SHA256', 'Neo.Crypto.SHA256'));
+  builtins.addContractMember('CryptoConstructor', 'ripemd160', new HashSysCall('RIPEMD160'));
+  builtins.addContractMember('CryptoConstructor', 'sha256', new HashSysCall('SHA256'));
+  builtins.addContractMember('CryptoConstructor', 'hash160', new HashSysCall('SHA256', 'RIPEMD160'));
+  builtins.addContractMember('CryptoConstructor', 'hash256', new HashSysCall('SHA256', 'SHA256'));
   builtins.addContractValue('crypto', new CryptoValue());
 };

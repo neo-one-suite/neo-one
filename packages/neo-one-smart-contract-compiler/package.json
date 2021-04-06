@@ -28,7 +28,9 @@
     "safe-stable-stringify": "^1.1.0",
     "source-map": "^0.7.3",
     "tslib": "^1.10.0",
-    "typescript": "3.9.5"
+    "typescript": "3.9.5",
+    "rocksdb": "^4.1.0",
+    "fs-extra": "^8.1.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
@@ -45,6 +47,7 @@
     "@types/levelup": "^3.1.1",
     "@types/lodash": "^4.14.138",
     "@types/memdown": "^3.0.0",
+    "@types/fs-extra": "^8.0.0",
     "app-root-dir": "^1.0.2",
     "bignumber.js": "^9.0.0",
     "gulp": "~4.0.2",

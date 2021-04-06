@@ -17,21 +17,21 @@ export const gasTokenMethods: ReadonlyArray<ContractMethodJSON> = [
     name: 'decimals',
     parameters: [],
     returntype: 'Integer',
-    offset: 0,
+    offset: 7,
     safe: true,
   },
   {
     name: 'symbol',
     parameters: [],
     returntype: 'String',
-    offset: 0,
+    offset: 14,
     safe: true,
   },
   {
     name: 'totalSupply',
     parameters: [],
     returntype: 'Integer',
-    offset: 0,
+    offset: 21,
     safe: true,
   },
   {
@@ -55,7 +55,7 @@ export const gasTokenMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Boolean',
-    offset: 0,
+    offset: 28,
     safe: false,
   },
 ];

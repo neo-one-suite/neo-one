@@ -26,7 +26,7 @@ export class LedgerContract extends NativeContract implements LedgerContractNode
   public constructor(settings: BlockchainSettings) {
     super({
       name: 'LedgerContract',
-      id: -2,
+      id: -4,
       methods: ledgerMethods,
       settings,
     });
@@ -108,19 +108,13 @@ export class LedgerContract extends NativeContract implements LedgerContractNode
     const transactionsOut = await Promise.all(
       state.hashes.slice(1).map(async (tx) => this.getTransaction(context, tx)),
     );
-    const transactions = transactionsOut.filter(oneUtils.notNull);
+    const transactions = await Promise.all(
+      transactionsOut.filter(oneUtils.notNull).map(async (tx) => this.getTransaction(context, tx.hash)),
+    );
 
     return new Block({
-      messageMagic: this.settings.messageMagic,
-      version: state.version,
-      previousHash: state.previousHash,
-      merkleRoot: state.merkleRoot,
-      timestamp: state.timestamp,
-      index: state.index,
-      nextConsensus: state.nextConsensus,
-      witness: state.witness,
-      consensusData: state.consensusData,
-      transactions,
+      header: state.header,
+      transactions: transactions.filter(oneUtils.notNull),
     });
   }
 

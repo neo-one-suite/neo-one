@@ -23,8 +23,10 @@ export class ArrSomeHelper extends Helper {
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
+    // [map]
+    sb.emitHelper(node, options, sb.helpers.arrToMap);
     // [enumerator]
-    sb.emitSysCall(node, 'System.Enumerator.Create');
+    sb.emitSysCall(node, 'System.Iterator.Create');
     // [val]
     sb.emitHelper(
       node,

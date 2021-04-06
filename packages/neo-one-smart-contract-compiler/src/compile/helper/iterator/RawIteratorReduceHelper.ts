@@ -29,14 +29,14 @@ export class RawIteratorReduceHelper extends Helper {
           // [iterator, accum, iterator]
           sb.emitOp(node, 'OVER');
           // [value, accum, iterator]
-          sb.emitSysCall(node, 'System.Enumerator.Value');
+          sb.emitHelper(node, options, sb.helpers.getMapIteratorValue);
           // [iterator, value, accum]
           sb.emitOp(node, 'ROT');
           // [key, value, accum]
-          sb.emitSysCall(node, 'System.Iterator.Key');
+          sb.emitHelper(node, options, sb.helpers.getMapIteratorKey);
           if (this.deserializeKey) {
             // [key, value, accum]
-            sb.emitSysCall(node, 'System.Binary.Deserialize');
+            sb.emitHelper(node, options, sb.helpers.binaryDeserialize);
           }
           // [accum, key, value]
           sb.emitOp(node, 'ROT');

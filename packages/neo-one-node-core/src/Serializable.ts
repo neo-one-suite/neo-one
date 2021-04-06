@@ -1,12 +1,7 @@
-// import { ECPoint, UInt160 } from '@neo-one/client-common';
-// import { Action } from './action';
-// import { Asset } from './Asset';
-// import { Contract } from './Contract';
-// import { InvocationResult } from './invocationResult';
-// import { StorageChange } from './storageChange';
 import { BinaryReader, SerializableWire } from '@neo-one/client-common';
 import { utils } from '@neo-one/utils';
 import { Block } from './Block';
+import { Header } from './Header';
 import { ExtensiblePayload } from './payload';
 import { Signers } from './Signers';
 import { Transaction } from './transaction';
@@ -14,7 +9,8 @@ import { Verifiable } from './Verifiable';
 
 export { SerializeWire, SerializableWire, createSerializeWire } from '@neo-one/client-common';
 
-export type SerializableContainerType = 'Block' | 'Signers' | 'Transaction' | 'ExtensiblePayload';
+// TODO: may need to remove signers from here? And everywhere?
+export type SerializableContainerType = 'Block' | 'Header' | 'Signers' | 'Transaction' | 'ExtensiblePayload';
 
 export interface SerializableContainer extends SerializableWire, Verifiable {
   readonly type: SerializableContainerType;
@@ -33,6 +29,8 @@ export const deserializeScriptContainer = (
   switch (item.type) {
     case 'Block':
       return Block.deserializeWire({ buffer, context });
+    case 'Header':
+      return Header.deserializeWire({ buffer, context });
     case 'Transaction':
       return Transaction.deserializeWire({ buffer, context });
     case 'ExtensiblePayload':

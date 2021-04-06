@@ -28,7 +28,7 @@ export class ArrRangeHelper extends Helper {
     // [arr]
     sb.emitOp(node, 'NEWARRAY');
     // [enumerator]
-    sb.emitSysCall(node, 'System.Enumerator.Create');
+    sb.emitSysCall(node, 'System.Iterator.Create');
     // [number, enumerator]
     sb.emitPushInt(node, 0);
     // [arr, enumerator]
@@ -45,7 +45,7 @@ export class ArrRangeHelper extends Helper {
           // [enumerator, number, enumerator, arr]
           sb.emitOp(node, 'OVER');
           // [boolean, number, enumerator, arr]
-          sb.emitSysCall(node, 'System.Enumerator.Next');
+          sb.emitSysCall(node, 'System.Iterator.Next');
         },
         each: (innerOptions) => {
           // [2, number, enumerator, arr]

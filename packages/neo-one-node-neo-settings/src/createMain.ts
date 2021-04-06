@@ -4,6 +4,7 @@ import { common } from './common';
 
 const mainNetMessageMagic = 5195086;
 
+const DEFAULT_VALIDATORS_COUNT = 7;
 const DEFAULT_VALIDATORS: readonly string[] = [
   '03b209fd4f53a7170ea4444e0cb0a6bb6a53c2bd016926989cf85f9b0fba17a70c',
   '02df48f60e8f3e01c48ff40b9b7f1310d7a8b2a193188befe1c2e3df740e895093',
@@ -36,13 +37,17 @@ export const createMain = ({
   standbyValidators: standbyValidatorsIn = DEFAULT_VALIDATORS,
   extraCommitteeMembers: extraCommitteeMembersIn = DEFAULT_EXTRA_MEMBERS,
   millisecondsPerBlock,
+  validatorsCount = DEFAULT_VALIDATORS_COUNT,
 }: {
   readonly privateNet?: boolean;
   readonly standbyValidators?: readonly string[];
   readonly extraCommitteeMembers?: readonly string[];
   readonly millisecondsPerBlock?: number;
+  readonly validatorsCount?: number;
 } = {}): Settings => {
-  const standbyValidators = standbyValidatorsIn.map((value) => clientCommon.stringToECPoint(value));
+  const standbyValidators = standbyValidatorsIn
+    .map((value) => clientCommon.stringToECPoint(value))
+    .slice(0, validatorsCount);
   const standbyMembers = extraCommitteeMembersIn.map((value) => clientCommon.stringToECPoint(value));
   const standbyCommittee = standbyValidators.concat(standbyMembers);
 
@@ -63,11 +68,15 @@ export const createMain = ({
     standbyCommittee,
     committeeMembersCount: standbyCommittee.length,
     memoryPoolMaxTransactions: commonSettings.memoryPoolMaxTransactions,
-    validatorsCount: standbyValidators.length,
+    validatorsCount,
     messageMagic: mainNetMessageMagic,
     addressVersion: clientCommon.NEO_ADDRESS_VERSION,
     privateKeyVersion: clientCommon.NEO_PRIVATE_KEY_VERSION,
     standbyValidators,
-    nativeActivations: commonSettings.nativeActivations,
+    maxBlockSize: commonSettings.maxBlockSize,
+    maxBlockSystemFee: commonSettings.maxBlockSystemFee,
+    nativeUpdateHistory: commonSettings.nativeUpdateHistory,
+    maxTransactionsPerBlock: commonSettings.maxTransactionsPerBlock,
+    maxTraceableBlocks: commonSettings.maxTraceableBlocks,
   };
 };

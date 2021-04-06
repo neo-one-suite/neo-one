@@ -19,7 +19,7 @@ export class HandleValueStructuredStorageHelper extends Helper {
     // [iterator, iterator, size]
     sb.emitOp(node, 'DUP');
     // [keyBuffer, iterator, size]
-    sb.emitSysCall(node, 'System.Iterator.Key');
+    sb.emitHelper(node, options, sb.helpers.getMapIteratorKey);
     sb.emitHelper(
       node,
       options,
@@ -38,9 +38,9 @@ export class HandleValueStructuredStorageHelper extends Helper {
         },
         whenFalse: () => {
           // [value, size]
-          sb.emitSysCall(node, 'System.Enumerator.Value');
+          sb.emitHelper(node, options, sb.helpers.getMapIteratorValue);
           // [arr, size]
-          sb.emitSysCall(node, 'System.Binary.Deserialize');
+          sb.emitHelper(node, options, sb.helpers.binaryDeserialize);
           // [2, keyVal, valVal, size]
           sb.emitOp(node, 'UNPACK');
           // [keyVal, valVal, size]

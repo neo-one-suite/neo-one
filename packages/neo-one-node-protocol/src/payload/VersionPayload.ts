@@ -6,6 +6,7 @@ import {
   DeserializeWireOptions,
   NodeCapability,
 } from '@neo-one/node-core';
+import { Set } from 'immutable';
 
 export interface VersionPayloadAdd {
   readonly magic: number;
@@ -28,8 +29,7 @@ export class VersionPayload {
 
     const capabilities = reader.readArray(() => deserializeNodeCapabilityWireBase(options), this.maxCapabilities);
 
-    // TODO: test this is working as intended (checking distinct capabilities)
-    if (new Set(capabilities.map((cap) => cap.type)).size !== capabilities.length) {
+    if (Set(capabilities).size !== capabilities.length) {
       throw new InvalidFormatError();
     }
 

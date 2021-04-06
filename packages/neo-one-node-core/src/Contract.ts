@@ -1,4 +1,4 @@
-import { common, ContractParameterTypeModel, crypto, scriptHashToAddress, UInt160 } from '@neo-one/client-common';
+import { ContractParameterTypeModel, crypto, UInt160 } from '@neo-one/client-common';
 
 export interface ContractAdd {
   readonly parameterList: readonly ContractParameterTypeModel[];
@@ -22,12 +22,10 @@ export class Contract {
   public readonly script: Buffer;
   public readonly parameterList: readonly ContractParameterTypeModel[];
   public readonly scriptHash: UInt160;
-  public readonly address: string;
 
   private constructor({ parameterList, scriptHash, redeemScript }: ContractAdd) {
     this.script = redeemScript ?? Buffer.from([]);
     this.parameterList = parameterList;
     this.scriptHash = scriptHash ?? crypto.toScriptHash(this.script);
-    this.address = scriptHashToAddress(common.uInt160ToString(this.scriptHash));
   }
 }

@@ -12,7 +12,7 @@ export const ledgerMethods: ReadonlyArray<ContractMethodJSON> = [
     name: 'currentIndex',
     parameters: [],
     returntype: 'Integer',
-    offset: 0,
+    offset: 7,
     safe: true,
   },
   {
@@ -24,7 +24,7 @@ export const ledgerMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Array',
-    offset: 0,
+    offset: 14,
     safe: true,
   },
   {
@@ -36,7 +36,7 @@ export const ledgerMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Array',
-    offset: 0,
+    offset: 21,
     safe: true,
   },
   {
@@ -52,7 +52,7 @@ export const ledgerMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Array',
-    offset: 0,
+    offset: 28,
     safe: true,
   },
   {
@@ -64,7 +64,7 @@ export const ledgerMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Integer',
-    offset: 0,
+    offset: 35,
     safe: true,
   },
 ];

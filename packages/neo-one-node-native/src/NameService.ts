@@ -9,7 +9,7 @@ import {
   StackItem,
   utils,
 } from '@neo-one/node-core';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import _ from 'lodash';
 import { map, toArray } from 'rxjs/operators';
 import { nameServiceMethods } from './methods';
@@ -28,7 +28,7 @@ export class NameService extends NonfungibleToken implements NameServiceNode {
   public constructor(settings: BlockchainSettings) {
     super({
       name: 'NameService',
-      id: -8,
+      id: -10,
       symbol: 'NNS',
       methods: nameServiceMethods,
       settings,
@@ -169,29 +169,28 @@ export class NameService extends NonfungibleToken implements NameServiceNode {
 
 interface NameStateAdd extends NFTStateAdd {
   readonly expiration: BN;
-  readonly admin: UInt160;
+  readonly admin?: UInt160;
 }
 
 class NameState extends NFTState {
   public static fromStackItem(stackItem: StackItem) {
-    const { owner, name, description } = super.fromStackItem(stackItem);
+    const { owner, name } = super.fromStackItem(stackItem);
     const { array } = assertStructStackItem(stackItem);
-    const expiration = array[3].getInteger();
-    const admin = common.bufferToUInt160(array[4].getBuffer());
+    const expiration = array[2].getInteger();
+    const admin = array[3].isNull ? undefined : common.bufferToUInt160(array[3].getBuffer());
 
     return new NameState({
       owner,
       name,
-      description,
       expiration,
       admin,
     });
   }
 
   public readonly expiration: BN;
-  public readonly admin: UInt160;
-  public constructor({ expiration, admin, owner, name, description }: NameStateAdd) {
-    super({ owner, name, description });
+  public readonly admin?: UInt160;
+  public constructor({ expiration, admin, owner, name }: NameStateAdd) {
+    super({ owner, name });
     this.expiration = expiration;
     this.admin = admin;
   }
