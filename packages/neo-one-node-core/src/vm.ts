@@ -3,6 +3,7 @@ import { BN } from 'bn.js';
 import { Block } from './Block';
 import { Notification } from './Notification';
 import { SerializableContainer } from './Serializable';
+import { VMProtocolSettingsIn } from './Settings';
 import { StackItem } from './StackItems';
 import { Transaction } from './transaction';
 
@@ -39,11 +40,13 @@ export interface ApplicationEngineOptions {
   readonly snapshot?: SnapshotName;
   readonly persistingBlock?: Block;
   readonly gas: BN;
+  readonly settings: VMProtocolSettingsIn;
 }
 
 export interface RunEngineOptions {
   readonly script: Buffer;
   readonly snapshot: SnapshotName;
+  readonly rvcount?: number;
   readonly container?: SerializableContainer;
   readonly persistingBlock?: Block;
   readonly offset?: number;
@@ -81,7 +84,6 @@ export interface ApplicationEngine {
   readonly loadContract: (options: LoadContractOptions) => boolean;
   readonly execute: () => VMState;
   readonly push: (item: string) => boolean;
-  readonly stepOut: () => boolean;
 }
 
 export interface PutBatch {

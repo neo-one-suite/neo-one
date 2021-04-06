@@ -16,7 +16,7 @@ export class RoleManagement extends NativeContract implements RoleManagementNode
   public constructor(settings: BlockchainSettings) {
     super({
       name: 'RoleManagement',
-      id: -6,
+      id: -8,
       methods: roleManagementMethods,
       settings,
     });

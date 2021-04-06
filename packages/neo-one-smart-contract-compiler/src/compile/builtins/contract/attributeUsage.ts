@@ -1,16 +1,21 @@
-import { AttributeTypeModel as AttributeUsage } from '@neo-one/client-common';
+import { AttributeTypeModel } from '@neo-one/client-common';
 import { BuiltinBase } from '../BuiltinBase';
 import { BuiltinConstantNumberMemberValue } from '../BuiltinConstantNumberMemberValue';
 import { Builtins } from '../Builtins';
 
-class AttributeUsageValue extends BuiltinBase {}
+class AttributeTypeValue extends BuiltinBase {}
 
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {
-  builtins.addContractValue('AttributeUsage', new AttributeUsageValue());
+  builtins.addContractValue('AttributeType', new AttributeTypeValue());
   builtins.addContractMember(
-    'AttributeUsage',
+    'AttributeType',
     'HighPriority',
-    new BuiltinConstantNumberMemberValue(AttributeUsage.HighPriority),
+    new BuiltinConstantNumberMemberValue(AttributeTypeModel.HighPriority),
+  );
+  builtins.addContractMember(
+    'AttributeType',
+    'OracleResponse',
+    new BuiltinConstantNumberMemberValue(AttributeTypeModel.OracleResponse),
   );
 };

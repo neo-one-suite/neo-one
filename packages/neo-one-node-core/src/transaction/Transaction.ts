@@ -59,6 +59,11 @@ export class Transaction
     } = this.deserializeWireBaseUnsigned(options);
     const { reader } = options;
     const witnesses = reader.readArray(() => Witness.deserializeWireBase(options));
+    if (witnesses.length !== signers?.length) {
+      throw new InvalidFormatError(
+        `Expected witnesses length to equal signers length. Got ${witnesses.length} witnesses and ${signers?.length} signers`,
+      );
+    }
 
     return new Transaction({
       version,
@@ -193,12 +198,6 @@ export class Transaction
       return VerifyResultModel.PolicyFail;
     }
 
-    const maxBlockSysFee = await native.Policy.getMaxBlockSystemFee(storage);
-    const sysFee = this.systemFee;
-    if (sysFee.gt(maxBlockSysFee)) {
-      return VerifyResultModel.PolicyFail;
-    }
-
     const checkTxPromise = transactionContext?.checkTransaction(this, storage) ?? Promise.resolve(true);
     const checkTx = await checkTxPromise;
     if (!checkTx) {
@@ -210,16 +209,18 @@ export class Transaction
       return VerifyResultModel.Invalid;
     }
 
-    if (hashes.length !== this.witnesses.length) {
-      return VerifyResultModel.Invalid;
-    }
-
     const [feePerByte, execFeeFactor] = await Promise.all([
       native.Policy.getFeePerByte(storage),
       native.Policy.getExecFeeFactor(storage),
     ]);
 
     let netFee = this.networkFee.sub(feePerByte.muln(this.size));
+    if (netFee.ltn(0)) {
+      return VerifyResultModel.InsufficientFunds;
+    }
+    if (netFee.gt(maxVerificationGas)) {
+      netFee = maxVerificationGas;
+    }
     // tslint:disable-next-line: no-loop-statement
     for (let i = 0; i < hashes.length; i += 1) {
       const witness = this.witnesses[i];
@@ -239,6 +240,7 @@ export class Transaction
           witness,
           gas: netFee,
           headerCache,
+          settings: verifyOptions.settings,
         });
         if (!result) {
           return VerifyResultModel.InsufficientFunds;
@@ -268,21 +270,29 @@ export class Transaction
       return VerifyResultModel.Invalid;
     }
 
+    let netFee = this.networkFee.gt(maxVerificationGas) ? this.networkFee : maxVerificationGas;
+
     // tslint:disable-next-line: no-loop-statement
     for (let i = 0; i < hashes.length; i += 1) {
       if (crypto.isStandardContract(this.witnesses[i].verification)) {
-        const { result } = await verifyWitness({
+        const { result, gas } = await verifyWitness({
           vm,
           verifiable: this,
           storage,
           native,
           hash: hashes[i],
           witness: this.witnesses[i],
-          gas: maxVerificationGas,
+          gas: netFee,
           headerCache,
+          settings: verifyOptions.settings,
         });
         if (!result) {
           return VerifyResultModel.Invalid;
+        }
+
+        netFee = netFee.sub(gas);
+        if (netFee.ltn(0)) {
+          return VerifyResultModel.InsufficientFunds;
         }
       }
     }

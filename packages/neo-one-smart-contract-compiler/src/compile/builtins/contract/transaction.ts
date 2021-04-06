@@ -1,10 +1,10 @@
+import { common } from '@neo-one/client-common';
 import { Types } from '../../constants';
 import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
 import { BuiltinInstanceIndexValue } from './BuiltinInstanceIndexValue';
-import { SysCallInstanceMemberIndex } from './SysCallInstanceMemberIndex';
-import { SysCallInstanceMemberPrimitive } from './SysCallInstanceMemberPrimitive';
-import { ValueFor } from './ValueFor';
+import { InstanceMemberWithScript } from './InstanceMemberWithScript';
+import { ValueForWithScript } from './ValueForWithScript';
 import { ValueInstanceOf } from './ValueInstanceOf';
 
 class TransactionInterface extends BuiltinInterface {}
@@ -21,7 +21,26 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractMember(
     'Transaction',
     'height',
-    new SysCallInstanceMemberIndex('System.Blockchain.GetTransactionHeight', 0, Types.Transaction, Types.Number),
+    new InstanceMemberWithScript(
+      (sb, node, _options) => {
+        // [blockchainObject]
+        sb.emitPushInt(node, 0);
+        // [txHash]
+        sb.emitOp(node, 'PICKITEM');
+        // [1, txHash]
+        sb.emitPushInt(node, 1);
+        // [[txHash]]
+        sb.emitOp(node, 'PACK');
+        // ['getTransactionHeight', [txHash]]
+        sb.emitPushString(node, 'getTransactionHeight');
+        // [buffer, 'getTransactionHeight', [txHash]]
+        sb.emitPushBuffer(node, common.nativeHashes.Ledger);
+        // [height]
+        sb.emitSysCall(node, 'System.Contract.Call');
+      },
+      Types.Transaction,
+      Types.Number,
+    ),
   );
   builtins.addContractMember('Transaction', 'hash', new BuiltinInstanceIndexValue(0, Types.Transaction, Types.Buffer));
   builtins.addContractMember(
@@ -66,8 +85,22 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractMember(
     'TransactionConstructor',
     'for',
-    new ValueFor('System.Blockchain.GetTransaction', (sb, node, options) => {
-      sb.emitHelper(node, options, sb.helpers.wrapTransaction);
-    }),
+    new ValueForWithScript(
+      (sb, node, _options) => {
+        // [1, buffer]
+        sb.emitPushInt(node, 1);
+        // [[buffer]]
+        sb.emitOp(node, 'PACK');
+        // ['getTransaction', [buffer]]
+        sb.emitPushString(node, 'getTransaction');
+        // [buffer, 'getTransaction', [buffer]]
+        sb.emitPushBuffer(node, common.nativeHashes.Ledger);
+        // [conract]
+        sb.emitSysCall(node, 'System.Contract.Call');
+      },
+      (sb, node, options) => {
+        sb.emitHelper(node, options, sb.helpers.wrapTransaction);
+      },
+    ),
   );
 };

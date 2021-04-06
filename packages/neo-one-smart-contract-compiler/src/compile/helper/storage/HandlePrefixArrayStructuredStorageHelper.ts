@@ -21,7 +21,7 @@ export class HandlePrefixArrayStructuredStorageHelper extends Helper {
     // [val, prefix, val, struct]
     sb.emitOp(node, 'TUCK');
     // [buffer, prefix, val, struct]
-    sb.emitSysCall(node, 'System.Binary.Serialize');
+    sb.emitHelper(node, options, sb.helpers.binarySerialize);
     // [prefix, val, struct]
     sb.emitOp(node, 'CAT');
     // [struct, prefix, val]

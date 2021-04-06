@@ -21,9 +21,11 @@ export class ArrReduceHelper extends Helper {
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
+    // [arr, accum]
+    sb.emitOp(node, 'SWAP');
+    // [map, accum]
+    sb.emitHelper(node, options, sb.helpers.arrToMap);
     if (this.withIndex) {
-      // [arr, accum]
-      sb.emitOp(node, 'SWAP');
       // [iterator, accum]
       sb.emitSysCall(node, 'System.Iterator.Create');
       // [accum, iterator]
@@ -44,10 +46,8 @@ export class ArrReduceHelper extends Helper {
         }),
       );
     } else {
-      // [arr, accum]
-      sb.emitOp(node, 'SWAP');
       // [enumerator, accum]
-      sb.emitSysCall(node, 'System.Enumerator.Create');
+      sb.emitSysCall(node, 'System.Iterator.Create');
       // [accum, enumerator]
       sb.emitOp(node, 'SWAP');
       // [accum]

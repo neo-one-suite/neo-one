@@ -15,6 +15,10 @@ export class HeaderCache implements HeaderCacheNode {
     return this.mutableHeaders.length >= 1000;
   }
 
+  public get count() {
+    return this.mutableHeaders.length;
+  }
+
   public add(header: Header) {
     this.mutableHeaders.push(header);
   }

@@ -1,5 +1,11 @@
 import { CallFlags, TriggerType, UInt160Hex, VMState } from '@neo-one/client-common';
-import { LoadContractOptions, PushArgs, SerializedScriptContainer, SnapshotName } from '@neo-one/node-core';
+import {
+  LoadContractOptions,
+  PushArgs,
+  SerializedScriptContainer,
+  SnapshotName,
+  VMProtocolSettingsIn,
+} from '@neo-one/node-core';
 import { LogReturn, StackItemReturn } from '../converters';
 import { DefaultMethods, DispatchMethod } from '../types';
 
@@ -9,6 +15,7 @@ interface CreateEngineArgs {
   readonly gas: string;
   readonly persistingBlock?: Buffer;
   readonly snapshot?: SnapshotName;
+  readonly settings: VMProtocolSettingsIn;
 }
 
 interface LoadScriptVMArgs {
@@ -35,5 +42,4 @@ export interface EngineMethods extends DefaultMethods {
   readonly loadscript: DispatchMethod<boolean, LoadScriptVMArgs>;
   readonly loadcontract: DispatchMethod<boolean, LoadContractOptions>;
   readonly push: DispatchMethod<boolean, PushArgs>;
-  readonly stepOut: DispatchMethod<boolean>;
 }

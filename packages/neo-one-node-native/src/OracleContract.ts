@@ -16,6 +16,7 @@ import { NativeContract } from './NativeContract';
 
 export class OracleContract extends NativeContract implements OracleContractNode {
   private readonly prefixes = {
+    price: Buffer.from([5]),
     requestId: Buffer.from([9]),
     request: Buffer.from([7]),
     idList: Buffer.from([6]),
@@ -24,10 +25,16 @@ export class OracleContract extends NativeContract implements OracleContractNode
   public constructor(settings: BlockchainSettings) {
     super({
       name: 'OracleContract',
-      id: -7,
+      id: -9,
       methods: oracleMethods,
       settings,
     });
+  }
+
+  public async getPrice({ storages }: NativeContractStorageContext) {
+    const item = await storages.get(this.createStorageKey(this.prefixes.price).toStorageKey());
+
+    return new BN(item.value);
   }
 
   public async getRequest({ storages }: NativeContractStorageContext, id: BN) {

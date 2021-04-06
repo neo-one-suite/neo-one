@@ -1,4 +1,5 @@
 import {
+  CallFlags,
   common,
   crypto,
   privateKeyToAddress,
@@ -12,7 +13,7 @@ import {
   WitnessScopeModel,
 } from '@neo-one/client-common';
 import { constants } from '@neo-one/utils';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { Hash160 } from '../../Hash160';
 import { LocalKeyStore, LocalMemoryStore } from '../../user';
 
@@ -161,7 +162,7 @@ describe('RPC Call sendrawtransaction', () => {
     });
 
     const builder = new ScriptBuilder();
-    builder.emitDynamicAppCall(common.nativeHashes.NEO, 'transfer', multiScriptHash, scriptHash, 10);
+    builder.emitDynamicAppCall(common.nativeHashes.NEO, 'transfer', CallFlags.All, multiScriptHash, scriptHash, 10);
     const script = builder.build();
 
     const txUnsigned = new TransactionModel({

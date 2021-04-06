@@ -1,6 +1,7 @@
 import {
   ApplicationLogJSON,
   assertTriggerTypeJSON,
+  BlockJSON,
   CallReceiptJSON,
   common,
   crypto,
@@ -365,7 +366,7 @@ export const createHandler = ({
   const handlers: Handlers = {
     // Blockchain
     [RPC_METHODS.getbestblockhash]: async () => JSONHelper.writeUInt256(blockchain.currentBlock.hash),
-    [RPC_METHODS.getblock]: async (args) => {
+    [RPC_METHODS.getblock]: async (args): Promise<BlockJSON | string> => {
       let hashOrIndex: number | UInt256 = args[0];
       if (typeof args[0] === 'string') {
         hashOrIndex = JSONHelper.readUInt256(args[0]);
@@ -404,7 +405,11 @@ export const createHandler = ({
         const hash = await blockchain.getNextBlockHash(block.hash);
         const nextblockhash = hash ? JSONHelper.writeUInt256(hash) : undefined;
 
-        return block.serializeJSONVerbose(blockchain.serializeJSONContext, { confirmations, nextblockhash });
+        return {
+          ...block.serializeJSON(blockchain.serializeJSONContext),
+          confirmations,
+          nextblockhash,
+        };
       }
 
       return block.serializeWire().toString('base64');
@@ -490,7 +495,7 @@ export const createHandler = ({
         return tx.serializeJSONWithVerboseData({
           blockhash: JSONHelper.writeUInt256(block.hash),
           confirmations: (await blockchain.getCurrentIndex()) - block.index + 1,
-          blocktime: block.timestamp.toNumber(),
+          blocktime: block.header.timestamp.toNumber(),
         });
       }
 
@@ -607,7 +612,7 @@ export const createHandler = ({
     [RPC_METHODS.invokescript]: async (args) => {
       const script = JSONHelper.readBase64Buffer(args[0]);
       const signers = args[1] !== undefined ? Signers.fromJSON(args[1]) : undefined;
-      const result = blockchain.invokeScript(script, signers, new BN(20)); // TODO: should be 20 or 20 fixed8FromDecimal?
+      const result = blockchain.invokeScript({ script, signers, gas: new BN(20) }); // TODO: should be 20 or 20 fixed8FromDecimal?
 
       return getInvokeResult(script, result);
     },

@@ -1,4 +1,9 @@
-export class ImmutableHashSet<T> {
+import {
+  ImmutableHashSet as ImmutableHashSetNode,
+  ImmutableHashSetBuilder as ImmutableHashSetBuilderNode,
+} from '@neo-one/node-core';
+
+export class ImmutableHashSet<T> implements ImmutableHashSetNode<T> {
   private readonly set: Set<T>;
   public constructor(setIn: Set<T>) {
     this.set = setIn;
@@ -9,7 +14,7 @@ export class ImmutableHashSet<T> {
   }
 }
 
-export class ImmutableHashSetBuilder<T> {
+export class ImmutableHashSetBuilder<T> implements ImmutableHashSetBuilderNode<T> {
   private readonly internalSet: Set<T>;
   public constructor() {
     this.internalSet = new Set<T>();

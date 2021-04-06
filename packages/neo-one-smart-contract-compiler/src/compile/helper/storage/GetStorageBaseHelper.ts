@@ -1,4 +1,5 @@
 import ts from 'typescript';
+import { FindOptions } from '../../../types';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
@@ -9,7 +10,11 @@ export class GetStorageBaseHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
 
-    // [context, keyBuffer]
+    // [number, keyBuffer]
+    sb.emitPushInt(node, FindOptions.None);
+    // [keyBuffer, number]
+    sb.emitOp(node, 'SWAP');
+    // [context, keyBuffer, number]
     sb.emitSysCall(node, 'System.Storage.GetReadOnlyContext');
     // [iterator]
     sb.emitSysCall(node, 'System.Storage.Find');
@@ -21,11 +26,11 @@ export class GetStorageBaseHelper extends Helper {
       sb.helpers.if({
         condition: () => {
           // [boolean, iterator]
-          sb.emitSysCall(node, 'System.Enumerator.Next');
+          sb.emitSysCall(node, 'System.Iterator.Next');
         },
         whenTrue: () => {
           // [value]
-          sb.emitSysCall(node, 'System.Enumerator.Value');
+          sb.emitHelper(node, options, sb.helpers.getMapIteratorValue);
         },
         whenFalse: () => {
           // []

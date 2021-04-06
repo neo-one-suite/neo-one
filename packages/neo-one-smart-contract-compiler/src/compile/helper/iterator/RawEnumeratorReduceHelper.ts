@@ -26,7 +26,7 @@ export class RawEnumeratorReduceHelper extends Helper {
           // [enumerator, accum]
           sb.emitOp(node, 'SWAP');
           // [value, accum]
-          sb.emitSysCall(node, 'System.Enumerator.Value');
+          sb.emitHelper(node, options, sb.helpers.getMapIteratorValue);
           // [accum, value]
           sb.emitOp(node, 'SWAP');
           // [accum]

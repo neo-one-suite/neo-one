@@ -13,7 +13,7 @@ export class ConsoleLogHelper extends Helper {
     // [value]
     sb.emitHelper(node, options, sb.helpers.genericLogSerialize);
     // [buffer]
-    sb.emitSysCall(node, 'System.Binary.Serialize');
+    sb.emitHelper(node, options, sb.helpers.binarySerialize);
     // [line, buffer]
     sb.emitLine(node);
     // ['console.log', line, buffer]

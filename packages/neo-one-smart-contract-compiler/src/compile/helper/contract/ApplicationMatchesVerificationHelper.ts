@@ -50,9 +50,9 @@ export class ApplicationMatchesVerificationHelper extends Helper {
           // [argsBuffer]
           sb.emitOp(node, 'LEFT');
           // [argsHash]
-          sb.emitSysCall(node, 'Neo.Crypto.SHA256');
+          sb.emitHelper(node, options, sb.helpers.SHA256);
           // [argsHash]
-          sb.emitSysCall(node, 'Neo.Crypto.RIPEMD160');
+          sb.emitHelper(node, options, sb.helpers.RIPEMD160);
           // [entryHash, argsHash]
           sb.emitSysCall(node, 'System.Runtime.GetEntryScriptHash');
           // [boolean]

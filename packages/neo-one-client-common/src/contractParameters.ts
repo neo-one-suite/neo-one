@@ -46,6 +46,7 @@ const toBufferBuffer = (contractParameter: ContractParameter): Buffer => {
       value = utils.toSignedBuffer(contractParameter.value);
       break;
     case 'Hash160':
+    case 'Address':
       value = common.uInt160ToBuffer(
         crypto.addressToScriptHash({
           addressVersion: common.NEO_ADDRESS_VERSION,

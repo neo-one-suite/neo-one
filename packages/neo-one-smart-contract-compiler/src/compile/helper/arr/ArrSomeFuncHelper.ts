@@ -13,8 +13,10 @@ export class ArrSomeFuncHelper extends Helper {
     sb.emitHelper(node, options, sb.helpers.getCallable({}));
     // [arr, callable]
     sb.emitOp(node, 'SWAP');
+    // [map, callable]
+    sb.emitHelper(node, options, sb.helpers.arrToMap);
     // [enumerator, callable]
-    sb.emitSysCall(node, 'System.Enumerator.Create');
+    sb.emitSysCall(node, 'System.Iterator.Create');
     // [idx, enumerator, callable]
     sb.emitPushInt(node, 0);
     // [result, idx, enumerator, callable]
@@ -33,7 +35,7 @@ export class ArrSomeFuncHelper extends Helper {
           // [enumerator, !result, enumerator, result, idx, callable]
           sb.emitOp(node, 'OVER');
           // [boolean, !result, enumerator, result, idx, callable]
-          sb.emitSysCall(node, 'System.Enumerator.Next');
+          sb.emitSysCall(node, 'System.Iterator.Next');
           // [boolean, enumerator, result, idx, callable]
           sb.emitOp(node, 'BOOLAND');
         },
@@ -43,7 +45,7 @@ export class ArrSomeFuncHelper extends Helper {
           // [enumerator, enumerator, idx, callable]
           sb.emitOp(node, 'DUP');
           // [value, enumerator, idx, callable]
-          sb.emitSysCall(node, 'System.Enumerator.Value');
+          sb.emitHelper(node, options, sb.helpers.getMapIteratorValue);
           // [2, value, enumerator, idx, callable]
           sb.emitPushInt(node, 2);
           // [idx, value, enumerator, idx, callable]

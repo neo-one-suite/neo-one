@@ -1,5 +1,5 @@
 import { Constructor } from '@neo-one/utils';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { BinaryWriter } from '../../BinaryWriter';
 import { ECPoint, PrivateKey, UInt160 } from '../../common';
 import { crypto } from '../../crypto';

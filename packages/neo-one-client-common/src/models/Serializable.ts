@@ -1,4 +1,5 @@
 import { BinaryWriter } from '../BinaryWriter';
+import { UInt256 } from '../common';
 
 export type SerializeWire = () => Buffer;
 // tslint:disable-next-line no-unused
@@ -18,10 +19,10 @@ export interface SerializableJSON<TJSON> {
   readonly serializeJSON: () => TJSON;
 }
 
-export const getHashData = (wire: Buffer, magic: number) => {
+export const getSignData = (hash: UInt256, magic: number) => {
   const writer = new BinaryWriter();
   writer.writeUInt32LE(magic);
-  writer.writeBytes(wire);
+  writer.writeUInt256(hash);
 
   return writer.toBuffer();
 };

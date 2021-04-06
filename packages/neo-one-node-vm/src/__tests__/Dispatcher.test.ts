@@ -1,4 +1,5 @@
 import { common, ScriptBuilder, TriggerType, VMState } from '@neo-one/client-common';
+import { StackItem } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import { ApplicationEngine } from '../ApplicationEngine';
 import { Dispatcher } from '../Dispatcher';
@@ -9,11 +10,16 @@ describe('Dispatcher Tests', () => {
     dispatcher.reset();
   });
 
-  test('withApplicationEngine -- NOP Script', () => {
-    const result = dispatcher.withApplicationEngine(
+  test.only('withApplicationEngine -- NOP Script', () => {
+    const result = dispatcher.withApplicationEngine<{
+      readonly gasconsumed: BN;
+      readonly state: VMState;
+      readonly stack: readonly StackItem[];
+    }>(
       {
         trigger: TriggerType.Application,
         gas: common.ONE_HUNDRED_FIXED8,
+        settings: {},
       },
       (engine) => {
         expect(engine.state).toEqual(VMState.BREAK);

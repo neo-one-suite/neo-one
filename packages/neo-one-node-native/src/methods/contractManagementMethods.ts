@@ -34,14 +34,14 @@ export const contractManagementMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Array',
-    offset: 0,
+    offset: 7,
     safe: false,
   },
   {
     name: 'destroy',
     parameters: [],
     returntype: 'Void',
-    offset: 0,
+    offset: 14,
     safe: false,
   },
   {
@@ -53,14 +53,14 @@ export const contractManagementMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Array',
-    offset: 0,
+    offset: 21,
     safe: true,
   },
   {
     name: 'getMinimumDeploymentFee',
     parameters: [],
     returntype: 'Integer',
-    offset: 0,
+    offset: 28,
     safe: true,
   },
   {
@@ -72,7 +72,7 @@ export const contractManagementMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Void',
-    offset: 0,
+    offset: 35,
     safe: false,
   },
   {
@@ -88,7 +88,7 @@ export const contractManagementMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Void',
-    offset: 0,
+    offset: 42,
     safe: false,
   },
   {
@@ -108,7 +108,7 @@ export const contractManagementMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Void',
-    offset: 0,
+    offset: 49,
     safe: false,
   },
 ];

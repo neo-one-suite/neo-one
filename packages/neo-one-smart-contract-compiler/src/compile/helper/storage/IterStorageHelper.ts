@@ -1,4 +1,5 @@
 import ts from 'typescript';
+import { FindOptions } from '../../../types';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
@@ -11,7 +12,11 @@ export class IterStorageHelper extends Helper {
 
     // [keyBuffer, keyBuffer]
     sb.emitOp(node, 'DUP');
-    // [context, keyBuffer, keyBuffer]
+    // [number, keyBuffer, keyBuffer]
+    sb.emitPushInt(node, FindOptions.None);
+    // [keyBuffer, number, keyBuffer]
+    sb.emitOp(node, 'SWAP');
+    // [context, keyBuffer, number keyBuffer]
     sb.emitSysCall(node, 'System.Storage.GetReadOnlyContext');
     // [iterator, keyBuffer]
     sb.emitSysCall(node, 'System.Storage.Find');

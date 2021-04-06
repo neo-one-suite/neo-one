@@ -48,7 +48,6 @@ namespace NEOONE
           StorageItem sItem = new StorageItem()
           {
             Value = (byte[])args.value,
-            IsConstant = true,
           };
 
 

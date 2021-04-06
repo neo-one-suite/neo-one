@@ -9,8 +9,11 @@ export class ArrConcatHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
 
+    // [map, result]
+    sb.emitHelper(node, options, sb.helpers.arrToMap);
     // [enumerator, result]
-    sb.emitSysCall(node, 'System.Enumerator.Create');
+    sb.emitSysCall(node, 'System.Iterator.Create');
+    // [result]
     sb.emitHelper(
       node,
       options,
@@ -19,7 +22,7 @@ export class ArrConcatHelper extends Helper {
           // [enumerator, result, enumerator]
           sb.emitOp(node, 'TUCK');
           // [boolean, result, enumerator]
-          sb.emitSysCall(node, 'System.Enumerator.Next');
+          sb.emitSysCall(node, 'System.Iterator.Next');
         },
         each: () => {
           // [result, enumerator, result]
@@ -27,7 +30,7 @@ export class ArrConcatHelper extends Helper {
           // [enumerator, result, enumerator, result]
           sb.emitOp(node, 'OVER');
           // [value, result, enumerator, result]
-          sb.emitSysCall(node, 'System.Enumerator.Value');
+          sb.emitHelper(node, options, sb.helpers.getMapIteratorValue);
           // [enumerator, result]
           sb.emitOp(node, 'APPEND');
         },

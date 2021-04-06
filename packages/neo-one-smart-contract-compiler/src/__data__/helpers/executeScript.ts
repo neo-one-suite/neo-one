@@ -11,8 +11,10 @@ import { NativeContainer } from '@neo-one/node-native';
 import { test as testNet } from '@neo-one/node-neo-settings';
 import { storage } from '@neo-one/node-storage-levelup';
 import { blockchainSettingsToProtocolSettings, Dispatcher } from '@neo-one/node-vm';
+// import MemDown from 'memdown';
+import fs from 'fs-extra';
 import LevelUp from 'levelup';
-import MemDown from 'memdown';
+import RocksDB from 'rocksdb';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import { throwOnDiagnosticErrorOrWarning } from '../../utils';
@@ -37,12 +39,18 @@ export const executeScript = async (
   readonly sourceMaps: SourceMaps;
 }> => {
   const settings = testNet();
-  const dispatcher = new Dispatcher({ protocolSettings: blockchainSettingsToProtocolSettings(settings) });
+  const dataPath = `/Users/spencercorwin/Desktop/node-data-test-${Math.random() * 100000}`;
+  await fs.ensureDir(dataPath);
+  const db = LevelUp(RocksDB(dataPath));
+  const dispatcher = new Dispatcher({
+    levelDBPath: dataPath,
+    protocolSettings: blockchainSettingsToProtocolSettings(settings),
+  });
   const blockchain = await Blockchain.create({
     settings,
     storage: storage({
       context: { messageMagic: settings.messageMagic, validatorsCount: settings.validatorsCount },
-      db: LevelUp(MemDown()),
+      db, // LevelUp(MemDown()),
     }),
     vm: dispatcher,
     native: new NativeContainer(settings),
@@ -50,11 +58,11 @@ export const executeScript = async (
 
   throwOnDiagnosticErrorOrWarning(diagnostics, ignoreWarnings);
 
-  const code = Buffer.concat([prelude, Buffer.from(compiledCode, 'hex')]);
-  const receipt = blockchain.invokeScript(code);
+  const script = Buffer.concat([prelude, Buffer.from(compiledCode, 'hex')]);
+  const receipt = blockchain.invokeScript({ script });
   const resolvedSourceMap = await sourceMap;
 
-  const address = scriptHashToAddress(common.uInt160ToString(crypto.toScriptHash(code)));
+  const address = scriptHashToAddress(common.uInt160ToString(crypto.toScriptHash(script)));
   await blockchain.stop();
 
   return {

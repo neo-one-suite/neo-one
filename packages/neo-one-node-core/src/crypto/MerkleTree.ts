@@ -47,10 +47,10 @@ class MerkleTreeNode {
   }
 }
 
-const build = (leavesIn: readonly MerkleTreeNode[]): MerkleTreeNode => {
+const build = (leavesIn: readonly MerkleTreeNode[]): MerkleTreeNode | undefined => {
   const leaves = leavesIn;
   if (leaves.length === 0) {
-    throw new InvalidMerkleTreeException();
+    return undefined;
   }
   if (leaves.length === 1) {
     return leaves[0];
@@ -122,18 +122,31 @@ const depthFirstSearch = (node: MerkleTreeNode): readonly UInt256[] => {
 
 export class MerkleTree {
   public static computeRoot(hashes: readonly UInt256[]): UInt256 {
+    if (hashes.length === 0) {
+      return common.ZERO_UINT256;
+    }
     const tree = new this(hashes);
+    const hash = tree.root?.hash;
 
-    return tree.root.hash;
+    if (hash === undefined) {
+      throw new InvalidMerkleTreeException();
+    }
+
+    return hash;
   }
 
-  public readonly root: MerkleTreeNode;
+  public readonly root?: MerkleTreeNode;
   public readonly depth: number;
 
   public constructor(hashesOrNode: readonly UInt256[] | MerkleTreeNode) {
     this.root = Array.isArray(hashesOrNode)
       ? build(hashesOrNode.map((hash) => new MerkleTreeNode({ hash })))
       : (hashesOrNode as MerkleTreeNode);
+    if (this.root === undefined) {
+      this.depth = 0;
+
+      return;
+    }
     this.depth = 1;
     // tslint:disable-next-line no-loop-statement no-let
     for (let node = this.root; node.leftChild !== undefined; node = node.leftChild) {
@@ -142,17 +155,24 @@ export class MerkleTree {
   }
 
   public trim(flags: readonly boolean[]): MerkleTree {
+    if (this.root === undefined) {
+      return this;
+    }
     const result = this.root.clone();
     trim(result, 0, this.depth, flags);
 
     return new MerkleTree(result);
   }
 
-  public depthFirstSearch(): readonly UInt256[] {
-    return depthFirstSearch(this.root);
+  public toHashArray(): readonly UInt256[] {
+    if (this.root === undefined) {
+      return [];
+    }
+
+    return this.depthFirstSearch(this.root);
   }
 
-  public toHashArray(): readonly UInt256[] {
-    return this.depthFirstSearch();
+  private depthFirstSearch(node: MerkleTreeNode): readonly UInt256[] {
+    return depthFirstSearch(node);
   }
 }

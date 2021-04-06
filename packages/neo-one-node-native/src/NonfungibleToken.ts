@@ -7,7 +7,7 @@ import {
   StackItem,
   utils,
 } from '@neo-one/node-core';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { map, toArray } from 'rxjs/operators';
 import { AccountState } from './AccountStates';
 import { NativeContract, NativeContractAdd } from './NativeContract';

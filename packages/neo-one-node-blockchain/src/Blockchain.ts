@@ -1,4 +1,5 @@
 import {
+  CallFlags,
   common,
   crypto,
   ECPoint,
@@ -17,7 +18,6 @@ import {
   BlockchainSettings,
   CallReceipt,
   ChangeSet,
-  ConsensusData,
   DeserializeWireContext,
   DesignationRole,
   Execution,
@@ -36,7 +36,7 @@ import {
   TransactionVerificationContext,
   VerifyOptions,
   VM,
-  Witness,
+  VMProtocolSettingsIn,
 } from '@neo-one/node-core';
 import { Labels, utils as neoOneUtils } from '@neo-one/utils';
 import { BN } from 'bn.js';
@@ -112,7 +112,36 @@ export class Blockchain {
       verifyWitnesses: this.verifyWitnesses,
       verifyWitness: this.verifyWitness,
       height: this.currentBlockIndex,
-      isExtensibleWitnessWhiteListed: this.isExtensibleWitnessWhiteListed,
+      extensibleWitnessWhiteList: this.mutableExtensibleWitnessWhiteList,
+      settings: this.protocolSettings,
+    };
+  }
+
+  public get protocolSettings(): VMProtocolSettingsIn {
+    const {
+      messageMagic,
+      addressVersion,
+      standbyCommittee,
+      committeeMembersCount,
+      validatorsCount,
+      millisecondsPerBlock,
+      memoryPoolMaxTransactions,
+      maxTransactionsPerBlock,
+      maxTraceableBlocks,
+      nativeUpdateHistory,
+    } = this.settings;
+
+    return {
+      magic: messageMagic,
+      addressVersion,
+      standbyCommittee: standbyCommittee.map((ecp) => common.ecPointToString(ecp)),
+      committeeMembersCount,
+      validatorsCount,
+      millisecondsPerBlock,
+      memoryPoolMaxTransactions,
+      maxTransactionsPerBlock,
+      maxTraceableBlocks,
+      nativeUpdateHistory,
     };
   }
 
@@ -167,8 +196,6 @@ export class Blockchain {
 
     if (!(await getInitialized())) {
       await blockchain.persistBlock({ block: settings.genesisBlock });
-    } else {
-      await blockchain.updateExtensibleWitnessWhiteList(storage);
     }
 
     return blockchain;
@@ -273,6 +300,7 @@ export class Blockchain {
   }
 
   public async verifyConsensusPayload(payload: ExtensiblePayload) {
+    this.mutableExtensibleWitnessWhiteList = await this.updateExtensibleWitnessWhiteList(this.storage);
     const verification = await payload.verify(this.verifyOptions);
     if (!verification) {
       throw new ConsensusPayloadVerifyError(payload.hashHex);
@@ -346,18 +374,6 @@ export class Blockchain {
     return this.native.NEO.getNextBlockValidators(this.storage);
   }
 
-  public async getMaxBlockSize(): Promise<number> {
-    return this.native.Policy.getMaxBlockSize(this.storage);
-  }
-
-  public async getMaxBlockSystemFee(): Promise<BN> {
-    return this.native.Policy.getMaxBlockSystemFee(this.storage);
-  }
-
-  public async getMaxTransactionsPerBlock(): Promise<number> {
-    return this.native.Policy.getMaxTransactionsPerBlock(this.storage);
-  }
-
   public async getFeePerByte(): Promise<BN> {
     return this.native.Policy.getFeePerByte(this.storage);
   }
@@ -399,7 +415,7 @@ export class Blockchain {
       return { fee: utils.ZERO, size: 0 };
     }
 
-    return utils.verifyContract(contract, this.vm, transaction);
+    return utils.verifyContract({ contract, vm: this.vm, transaction, protocolSettings: this.protocolSettings });
   }
 
   public testTransaction(transaction: Transaction): CallReceipt {
@@ -411,12 +427,23 @@ export class Blockchain {
     });
   }
 
-  public invokeScript(script: Buffer, signers?: Signers, gas?: BN): CallReceipt {
+  public invokeScript({
+    script,
+    signers,
+    gas,
+    rvcount,
+  }: {
+    readonly script: Buffer;
+    readonly signers?: Signers;
+    readonly gas?: BN;
+    readonly rvcount?: number;
+  }): CallReceipt {
     return this.runEngineWrapper({
       script,
       snapshot: 'main',
       container: signers,
       gas,
+      rvcount,
     });
   }
 
@@ -449,26 +476,18 @@ export class Blockchain {
       builder.unionWith(stateValidators.map((val) => crypto.toScriptHash(crypto.createSignatureRedeemScript(val))));
     }
 
-    this.mutableExtensibleWitnessWhiteList = builder.toImmutable();
-  }
-
-  public isExtensibleWitnessWhiteListed(address: UInt160) {
-    return this.mutableExtensibleWitnessWhiteList.contains(address);
+    return builder.toImmutable();
   }
 
   private runEngineWrapper({
     script,
     snapshot,
     container,
-    persistingBlock: blockIn,
+    persistingBlock,
+    rvcount,
     offset = 0,
     gas = common.TEN_FIXED8,
   }: RunEngineOptions): CallReceipt {
-    let persistingBlock = blockIn;
-    if (persistingBlock === undefined) {
-      persistingBlock = this.createDummyBlock();
-    }
-
     return this.vm.withApplicationEngine(
       {
         trigger: TriggerType.Application,
@@ -476,9 +495,10 @@ export class Blockchain {
         snapshot,
         gas,
         persistingBlock,
+        settings: this.protocolSettings,
       },
       (engine) => {
-        engine.loadScript({ script, initialPosition: offset });
+        engine.loadScript({ script, initialPosition: offset, rvcount });
         engine.execute();
 
         return utils.getCallReceipt(engine, container);
@@ -593,9 +613,9 @@ export class Blockchain {
 
     const nep17BalancePairs = assetKeys.map((key) => {
       const script = new ScriptBuilder()
-        .emitDynamicAppCall(key.assetScriptHash, 'balanceOf', key.userScriptHash)
+        .emitDynamicAppCall(key.assetScriptHash, 'balanceOf', CallFlags.ReadOnly, key.userScriptHash)
         .build();
-      const callReceipt = this.invokeScript(script);
+      const callReceipt = this.invokeScript({ script });
       const balanceBuffer = callReceipt.stack[0].getInteger().toBuffer();
 
       return { key, value: new Nep17Balance({ balanceBuffer, lastUpdatedBlock: this.currentBlockIndex }) };
@@ -771,7 +791,7 @@ export class Blockchain {
       await this.storage.commit(blockLogUpdate);
     }
 
-    await this.updateExtensibleWitnessWhiteList(this.storage);
+    this.mutableExtensibleWitnessWhiteList = new ImmutableHashSetBuilder<UInt160>().toImmutable();
 
     await this.onPersist();
 
@@ -779,7 +799,7 @@ export class Blockchain {
     if (firstHeader !== undefined && firstHeader.index !== block.index) {
       logger.trace({
         name: 'neo_blockchain',
-        message: 'Header cache index does not match block index when persisting new block',
+        message: `Header cache index does not match block index when persisting new block. Block index: ${block.index}. Headercache index: ${firstHeader.index}`,
       });
     }
   }
@@ -789,23 +809,7 @@ export class Blockchain {
       onPersistNativeContractScript: this.onPersistNativeContractScript,
       postPersistNativeContractScript: this.postPersistNativeContractScript,
       vm: this.vm,
-    });
-  }
-
-  private createDummyBlock(): Block {
-    return new Block({
-      version: 0,
-      previousHash: this.currentBlock.hash,
-      timestamp: this.currentBlock.timestamp.addn(this.settings.millisecondsPerBlock),
-      index: this.currentBlockIndex + 0,
-      nextConsensus: this.currentBlock.nextConsensus,
-      witness: new Witness({
-        invocation: Buffer.from([]),
-        verification: Buffer.from([]),
-      }),
-      consensusData: new ConsensusData({ primaryIndex: 0, nonce: new BN(0) }),
-      transactions: [],
-      messageMagic: this.settings.messageMagic,
+      protocolSettings: this.protocolSettings,
     });
   }
 }

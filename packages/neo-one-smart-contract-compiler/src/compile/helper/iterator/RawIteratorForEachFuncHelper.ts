@@ -26,15 +26,15 @@ export class RawIteratorForEachFuncHelper extends Helper {
       sb.helpers.rawIteratorForEachFuncBase({
         handleNext: () => {
           // [key, iterator, callable]
-          sb.emitSysCall(node, 'System.Iterator.Key');
+          sb.emitHelper(node, options, sb.helpers.getMapIteratorKey);
           if (this.deserializeKey) {
             // [key, iterator, callable]
-            sb.emitSysCall(node, 'System.Binary.Deserialize');
+            sb.emitHelper(node, options, sb.helpers.binaryDeserialize);
           }
           // [iterator, key, iterator, callable]
           sb.emitOp(node, 'OVER');
           // [value, key, iterator, callable]
-          sb.emitSysCall(node, 'System.Enumerator.Value');
+          sb.emitHelper(node, options, sb.helpers.getMapIteratorValue);
           // [2, value, key, iterator, callable]
           sb.emitPushInt(node, 2);
           // [argsarr, iterator, callable]

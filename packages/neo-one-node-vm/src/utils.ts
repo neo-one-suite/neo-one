@@ -1,9 +1,8 @@
 import { common, ECPoint } from '@neo-one/client-common';
 import { func, Params, Source, TSQL } from '@neo-one/edge';
-import { Settings } from '@neo-one/node-core';
+import { Settings, VMProtocolSettingsIn } from '@neo-one/node-core';
 import path from 'path';
 import { InvalidByteError, InvalidIntError, InvalidUIntError } from './errors';
-import { ProtocolSettings } from './Methods';
 import { DefaultMethods, DispatcherFunc } from './types';
 
 const directory = path.basename(__dirname);
@@ -36,7 +35,7 @@ export const createCSharpDispatchInvoke = <Methods extends DefaultMethods>(
   return (input) => invokeFunction(input, true);
 };
 
-export const blockchainSettingsToProtocolSettings = (settingsIn: Settings) => ({
+export const blockchainSettingsToProtocolSettings = (settingsIn: Settings): VMProtocolSettingsIn => ({
   magic: settingsIn.messageMagic,
   addressVersion: settingsIn.addressVersion,
   standbyCommittee: settingsIn.standbyCommittee.map((ecpoint: ECPoint) => common.ecPointToString(ecpoint)),
@@ -44,13 +43,16 @@ export const blockchainSettingsToProtocolSettings = (settingsIn: Settings) => ({
   validatorsCount: settingsIn.validatorsCount,
   millisecondsPerBlock: settingsIn.millisecondsPerBlock,
   memoryPoolMaxTransactions: settingsIn.memoryPoolMaxTransactions,
+  maxTraceableBlocks: settingsIn.maxTraceableBlocks,
+  maxTransactionsPerBlock: settingsIn.maxTransactionsPerBlock,
+  nativeUpdateHistory: settingsIn.nativeUpdateHistory,
 });
 
 const numIsUint = (num: number) => num >= 0 && num < 2 ** 32 - 1;
 const numIsInt = (num: number) => num >= -(2 ** 32 / 2) && num <= 2 ** 32 / 2 - 1;
 const numIsByte = (num: number) => num >= 0 && num <= 2 ** 8 - 1;
 
-export const validateProtocolSettings = (settings: ProtocolSettings) => {
+export const validateProtocolSettings = (settings: VMProtocolSettingsIn) => {
   const {
     magic,
     addressVersion,
@@ -58,6 +60,8 @@ export const validateProtocolSettings = (settings: ProtocolSettings) => {
     validatorsCount,
     millisecondsPerBlock,
     memoryPoolMaxTransactions,
+    maxTraceableBlocks,
+    maxTransactionsPerBlock,
   } = settings;
   if (magic !== undefined && !numIsUint(magic)) {
     throw new InvalidUIntError(magic);
@@ -76,6 +80,12 @@ export const validateProtocolSettings = (settings: ProtocolSettings) => {
   }
   if (memoryPoolMaxTransactions !== undefined && !numIsInt(memoryPoolMaxTransactions)) {
     throw new InvalidIntError(memoryPoolMaxTransactions);
+  }
+  if (maxTraceableBlocks !== undefined && !numIsUint(maxTraceableBlocks)) {
+    throw new InvalidUIntError(maxTraceableBlocks);
+  }
+  if (maxTransactionsPerBlock !== undefined && !numIsUint(maxTransactionsPerBlock)) {
+    throw new InvalidUIntError(maxTransactionsPerBlock);
   }
 
   return settings;

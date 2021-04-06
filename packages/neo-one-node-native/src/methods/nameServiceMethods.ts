@@ -22,14 +22,14 @@ export const nameServiceMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Integer',
-    offset: 0,
+    offset: 7,
     safe: true,
   },
   {
     name: 'decimals',
     parameters: [],
     returntype: 'Integer',
-    offset: 0,
+    offset: 14,
     safe: true,
   },
   {
@@ -45,14 +45,14 @@ export const nameServiceMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Void',
-    offset: 0,
+    offset: 21,
     safe: false,
   },
   {
     name: 'getPrice',
     parameters: [],
     returntype: 'Integer',
-    offset: 0,
+    offset: 28,
     safe: true,
   },
   {
@@ -68,7 +68,7 @@ export const nameServiceMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'String',
-    offset: 0,
+    offset: 35,
     safe: true,
   },
   {
@@ -80,7 +80,7 @@ export const nameServiceMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Boolean',
-    offset: 0,
+    offset: 42,
     safe: true,
   },
   {
@@ -92,7 +92,7 @@ export const nameServiceMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Hash160',
-    offset: 0,
+    offset: 49,
     safe: true,
   },
   {
@@ -104,7 +104,7 @@ export const nameServiceMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Map',
-    offset: 0,
+    offset: 56,
     safe: true,
   },
   {
@@ -120,7 +120,7 @@ export const nameServiceMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Boolean',
-    offset: 0,
+    offset: 63,
     safe: false,
   },
   {
@@ -132,7 +132,7 @@ export const nameServiceMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Integer',
-    offset: 0,
+    offset: 70,
     safe: false,
   },
   {
@@ -148,7 +148,7 @@ export const nameServiceMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'String',
-    offset: 0,
+    offset: 77,
     safe: true,
   },
   {
@@ -164,7 +164,7 @@ export const nameServiceMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Void',
-    offset: 0,
+    offset: 84,
     safe: false,
   },
   {
@@ -176,7 +176,7 @@ export const nameServiceMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Void',
-    offset: 0,
+    offset: 91,
     safe: false,
   },
   {
@@ -196,21 +196,21 @@ export const nameServiceMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Void',
-    offset: 0,
+    offset: 98,
     safe: false,
   },
   {
     name: 'symbol',
     parameters: [],
     returntype: 'String',
-    offset: 0,
+    offset: 105,
     safe: true,
   },
   {
     name: 'tokens',
     parameters: [],
-    returntype: 'Any',
-    offset: 0,
+    returntype: 'InteropInterface',
+    offset: 112,
     safe: true,
   },
   {
@@ -221,15 +221,15 @@ export const nameServiceMethods: ReadonlyArray<ContractMethodJSON> = [
         type: 'Hash160',
       },
     ],
-    returntype: 'Any',
-    offset: 0,
+    returntype: 'InteropInterface',
+    offset: 119,
     safe: true,
   },
   {
     name: 'totalSupply',
     parameters: [],
     returntype: 'Integer',
-    offset: 0,
+    offset: 126,
     safe: true,
   },
   {
@@ -245,7 +245,7 @@ export const nameServiceMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Boolean',
-    offset: 0,
+    offset: 133,
     safe: false,
   },
 ];

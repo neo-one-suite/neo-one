@@ -17,7 +17,7 @@ const getBackupContext = (getGasBalance: (storage: NativeContractStorageContext,
     blockOptions: {
       previousHash,
       index: blockIndex,
-      consensusData: { primaryIndex },
+      primaryIndex,
     },
     viewNumber,
     myIndex: backupIndex,
@@ -33,7 +33,7 @@ const getPrimaryContext = (getGasBalance: (storage: NativeContractStorageContext
     blockOptions: {
       previousHash,
       index: blockIndex,
-      consensusData: { primaryIndex },
+      primaryIndex,
     },
     viewNumber,
     myIndex: primaryIndex,

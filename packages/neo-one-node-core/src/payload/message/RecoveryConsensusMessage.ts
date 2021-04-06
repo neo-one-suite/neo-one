@@ -158,7 +158,7 @@ export class RecoveryConsensusMessage extends ConsensusMessageBase {
       return undefined;
     }
 
-    const index = context.blockBuilder.getConsensusData().primaryIndex;
+    const index = context.blockBuilder.primaryIndex;
     const maybePreparationMessage = this.preparationMessages[index];
     // tslint:disable-next-line: strict-type-predicates
     if (maybePreparationMessage === undefined) {
@@ -169,23 +169,25 @@ export class RecoveryConsensusMessage extends ConsensusMessageBase {
   }
 
   public getPrepareResponsePayloads(context: ConsensusContext, magic: number): readonly ExtensiblePayload[] {
-    const index = context.blockBuilder.getConsensusData().primaryIndex;
+    const index = context.blockBuilder.primaryIndex;
     const preparationHash = this.preparationHash ?? context.preparationPayloads[index]?.hash;
     if (preparationHash === undefined) {
       return [];
     }
 
-    return Object.values(this.preparationMessages).map((item: PreparationPayloadCompact) =>
-      context.createPayload(
-        new PrepareResponseConsensusMessage({
-          blockIndex: this.blockIndex,
-          validatorIndex: item.validatorIndex,
-          viewNumber: this.viewNumber,
-          preparationHash,
-        }),
-        magic,
-        item.invocationScript,
-      ),
-    );
+    return Object.values(this.preparationMessages)
+      .filter((item: PreparationPayloadCompact) => item.validatorIndex !== index)
+      .map((item: PreparationPayloadCompact) =>
+        context.createPayload(
+          new PrepareResponseConsensusMessage({
+            blockIndex: this.blockIndex,
+            validatorIndex: item.validatorIndex,
+            viewNumber: this.viewNumber,
+            preparationHash,
+          }),
+          magic,
+          item.invocationScript,
+        ),
+      );
   }
 }

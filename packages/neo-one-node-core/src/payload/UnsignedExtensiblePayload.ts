@@ -4,7 +4,6 @@ import {
   common,
   createSerializeWire,
   crypto,
-  getHashData,
   InvalidFormatError,
   UInt160,
 } from '@neo-one/client-common';
@@ -63,8 +62,7 @@ export class UnsignedExtensiblePayload implements SerializableWire {
   public readonly magic: number;
 
   public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
-  private readonly messageInternal = utils.lazy(() => getHashData(this.serializeWire(), this.magic));
-  private readonly hashInternal = utils.lazy(() => crypto.hash256(this.messageInternal()));
+  private readonly hashInternal = utils.lazy(() => crypto.calculateHash(this.serializeWire()));
 
   public constructor({
     category,

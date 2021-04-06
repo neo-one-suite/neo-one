@@ -153,10 +153,10 @@ namespace NEOONE
 
       public LogReturn(LogEventArgs log)
       {
-        containerHash = log.ScriptContainer != null ? Crypto.Hash256(log.ScriptContainer.GetHashData()) : null;
+        containerHash = log.ScriptContainer != null ? Crypto.Hash256(log.ScriptContainer.GetSignData(ProtocolSettings.Default.Magic)) : null;
         callingScriptHash = log.ScriptHash != null ? log.ScriptHash.ToArray() : null;
         message = log.Message;
-        // position = log.Position;
+        position = -1; // log.Position
       }
     }
 
@@ -175,20 +175,22 @@ namespace NEOONE
       public int millisecondsPerBlock;
       public int memoryPoolMaxTransactions;
       public int maxTraceableBlocks;
-      public dynamic nativeActivations;
+      public int maxTransactionsPerBlock;
+      public dynamic nativeUpdateHistory;
 
       public ProtocolSettingsReturn(ProtocolSettings value)
       {
         this.magic = Convert.ToInt32(value.Magic);
         this.addressVersion = Convert.ToInt32(value.AddressVersion);
-        this.standbyCommittee = value.StandbyCommittee;
+        this.standbyCommittee = value.StandbyCommittee.Select(p => p.ToString()).ToArray();
         this.committeeMembersCount = value.CommitteeMembersCount;
         this.validatorsCount = value.ValidatorsCount;
         this.seedList = value.SeedList;
         this.millisecondsPerBlock = Convert.ToInt32(value.MillisecondsPerBlock);
         this.memoryPoolMaxTransactions = value.MemoryPoolMaxTransactions;
         this.maxTraceableBlocks = Convert.ToInt32(value.MaxTraceableBlocks);
-        this.nativeActivations = value.MaxTraceableBlocks;
+        this.maxTransactionsPerBlock = Convert.ToInt32(value.MaxTransactionsPerBlock);
+        this.nativeUpdateHistory = value.NativeUpdateHistory;
       }
     }
   }

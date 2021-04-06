@@ -64,10 +64,8 @@ export const checkPrepareResponse = async ({
       return { context };
     }
 
-    const [maxBlockSize, maxSystemFee] = await Promise.all([
-      node.blockchain.getMaxBlockSize(),
-      node.blockchain.getMaxBlockSystemFee(),
-    ]);
+    const maxBlockSize = node.blockchain.settings.maxBlockSize;
+    const maxSystemFee = node.blockchain.settings.maxBlockSystemFee;
 
     if (getExpectedBlockSize(context) > maxBlockSize) {
       return requestChangeView({

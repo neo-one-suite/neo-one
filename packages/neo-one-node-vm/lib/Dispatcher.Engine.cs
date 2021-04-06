@@ -10,7 +10,6 @@ using Neo.SmartContract.Native;
 using Neo.SmartContract.Manifest;
 using Neo.VM;
 using Neo.VM.Types;
-using System.Threading;
 
 namespace NEOONE
 {
@@ -20,6 +19,7 @@ namespace NEOONE
     private enum ContainerType
     {
       Block,
+      Header,
       Transaction,
       Signers,
       ExtensiblePayload,
@@ -39,6 +39,9 @@ namespace NEOONE
         {
           case ContainerType.Block:
             container = new Block();
+            break;
+          case ContainerType.Header:
+            container = new Header();
             break;
           case ContainerType.Transaction:
             container = new Transaction();
@@ -80,7 +83,6 @@ namespace NEOONE
       getfaultexception,
       dispose_engine,
       push,
-      stepout,
     }
 
     private dynamic dispatchEngineMethod(EngineMethod method, dynamic args)
@@ -105,8 +107,13 @@ namespace NEOONE
               persistingBlock.Deserialize(reader);
             }
           }
+          ProtocolSettings settings = ProtocolSettings.Default;
+          // if (args.protocolSettings != null)
+          // {
+          //   settings = parseConfig(args.protocolSettings);
+          // }
 
-          return this._create(trigger, container, this.selectSnapshot(args.snapshot, false), persistingBlock, gas);
+          return this._create(trigger, container, this.selectSnapshot(args.snapshot, false), persistingBlock, settings, gas);
 
         case EngineMethod.execute:
           return this._execute();
@@ -172,10 +179,6 @@ namespace NEOONE
         case EngineMethod.push:
           return this._push((string)args.item);
 
-        case EngineMethod.stepout:
-          this._stepOut();
-
-          return true;
         default:
           throw new InvalidOperationException();
       }
@@ -190,21 +193,21 @@ namespace NEOONE
       }
     }
 
-    private bool _create(TriggerType trigger, IVerifiable container, DataCache snapshot, Block persistingBlock, long gas)
+    public bool _create(TriggerType trigger, IVerifiable container, DataCache snapshot, Block persistingBlock, ProtocolSettings settings, long gas)
     {
       this.disposeEngine();
-      this.engine = ApplicationEngine.Create(trigger, container, snapshot, persistingBlock, gas);
+      this.engine = ApplicationEngine.Create(trigger, container, snapshot, persistingBlock, settings, gas);
 
       return true;
     }
 
-    private VMState _execute()
+    public VMState _execute()
     {
       this.isEngineInitialized();
       return this.engine.Execute();
     }
 
-    private bool _loadScript(Script script, CallFlags flags, UInt160 hash = null, int rvcount = -1, int initialPosition = 0)
+    public bool _loadScript(Script script, CallFlags flags, UInt160 hash = null, int rvcount = -1, int initialPosition = 0)
     {
       this.isEngineInitialized();
       if (hash == null)
@@ -244,7 +247,7 @@ namespace NEOONE
       return this.engine != null ? this.engine.State : VMState.BREAK;
     }
 
-    private dynamic[] _getResultStack()
+    public dynamic[] _getResultStack()
     {
       return this.engine != null ? this.engine.ResultStack.Select((StackItem p) => ReturnHelpers.convertStackItem(p)).ToArray() : new dynamic[0];
     }
@@ -299,13 +302,6 @@ namespace NEOONE
     private bool _push(string item)
     {
       this.engine.Push(item);
-
-      return true;
-    }
-
-    private bool _stepOut()
-    {
-      this.engine.StepOut();
 
       return true;
     }

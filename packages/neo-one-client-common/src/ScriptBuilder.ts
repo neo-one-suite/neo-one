@@ -61,9 +61,9 @@ export class ScriptBuilder extends BaseScriptBuilder {
   }
 
   // tslint:disable-next-line readonly-array
-  public emitAppCallInvocation(operation: string, ...params: ScriptBuilderParam[]): this {
+  public emitAppCallInvocation(operation: string, flags: CallFlags, ...params: ScriptBuilderParam[]): this {
     this.emitPushArray(params);
-    this.emitPushInt(CallFlags.All);
+    this.emitPushInt(flags);
 
     return this.emitPushParam(operation);
   }
@@ -75,8 +75,13 @@ export class ScriptBuilder extends BaseScriptBuilder {
   }
 
   // tslint:disable-next-line readonly-array
-  public emitDynamicAppCall(scriptHash: UInt160, operation: string, ...params: ScriptBuilderParam[]): this {
-    this.emitAppCallInvocation(operation, ...params);
+  public emitDynamicAppCall(
+    scriptHash: UInt160,
+    operation: string,
+    flags: CallFlags,
+    ...params: readonly ScriptBuilderParam[]
+  ): this {
+    this.emitAppCallInvocation(operation, flags, ...params);
 
     return this.emitAppCallVerification(scriptHash);
   }

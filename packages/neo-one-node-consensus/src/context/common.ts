@@ -31,21 +31,17 @@ import _ from 'lodash';
 import { Result } from '../types';
 import { Transactions } from './types';
 
-export const getExpectedBlockSizeWithoutTransactions = (context: ConsensusContext, expectedTransactions: number) => {
-  const blockSizeInit =
-    IOHelper.sizeOfUInt32LE +
-    IOHelper.sizeOfUInt256 +
-    IOHelper.sizeOfUInt256 +
-    IOHelper.sizeOfUInt64LE +
-    IOHelper.sizeOfUInt32LE +
-    IOHelper.sizeOfUInt160 +
-    IOHelper.sizeOfUInt8 +
-    context.witnessSize;
-
-  return (
-    blockSizeInit + context.blockBuilder.getConsensusData().size + IOHelper.sizeOfVarUIntLE(expectedTransactions + 1)
-  );
-};
+export const getExpectedBlockSizeWithoutTransactions = (context: ConsensusContext, expectedTransactions: number) =>
+  IOHelper.sizeOfUInt32LE +
+  IOHelper.sizeOfUInt256 +
+  IOHelper.sizeOfUInt256 +
+  IOHelper.sizeOfUInt64LE +
+  IOHelper.sizeOfUInt32LE +
+  IOHelper.sizeOfUInt8 +
+  IOHelper.sizeOfUInt160 +
+  IOHelper.sizeOfUInt8 +
+  context.witnessSize +
+  IOHelper.sizeOfVarUIntLE(expectedTransactions);
 
 export const getExpectedBlockSize = (context: ConsensusContext) => {
   const transactionValues = Object.values(context.transactions);
@@ -77,7 +73,6 @@ const getPrimaryIndex = ({
 export const createBlock = async ({
   context: contextIn,
   storage,
-  headerCache,
   native,
 }: {
   readonly context: ConsensusContext;
@@ -94,13 +89,13 @@ export const createBlock = async ({
   };
   const scriptHashes = await getBlockScriptHashesForVerifying({
     storage,
-    block: scriptHashOptions,
-    headerCache,
+    header: scriptHashOptions,
     native,
   });
+
   // TODO: this might be wrong
   // tslint:disable-next-line: strict-type-predicates
-  if (scriptHashes[0] === undefined) {
+  if (scriptHashes[0] === undefined || scriptHashes.length === 0) {
     // getBlockScriptHashesForVerifying can only return this when prevHash = UINT256_ZERO, so on genesis block
     // when a witness SHOULD already be defined on the block.
     throw new Error();
@@ -143,8 +138,7 @@ export const ensureHeader = (contextIn: ConsensusContext) => {
   }
 
   if (context.blockBuilder.merkleRoot === undefined) {
-    const consensusData = context.blockBuilder.getConsensusData();
-    const merkleRoot = MerkleTree.computeRoot([consensusData.hash].concat(context.transactionHashes));
+    const merkleRoot = MerkleTree.computeRoot(context.transactionHashes);
     context = context.clone({ blockOptions: { merkleRoot } });
   }
 
@@ -156,11 +150,9 @@ export const ensureMaxBlockLimitation = async (
   context: ConsensusContext,
   transactionsIn: readonly Transaction[],
 ) => {
-  const [maxBlockSize, maxBlockSystemFee, maxTransactionsPerBlock] = await Promise.all([
-    node.blockchain.getMaxBlockSize(),
-    node.blockchain.getMaxBlockSystemFee(),
-    node.blockchain.getMaxTransactionsPerBlock(),
-  ]);
+  const maxTransactionsPerBlock = node.blockchain.settings.maxTransactionsPerBlock;
+  const maxBlockSize = node.blockchain.settings.maxBlockSize;
+  const maxBlockSystemFee = node.blockchain.settings.maxBlockSystemFee;
 
   const txs = transactionsIn.slice(0, maxTransactionsPerBlock);
   const newVerificationContext = node.getNewVerificationContext();
@@ -225,17 +217,17 @@ const validatorsChanged = async (blockchain: Blockchain) => {
   }
 
   const hash = await blockchain.getCurrentHash();
-  const currentBlock = await blockchain.getBlock(hash);
+  const currentBlock = await blockchain.getTrimmedBlock(hash);
   if (currentBlock === undefined) {
     throw new Error('validatorsChanged function expected currentBlock to be defined');
   }
-  const prevBlock = await blockchain.getBlock(currentBlock?.previousHash);
+  const prevBlock = await blockchain.getTrimmedBlock(currentBlock?.header.previousHash);
 
   if (prevBlock === undefined) {
     throw new Error('validatorsChanged function expected previousBlock to be defined');
   }
 
-  return !currentBlock.nextConsensus.equals(prevBlock.nextConsensus);
+  return !currentBlock.header.nextConsensus.equals(prevBlock.header.nextConsensus);
 };
 
 export const reset = async ({
@@ -260,7 +252,9 @@ export const reset = async ({
     const initialBlockOptions = {
       previousHash: currentHash,
       index: currentIndex + 1,
-      nextConsensus: crypto.getBFTAddress(blockchain.shouldRefreshCommittee(1) ? validators : nextValidators),
+      nextConsensus: crypto.getBFTAddress(
+        blockchain.shouldRefreshCommittee(currentIndex + 1) ? validators : nextValidators,
+      ),
       merkleRoot: undefined,
       messageMagic: blockchain.settings.messageMagic,
     };
@@ -331,9 +325,7 @@ export const reset = async ({
 
   const primaryIndex = getPrimaryIndex({ context, viewNumber });
   const newBlockOptions = {
-    consensusData: {
-      primaryIndex,
-    },
+    primaryIndex,
     merkleRoot: undefined,
     timestamp: new BN(0),
     transactions: undefined,
@@ -380,7 +372,7 @@ export const getInitialContext = ({
   const blockOptions = {
     version: 0,
     index: blockIndex,
-    consensusData: { primaryIndex },
+    primaryIndex,
   };
 
   return new ConsensusContext({

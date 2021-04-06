@@ -25,9 +25,7 @@ export interface NativeContract {
   readonly name: string;
   readonly nef: NefFile;
   readonly hash: UInt160;
-  readonly script: Buffer;
   readonly manifest: ContractManifest;
-  readonly activeBlockIndex: number;
   readonly serializeJSON: () => NativeContractJSON;
 }
 
@@ -42,9 +40,6 @@ export interface FungibleToken extends NativeContract {
 export interface GASContract extends FungibleToken {}
 
 export interface PolicyContract extends NativeContract {
-  readonly getMaxTransactionsPerBlock: (storage: NativeContractStorageContext) => Promise<number>;
-  readonly getMaxBlockSize: (storage: NativeContractStorageContext) => Promise<number>;
-  readonly getMaxBlockSystemFee: (storage: NativeContractStorageContext) => Promise<BN>;
   readonly getFeePerByte: (storage: NativeContractStorageContext) => Promise<BN>;
   readonly getExecFeeFactor: (storage: NativeContractStorageContext) => Promise<number>;
   readonly getStoragePrice: (storage: NativeContractStorageContext) => Promise<number>;
@@ -67,6 +62,7 @@ export interface NEOContract extends FungibleToken {
   readonly unclaimedGas: (storage: NativeContractStorageContext, account: UInt160, end: number) => Promise<BN>;
   readonly getNextBlockValidators: (storage: NativeContractStorageContext) => Promise<readonly ECPoint[]>;
   readonly computeNextBlockValidators: (storage: NativeContractStorageContext) => Promise<readonly ECPoint[]>;
+  readonly getRegisterPrice: (storage: NativeContractStorageContext) => Promise<BN>;
 }
 
 export interface ContractManagement extends NativeContract {
@@ -84,6 +80,7 @@ export interface RoleManagement extends NativeContract {
 }
 
 export interface OracleContract extends NativeContract {
+  readonly getPrice: (storage: NativeContractStorageContext) => Promise<BN>;
   readonly getRequest: (storage: NativeContractStorageContext, id: BN) => Promise<OracleRequest | undefined>;
   readonly getRequests: (storage: NativeContractStorageContext) => Promise<OracleRequestResults>;
   readonly getRequestsByUrl: (storage: NativeContractStorageContext, url: string) => Promise<readonly OracleRequest[]>;
@@ -149,6 +146,10 @@ export interface NameService extends NonfungibleToken {
   ) => Promise<string | undefined>;
 }
 
+export interface CryptoLib {}
+
+export interface StdLib {}
+
 export interface NativeContainer {
   readonly ContractManagement: ContractManagement;
   readonly Ledger: LedgerContract;
@@ -158,6 +159,8 @@ export interface NativeContainer {
   readonly RoleManagement: RoleManagement;
   readonly Oracle: OracleContract;
   readonly NameService: NameService;
+  readonly CryptoLib: CryptoLib;
+  readonly StdLib: StdLib;
   readonly nativeHashes: readonly UInt160[];
   readonly nativeContracts: readonly NativeContract[];
   readonly isNative: (hash: UInt160) => boolean;

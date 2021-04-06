@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js';
 import { helpers, keys } from '../../../../__data__';
 
 describe('Blockchain', () => {
-  test('currentHeight', async () => {
+  test.only('currentHeight', async () => {
     const node = await helpers.startNode();
 
     await node.executeString(`

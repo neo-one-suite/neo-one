@@ -4,101 +4,71 @@ import {
   BlockJSON,
   common,
   createSerializeWire,
+  getSignData,
   InvalidFormatError,
   IOHelper,
+  UInt160,
   UInt256,
+  UInt256Hex,
+  utils as clientCommonUtils,
 } from '@neo-one/client-common';
-import _ from 'lodash';
-import { BlockBase, BlockBaseAdd } from './BlockBase';
-import { ConsensusData } from './ConsensusData';
+import { BN } from 'bn.js';
+import { Set } from 'immutable';
 import { MerkleTree } from './crypto';
+import { NotSupportedError } from './errors';
 import { Header } from './Header';
+import { NativeContainer } from './Native';
 import {
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
   SerializableContainer,
+  SerializableContainerType,
   SerializableJSON,
   SerializeJSONContext,
 } from './Serializable';
+import { BlockchainStorage } from './Storage';
 import { Transaction } from './transaction';
 import { utils } from './utils';
+import { VerifyOptions } from './Verifiable';
 import { Witness } from './Witness';
 
-export interface BlockAdd extends Omit<BlockBaseAdd, 'merkleRoot'> {
-  readonly merkleRoot?: UInt256;
-  readonly consensusData?: ConsensusData;
+export interface BlockAdd {
+  readonly header: Header;
   readonly transactions: readonly Transaction[];
-  readonly messageMagic: number;
 }
 
-// export interface BlockVerifyOptions {
-//   readonly genesisBlock: Block;
-//   readonly tryGetBlock: (block: BlockKey) => Promise<Block | undefined>;
-//   readonly tryGetHeader: (header: HeaderKey) => Promise<Header | undefined>;
-//   readonly isSpent: (key: OutputKey) => Promise<boolean>;
-//   readonly getAsset: (key: AssetKey) => Promise<Asset>;
-//   readonly getOutput: (key: OutputKey) => Promise<Output>;
-//   readonly tryGetAccount: (key: AccountKey) => Promise<Account | undefined>;
-//   readonly getValidators: (transactions: readonly Transaction[]) => Promise<readonly ECPoint[]>;
-//   readonly standbyValidators: readonly ECPoint[];
-//   readonly getAllValidators: () => Promise<readonly Validator[]>;
-//   readonly calculateClaimAmount: (inputs: readonly Input[]) => Promise<BN>;
-//   readonly verifyScript: VerifyScript;
-//   readonly currentHeight: number;
-//   readonly governingToken: RegisterTransaction;
-//   readonly utilityToken: RegisterTransaction;
-//   readonly fees: { [K in TransactionType]?: BN };
-//   readonly registerValidatorFee: BN;
-//   readonly completely?: boolean;
-// }
-
-type TransactionOrConsensusData = Transaction | ConsensusData;
-const getCombinedModels = (
-  transactions: readonly Transaction[],
-  consensusData?: ConsensusData,
-): readonly TransactionOrConsensusData[] => {
-  const init: TransactionOrConsensusData[] = consensusData ? [consensusData] : [];
-
-  return init.concat(transactions);
-};
-
-export class Block extends BlockBase implements SerializableContainer, SerializableJSON<BlockJSON> {
-  public static readonly MaxContentsPerBlock = utils.USHORT_MAX;
-  public static readonly MaxTransactionsPerBlock = utils.USHORT_MAX.subn(1);
-
+export class Block implements SerializableContainer, SerializableJSON<BlockJSON> {
+  public static deserializeUnsignedWireBase(_options: DeserializeWireBaseOptions): Block {
+    throw new NotSupportedError('Cannot deserialize unsigned Block');
+  }
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Block {
     const { reader } = options;
-    const blockBase = super.deserializeWireBase(options);
-    const count = reader.readVarUIntLE(this.MaxContentsPerBlock).toNumber();
-    if (count === 0) {
-      throw new InvalidFormatError('Expected count to be greater than 0');
-    }
-    const consensusData = ConsensusData.deserializeWireBase(options);
-    const transactions = _.range(count - 1).map(() => Transaction.deserializeWireBase(options));
-
-    if (transactions.length !== count - 1) {
-      throw new InvalidFormatError(`Expected ${count - 1} transactions on the block, found: ${transactions.length}`);
-    }
-
-    const merkleRoot = MerkleTree.computeRoot(
-      [consensusData.hash].concat(transactions.map((transaction) => transaction.hash)),
+    const header = Header.deserializeWireBase(options);
+    const transactions = reader.readArray(
+      () => Transaction.deserializeWireBase(options),
+      clientCommonUtils.USHORT_MAX_NUMBER,
     );
 
-    if (!common.uInt256Equal(merkleRoot, blockBase.merkleRoot)) {
+    if (Set(transactions).size !== transactions.length) {
+      throw new InvalidFormatError(`Expected every transaction in block to be distinct`);
+    }
+
+    const merkleRoot = MerkleTree.computeRoot(transactions.map((transaction) => transaction.hash));
+
+    if (!common.uInt256Equal(merkleRoot, header.merkleRoot)) {
       throw new InvalidFormatError('Invalid merkle root');
     }
 
     return new Block({
-      version: blockBase.version,
-      previousHash: blockBase.previousHash,
-      merkleRoot: blockBase.merkleRoot,
-      timestamp: blockBase.timestamp,
-      index: blockBase.index,
-      consensusData,
-      nextConsensus: blockBase.nextConsensus,
-      witness: blockBase.witness,
+      header,
       transactions,
-      messageMagic: options.context.messageMagic,
+    });
+  }
+
+  public static deserializeUnsignedWire(options: DeserializeWireOptions): Block {
+    return this.deserializeUnsignedWireBase({
+      context: options.context,
+      reader: new BinaryReader(options.buffer),
     });
   }
 
@@ -108,103 +78,100 @@ export class Block extends BlockBase implements SerializableContainer, Serializa
       reader: new BinaryReader(options.buffer),
     });
   }
+
+  public readonly type: SerializableContainerType = 'Block';
   public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
-  public readonly serializeUnsigned = createSerializeWire(super.serializeUnsignedBase.bind(this));
+  public readonly serializeUnsigned = createSerializeWire(this.serializeWireBaseUnsigned.bind(this));
   public readonly transactions: readonly Transaction[];
-  public readonly consensusData?: ConsensusData;
-  protected readonly sizeExclusive = utils.lazy(() =>
-    IOHelper.sizeOfArray(getCombinedModels(this.transactions, this.consensusData), (model) => model.size),
+  public readonly header: Header;
+  private readonly hashHexInternal = utils.lazy(() => common.uInt256ToHex(this.hash));
+  private readonly sizeInternal = utils.lazy(
+    () => this.header.size + IOHelper.sizeOfArray(this.transactions, (tx) => tx.size),
   );
-  private readonly headerInternal = utils.lazy(
-    () =>
-      new Header({
-        version: this.version,
-        previousHash: this.previousHash,
-        merkleRoot: this.merkleRoot,
-        timestamp: this.timestamp,
-        index: this.index,
-        nextConsensus: this.nextConsensus,
-        witness: this.witness,
-        messageMagic: this.messageMagic,
-      }),
-  );
+  private readonly messageInternal = utils.lazy(() => getSignData(this.hash, this.messageMagic));
 
-  private readonly allHashesInternal = utils.lazy(() =>
-    getCombinedModels(this.transactions, this.consensusData).map((model) => model.hash),
-  );
-
-  public constructor({
-    version,
-    previousHash,
-    timestamp,
-    index,
-    consensusData,
-    nextConsensus,
-    witness,
-    hash,
-    transactions,
-    messageMagic,
-    merkleRoot = MerkleTree.computeRoot(getCombinedModels(transactions, consensusData).map((model) => model.hash)),
-  }: BlockAdd) {
-    super({
-      version,
-      previousHash,
-      merkleRoot,
-      timestamp,
-      index,
-      nextConsensus,
-      witness,
-      hash,
-      messageMagic,
-    });
-
+  public constructor({ header, transactions }: BlockAdd) {
+    this.header = header;
     this.transactions = transactions;
-    this.consensusData = consensusData;
   }
 
-  public get header(): Header {
-    return this.headerInternal();
+  public get message(): Buffer {
+    return this.messageInternal();
   }
 
-  public get allHashes(): readonly UInt256[] {
-    return this.allHashesInternal();
+  public get messageMagic(): number {
+    return this.header.messageMagic;
   }
 
-  public clone({
-    transactions,
-    witness,
-  }: {
-    readonly transactions: readonly Transaction[];
-    readonly witness: Witness;
-  }): Block {
-    return new Block({
-      version: this.version,
-      previousHash: this.previousHash,
-      merkleRoot: this.merkleRoot,
-      timestamp: this.timestamp,
-      index: this.index,
-      consensusData: this.consensusData,
-      nextConsensus: this.nextConsensus,
-      messageMagic: this.messageMagic,
-      transactions,
-      witness,
-    });
+  public get size(): number {
+    return this.sizeInternal();
+  }
+
+  public get hash(): UInt256 {
+    return this.header.hash;
+  }
+
+  public get hashHex(): UInt256Hex {
+    return this.hashHexInternal();
+  }
+
+  public get version(): number {
+    return this.header.version;
+  }
+
+  public get previousHash(): UInt256 {
+    return this.header.previousHash;
+  }
+
+  public get merkleRoot(): UInt256 {
+    return this.header.merkleRoot;
+  }
+
+  public get timestamp(): BN {
+    return this.header.timestamp;
+  }
+
+  public get index(): number {
+    return this.header.index;
+  }
+
+  public get primaryIndex(): number {
+    return this.header.primaryIndex;
+  }
+
+  public get nextConsensus(): UInt160 {
+    return this.header.nextConsensus;
+  }
+
+  public get witnesses(): readonly Witness[] {
+    return this.header.witnesses;
+  }
+
+  public async verify(options: VerifyOptions) {
+    return this.header.verify(options);
+  }
+
+  public async getScriptHashesForVerifying(context: {
+    readonly storage: BlockchainStorage;
+    readonly native: NativeContainer;
+  }) {
+    return this.header.getScriptHashesForVerifying(context);
+  }
+
+  public serializeWireBaseUnsigned(writer: BinaryWriter): void {
+    this.header.serializeWireUnsignedBase(writer);
   }
 
   public serializeWireBase(writer: BinaryWriter): void {
-    super.serializeWireBase(writer);
-    writer.writeArray(getCombinedModels(this.transactions, this.consensusData), (model) =>
-      model.serializeWireBase(writer),
-    );
+    this.header.serializeWireBase(writer);
+    writer.writeArray(this.transactions, (tx) => tx.serializeWireBase(writer));
   }
 
   public serializeJSON(context: SerializeJSONContext): BlockJSON {
-    const blockBaseJSON = super.serializeJSON(context);
-
     return {
-      ...blockBaseJSON,
-      consensusdata: this.consensusData ? this.consensusData.serializeJSON() : undefined,
-      tx: this.transactions.map((transaction) => transaction.serializeJSON()),
+      ...this.header.serializeJSON(context),
+      size: this.size,
+      tx: this.transactions.map((tx) => tx.serializeJSON()),
     };
   }
 }

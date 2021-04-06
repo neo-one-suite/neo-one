@@ -17,35 +17,42 @@ export const neoTokenMethods: ReadonlyArray<ContractMethodJSON> = [
     name: 'decimals',
     parameters: [],
     returntype: 'Integer',
-    offset: 0,
+    offset: 7,
     safe: true,
   },
   {
     name: 'getCandidates',
     parameters: [],
     returntype: 'Array',
-    offset: 0,
+    offset: 14,
     safe: true,
   },
   {
     name: 'getCommittee',
     parameters: [],
     returntype: 'Array',
-    offset: 0,
+    offset: 21,
     safe: true,
   },
   {
     name: 'getGasPerBlock',
     parameters: [],
     returntype: 'Integer',
-    offset: 0,
+    offset: 28,
     safe: true,
   },
   {
     name: 'getNextBlockValidators',
     parameters: [],
     returntype: 'Array',
-    offset: 0,
+    offset: 35,
+    safe: true,
+  },
+  {
+    name: 'getRegisterPrice',
+    parameters: [],
+    returntype: 'Integer',
+    offset: 42,
     safe: true,
   },
   {
@@ -53,11 +60,11 @@ export const neoTokenMethods: ReadonlyArray<ContractMethodJSON> = [
     parameters: [
       {
         name: 'pubkey',
-        type: 'ByteArray',
+        type: 'PublicKey',
       },
     ],
     returntype: 'Boolean',
-    offset: 0,
+    offset: 49,
     safe: false,
   },
   {
@@ -69,21 +76,33 @@ export const neoTokenMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Void',
-    offset: 0,
+    offset: 56,
+    safe: false,
+  },
+  {
+    name: 'setRegisterPrice',
+    parameters: [
+      {
+        name: 'registerPrice',
+        type: 'Integer',
+      },
+    ],
+    returntype: 'Void',
+    offset: 63,
     safe: false,
   },
   {
     name: 'symbol',
     parameters: [],
     returntype: 'String',
-    offset: 0,
+    offset: 70,
     safe: true,
   },
   {
     name: 'totalSupply',
     parameters: [],
     returntype: 'Integer',
-    offset: 0,
+    offset: 77,
     safe: true,
   },
   {
@@ -107,7 +126,7 @@ export const neoTokenMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Boolean',
-    offset: 0,
+    offset: 84,
     safe: false,
   },
   {
@@ -123,7 +142,7 @@ export const neoTokenMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Integer',
-    offset: 0,
+    offset: 91,
     safe: true,
   },
   {
@@ -131,11 +150,11 @@ export const neoTokenMethods: ReadonlyArray<ContractMethodJSON> = [
     parameters: [
       {
         name: 'pubkey',
-        type: 'ByteArray',
+        type: 'PublicKey',
       },
     ],
     returntype: 'Boolean',
-    offset: 0,
+    offset: 98,
     safe: false,
   },
   {
@@ -147,11 +166,11 @@ export const neoTokenMethods: ReadonlyArray<ContractMethodJSON> = [
       },
       {
         name: 'voteTo',
-        type: 'ByteArray',
+        type: 'PublicKey',
       },
     ],
     returntype: 'Boolean',
-    offset: 0,
+    offset: 105,
     safe: false,
   },
 ];

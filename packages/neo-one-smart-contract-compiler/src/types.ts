@@ -11,3 +11,15 @@ export interface CompilerHost {
     withTestHarness?: boolean,
   ) => ts.LanguageServiceHost;
 }
+
+export enum FindOptions {
+  None = 0,
+  // tslint:disable: no-bitwise
+  KeysOnly = 1 << 0,
+  RemovePrefix = 1 << 1,
+  ValuesOnly = 1 << 2,
+  DeserializeValues = 1 << 3,
+  PickField0 = 1 << 4,
+  PickField1 = 1 << 5,
+  // tslint:enable: no-bitwise
+}

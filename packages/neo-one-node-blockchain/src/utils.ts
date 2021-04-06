@@ -9,14 +9,17 @@ import {
 } from '@neo-one/client-common';
 import {
   ApplicationEngine,
-  BlockBase,
+  Block,
   ContractState,
+  Header,
   Notification,
   Transaction,
   utils as coreUtils,
   Verifiable,
   VM,
+  VMProtocolSettingsIn,
 } from '@neo-one/node-core';
+import { BN } from 'bn.js';
 import { ScriptVerifyError } from './errors';
 
 const hashListBatchSize = 2000;
@@ -52,13 +55,24 @@ const getCallReceipt = (engine: ApplicationEngine, container?: Verifiable) => ({
   logs: engine.logs,
 });
 
-const verifyContract = async (contract: ContractState, vm: VM, transaction: Transaction) => {
-  const gas = vm.withApplicationEngine(
+const verifyContract = async ({
+  contract,
+  vm,
+  transaction,
+  protocolSettings,
+}: {
+  readonly contract: ContractState;
+  readonly vm: VM;
+  readonly transaction: Transaction;
+  readonly protocolSettings: VMProtocolSettingsIn;
+}) => {
+  const gas = vm.withApplicationEngine<BN>(
     {
       trigger: TriggerType.Verification,
       container: transaction,
       snapshot: 'clone',
       gas: common.TWENTY_FIXED8,
+      settings: protocolSettings,
     },
     (engine) => {
       const loaded = engine.loadContract({
@@ -88,7 +102,7 @@ const verifyContract = async (contract: ContractState, vm: VM, transaction: Tran
   return { fee: gas, size: IOHelper.sizeOfUInt8 * 2 };
 };
 
-const blockComparator = <TBlock extends BlockBase>({ index: aIndex }: TBlock, { index: bIndex }: TBlock) => {
+const blockComparator = <TBlock extends Header | Block>({ index: aIndex }: TBlock, { index: bIndex }: TBlock) => {
   if (aIndex > bIndex) {
     return 1;
   }

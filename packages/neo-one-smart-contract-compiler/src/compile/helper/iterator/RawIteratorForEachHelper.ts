@@ -27,14 +27,14 @@ export class RawIteratorForEachHelper extends Helper {
       sb.helpers.rawIteratorForEachBase({
         each: (innerOptions) => {
           // [val]
-          sb.emitSysCall(node, 'System.Enumerator.Value');
+          sb.emitHelper(node, options, sb.helpers.getMapIteratorValue);
           // [iterator, val]
           sb.emitOp(node, 'OVER');
           // [key, val]
-          sb.emitSysCall(node, 'System.Iterator.Key');
+          sb.emitHelper(node, options, sb.helpers.getMapIteratorKey);
           if (this.deserializeKey) {
             // [key, val]
-            sb.emitSysCall(node, 'System.Binary.Deserialize');
+            sb.emitHelper(node, options, sb.helpers.binaryDeserialize);
           }
           // []
           this.each(innerOptions);

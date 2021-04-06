@@ -153,26 +153,14 @@ export type Integer = Fixed<0>;
 export type Fixed8 = Fixed<8>;
 
 /**
- * `Attribute` usage flag indicates the type of the data.
+ * `AttributeType` flag indicates the type of the data.
  *
- * @see HighPriorityAttributeUsage
+ * @see Attribute
  */
-export enum AttributeUsage {
+export enum AttributeType {
   HighPriority = 0x01,
-  Reserved = 0xff, // Strange behavior in TypeScript compiler API makes this necessary for now
+  OracleResponse = 0x11,
 }
-/**
- * `Attribute` usage flag indicating the data is high priority.
- *
- * @see HighPriorityAttribute
- */
-export type HighPriorityAttributeUsage = AttributeUsage.HighPriority;
-/**
- * `Attribute` placeholder for TypeScript compiler.
- *
- * @see ReservedAttribute
- */
-export type ReservedAttributeUsage = AttributeUsage.Reserved;
 
 /**
  * Base interface for `Attribute`s
@@ -181,7 +169,7 @@ export type ReservedAttributeUsage = AttributeUsage.Reserved;
  */
 export const AttributeBase: AttributeBaseConstructor;
 export interface AttributeBase {
-  readonly usage: AttributeUsage;
+  readonly type: AttributeType;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 
@@ -190,18 +178,17 @@ export interface AttributeBaseConstructor {
 }
 
 export interface HighPriorityAttribute extends AttributeBase {
-  readonly usage: HighPriorityAttributeUsage;
+  readonly type: AttributeType.HighPriority;
 }
 
-export interface ReservedAttribute extends AttributeBase {
-  readonly usage: ReservedAttributeUsage;
+export interface OracleAttribute extends AttributeBase {
+  readonly type: AttributeType.OracleResponse;
 }
 
 /**
- * `Attribute`s are used to store additional data on `Transaction`s. Most `Attribute`s are used to store arbitrary data, whereas some, like `AddressAttribute`, have specific uses in the NEO
- * protocol. The only attribute currently available in the Neo v3 protocol is the \"HighPriority\" attribute.
+ * `Attribute`s are used to store additional data on `Transaction`s.
  */
-export type Attribute = HighPriorityAttribute | ReservedAttribute;
+export type Attribute = HighPriorityAttribute | OracleAttribute;
 
 export enum WitnessScope {
   None = 0x00,
@@ -439,6 +426,10 @@ export interface Block {
    * `Block` index.
    */
   readonly index: Integer;
+  /**
+   * `Block` primary index of the consensus node that generated this block.
+   */
+  readonly primaryIndex: Integer;
   /**
    * Root of the `Transaction` hash Merkle Tree.
    */

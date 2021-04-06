@@ -34,7 +34,7 @@ export class MapHas extends BuiltinInstanceMemberCall {
     // [keyVal, map]
     sb.visit(tsUtils.argumented.getArguments(node)[0], options);
     // [key, map]
-    sb.emitSysCall(node, 'System.Binary.Serialize');
+    sb.emitHelper(node, options, sb.helpers.binarySerialize);
     // [boolean]
     sb.emitOp(node, 'HASKEY');
     // [booleanVal]

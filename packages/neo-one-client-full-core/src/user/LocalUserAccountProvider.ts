@@ -3,6 +3,7 @@ import {
   ABIReturn,
   BinaryWriter,
   BufferString,
+  CallFlags,
   common,
   ContractManifestClient,
   ContractParameterTypeModel,
@@ -226,6 +227,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           sb.emitDynamicAppCall(
             hash,
             'deploy',
+            CallFlags.All,
             ...convertParams({
               parameters: deployFunc.parameters === undefined ? [] : deployFunc.parameters,
               params,

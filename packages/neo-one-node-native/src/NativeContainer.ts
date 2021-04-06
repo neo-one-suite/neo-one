@@ -1,6 +1,7 @@
 import { UInt160 } from '@neo-one/client-common';
 import { BlockchainSettings, NativeContainer as NativeContainerNode, NativeContract } from '@neo-one/node-core';
 import { ContractManagement } from './ContractManagement';
+import { CryptoLib } from './CryptoLib';
 import { GASToken } from './GASToken';
 import { LedgerContract } from './LedgerContract';
 import { NameService } from './NameService';
@@ -8,6 +9,7 @@ import { NEOToken } from './NEOToken';
 import { OracleContract } from './OracleContract';
 import { PolicyContract } from './Policy';
 import { RoleManagement } from './RoleManagement';
+import { StdLib } from './StdLib';
 
 export class NativeContainer implements NativeContainerNode {
   public readonly ContractManagement: ContractManagement;
@@ -18,6 +20,8 @@ export class NativeContainer implements NativeContainerNode {
   public readonly RoleManagement: RoleManagement;
   public readonly Oracle: OracleContract;
   public readonly NameService: NameService;
+  public readonly CryptoLib: CryptoLib;
+  public readonly StdLib: StdLib;
   public readonly nativeHashes: readonly UInt160[];
   public readonly nativeContracts: readonly NativeContract[];
 
@@ -30,16 +34,8 @@ export class NativeContainer implements NativeContainerNode {
     this.RoleManagement = new RoleManagement(settings);
     this.Oracle = new OracleContract(settings);
     this.NameService = new NameService(settings);
-    this.nativeHashes = [
-      this.ContractManagement.hash,
-      this.Ledger.hash,
-      this.NEO.hash,
-      this.GAS.hash,
-      this.Policy.hash,
-      this.RoleManagement.hash,
-      this.Oracle.hash,
-      this.NameService.hash,
-    ];
+    this.CryptoLib = new CryptoLib(settings);
+    this.StdLib = new StdLib(settings);
     this.nativeContracts = [
       this.ContractManagement,
       this.Ledger,
@@ -49,7 +45,10 @@ export class NativeContainer implements NativeContainerNode {
       this.RoleManagement,
       this.Oracle,
       this.NameService,
+      this.CryptoLib,
+      this.StdLib,
     ];
+    this.nativeHashes = this.nativeContracts.map((contract) => contract.hash);
   }
 
   public isNative(hash: UInt160) {

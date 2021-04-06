@@ -166,7 +166,7 @@ export const writeContract = async (
       await new Promise((resolve) =>
         zip
           .generateNodeStream({ type: 'nodebuffer', streamFiles: true })
-          .pipe(fs.createWriteStream(outputPath.replace('.contract.json', '.avmdbgnfo')))
+          .pipe(fs.createWriteStream(outputPath.replace('.contract.json', '.nefdbgnfo')))
           .on('finish', () => {
             resolve();
           }),
@@ -179,7 +179,7 @@ export const writeContract = async (
 
     if (opcodesFlag) {
       await fs.writeFile(
-        outputPath.replace('.contract.json', '.avm.txt'),
+        outputPath.replace('.contract.json', '.nef.txt'),
         disassembled.reduce((acc, op) => `${acc}${op.value.split(':').join(' ')}\n`, ''),
       );
     }

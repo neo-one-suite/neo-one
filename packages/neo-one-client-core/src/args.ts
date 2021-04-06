@@ -50,7 +50,7 @@ import {
 } from '@neo-one/client-common';
 import { JSONObject, JSONValue, OmitStrict, utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import _ from 'lodash';
 import { InvalidArgumentError } from './errors';
 

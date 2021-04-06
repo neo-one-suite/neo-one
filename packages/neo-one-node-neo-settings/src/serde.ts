@@ -1,5 +1,6 @@
 import { common } from '@neo-one/client-common';
 import { Block, Settings } from '@neo-one/node-core';
+import { BN } from 'bn.js';
 
 export const serializeSettings = (settings: Settings) => {
   const {
@@ -15,6 +16,11 @@ export const serializeSettings = (settings: Settings) => {
     validatorsCount,
     millisecondsPerBlock,
     memoryPoolMaxTransactions,
+    maxTraceableBlocks,
+    nativeUpdateHistory,
+    maxBlockSize,
+    maxBlockSystemFee,
+    maxTransactionsPerBlock,
   } = settings;
 
   return {
@@ -30,6 +36,11 @@ export const serializeSettings = (settings: Settings) => {
     addressVersion,
     millisecondsPerBlock,
     memoryPoolMaxTransactions,
+    maxTraceableBlocks,
+    nativeUpdateHistory,
+    maxBlockSize,
+    maxBlockSystemFee: maxBlockSystemFee.toString(),
+    maxTransactionsPerBlock,
   };
 };
 
@@ -48,6 +59,11 @@ export const deserializeSettings = (settings: any): Settings => {
     validatorsCount,
     millisecondsPerBlock,
     memoryPoolMaxTransactions,
+    maxTraceableBlocks,
+    nativeUpdateHistory,
+    maxBlockSize,
+    maxBlockSystemFee,
+    maxTransactionsPerBlock,
   } = settings;
 
   const context = { messageMagic, validatorsCount };
@@ -65,5 +81,10 @@ export const deserializeSettings = (settings: any): Settings => {
     validatorsCount,
     millisecondsPerBlock,
     memoryPoolMaxTransactions,
+    maxTraceableBlocks,
+    nativeUpdateHistory,
+    maxBlockSize,
+    maxBlockSystemFee: new BN(maxBlockSystemFee),
+    maxTransactionsPerBlock,
   };
 };

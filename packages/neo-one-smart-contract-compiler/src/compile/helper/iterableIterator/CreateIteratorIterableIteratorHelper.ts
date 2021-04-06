@@ -36,16 +36,16 @@ export class CreateIteratorIterableIteratorHelper extends Helper {
           // [iterator, iterator]
           sb.emitOp(node, 'DUP');
           // [value, iterator]
-          sb.emitSysCall(node, 'System.Enumerator.Value');
+          sb.emitHelper(node, options, sb.helpers.getMapIteratorValue);
           // [valueVal, iterator]
           this.mapValue(innerOptions);
           // [iterator, valueVal]
           sb.emitOp(node, 'SWAP');
           // [key, valueVal]
-          sb.emitSysCall(node, 'System.Iterator.Key');
+          sb.emitHelper(node, options, sb.helpers.getMapIteratorKey);
           if (this.deserializeKey) {
             // [key, valueVal]
-            sb.emitSysCall(node, 'System.Binary.Deserialize');
+            sb.emitHelper(node, options, sb.helpers.binaryDeserialize);
           }
           // [keyVal, valueVal]
           this.mapKey(innerOptions);

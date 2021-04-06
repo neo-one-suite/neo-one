@@ -21,6 +21,8 @@ export class ArrMapHelper extends Helper {
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
+    // [map]
+    sb.emitHelper(node, options, sb.helpers.arrToMap);
     if (this.withIndex) {
       // [iterator]
       sb.emitSysCall(node, 'System.Iterator.Create');
@@ -54,7 +56,7 @@ export class ArrMapHelper extends Helper {
       );
     } else {
       // [enumerator]
-      sb.emitSysCall(node, 'System.Enumerator.Create');
+      sb.emitSysCall(node, 'System.Iterator.Create');
       // [0, enumerator]
       sb.emitPushInt(node, 0);
       // [accum, enumerator]

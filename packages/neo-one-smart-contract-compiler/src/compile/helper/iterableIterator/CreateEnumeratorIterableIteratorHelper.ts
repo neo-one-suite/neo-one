@@ -31,10 +31,10 @@ export class CreateEnumeratorIterableIteratorHelper extends Helper {
       sb.helpers.createIterableIteratorBase({
         handleNext: (innerOptions) => {
           // [value]
-          sb.emitSysCall(node, 'System.Enumerator.Value');
+          sb.emitHelper(node, options, sb.helpers.getMapIteratorValue);
           if (this.deserializeKey) {
             // [value]
-            sb.emitSysCall(node, 'System.Binary.Deserialize');
+            sb.emitHelper(node, options, sb.helpers.binaryDeserialize);
           }
           // [val]
           this.mapValue(innerOptions);

@@ -43,6 +43,7 @@ export class NEOToken extends FungibleToken implements NEOContract {
     committee: Buffer.from([14]),
     gasPerBlock: Buffer.from([29]),
     voterRewardPerCommittee: Buffer.from([23]),
+    registerPrice: Buffer.from([13]),
   };
 
   private readonly ratios = {
@@ -54,7 +55,7 @@ export class NEOToken extends FungibleToken implements NEOContract {
   public constructor(settings: BlockchainSettings) {
     super({
       name: 'NeoToken',
-      id: -3,
+      id: -5,
       symbol: 'NEO',
       decimals: 0,
       methods: neoTokenMethods,
@@ -142,6 +143,12 @@ export class NEOToken extends FungibleToken implements NEOContract {
     return _.take(committeeCache.members, this.settings.validatorsCount)
       .map(({ publicKey }) => publicKey)
       .sort(common.ecPointCompare);
+  }
+
+  public async getRegisterPrice({ storages }: NativeContractStorageContext): Promise<BN> {
+    const item = await storages.get(this.createStorageKey(this.prefixes.registerPrice).toStorageKey());
+
+    return new BN(item.value);
   }
 
   private async calculateBonus({ storages, vote, value, start, end }: CalculateBonusOptions) {

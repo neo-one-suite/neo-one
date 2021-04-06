@@ -32,13 +32,13 @@ export class CommonStorageHelper extends Helper {
           // [map, map, number, globalObject, number, globalObject]
           sb.emitOp(node, 'DUP');
           // [buffer, map, number, globalObject, number, globalObject]
-          sb.emitSysCall(node, 'System.Binary.Serialize');
+          sb.emitHelper(node, options, sb.helpers.binarySerialize);
         },
         handleDefined: () => {
           // [buffer, buffer, number, globalObject, number, globalObject]
           sb.emitOp(node, 'DUP');
           // [map, buffer, number, globalObject, number, globalObject]
-          sb.emitSysCall(node, 'System.Binary.Deserialize');
+          sb.emitHelper(node, options, sb.helpers.binaryDeserialize);
           // [buffer, map, number, globalObject, number, globalObject]
           sb.emitOp(node, 'SWAP');
         },
@@ -70,7 +70,7 @@ export class CommonStorageHelper extends Helper {
     // [map, bufferOriginal]
     sb.emitOp(node, 'PICKITEM');
     // [buffer, bufferOriginal]
-    sb.emitSysCall(node, 'System.Binary.Serialize');
+    sb.emitHelper(node, options, sb.helpers.binarySerialize);
     // [buffer, bufferOriginal, buffer]
     sb.emitOp(node, 'TUCK');
     sb.emitHelper(

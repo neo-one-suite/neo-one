@@ -1,4 +1,10 @@
-import { BinaryReader, BinaryWriter, createSerializeWire, SerializableWire } from '@neo-one/client-common';
+import {
+  BinaryReader,
+  BinaryWriter,
+  createSerializeWire,
+  InvalidFormatError,
+  SerializableWire,
+} from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from '../Serializable';
 
@@ -13,6 +19,9 @@ export class ChangeViewPayloadCompact implements SerializableWire {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): ChangeViewPayloadCompact {
     const { reader } = options;
     const validatorIndex = reader.readUInt16LE();
+    if (validatorIndex >= options.context.validatorsCount) {
+      throw new InvalidFormatError('Validator index cannot be greater than validators count');
+    }
     const originalViewNumber = reader.readUInt8();
     const timestamp = reader.readUInt64LE();
     const invocationScript = reader.readVarBytesLE(1024);

@@ -38,7 +38,7 @@ export class RawIteratorSomeBaseHelper extends Helper {
           // [iterator, !result, result, iterator]
           sb.emitOp(node, 'SWAP');
           // [boolean, !result, result, iterator]
-          sb.emitSysCall(node, 'System.Enumerator.Next');
+          sb.emitSysCall(node, 'System.Iterator.Next');
           // [boolean, result, iterator]
           sb.emitOp(node, 'BOOLAND');
         },

@@ -21,7 +21,6 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractMember(
     'ContractConstructor',
     'for',
-    // TODO: this can be better/cleaner. also needs to be tested
     new ValueForWithScript(
       (sb, node, _options) => {
         // [1, buffer]
@@ -32,7 +31,7 @@ export const add = (builtins: Builtins): void => {
         sb.emitPushString(node, 'getContract');
         // [buffer, 'getContract', [buffer]]
         sb.emitPushBuffer(node, common.nativeHashes.ContractManagement);
-        // [conract]
+        // [contract]
         sb.emitSysCall(node, 'System.Contract.Call');
       },
       (sb, node, options) => {

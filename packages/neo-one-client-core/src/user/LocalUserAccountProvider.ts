@@ -1,15 +1,15 @@
 import {
   Attribute,
+  CallFlags,
   common,
   crypto,
-  ECDsaVerifyPrice,
-  getOpCodePrice,
   GetOptions,
   IOHelper,
+  multiSignatureContractCost,
   NetworkType,
-  Op,
   RelayTransactionResult,
   ScriptBuilder,
+  signatureContractCost,
   SignerModel,
   SourceMaps,
   toVerifyResultJSON,
@@ -187,7 +187,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
 
         if (witnessScript === undefined && transaction.witnesses.length !== 0) {
           transaction.witnesses.forEach((witness) => {
-            if (crypto.toScriptHash(witness.verification).equals(hash)) {
+            if (common.uInt160Equal(crypto.toScriptHash(witness.verification), hash)) {
               witnessScript = witness.verification;
             }
           });
@@ -203,32 +203,13 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
           const { m, n } = multiSig;
           const sizeInv = m * 66;
           const sizeMulti = IOHelper.sizeOfVarUIntLE(sizeInv) + sizeInv + IOHelper.sizeOfVarBytesLE(witnessScript);
-
-          const initMFee = getOpCodePrice(Op.PUSHDATA1).multipliedBy(m).multipliedBy(execFeeFactor);
-          const mBuilder = new ScriptBuilder();
-          const mScript = mBuilder.emitPushInt(m).build();
-          const mFee = getOpCodePrice(mScript[0]).multipliedBy(execFeeFactor).plus(initMFee);
-
-          const initNFee = getOpCodePrice(Op.PUSHDATA1).multipliedBy(n).multipliedBy(execFeeFactor);
-          const nBuilder = new ScriptBuilder();
-          const nScript = nBuilder.emitPushInt(n).build();
-          const nFee = getOpCodePrice(nScript[0]).multipliedBy(execFeeFactor).plus(initNFee);
-
-          const totalFee = getOpCodePrice(Op.PUSHNULL)
-            .plus(ECDsaVerifyPrice.multipliedBy(n))
-            .multipliedBy(execFeeFactor)
-            .plus(mFee)
-            .plus(nFee);
+          const totalFee = multiSignatureContractCost(m, n).multipliedBy(execFeeFactor);
 
           size = size + sizeMulti;
           fee = fee.plus(totalFee);
         } else if (crypto.isSignatureContract(witnessScript)) {
           const sigSize = IOHelper.sizeOfVarBytesLE(witnessScript) + 67;
-          const sigFee = getOpCodePrice(Op.PUSHDATA1)
-            .multipliedBy(2)
-            .plus(getOpCodePrice(Op.PUSHNULL))
-            .plus(ECDsaVerifyPrice)
-            .multipliedBy(execFeeFactor);
+          const sigFee = signatureContractCost.multipliedBy(execFeeFactor);
 
           size = size + sigSize;
           fee = fee.plus(sigFee);
@@ -350,6 +331,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
       sb.emitDynamicAppCall(
         common.stringToUInt160(transfer.asset),
         'transfer',
+        CallFlags.All,
         crypto.addressToScriptHash({ addressVersion, address: from.address }),
         crypto.addressToScriptHash({ addressVersion, address: transfer.to }),
         transfer.amount.toNumber(),

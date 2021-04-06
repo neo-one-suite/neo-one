@@ -1,13 +1,7 @@
+import { VMProtocolSettingsIn, VMProtocolSettingsReturn } from '@neo-one/node-core';
 import * as nodePath from 'path';
 import { ApplicationEngine, CreateOptions } from './ApplicationEngine';
-import {
-  BaseMethods,
-  EngineMethods,
-  ProtocolSettings,
-  ProtocolSettingsReturn,
-  SnapshotMethods,
-  TestMethods,
-} from './Methods';
+import { BaseMethods, EngineMethods, SnapshotMethods, TestMethods } from './Methods';
 import { SnapshotHandler } from './SnapshotHandler';
 import { DispatcherFunc } from './types';
 import { constants, createCSharpDispatchInvoke, validateProtocolSettings } from './utils';
@@ -24,7 +18,7 @@ export const createDispatcher = () => createCSharpDispatchInvoke<DispatcherMetho
 
 export interface DispatcherOptions {
   readonly levelDBPath?: string;
-  readonly protocolSettings?: ProtocolSettings;
+  readonly protocolSettings?: VMProtocolSettingsIn;
 }
 
 export class Dispatcher {
@@ -88,7 +82,7 @@ export class Dispatcher {
     this.initialize(this.options.levelDBPath);
   }
 
-  public getConfig(): ProtocolSettingsReturn {
+  public getConfig(): VMProtocolSettingsReturn {
     return this.dispatch({
       method: 'get_config',
     });
@@ -140,7 +134,7 @@ export class Dispatcher {
     });
   }
 
-  private initialize(path?: string, settings?: ProtocolSettings): boolean {
+  private initialize(path?: string, settings?: VMProtocolSettingsIn): boolean {
     return this.dispatch({
       method: 'init',
       args: {

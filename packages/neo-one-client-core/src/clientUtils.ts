@@ -1,4 +1,4 @@
-import { common, ScriptBuilder, ScriptBuilderParam, UInt160Hex } from '@neo-one/client-common';
+import { CallFlags, common, ScriptBuilder, ScriptBuilderParam, UInt160Hex } from '@neo-one/client-common';
 
 const getInvokeMethodInvocationScript = ({
   method,
@@ -8,7 +8,7 @@ const getInvokeMethodInvocationScript = ({
   readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
 }): Buffer => {
   const sb = new ScriptBuilder();
-  sb.emitAppCallInvocation(method, ...params);
+  sb.emitAppCallInvocation(method, CallFlags.All, ...params);
 
   return sb.build();
 };
@@ -23,7 +23,7 @@ const getInvokeMethodScript = ({
   readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
 }): Buffer => {
   const sb = new ScriptBuilder();
-  sb.emitDynamicAppCall(common.stringToUInt160(scriptHash), method, ...params);
+  sb.emitDynamicAppCall(common.stringToUInt160(scriptHash), method, CallFlags.All, ...params);
 
   return sb.build();
 };
