@@ -13,6 +13,7 @@ namespace NEOONE
   {
 
     private ApplicationEngine engine;
+    private Neo.ProtocolSettings settings;
     private IStore store;
     private bool init = false;
     private string path;
@@ -77,7 +78,7 @@ namespace NEOONE
     {
       if (!this.init)
       {
-        Neo.ProtocolSettings.Load(config);
+        this.settings = Neo.ProtocolSettings.Load(config);
         this.resetSnapshots();
 
         this.init = true;
@@ -130,7 +131,7 @@ namespace NEOONE
 
     private NEOONE.ReturnHelpers.ProtocolSettingsReturn _getConfig()
     {
-      return new NEOONE.ReturnHelpers.ProtocolSettingsReturn(Neo.ProtocolSettings.Default);
+      return new NEOONE.ReturnHelpers.ProtocolSettingsReturn(this.settings);
     }
 
 #pragma warning disable 1998
@@ -235,6 +236,20 @@ namespace NEOONE
       {
         int MaxTransactionsPerBlock = (int)input.maxTransactionsPerBlock;
         config.Add("ProtocolConfiguration:MaxTransactionsPerBlock", MaxTransactionsPerBlock.ToString());
+      }
+      if (input.nativeUpdateHistory != null)
+      {
+        Dictionary<string, object[]> UpdateHistory = new Dictionary<string, object[]>() { };
+        foreach (KeyValuePair<string, object> item in input.nativeUpdateHistory)
+        {
+          IEnumerable<object> Value = (IEnumerable<object>)item.Value;
+          int idx = 0;
+          foreach (object obj in Value)
+          {
+            config.Add($"ProtocolConfiguration:NativeUpdateHistory:{item.Key}:{idx}", obj.ToString());
+            idx++;
+          }
+        }
       }
 
       return new ConfigurationBuilder().AddInMemoryCollection(config).Build().GetSection("ProtocolConfiguration");

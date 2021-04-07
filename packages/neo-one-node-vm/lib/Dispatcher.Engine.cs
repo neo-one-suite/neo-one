@@ -108,10 +108,10 @@ namespace NEOONE
             }
           }
           ProtocolSettings settings = ProtocolSettings.Default;
-          // if (args.protocolSettings != null)
-          // {
-          //   settings = parseConfig(args.protocolSettings);
-          // }
+          if (args.settings != null)
+          {
+            settings = ProtocolSettings.Load(parseConfig(args.settings));
+          }
 
           return this._create(trigger, container, this.selectSnapshot(args.snapshot, false), persistingBlock, settings, gas);
 
@@ -193,7 +193,7 @@ namespace NEOONE
       }
     }
 
-    public bool _create(TriggerType trigger, IVerifiable container, DataCache snapshot, Block persistingBlock, ProtocolSettings settings, long gas)
+    private bool _create(TriggerType trigger, IVerifiable container, DataCache snapshot, Block persistingBlock, ProtocolSettings settings, long gas)
     {
       this.disposeEngine();
       this.engine = ApplicationEngine.Create(trigger, container, snapshot, persistingBlock, settings, gas);
@@ -201,13 +201,13 @@ namespace NEOONE
       return true;
     }
 
-    public VMState _execute()
+    private VMState _execute()
     {
       this.isEngineInitialized();
       return this.engine.Execute();
     }
 
-    public bool _loadScript(Script script, CallFlags flags, UInt160 hash = null, int rvcount = -1, int initialPosition = 0)
+    private bool _loadScript(Script script, CallFlags flags, UInt160 hash = null, int rvcount = -1, int initialPosition = 0)
     {
       this.isEngineInitialized();
       if (hash == null)
@@ -247,7 +247,7 @@ namespace NEOONE
       return this.engine != null ? this.engine.State : VMState.BREAK;
     }
 
-    public dynamic[] _getResultStack()
+    private dynamic[] _getResultStack()
     {
       return this.engine != null ? this.engine.ResultStack.Select((StackItem p) => ReturnHelpers.convertStackItem(p)).ToArray() : new dynamic[0];
     }

@@ -145,6 +145,14 @@ export class Blockchain {
     };
   }
 
+  public get settings(): BlockchainSettings {
+    return {
+      ...this.settingsInternal,
+      standbyCommittee: this.mutableStandbyCommittee,
+      committeeMembersCount: this.mutableStandbyCommittee.length,
+    };
+  }
+
   public get nep17Balances() {
     return this.storage.nep17Balances;
   }
@@ -205,16 +213,17 @@ export class Blockchain {
 
   public readonly verifyWitness = verifyWitness;
   public readonly verifyWitnesses = verifyWitnesses;
-  public readonly settings: BlockchainSettings;
   public readonly onPersistNativeContractScript: Buffer;
   public readonly postPersistNativeContractScript: Buffer;
   public readonly headerCache = new HeaderCache();
 
+  private readonly settingsInternal: BlockchainSettings;
   private readonly storage: Storage;
   private readonly native: NativeContainer;
   private readonly vm: VM;
   private readonly onPersist: () => void | Promise<void>;
 
+  private mutableStandbyCommittee: readonly ECPoint[];
   private mutableBlockQueue: PriorityQueue<Entry> = new PriorityQueue({
     comparator: (a, b) => a.block.index - b.block.index,
   });
@@ -229,7 +238,8 @@ export class Blockchain {
   private mutableBlock$: Subject<Block> = new Subject();
 
   public constructor(options: BlockchainOptions) {
-    this.settings = options.settings;
+    this.settingsInternal = options.settings;
+    this.mutableStandbyCommittee = this.settingsInternal.standbyCommittee;
     this.storage = options.storage;
     this.native = options.native;
     this.vm = options.vm;
@@ -801,6 +811,11 @@ export class Blockchain {
         name: 'neo_blockchain',
         message: `Header cache index does not match block index when persisting new block. Block index: ${block.index}. Headercache index: ${firstHeader.index}`,
       });
+    }
+
+    if (this.shouldRefreshCommittee()) {
+      const newCommittee = await this.native.NEO.getCommittee(this.storage);
+      this.mutableStandbyCommittee = newCommittee;
     }
   }
 

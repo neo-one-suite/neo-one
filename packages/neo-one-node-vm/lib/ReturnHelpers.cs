@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Neo.IO;
 using Neo.VM.Types;
@@ -190,7 +191,14 @@ namespace NEOONE
         this.memoryPoolMaxTransactions = value.MemoryPoolMaxTransactions;
         this.maxTraceableBlocks = Convert.ToInt32(value.MaxTraceableBlocks);
         this.maxTransactionsPerBlock = Convert.ToInt32(value.MaxTransactionsPerBlock);
-        this.nativeUpdateHistory = value.NativeUpdateHistory;
+
+        Dictionary<string, int[]> UpdateHistory = new Dictionary<string, int[]>();
+        foreach (KeyValuePair<string, uint[]> kvp in value.NativeUpdateHistory)
+        {
+          UpdateHistory[kvp.Key] = kvp.Value.Select(v => Convert.ToInt32(v)).ToArray();
+        }
+
+        this.nativeUpdateHistory = UpdateHistory;
       }
     }
   }
