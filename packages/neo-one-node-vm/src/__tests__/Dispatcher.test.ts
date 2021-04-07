@@ -10,7 +10,7 @@ describe('Dispatcher Tests', () => {
     dispatcher.reset();
   });
 
-  test.only('withApplicationEngine -- NOP Script', () => {
+  test('withApplicationEngine -- NOP Script', () => {
     const result = dispatcher.withApplicationEngine<{
       readonly gasconsumed: BN;
       readonly state: VMState;
@@ -84,6 +84,12 @@ describe('Dispatcher Tests', () => {
       validatorsCount: standbyValidators.length,
       millisecondsPerBlock: 15000 + 1,
       memoryPoolMaxTransactions: 50000 + 1,
+      maxTraceableBlocks: 1,
+      maxTransactionsPerBlock: 10000,
+      nativeUpdateHistory: {
+        StdLib: [1, 2, 3],
+        ContractManagement: [0],
+      },
     };
 
     const newDis = new Dispatcher({ protocolSettings: input });

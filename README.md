@@ -1,5 +1,7 @@
 # NEO•ONE
 
+This branch is under heavy development during our migration to [N3](https://neo.org/). Please see the [master-2.x](https://github.com/neo-one-suite/neo-one/tree/master-2.x) branch for currently published source code.
+
 [![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=shield)](#contributors)
 [![CircleCI](https://circleci.com/gh/neo-one-suite/neo-one.svg?style=shield)](https://circleci.com/gh/neo-one-suite/neo-one)
 [![codecov](https://codecov.io/gh/neo-one-suite/neo-one/branch/master/graph/badge.svg)](https://codecov.io/gh/neo-one-suite/neo-one)

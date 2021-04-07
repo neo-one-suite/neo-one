@@ -56,7 +56,7 @@ namespace NEOONE
       this.clonedSnapshot = this.snapshot.CreateSnapshot();
     }
 
-    public DataCache selectSnapshot(string snapshot, bool required = true)
+    private DataCache selectSnapshot(string snapshot, bool required = true)
     {
       switch (snapshot)
       {
