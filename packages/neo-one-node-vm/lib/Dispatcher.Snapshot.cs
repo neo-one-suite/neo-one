@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using Neo.Network.P2P.Payloads;
 using Neo.Persistence;
 using NEOONE.Storage;
 

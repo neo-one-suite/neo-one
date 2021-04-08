@@ -1,22 +1,25 @@
 import { BlockJSON, common, crypto, JSONHelper, toWitnessScope, WitnessScopeModel } from '@neo-one/client-common';
-import { Block, ConsensusData, Signer, Transaction, Witness } from '@neo-one/node-core';
+import { Block, Header, Signer, Transaction, Witness } from '@neo-one/node-core';
 import { BN } from 'bn.js';
-import { debugBlockJSON, genesisJSON, secondBlockJSON, thirdBlockJSON } from './jsonBlocks';
+import { genesisJSON, secondBlockJSON, thirdBlockJSON } from './jsonBlocks';
 
 const convertBlock = (json: BlockJSON, messageMagic: number) =>
   new Block({
-    version: json.version,
-    previousHash: JSONHelper.readUInt256(json.previousblockhash),
-    timestamp: new BN(json.time),
-    index: json.index,
-    nextConsensus: crypto.addressToScriptHash({
-      addressVersion: common.NEO_ADDRESS_VERSION,
-      address: json.nextconsensus,
-    }),
-    merkleRoot: JSONHelper.readUInt256(json.merkleroot),
-    witness: new Witness({
-      invocation: JSONHelper.readBase64Buffer(json.witnesses[0].invocation),
-      verification: JSONHelper.readBase64Buffer(json.witnesses[0].verification),
+    header: new Header({
+      previousHash: JSONHelper.readUInt256(json.previousblockhash),
+      timestamp: new BN(json.time),
+      index: json.index,
+      primaryIndex: json.primary,
+      nextConsensus: crypto.addressToScriptHash({
+        addressVersion: common.NEO_ADDRESS_VERSION,
+        address: json.nextconsensus,
+      }),
+      merkleRoot: JSONHelper.readUInt256(json.merkleroot),
+      witness: new Witness({
+        invocation: JSONHelper.readBase64Buffer(json.witnesses[0].invocation),
+        verification: JSONHelper.readBase64Buffer(json.witnesses[0].verification),
+      }),
+      messageMagic,
     }),
     transactions: json.tx.map(
       (tx) =>
@@ -47,13 +50,6 @@ const convertBlock = (json: BlockJSON, messageMagic: number) =>
           messageMagic,
         }),
     ),
-    consensusData: json.consensusdata
-      ? new ConsensusData({
-          primaryIndex: json.consensusdata.primary,
-          nonce: new BN(json.consensusdata.nonce, 16),
-        })
-      : undefined,
-    messageMagic,
   });
 
 // tslint:disable no-any export-name
@@ -61,5 +57,4 @@ export const getData = (messageMagic: number) => ({
   genesisBlock: convertBlock(genesisJSON as any, messageMagic),
   secondBlock: convertBlock(secondBlockJSON as any, messageMagic),
   thirdBlock: convertBlock(thirdBlockJSON as any, messageMagic),
-  debugBlock: convertBlock(debugBlockJSON as any, messageMagic),
 });

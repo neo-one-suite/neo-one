@@ -14,6 +14,7 @@ export const MAX_TRANSACTION_PER_BLOCK = 512;
 export const MAX_BLOCK_SIZE = 262144;
 export const MAX_BLOCK_SYSTEM_FEE = new BN(900000000000);
 export const NATIVE_UPDATE_HISTORY = {
+  ContractManagement: [0],
   CryptoLib: [0],
   GasToken: [0],
   LedgerContract: [0],
