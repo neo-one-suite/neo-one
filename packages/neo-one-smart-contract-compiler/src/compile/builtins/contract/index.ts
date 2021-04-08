@@ -2,7 +2,7 @@ import { Builtins } from '../Builtins';
 import { add as addAddress } from './address';
 import { add as addArrayStorage } from './arrayStorage';
 import { add as addAttribute } from './attribute';
-import { add as addAttributeUsage } from './attributeUsage';
+import { add as addAttributeUsage } from './attributeType';
 import { add as addBlock } from './block';
 import { add as addBlockchain } from './blockchain';
 import { add as addContract } from './contract';
@@ -38,8 +38,6 @@ export const add = (builtins: Builtins): void => {
   addSetStorage(builtins);
   addSmartContract(builtins);
   addTransaction(builtins);
-
-  // void calls saved for later implementations
   addAttribute(builtins);
   addAttributeUsage(builtins);
 };

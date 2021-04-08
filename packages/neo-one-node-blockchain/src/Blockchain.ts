@@ -37,6 +37,7 @@ import {
   VerifyOptions,
   VM,
   VMProtocolSettingsIn,
+  Witness,
 } from '@neo-one/node-core';
 import { Labels, utils as neoOneUtils } from '@neo-one/utils';
 import { BN } from 'bn.js';
@@ -493,11 +494,16 @@ export class Blockchain {
     script,
     snapshot,
     container,
-    persistingBlock,
+    persistingBlock: blockIn,
     rvcount,
     offset = 0,
     gas = common.TEN_FIXED8,
   }: RunEngineOptions): CallReceipt {
+    let persistingBlock = blockIn;
+    if (persistingBlock === undefined) {
+      persistingBlock = this.createDummyBlock();
+    }
+
     return this.vm.withApplicationEngine(
       {
         trigger: TriggerType.Application,
@@ -623,7 +629,7 @@ export class Blockchain {
 
     const nep17BalancePairs = assetKeys.map((key) => {
       const script = new ScriptBuilder()
-        .emitDynamicAppCall(key.assetScriptHash, 'balanceOf', CallFlags.ReadOnly, key.userScriptHash)
+        .emitDynamicAppCall(key.assetScriptHash, 'balanceOf', CallFlags.All, key.userScriptHash)
         .build();
       const callReceipt = this.invokeScript({ script });
       const balanceBuffer = callReceipt.stack[0].getInteger().toBuffer();
@@ -825,6 +831,26 @@ export class Blockchain {
       postPersistNativeContractScript: this.postPersistNativeContractScript,
       vm: this.vm,
       protocolSettings: this.protocolSettings,
+    });
+  }
+
+  private createDummyBlock(): Block {
+    return new Block({
+      header: new Header({
+        version: 0,
+        previousHash: this.currentBlock.hash,
+        timestamp: this.currentBlock.timestamp.addn(this.settings.millisecondsPerBlock),
+        index: this.currentBlockIndex + 0,
+        primaryIndex: 0,
+        merkleRoot: common.ZERO_UINT256,
+        nextConsensus: this.currentBlock.nextConsensus,
+        witness: new Witness({
+          invocation: Buffer.from([]),
+          verification: Buffer.from([]),
+        }),
+        messageMagic: this.settings.messageMagic,
+      }),
+      transactions: [],
     });
   }
 }

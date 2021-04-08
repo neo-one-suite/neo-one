@@ -181,14 +181,14 @@ export interface HighPriorityAttribute extends AttributeBase {
   readonly type: AttributeType.HighPriority;
 }
 
-export interface OracleAttribute extends AttributeBase {
+export interface OracleResponseAttribute extends AttributeBase {
   readonly type: AttributeType.OracleResponse;
 }
 
 /**
  * `Attribute`s are used to store additional data on `Transaction`s.
  */
-export type Attribute = HighPriorityAttribute | OracleAttribute;
+export type Attribute = HighPriorityAttribute | OracleResponseAttribute;
 
 export enum WitnessScope {
   None = 0x00,

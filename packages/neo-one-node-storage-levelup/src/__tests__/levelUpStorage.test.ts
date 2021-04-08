@@ -28,7 +28,6 @@ describe('levelUpStorage', () => {
 
     const storageItem = new StorageItem({
       value,
-      isConstant: false,
     });
     const addChange: AddChange = {
       type: 'storage',

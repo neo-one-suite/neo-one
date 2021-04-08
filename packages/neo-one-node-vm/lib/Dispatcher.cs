@@ -64,7 +64,7 @@ namespace NEOONE
     {
       if (!this.init)
       {
-        Neo.ProtocolSettings.Load(config);
+        this.settings = Neo.ProtocolSettings.Load(config);
         this.path = path;
         this.resetSnapshots();
 
