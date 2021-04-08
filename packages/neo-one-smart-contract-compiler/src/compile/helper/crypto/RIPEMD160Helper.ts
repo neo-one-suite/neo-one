@@ -1,4 +1,4 @@
-import { common } from '@neo-one/client-common';
+import { CallFlags, common } from '@neo-one/client-common';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -12,9 +12,11 @@ export class RIPEMD160Helper extends Helper {
     sb.emitPushInt(node, 1);
     // [[argsBuffer]]
     sb.emitOp(node, 'PACK');
-    // ['ripemd160', [argsBuffer]]
+    // [number, [argsBuffer]]
+    sb.emitPushInt(node, CallFlags.None);
+    // ['ripemd160', number, [argsBuffer]]
     sb.emitPushString(node, 'ripemd160');
-    // [buffer, 'ripemd160', [argsBuffer]]
+    // [buffer, 'ripemd160', number, [argsBuffer]]
     sb.emitPushBuffer(node, common.nativeHashes.CryptoLib);
     // [argsHash]
     sb.emitSysCall(node, 'System.Contract.Call');

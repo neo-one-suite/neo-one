@@ -1,3 +1,4 @@
+import { CallFlags } from '@neo-one/client-common/src';
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../../sb';
@@ -54,13 +55,25 @@ export class SmartContractFor extends SmartContractForBase {
     if (scriptHash === undefined) {
       // [bufferVal, string, params]
       sb.scope.get(sb, arg, options, addressName);
-      // [buffer, string, params]
+      // [number, bufferVal, string, params]
+      sb.emitPushInt(node, CallFlags.None);
+      // [string, bufferVal, number, params]
+      sb.emitOp(node, 'REVERSE3');
+      // [bufferVal, string, number, params]
+      sb.emitOp(node, 'SWAP');
+      // [buffer, string, number, params]
       sb.emitHelper(prop, options, sb.helpers.unwrapBuffer);
       // [result]
       sb.emitSysCall(node, 'System.Contract.Call');
     } else {
       // [buffer, string, params]
       sb.emitPushBuffer(prop, scriptHash);
+      // [number, buffer, string, params]
+      sb.emitPushInt(node, CallFlags.None);
+      // [string, buffer, number, params]
+      sb.emitOp(node, 'REVERSE3');
+      // [buffer, string, number, params]
+      sb.emitOp(node, 'SWAP');
       // [result]
       sb.emitSysCall(node, 'System.Contract.Call');
     }

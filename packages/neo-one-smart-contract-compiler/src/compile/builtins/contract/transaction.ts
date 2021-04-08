@@ -1,4 +1,4 @@
-import { common } from '@neo-one/client-common';
+import { CallFlags, common } from '@neo-one/client-common';
 import { Types } from '../../constants';
 import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
@@ -31,9 +31,11 @@ export const add = (builtins: Builtins): void => {
         sb.emitPushInt(node, 1);
         // [[txHash]]
         sb.emitOp(node, 'PACK');
-        // ['getTransactionHeight', [txHash]]
+        // [number, [txHash]]
+        sb.emitPushInt(node, CallFlags.None);
+        // ['getTransactionHeight', number, [txHash]]
         sb.emitPushString(node, 'getTransactionHeight');
-        // [buffer, 'getTransactionHeight', [txHash]]
+        // [buffer, 'getTransactionHeight', number, [txHash]]
         sb.emitPushBuffer(node, common.nativeHashes.Ledger);
         // [height]
         sb.emitSysCall(node, 'System.Contract.Call');
@@ -91,9 +93,11 @@ export const add = (builtins: Builtins): void => {
         sb.emitPushInt(node, 1);
         // [[buffer]]
         sb.emitOp(node, 'PACK');
-        // ['getTransaction', [buffer]]
+        // [number, [buffer]]
+        sb.emitPushInt(node, CallFlags.None);
+        // ['getTransaction', number, [buffer]]
         sb.emitPushString(node, 'getTransaction');
-        // [buffer, 'getTransaction', [buffer]]
+        // [buffer, 'getTransaction', number, [buffer]]
         sb.emitPushBuffer(node, common.nativeHashes.Ledger);
         // [conract]
         sb.emitSysCall(node, 'System.Contract.Call');

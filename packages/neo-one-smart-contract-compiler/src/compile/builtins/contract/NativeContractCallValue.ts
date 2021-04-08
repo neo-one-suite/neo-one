@@ -1,4 +1,4 @@
-import { UInt160 } from '@neo-one/client-common';
+import { CallFlags, UInt160 } from '@neo-one/client-common';
 import { WrappableType } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -20,9 +20,11 @@ export class NativeContractCallValue extends BuiltinMemberValue {
     }
     // [[]]
     sb.emitOp(node, 'NEWARRAY0');
-    // [method, []]
+    // [number, []]
+    sb.emitPushInt(node, CallFlags.None);
+    // [method, number, []]
     sb.emitPushString(node, this.method);
-    // [buffer, method, []]
+    // [buffer, method, number, []]
     sb.emitPushBuffer(node, this.hash);
     // [val]
     sb.emitSysCall(node, 'System.Contract.Call');

@@ -1,4 +1,4 @@
-import { common } from '@neo-one/client-common';
+import { CallFlags, common } from '@neo-one/client-common';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -12,9 +12,11 @@ export class BinaryDeserializeHelper extends Helper {
     sb.emitPushInt(node, 1);
     // [[buffer]]
     sb.emitOp(node, 'PACK');
-    // ['deserialize', [buffer]]
+    // [number, [buffer]]
+    sb.emitPushInt(node, CallFlags.None);
+    // ['deserialize', number, [buffer]]
     sb.emitPushString(node, 'deserialize');
-    // [buffer, 'deserialize', [buffer]]
+    // [buffer, 'deserialize', number, [buffer]]
     sb.emitPushBuffer(node, common.nativeHashes.StdLib);
     // [val]
     sb.emitSysCall(node, 'System.Contract.Call');
