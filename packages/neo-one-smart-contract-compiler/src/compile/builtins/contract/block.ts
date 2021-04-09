@@ -1,4 +1,4 @@
-import { common } from '@neo-one/client-common';
+import { CallFlags, common } from '@neo-one/client-common';
 import { Types } from '../../constants';
 import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
@@ -37,9 +37,11 @@ export const add = (builtins: Builtins): void => {
         sb.emitPushInt(node, 1);
         // [[buffer]]
         sb.emitOp(node, 'PACK');
-        // ['getBlock', [buffer]]
+        // [number, [buffer]]
+        sb.emitPushInt(node, CallFlags.None);
+        // ['getBlock', number, [buffer]]
         sb.emitPushString(node, 'getBlock');
-        // [buffer, 'gettransaction', [buffer]]
+        // [buffer, 'getBlock', number, [buffer]]
         sb.emitPushBuffer(node, common.nativeHashes.Ledger);
         // [conract]
         sb.emitSysCall(node, 'System.Contract.Call');

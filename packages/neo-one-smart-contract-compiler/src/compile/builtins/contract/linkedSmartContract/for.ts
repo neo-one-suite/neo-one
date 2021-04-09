@@ -1,4 +1,4 @@
-import { UInt160 } from '@neo-one/client-common';
+import { CallFlags, UInt160 } from '@neo-one/client-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
@@ -51,7 +51,11 @@ export class LinkedSmartContractFor extends SmartContractForBase {
       sb.emitOp(node, 'PACK');
       // [string, [string, params]]
       sb.emitOp(node, 'SWAP');
-      // [buffer, string, params]
+      // [number, string, [string, params]]
+      sb.emitPushInt(node, CallFlags.None);
+      // [string, number, [string, params]]
+      sb.emitOp(node, 'SWAP');
+      // [buffer, string, number, [string, params]]
       sb.emitPushBuffer(prop, scriptHash);
       // [result]
       sb.emitSysCall(prop, 'System.Contract.Call');

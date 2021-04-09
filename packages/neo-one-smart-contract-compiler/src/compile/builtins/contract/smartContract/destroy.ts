@@ -1,4 +1,4 @@
-import { common } from '@neo-one/client-common';
+import { CallFlags, common } from '@neo-one/client-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../../sb';
@@ -28,9 +28,11 @@ export class SmartContractDestroy extends BuiltinInstanceMemberCall {
     sb.emitPushInt(node, 1);
     // [[buffer]]
     sb.emitOp(node, 'PACK');
-    // ['destroy', [buffer], buffer]
+    // [number, [buffer]]
+    sb.emitPushInt(node, CallFlags.None);
+    // ['destroy', number, [buffer]]
     sb.emitPushString(node, 'destroy');
-    // [buffer, 'destroy', [buffer]]
+    // [buffer, 'destroy', number, [buffer]]
     sb.emitPushBuffer(node, common.nativeHashes.ContractManagement);
     // [conract]
     sb.emitSysCall(node, 'System.Contract.Call');
