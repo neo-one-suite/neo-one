@@ -46,7 +46,7 @@ export class UpgradeHelper extends Helper {
           // TODO: need to test this and make sure the "arg" is an array
           // first arg is nefFile and second is manifest
           // [number, arg]
-          sb.emitPushInt(node, CallFlags.None);
+          sb.emitPushInt(node, CallFlags.All);
           // ['update', number, arg]
           sb.emitPushString(node, 'update');
           // [buffer, 'update', number, arg]

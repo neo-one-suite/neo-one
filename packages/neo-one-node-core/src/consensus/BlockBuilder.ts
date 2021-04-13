@@ -1,7 +1,7 @@
 import { BlockJSON, JSONHelper, UInt160, UInt256 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { Block, BlockAdd } from '../Block';
-import { HeaderAdd } from '../Header';
+import { Header, HeaderAdd } from '../Header';
 import { Transaction } from '../transaction';
 import { Witness } from '../Witness';
 
@@ -64,7 +64,7 @@ export class BlockBuilder {
     // TODO: we could assert all these options but we'd throw anyway, maybe clean up.
     return new Block({
       transactions: this.transactions ?? [],
-      header: {
+      header: new Header({
         version: this.version,
         previousHash: this.previousHash,
         merkleRoot: this.merkleRoot,
@@ -75,7 +75,7 @@ export class BlockBuilder {
         witness: this.witness,
         messageMagic: this.messageMagic,
         // tslint:disable-next-line: no-any
-      } as any,
+      } as any),
     });
   }
 

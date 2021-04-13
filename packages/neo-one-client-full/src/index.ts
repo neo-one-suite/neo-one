@@ -44,7 +44,6 @@ export {
   BufferContractParameter,
   BufferString,
   ConfirmedTransaction,
-  ConsensusData,
   Contract,
   ContractABI,
   ContractABIClient,

@@ -186,11 +186,13 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
         })?.contract.script;
 
         if (witnessScript === undefined && transaction.witnesses.length !== 0) {
-          transaction.witnesses.forEach((witness) => {
+          // tslint:disable-next-line: no-loop-statement
+          for (const witness of transaction.witnesses) {
             if (common.uInt160Equal(crypto.toScriptHash(witness.verification), hash)) {
               witnessScript = witness.verification;
+              break;
             }
-          });
+          }
         }
 
         // it may seem odd to throw here and continue logic, but it helps keep our other checks type safe when it IS defined.
@@ -263,7 +265,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
         const userAccount = this.getUserAccount(from);
 
         let witness: WitnessModel;
-        if (crypto.isMultiSigContract(userAccount.contract.script)) {
+        if (crypto.isMultiSigContractWithResult(userAccount.contract.script).result) {
           witness = crypto.createMultiSignatureWitness(
             1,
             [common.stringToECPoint(userAccount.publicKey)],
@@ -280,7 +282,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
 
         const result = await this.provider.relayTransaction(
           from.network,
-          // TODO: addWitness possibly needs to be fixed/reverted
           this.addWitness({
             transaction: transactionUnsigned,
             witness,

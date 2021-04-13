@@ -1,11 +1,11 @@
-import { BinaryReader, crypto, NefFileJSON, NefFileModel } from '@neo-one/client-common';
+import { BinaryReader, NefFileJSON, NefFileModel } from '@neo-one/client-common';
 import { MethodToken } from './MethodToken';
 import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableJSON } from './Serializable';
 
 export class NefFile extends NefFileModel implements SerializableJSON<NefFileJSON> {
   public static readonly maxScriptLength = 512 * 1024;
 
-  public static deserializeWireBase(options: DeserializeWireBaseOptions): NefFile {
+  public static deserializeWireBase(options: Omit<DeserializeWireBaseOptions, 'context'>): NefFile {
     const { reader } = options;
     const magic = reader.readUInt32LE();
     if (magic !== this.magic) {
@@ -39,17 +39,7 @@ export class NefFile extends NefFileModel implements SerializableJSON<NefFileJSO
     return nef;
   }
 
-  public static deserializeWire(options: DeserializeWireOptions): NefFile {
-    return this.deserializeWireBase({
-      context: options.context,
-      reader: new BinaryReader(options.buffer),
-    });
-  }
-
-  public static computeCheckSum(file: NefFile) {
-    const buff = file.serializeWire().slice(0, -4);
-    const hash = crypto.hash256(buff);
-
-    return hash.readUInt32LE();
+  public static deserializeWire(options: Omit<DeserializeWireOptions, 'context'>): NefFile {
+    return this.deserializeWireBase({ reader: new BinaryReader(options.buffer) });
   }
 }

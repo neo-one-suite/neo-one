@@ -28,6 +28,7 @@ import {
   ContractPermission,
   ContractPermissionJSON,
   DeveloperProvider,
+  ExecutionJSON,
   GetOptions,
   Hash256String,
   IterOptions,
@@ -40,6 +41,7 @@ import {
   PrivateNetworkSettings,
   RawApplicationLogData,
   RawCallReceipt,
+  RawExecutionData,
   RelayTransactionResult,
   RelayTransactionResultJSON,
   ScriptBuilderParam,
@@ -286,7 +288,6 @@ export class NEOONEDataProvider implements DeveloperProvider {
 
   private convertStorageItem(storageItem: StorageItemJSON): StorageItem {
     return {
-      address: scriptHashToAddress(storageItem.hash),
       key: storageItem.key,
       value: storageItem.value,
     };
@@ -294,23 +295,19 @@ export class NEOONEDataProvider implements DeveloperProvider {
 
   private convertBlock(block: BlockJSON): Block {
     return {
-      version: block.version,
-      hash: block.hash,
-      previousBlockHash: block.previousblockhash,
-      merkleRoot: block.merkleroot,
-      time: new BigNumber(block.time),
-      consensusData:
-        block.consensusdata === undefined
-          ? undefined
-          : {
-              primaryIndex: block.consensusdata.primary,
-              nonce: block.consensusdata.nonce,
-            },
-      index: block.index,
-      nextConsensus: block.nextconsensus,
-      witness: block.witnesses[0],
-      witnesses: block.witnesses,
-      size: block.size,
+      header: {
+        version: block.version,
+        hash: block.hash,
+        previousBlockHash: block.previousblockhash,
+        merkleRoot: block.merkleroot,
+        time: new BigNumber(block.time),
+        primaryIndex: block.primary,
+        index: block.index,
+        nextConsensus: block.nextconsensus,
+        witness: block.witnesses[0],
+        witnesses: block.witnesses,
+        size: block.size,
+      },
       transactions: block.tx.map((transaction) => this.convertConfirmedTransaction(transaction)),
     };
   }
@@ -486,15 +483,22 @@ export class NEOONEDataProvider implements DeveloperProvider {
     }
   }
 
-  private convertApplicationLogData(data: ApplicationLogJSON): RawApplicationLogData {
+  private convertExecution(data: ExecutionJSON): RawExecutionData {
     return {
-      txId: data?.txid,
       trigger: data.trigger,
       vmState: data.vmstate,
       gasConsumed: new BigNumber(data.gasconsumed),
       stack: typeof data.stack === 'string' ? data.stack : data.stack.map(convertStackItem),
       notifications: data.notifications.map(convertNotification),
       logs: data.logs.map(convertLog),
+    };
+  }
+
+  private convertApplicationLogData(data: ApplicationLogJSON): RawApplicationLogData {
+    return {
+      txId: data.txid,
+      blockHash: data.blockhash,
+      executions: data.executions.map(this.convertExecution),
     };
   }
 

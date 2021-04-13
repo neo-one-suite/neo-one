@@ -1,7 +1,7 @@
 import {
   ABIParameter,
   ABIReturn,
-  BinaryWriter,
+  assertCallFlags,
   BufferString,
   CallFlags,
   common,
@@ -12,6 +12,8 @@ import {
   ECPoint,
   InvocationResultError,
   InvocationResultSuccess,
+  MethodTokenModel,
+  NefFileModel,
   NetworkSettings,
   NetworkType,
   Param,
@@ -25,7 +27,6 @@ import {
   TransactionResult,
   UInt160,
   UserAccountID,
-  utils as clientUtils,
   Wildcard,
   WitnessScopeModel,
 } from '@neo-one/client-common';
@@ -44,7 +45,6 @@ import {
   ContractParameterDefinitionModel,
   ContractPermissionDescriptorModel,
   ContractPermissionModel,
-  ContractStateModel,
 } from '@neo-one/client-full-common';
 import { processActionsAndMessage, processConsoleLogMessages } from '@neo-one/client-switch';
 import { utils as commonUtils } from '@neo-one/utils';
@@ -94,10 +94,7 @@ const toContractParameterType = (parameter: ABIReturn | ABIParameter): ContractP
   }
 };
 
-export const contractRegisterToContractModel = (
-  contractIn: ContractRegister,
-  contractHash: UInt160,
-): ContractStateModel => {
+export const contractRegisterToContractManifest = (contractIn: ContractRegister): ContractManifestModel => {
   const abi = new ContractABIModel({
     methods: contractIn.manifest.abi.methods.map(
       (methodIn) =>
@@ -151,7 +148,8 @@ export const contractRegisterToContractModel = (
 
     return '*';
   };
-  const manifest = new ContractManifestModel({
+
+  return new ContractManifestModel({
     name: contractIn.manifest.name,
     groups: contractIn.manifest.groups.map(
       (group) =>
@@ -171,14 +169,6 @@ export const contractRegisterToContractModel = (
     ),
     trusts: contractIn.manifest.trusts === '*' ? '*' : contractIn.manifest.trusts.map(common.stringToUInt160),
     extra: contractIn.manifest.extra,
-  });
-
-  return new ContractStateModel({
-    hash: contractHash,
-    updateCounter: 1, // TODO: what should this be?
-    script: Buffer.from(contractIn.script, 'hex'),
-    id: clientUtils.randomUShort(),
-    manifest,
   });
 };
 
@@ -254,21 +244,28 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       invokeMethodOptionsOrScript: bufferScript,
       options,
       transfers: options.transfers === undefined ? [] : options.transfers.map((transfer) => ({ ...transfer, from })),
-      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
-        blockIndex: receipt.blockIndex,
-        blockHash: receipt.blockHash,
-        blockTime: receipt.blockTime,
-        transactionIndex: receipt.transactionIndex,
-        transactionHash: receipt.transactionHash,
-        globalIndex: receipt.globalIndex,
-        confirmations: receipt.confirmations,
-        stack: typeof data.stack === 'string' ? [] : data.stack, // TODO: fix
-        state: data.vmState as 'HALT' | 'FAULT', // TODO: fix
-        script: bufferScript,
-        gasConsumed: data.gasConsumed,
-        logs: data.logs,
-        notifications: data.notifications,
-      }),
+      onConfirm: ({ receipt, data: dataIn }): RawInvokeReceipt => {
+        const data = dataIn.executions.length > 0 ? dataIn.executions[0] : undefined;
+        if (data === undefined) {
+          throw new Error('Expected application log for transaction to have at least one execution');
+        }
+
+        return {
+          blockIndex: receipt.blockIndex,
+          blockHash: receipt.blockHash,
+          blockTime: receipt.blockTime,
+          transactionIndex: receipt.transactionIndex,
+          transactionHash: receipt.transactionHash,
+          globalIndex: receipt.globalIndex,
+          confirmations: receipt.confirmations,
+          stack: typeof data.stack === 'string' ? [] : data.stack, // TODO: fix
+          state: data.vmState,
+          script: bufferScript,
+          gasConsumed: data.gasConsumed,
+          logs: data.logs,
+          notifications: data.notifications,
+        };
+      },
       method: 'execute',
       sourceMaps,
     });
@@ -285,36 +282,40 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     if (address === undefined) {
       throw new Error('Expected address to be defined');
     }
-    // TODO: clean up this mess and clean up this transaction flow
     const signer = new SignerModel({
       account: crypto.addressToScriptHash({ address, addressVersion: common.NEO_ADDRESS_VERSION }),
       scopes: WitnessScopeModel.Global,
     });
 
-    const contractHashUInt160 = crypto.getContractHash(signer.account, Buffer.from(contractIn.script, 'hex'));
-    const contractHash = common.uInt160ToString(contractHashUInt160);
-    const contract = contractRegisterToContractModel(contractIn, contractHashUInt160);
+    const nefFile = new NefFileModel({
+      compiler: contractIn.nefFile.compiler,
+      script: Buffer.from(contractIn.nefFile.script, 'hex'),
+      tokens: contractIn.nefFile.tokens.map(
+        (token) =>
+          new MethodTokenModel({
+            hash: common.stringToUInt160(token.hash),
+            method: token.method,
+            paramCount: token.paramCount,
+            hasReturnValue: token.hasReturnValue,
+            callFlags: assertCallFlags(token.callFlags),
+          }),
+      ),
+    });
 
-    // TODO: create function to do this
-    const writer = new BinaryWriter();
-    writer.writeUInt32LE(0x3346454e); // TODO: abstract this number
-    writer.writeFixedString(contractIn.compilerName, 64);
-    writer.writeUInt16LE(0);
-    // writer.writeArray(contractIn.manifest.abi.methods);
-    writer.writeUInt16LE(0);
-    writer.writeVarBytesLE(Buffer.from(contractIn.script, 'hex'));
-    writer.writeBytes(crypto.sha256(crypto.sha256(writer.toBuffer())).slice(0, 4));
+    const contractHash = crypto.getContractHash(signer.account, nefFile.checkSum, contractIn.manifest.name);
+    const manifest = contractRegisterToContractManifest(contractIn);
 
     const sb = new ScriptBuilder();
-    sb.emitPush(contract.manifest.serializeWireForNeo()); // TODO: remove this later
-    sb.emitPush(writer.toBuffer());
+    sb.emitPush(manifest.serializeWireForNeo());
+    sb.emitPush(nefFile.serializeWire());
     sb.emitPushInt(2);
     sb.emitOp('PACK');
+    sb.emitPushInt(CallFlags.All);
     sb.emitPushString('deploy');
     sb.emitPush(common.nativeHashes.ContractManagement);
     sb.emitSysCall('System.Contract.Call');
     const { from } = this.getTransactionOptions(options);
-    emit(sb, from, contractHashUInt160);
+    emit(sb, from, contractHash);
 
     const script = sb.build();
 
@@ -323,13 +324,16 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       options,
       onConfirm: async ({ receipt, data }): Promise<PublishReceipt> => {
         let result;
+        const execution = data.executions.length > 0 ? data.executions[0] : undefined;
+        const vmState = execution?.vmState;
+
         // tslint:disable-next-line: prefer-switch
-        if (data.vmState === 'FAULT') {
+        if (vmState === 'FAULT') {
           result = await this.getInvocationResultError(data, sourceMaps);
-        } else if (data.vmState === 'NONE' || data.vmState === 'BREAK') {
-          throw new Error(`Something went wrong. Expected VM state HALT or FAULT. Got: ${data.vmState}`);
+        } else if (vmState === 'NONE' || vmState === 'BREAK') {
+          throw new Error(`Something went wrong. Expected VM state HALT or FAULT. Got: ${vmState}`);
         } else {
-          const contractAddress = scriptHashToAddress(contractHash);
+          const contractAddress = scriptHashToAddress(common.uInt160ToString(contractHash));
           const contractOut = await this.provider.getContract(from.network, contractAddress);
 
           result = await this.getInvocationResultSuccess(data, contractOut, sourceMaps);
@@ -352,15 +356,18 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   }
 
   protected async getInvocationResultError(
-    data: RawApplicationLogData,
+    dataIn: RawApplicationLogData,
     sourceMaps: SourceMaps = {},
   ): Promise<InvocationResultError> {
+    const data = dataIn.executions.length > 0 ? dataIn.executions[0] : undefined;
+    if (data === undefined) {
+      throw new Error('Expected application log for transaction to have at least one execution');
+    }
     const message = await processActionsAndMessage({
       actions: [...data.logs, ...data.notifications],
       sourceMaps,
     });
 
-    // TODO: fix vm states
     // tslint:disable-next-line: prefer-switch
     if (data.vmState === 'HALT' || data.vmState === 'BREAK' || data.vmState === 'NONE') {
       throw new Error(`Expected FAULT state. Got: ${data.vmState}`);
@@ -374,16 +381,19 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   }
 
   protected async getInvocationResultSuccess<T>(
-    data: RawApplicationLogData,
+    dataIn: RawApplicationLogData,
     value: T,
     sourceMaps: SourceMaps = {},
   ): Promise<InvocationResultSuccess<T>> {
+    const data = dataIn.executions.length > 0 ? dataIn.executions[0] : undefined;
+    if (data === undefined) {
+      throw new Error('Expected application log for transaction to have at least one execution');
+    }
     await processConsoleLogMessages({
       actions: [...data.logs, ...data.notifications],
       sourceMaps,
     });
 
-    // TODO: fix vm states
     // tslint:disable-next-line: prefer-switch
     if (data.vmState === 'FAULT' || data.vmState === 'BREAK' || data.vmState === 'NONE') {
       throw new Error(`Expected HALT state. Got: ${data.vmState}`);

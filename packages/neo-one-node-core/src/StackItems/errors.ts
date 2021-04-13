@@ -15,10 +15,6 @@ export const InvalidValueHeaderError = makeErrorWithCode(
   () => 'Invalid Value. Expected Header',
 );
 export const InvalidValueBlockError = makeErrorWithCode('INVALID_VALUE_BLOCK', () => 'Invalid Value. Expected Block');
-export const InvalidValueBlockBaseError = makeErrorWithCode(
-  'INVALID_VALUE_BLOCK_BASE',
-  () => 'Invalid Value. Expected BlockBase',
-);
 export const InvalidValueTransactionError = makeErrorWithCode(
   'INVALID_VALUE_TRANSACTION',
   () => 'Invalid Value. Expected Transaction',

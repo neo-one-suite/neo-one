@@ -1,6 +1,6 @@
 import { common, ContractManifestJSON, InvalidFormatError, JSONHelper, UInt160 } from '@neo-one/client-common';
 import { ContractManifestModel } from '@neo-one/client-full-common';
-import { Set as ISet } from 'immutable';
+import { Set as iSet } from 'immutable';
 import { assertArrayStackItem, assertStructStackItem, StackItem } from '../StackItems';
 import { utils } from '../utils';
 import { ContractABI } from './ContractABI';
@@ -45,7 +45,7 @@ export class ContractManifest extends ContractManifestModel<ContractABI, Contrac
       throw new InvalidFormatError('Manifest name cannot be an empty string');
     }
     const groups = json.groups.map((group) => ContractGroup.deserializeJSON(group));
-    if (ISet(groups.map((g) => g.publicKey)).size !== groups.length) {
+    if (iSet(groups.map((g) => g.publicKey)).size !== groups.length) {
       throw new InvalidFormatError('Manifest groups cannot contain duplicates');
     }
     const supportedStandards = json.supportedstandards;
@@ -59,11 +59,11 @@ export class ContractManifest extends ContractManifestModel<ContractABI, Contrac
     }
     const abi = ContractABI.deserializeJSON(json.abi);
     const permissions = json.permissions.map((permission) => ContractPermission.deserializeJSON(permission));
-    if (ISet(permissions.map((p) => p.contract)).size !== permissions.length) {
+    if (iSet(permissions.map((p) => p.contract)).size !== permissions.length) {
       throw new InvalidFormatError('Manifest permissions cannot contain duplicates');
     }
     const trusts = utils.wildCardFromJSON<UInt160>(json.trusts, JSONHelper.readUInt160);
-    if (typeof trusts !== 'string' && ISet(trusts).size !== trusts.length) {
+    if (typeof trusts !== 'string' && iSet(trusts).size !== trusts.length) {
       throw new InvalidFormatError('Manifest trusts cannot contain duplicates');
     }
     const extra = json.extra;

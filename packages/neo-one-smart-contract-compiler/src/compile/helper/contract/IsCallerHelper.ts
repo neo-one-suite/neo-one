@@ -38,7 +38,7 @@ export class IsCallerHelper extends Helper {
           // [[addressBuffer], addressBuffer]
           sb.emitOp(node, 'PACK');
           // [number, [addressBuffer], addressBuffer]
-          sb.emitPushInt(node, CallFlags.None);
+          sb.emitPushInt(node, CallFlags.ReadStates);
           // ['getContract', number, [addressBuffer], addressBuffer]
           sb.emitPushString(node, 'getContract');
           // [buffer, 'getContract', number, [addressBuffer], addressBuffer]

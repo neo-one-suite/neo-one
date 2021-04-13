@@ -53,7 +53,7 @@ export const restore = async ({ path, bucket, folder }: RestoreOptions) => {
 
   if (localMTime.getTime() >= cloudMTime.getTime()) {
     // tslint:disable-next-line: no-console
-    console.log('skipping restore, local files more synced');
+    console.log('Skipping restore, local files more synced.');
 
     return undefined;
   }

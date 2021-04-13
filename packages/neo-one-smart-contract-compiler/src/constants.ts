@@ -17,7 +17,7 @@ export interface ContractProperties {
 }
 
 export const DEFAULT_CONTRACT_PROPERTIES = {
-  name: '',
+  name: 'A NEO•ONE Smart Contract',
   groups: [],
   permissions: [],
   trusts: '*' as '*',

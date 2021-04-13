@@ -32,7 +32,7 @@ export const add = (builtins: Builtins): void => {
         // [[txHash]]
         sb.emitOp(node, 'PACK');
         // [number, [txHash]]
-        sb.emitPushInt(node, CallFlags.None);
+        sb.emitPushInt(node, CallFlags.ReadStates);
         // ['getTransactionHeight', number, [txHash]]
         sb.emitPushString(node, 'getTransactionHeight');
         // [buffer, 'getTransactionHeight', number, [txHash]]

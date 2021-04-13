@@ -51,7 +51,8 @@ describe('TS <--> C# Storage Test', () => {
       }),
       previousHash: common.ZERO_UINT256,
       nextConsensus: common.ZERO_UINT160,
-      consensusData: new ConsensusData({ nonce: new BN(1), primaryIndex: 1 }),
+      nonce: new BN(1),
+      primaryIndex: 1,
       transactions: [tx],
       messageMagic,
     });
@@ -113,7 +114,8 @@ describe('TS <--> C# Storage Test', () => {
       }),
       previousHash: common.ZERO_UINT256,
       nextConsensus: common.ZERO_UINT160,
-      consensusData: new ConsensusData({ nonce: new BN(1), primaryIndex: 1 }),
+      nonce: 1,
+      primaryIndex: 1,
       transactions: [tx],
       messageMagic,
     });

@@ -2,7 +2,7 @@ import { BinaryReader, InvalidFormatError, MethodTokenJSON, MethodTokenModel } f
 import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableJSON } from './Serializable';
 
 export class MethodToken extends MethodTokenModel implements SerializableJSON<MethodTokenJSON> {
-  public static deserializeWireBase(options: DeserializeWireBaseOptions): MethodToken {
+  public static deserializeWireBase(options: Omit<DeserializeWireBaseOptions, 'context'>): MethodToken {
     const { reader } = options;
 
     const hash = reader.readUInt160();
@@ -23,10 +23,7 @@ export class MethodToken extends MethodTokenModel implements SerializableJSON<Me
     });
   }
 
-  public static deserializeWire(options: DeserializeWireOptions): MethodToken {
-    return this.deserializeWireBase({
-      context: options.context,
-      reader: new BinaryReader(options.buffer),
-    });
+  public static deserializeWire(options: Omit<DeserializeWireOptions, 'context'>): MethodToken {
+    return this.deserializeWireBase({ reader: new BinaryReader(options.buffer) });
   }
 }

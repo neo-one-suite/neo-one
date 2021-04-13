@@ -58,7 +58,7 @@ export class Transaction
       script,
     } = this.deserializeWireBaseUnsigned(options);
     const { reader } = options;
-    const witnesses = reader.readArray(() => Witness.deserializeWireBase(options));
+    const witnesses = reader.readArray(() => Witness.deserializeWireBase(options), signers?.length);
     if (witnesses.length !== signers?.length) {
       throw new InvalidFormatError(
         `Expected witnesses length to equal signers length. Got ${witnesses.length} witnesses and ${signers?.length} signers`,

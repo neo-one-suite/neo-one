@@ -1,13 +1,10 @@
 // wallaby.skip
-import { common, crypto, Op, ScriptBuilder, UInt256Hex, WitnessScopeModel } from '@neo-one/client-common';
+import { common, crypto, Op, UInt256Hex } from '@neo-one/client-common';
 import {
   Block,
   ChangeViewConsensusMessage,
   ChangeViewReason,
   ConsensusContext,
-  ConsensusData,
-  Signer,
-  Transaction,
   TransactionVerificationContext,
   Witness,
 } from '@neo-one/node-core';
@@ -94,18 +91,12 @@ describe('handleConsensusPayload', () => {
       verification: Buffer.from([Op.PUSH1]),
     });
 
-    const consensusData = new ConsensusData({
-      primaryIndex: 0,
-      nonce: new BN(2083236893),
-    });
-
     const genesisBlock = new Block({
       previousHash: common.ZERO_UINT256,
       timestamp: new BN(Date.now()),
       index: 0,
       nextConsensus: consensusAddress,
       witness: deployWitness,
-      consensusData,
       transactions: [],
       messageMagic: 7630401,
     });

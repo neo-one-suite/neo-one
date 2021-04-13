@@ -103,7 +103,7 @@ const getCompiledScript = async (script: string, fileName?: string): Promise<Com
     withTestHarness: true,
   });
 
-  return compile({ context, sourceFile });
+  return compile({ context, sourceFile, addDummyMethod: true });
 };
 
 const publish = async (

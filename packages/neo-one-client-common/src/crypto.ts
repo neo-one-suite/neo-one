@@ -568,75 +568,14 @@ const decryptNEP2 = async ({
 };
 
 // TODO: find a way to not hard-code these. they should come directly from the SysCallHashNum enum ideally
-const checkMultisig = Buffer.from(common.strip0x(`${0x7bce6ca5}`), 'hex');
-const checkSig = Buffer.from(common.strip0x(`${0x747476aa}`), 'hex');
-
-// tslint:disable
-const isMultiSigContract = (script: Buffer) => {
-  let m = 0;
-  let n = 0;
-  let i = 0;
-  if (script.length < 42) return false;
-  if (script[i] > Op.PUSH16) return false;
-  if (script[i] < Op.PUSH1 && script[i] !== 1 && script[i] !== 2) return false;
-  switch (script[i]) {
-    case Op.PUSHINT8:
-      m = script[++i];
-      ++i;
-      break;
-    case Op.PUSHINT16:
-      m = script.readUInt16LE(++i);
-      i += 2;
-      break;
-    default:
-      const b = script[i];
-      if (b >= Op.PUSH1 && b <= Op.PUSH16) {
-        m = b - Op.PUSH0;
-        ++i;
-        break;
-      }
-      return false;
-  }
-  if (m < 1 || m > 1024) return false;
-  while (script[i] == Op.PUSHDATA1) {
-    if (script.length <= i + 35) return false;
-    if (script[++i] !== 33) return false;
-    // TODO: add "points" list from C#
-    // points?.push(script.slice(i + 1, i + 1 + 33));
-
-    i += 34;
-    ++n;
-  }
-  if (n < m || n > 1024) return false;
-  switch (script[i]) {
-    case Op.PUSHINT8:
-      if (n != script[++i]) return false;
-      ++i;
-      break;
-    case Op.PUSHINT16:
-      if (script.length < i + 3 || n != script.readUInt16LE(++i)) return false;
-      i += 2;
-      break;
-    default:
-      const b = script[i];
-      if (b >= Op.PUSH1 && b <= Op.PUSH16) {
-        if (n !== b - Op.PUSH0) return false;
-        ++i;
-        break;
-      }
-      return false;
-  }
-  if (script[i++] !== Op.SYSCALL) return false;
-  if (script.length !== i + 5) return false;
-  if (!script.slice(i).equals(checkMultisig)) return false;
-  return true;
-};
-// tslint:enable
+const checkMultisig = Buffer.from('7bce6ca5', 'hex');
+const checkSig = Buffer.from('747476aa', 'hex');
 
 type MultiSigResult =
   | { readonly result: true; readonly m: number; readonly n: number; readonly points: readonly ECPoint[] }
   | { readonly result: false };
 // tslint:disable
+// tslint:enable no-suspicious-comment
 const isMultiSigContractWithResult = (script: Buffer): MultiSigResult => {
   let m = 0;
   let n = 0;
@@ -692,8 +631,8 @@ const isMultiSigContractWithResult = (script: Buffer): MultiSigResult => {
       }
       return { result: false };
   }
-  if (script[i++] !== Op.SYSCALL) return { result: false };
   if (script.length !== i + 5) return { result: false };
+  if (script[i++] !== Op.SYSCALL) return { result: false };
   if (!script.slice(i).equals(checkMultisig)) return { result: false };
   return { result: true, m, n, points };
 };
@@ -706,7 +645,8 @@ const isSignatureContract = (script: Buffer) =>
   script[35] === Op.SYSCALL &&
   script.slice(36).equals(checkSig);
 
-const isStandardContract = (script: Buffer) => isSignatureContract(script) || isMultiSigContract(script);
+const isStandardContract = (script: Buffer) =>
+  isSignatureContract(script) || isMultiSigContractWithResult(script).result;
 
 // https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
 const HARDENED_KEY_OFFSET = 0x80000000;
@@ -929,7 +869,6 @@ export const crypto = {
   encryptNEP2,
   decryptNEP2,
   createPrivateKey,
-  isMultiSigContract,
   isMultiSigContractWithResult,
   isSignatureContract,
   isStandardContract,

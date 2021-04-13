@@ -458,8 +458,7 @@ export class Blockchain {
     });
   }
 
-  // TODO: set to private?
-  public async updateExtensibleWitnessWhiteList(storage: Storage) {
+  private async updateExtensibleWitnessWhiteList(storage: Storage) {
     const currentHeight = await this.native.Ledger.currentIndex(storage);
     const builder = new ImmutableHashSetBuilder<UInt160>();
     builder.add(await this.native.NEO.getCommitteeAddress(storage));

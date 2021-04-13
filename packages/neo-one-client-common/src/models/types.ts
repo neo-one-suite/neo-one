@@ -221,7 +221,6 @@ export type ActionTypeJSON = ActionJSON['type'];
 export interface StorageItemJSON {
   readonly key: string;
   readonly value: string;
-  readonly isConstant: boolean;
 }
 
 export interface WitnessJSON {
@@ -483,6 +482,11 @@ export interface NetworkSettingsJSON {
   readonly validatorscount: number;
   readonly millisecondsperblock: number;
   readonly memorypoolmaxtransactions: number;
+  readonly maxtraceableblocks: number;
+  readonly maxblocksize: number;
+  readonly maxblocksystemfee: number;
+  readonly maxtransactionsperblock: number;
+  readonly nativeupdatehistory: { readonly [key: string]: readonly number[] };
 }
 
 export interface NotificationJSON {

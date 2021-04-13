@@ -1,15 +1,13 @@
 import { ApplicationLogJSON } from '@neo-one/client-common';
 import { Observable } from 'rxjs';
 import { ApplicationLog } from './ApplicationLog';
-import { HashIndexState } from './HashIndexState';
 import { Nep17Balance } from './Nep17Balance';
 import { Nep17BalanceKey } from './Nep17BalanceKey';
 import { Nep17Transfer } from './Nep17Transfer';
 import { Nep17TransferKey } from './Nep17TransferKey';
 import { StorageItem } from './StorageItem';
 import { StorageKey } from './StorageKey';
-import { TransactionKey, TransactionState } from './transaction';
-import { BlockKey, TrimmedBlock } from './TrimmedBlock';
+import { TransactionKey } from './transaction';
 
 // TODO: along with other storage definitions in node-vm `batch` definitions need to move to `node-core`.
 type AbstractBatch = any;

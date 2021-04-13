@@ -38,7 +38,7 @@ export const add = (builtins: Builtins): void => {
         // [[buffer]]
         sb.emitOp(node, 'PACK');
         // [number, [buffer]]
-        sb.emitPushInt(node, CallFlags.None);
+        sb.emitPushInt(node, CallFlags.ReadStates);
         // ['getBlock', number, [buffer]]
         sb.emitPushString(node, 'getBlock');
         // [buffer, 'getBlock', number, [buffer]]

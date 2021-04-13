@@ -1,4 +1,4 @@
-import { CallFlags } from '@neo-one/client-common/src';
+import { CallFlags } from '@neo-one/client-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../../sb';

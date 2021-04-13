@@ -20,11 +20,7 @@ export class ContractState extends ContractStateModel<ContractManifest, NefFile>
     const id = array[0].getInteger().toNumber();
     const updateCounter = array[1].getInteger().toNumber();
     const hash = common.bufferToUInt160(array[2].getBuffer());
-    const nef = NefFile.deserializeWire({
-      buffer: array[3].getBuffer(),
-      // TODO: fix this
-      context: { validatorsCount: 0, messageMagic: 0 },
-    });
+    const nef = NefFile.deserializeWire({ buffer: array[3].getBuffer() });
     const manifest = ContractManifest.fromStackItem(array[4]);
 
     return new ContractState({

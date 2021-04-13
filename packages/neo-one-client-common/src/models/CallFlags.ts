@@ -1,3 +1,5 @@
+import { InvalidFormatError } from '../common';
+
 export enum CallFlags {
   None = 0,
   ReadStates = 0b00000001,
@@ -11,3 +13,14 @@ export enum CallFlags {
   // tslint:disable-next-line: no-bitwise
   All = States | AllowCall | AllowNotify,
 }
+
+// tslint:disable-next-line: strict-type-predicates
+export const isCallFlag = (value: number): value is CallFlags => CallFlags[value] !== undefined;
+
+export const assertCallFlags = (value: number): CallFlags => {
+  if (isCallFlag(value)) {
+    return value;
+  }
+
+  throw new InvalidFormatError(`Expected StackItemType, found: ${value}`);
+};

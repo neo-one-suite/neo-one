@@ -1,5 +1,5 @@
 import { common, ScriptBuilder, TriggerType } from '@neo-one/client-common';
-import { Block, ConsensusData, Witness } from '@neo-one/node-core';
+import { Block, Witness } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import { ApplicationEngine } from '../ApplicationEngine';
@@ -166,7 +166,6 @@ describe('Application Engine SysCall Tests', () => {
       previousHash: common.ZERO_UINT256,
       merkleRoot: common.ZERO_UINT256,
       nextConsensus: common.ZERO_UINT160,
-      consensusData: new ConsensusData({ nonce: new BN(1), primaryIndex: 1 }),
       transactions: [],
       messageMagic: 1951352142,
     });

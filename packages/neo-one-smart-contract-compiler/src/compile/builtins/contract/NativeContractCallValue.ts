@@ -8,6 +8,7 @@ import { MemberLikeExpression } from '../types';
 export class NativeContractCallValue extends BuiltinMemberValue {
   public constructor(
     private readonly method: string,
+    private readonly callFlags: CallFlags,
     private readonly hash: UInt160,
     private readonly type: WrappableType,
   ) {
@@ -21,7 +22,7 @@ export class NativeContractCallValue extends BuiltinMemberValue {
     // [[]]
     sb.emitOp(node, 'NEWARRAY0');
     // [number, []]
-    sb.emitPushInt(node, CallFlags.None);
+    sb.emitPushInt(node, this.callFlags);
     // [method, number, []]
     sb.emitPushString(node, this.method);
     // [buffer, method, number, []]
