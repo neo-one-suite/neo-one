@@ -27,7 +27,7 @@ class BlockchainCurrentCallerContract extends BuiltinMemberValue {
       // [[buffer], buffer]
       sb.emitOp(node, 'PACK');
       // [number, [buffer], buffer]
-      sb.emitPushInt(node, CallFlags.None);
+      sb.emitPushInt(node, CallFlags.ReadStates);
       // ['getContract', number, [buffer], buffer]
       sb.emitPushString(node, 'getContract');
       // [buffer, 'getContract', number, [buffer], buffer]
@@ -72,7 +72,7 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractMember(
     'BlockchainConstructor',
     'currentHeight',
-    new NativeContractCallValue('currentIndex', common.nativeHashes.Ledger, Types.Number),
+    new NativeContractCallValue('currentIndex', CallFlags.ReadStates, common.nativeHashes.Ledger, Types.Number),
   );
   builtins.addContractMember(
     'BlockchainConstructor',

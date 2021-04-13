@@ -9,6 +9,7 @@ import {
   Hash256String,
   InvocationResult,
   IterOptions,
+  NefFile,
   NetworkType,
   Param,
   Peer,
@@ -24,7 +25,8 @@ import {
 export interface ContractRegister {
   readonly script: BufferString;
   readonly manifest: ContractManifestClient;
-  readonly compilerName: string;
+  readonly compiler: string;
+  readonly nefFile: NefFile;
 }
 
 export interface PublishReceipt extends TransactionReceipt {

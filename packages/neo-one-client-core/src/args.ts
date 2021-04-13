@@ -7,9 +7,11 @@ import {
   AddressString,
   addressToScriptHash,
   assertAttributeTypeJSON,
+  assertCallFlags as clientAssertCallFlags,
   Attribute,
   AttributeTypeModel,
   BufferString,
+  CallFlags,
   common,
   ContractABI,
   ContractABIClient,
@@ -28,6 +30,8 @@ import {
   Hash256String,
   InvokeSendUnsafeReceiveTransactionOptions,
   IterOptions,
+  MethodToken,
+  NefFile,
   Param,
   PrivateKeyString,
   privateKeyToPublicKey,
@@ -76,6 +80,14 @@ export const assertNullableBoolean = (name: string, value?: unknown): boolean | 
   }
 
   return assertBoolean(name, value);
+};
+
+export const assertNonNegativeNumber = (name: string, value?: unknown): number => {
+  if (value == undefined || typeof value !== 'number' || value < 0) {
+    throw new InvalidArgumentError('number', name, value);
+  }
+
+  return value;
 };
 
 export const assertNumber = (name: string, value?: unknown): number => {
@@ -765,6 +777,46 @@ export const assertNullableJSON = (name: string, value?: unknown): JSONObject =>
   }
 
   return value;
+};
+
+export const assertCallFlags = (name: string, value?: unknown): CallFlags => {
+  const numberIn = assertNumber(name, value);
+  let result;
+  try {
+    result = clientAssertCallFlags(numberIn);
+  } catch {
+    throw new InvalidArgumentError('CallFlags', name, value);
+  }
+
+  return result;
+};
+
+export const assertMethodToken = (name: string, value?: unknown): MethodToken => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('MethodToken', name, value);
+  }
+
+  return {
+    hash: assertProperty(value, 'MethodToken', 'hash', assertUInt160Hex),
+    method: assertProperty(value, 'MethodToken', 'method', assertString),
+    paramCount: assertProperty(value, 'MethodToken', 'paramCount', assertNonNegativeNumber),
+    hasReturnValue: assertProperty(value, 'MethodToken', 'hasReturnValue', assertBoolean),
+    callFlags: assertProperty(value, 'MethodToken', 'callFlags', assertCallFlags),
+  };
+};
+
+export const assertNefFile = (name: string, value?: unknown): NefFile => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('NefFile', name, value);
+  }
+
+  return {
+    compiler: assertProperty(value, 'NefFile', 'compiler', assertString),
+    script: assertProperty(value, 'NefFile', 'script', assertString),
+    tokens: assertProperty(value, 'NefFile', 'tokens', assertArray).map((token) =>
+      assertMethodToken('NefFile.tokens', token),
+    ),
+  };
 };
 
 export const assertContractManifestClient = (name: string, value?: unknown): ContractManifestClient => {

@@ -25,9 +25,7 @@ export class NefFileModel implements SerializableJSON<NefFileJSON>, Serializable
   public readonly script: Buffer;
   public readonly checkSum: number;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
-  public readonly serializeForChecksum: SerializeWire = createSerializeWire(
-    this.serializeBeforeChecksumBase.bind(this),
-  );
+  public readonly serializeForChecksum: SerializeWire = createSerializeWire(this.serializeForChecksumBase.bind(this));
 
   private readonly headerSize = utils.lazy(() => IOHelper.sizeOfUInt32LE + IOHelper.sizeOfFixedString(64));
   private readonly sizeInternal = utils.lazy(
@@ -44,7 +42,7 @@ export class NefFileModel implements SerializableJSON<NefFileJSON>, Serializable
     this.compiler = compiler;
     this.tokens = tokens;
     this.script = script;
-    this.checkSum = checkSum ?? crypto.sha256(this.serializeForChecksum()).readUInt32LE(0);
+    this.checkSum = checkSum ?? crypto.hash256(this.serializeForChecksum()).readUInt32LE(0);
   }
 
   public serializeHeader(writer: BinaryWriter): void {
@@ -52,7 +50,7 @@ export class NefFileModel implements SerializableJSON<NefFileJSON>, Serializable
     writer.writeFixedString(this.compiler, 64);
   }
 
-  public serializeBeforeChecksumBase(writer: BinaryWriter): void {
+  public serializeForChecksumBase(writer: BinaryWriter): void {
     this.serializeHeader(writer);
     writer.writeUInt16LE(0);
     writer.writeArray(this.tokens, (token) => token.serializeWire());
@@ -61,7 +59,7 @@ export class NefFileModel implements SerializableJSON<NefFileJSON>, Serializable
   }
 
   public serializeWireBase(writer: BinaryWriter): void {
-    this.serializeBeforeChecksumBase(writer);
+    this.serializeForChecksumBase(writer);
     writer.writeUInt32LE(this.checkSum);
   }
 

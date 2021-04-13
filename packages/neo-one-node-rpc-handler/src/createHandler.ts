@@ -7,6 +7,7 @@ import {
   crypto,
   JSONHelper,
   LogJSON,
+  NetworkSettingsJSON,
   RelayTransactionResultJSON,
   scriptHashToAddress,
   toVerifyResultJSON,
@@ -365,7 +366,7 @@ export const createHandler = ({
 
   const handlers: Handlers = {
     // Blockchain
-    [RPC_METHODS.getbestblockhash]: async () => JSONHelper.writeUInt256(blockchain.currentBlock.hash),
+    [RPC_METHODS.getbestblockhash]: async (): Promise<string> => JSONHelper.writeUInt256(blockchain.currentBlock.hash),
     [RPC_METHODS.getblock]: async (args): Promise<BlockJSON | string> => {
       let hashOrIndex: number | UInt256 = args[0];
       if (typeof args[0] === 'string') {
@@ -414,9 +415,9 @@ export const createHandler = ({
 
       return block.serializeWire().toString('base64');
     },
-    [RPC_METHODS.getblockheadercount]: async () =>
+    [RPC_METHODS.getblockheadercount]: async (): Promise<number> =>
       blockchain.headerCache.last?.index ?? (await blockchain.getCurrentIndex()) + 1,
-    [RPC_METHODS.getblockcount]: async () => (await blockchain.getCurrentIndex()) + 1,
+    [RPC_METHODS.getblockcount]: async (): Promise<number> => (await blockchain.getCurrentIndex()) + 1,
     [RPC_METHODS.getblockhash]: async (args) => {
       const height = args[0];
       await checkHeight(height);
@@ -926,7 +927,7 @@ export const createHandler = ({
 
       // return result.data;
     },
-    [RPC_METHODS.getnetworksettings]: async () => {
+    [RPC_METHODS.getnetworksettings]: async (): Promise<NetworkSettingsJSON> => {
       const {
         decrementInterval,
         generationAmount,
@@ -939,6 +940,11 @@ export const createHandler = ({
         validatorsCount,
         millisecondsPerBlock,
         memoryPoolMaxTransactions,
+        maxTraceableBlocks,
+        maxBlockSize,
+        maxBlockSystemFee,
+        maxTransactionsPerBlock,
+        nativeUpdateHistory,
       } = blockchain.settings;
 
       return {
@@ -954,6 +960,11 @@ export const createHandler = ({
         validatorscount: validatorsCount,
         millisecondsperblock: millisecondsPerBlock,
         memorypoolmaxtransactions: memoryPoolMaxTransactions,
+        maxtraceableblocks: maxTraceableBlocks,
+        maxblocksize: maxBlockSize,
+        maxblocksystemfee: maxBlockSystemFee.toNumber(),
+        maxtransactionsperblock: maxTransactionsPerBlock,
+        nativeupdatehistory: nativeUpdateHistory,
       };
     },
     [RPC_METHODS.getfeeperbyte]: async () => {

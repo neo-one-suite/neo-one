@@ -11,8 +11,10 @@ import { NativeContainer } from '@neo-one/node-native';
 import { test as testNet } from '@neo-one/node-neo-settings';
 import { storage } from '@neo-one/node-storage-levelup';
 import { blockchainSettingsToProtocolSettings, Dispatcher } from '@neo-one/node-vm';
+// import fs from 'fs-extra';
 import LevelUp from 'levelup';
 import MemDown from 'memdown';
+// import RocksDB from 'rocksdb';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import { throwOnDiagnosticErrorOrWarning } from '../../utils';
@@ -36,8 +38,12 @@ export const executeScript = async (
   readonly receipt: CallReceiptJSON;
   readonly sourceMaps: SourceMaps;
 }> => {
+  // const path = `/Users/spencercorwin/Desktop/node-test-data-${Math.random() * 100000000}`;
+  // await fs.ensureDir(path);
+  // const db = LevelUp(RocksDB(path));
   const settings = testNet();
   const dispatcher = new Dispatcher({
+    // levelDBPath: path,
     protocolSettings: blockchainSettingsToProtocolSettings(settings),
   });
   const blockchain = await Blockchain.create({

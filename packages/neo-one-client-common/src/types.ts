@@ -8,6 +8,7 @@ import { ECPoint, UInt160, UInt160Hex, UInt256 } from './common';
 import {
   AccountContract,
   AttributeTypeModel,
+  CallFlags,
   OracleResponseCode,
   TriggerTypeJSON,
   VerifyResultModel,
@@ -237,6 +238,10 @@ export interface Header {
    */
   readonly index: number;
   /**
+   * The primary index of the consensus node that generated this `Block`.
+   */
+  readonly primaryIndex: number;
+  /**
    * Next consensus address.
    */
   readonly nextConsensus: AddressString;
@@ -258,7 +263,11 @@ export interface Header {
   readonly size: number;
 }
 
-export interface Block extends Header {
+export interface Block {
+  /**
+   * `Block`'s `Header`.
+   */
+  readonly header: Header;
   /**
    * `Transaction`s contained in the `Block`.
    */
@@ -1707,6 +1716,50 @@ export interface ContractManifest {
   readonly extra?: JSONObject;
 }
 
+/**
+ * A token that represents the method that a contract will call statically.
+ */
+export interface MethodToken {
+  /**
+   * The hash of the contract to be called.
+   */
+  readonly hash: string;
+  /**
+   * The name of the method to be called.
+   */
+  readonly method: string;
+  /**
+   * The number of parameters that the method expects.
+   */
+  readonly paramCount: number;
+  /**
+   * Indicates if the method to be called has a return value.
+   */
+  readonly hasReturnValue: boolean;
+  /**
+   * The `CallFlags` to be used to call the contract.
+   */
+  readonly callFlags: CallFlags;
+}
+
+/**
+ * The structure of a Neo Executable Format (NEF) file.
+ */
+export interface NefFile {
+  /**
+   * The name and version of the compiler that created this NEF file.
+   */
+  readonly compiler: string;
+  /**
+   * The script of the contract.
+   */
+  readonly script: string;
+  /**
+   * The methods to be called statically.
+   */
+  readonly tokens: readonly MethodToken[];
+}
+
 declare const OpaqueTagSymbol: unique symbol;
 /**
  * `ForwardValue` represents a value that's intended to be forwarded to another smart contract method. This object is not meant to be directly constructued, instead one should produce them via the automatically generated `forward<method>Args` methods.
@@ -2419,14 +2472,7 @@ export interface RelayTransactionResult {
   readonly verifyResult?: VerifyResultModel;
 }
 
-/**
- * Additional raw data that is typically used for the client APIs.
- */
-export interface RawApplicationLogData {
-  /**
-   * The `Transaction`'s ID.
-   */
-  readonly txId?: string;
+export interface RawExecutionData {
   /**
    * The `Transaction`'s trigger type.
    */
@@ -2451,6 +2497,24 @@ export interface RawApplicationLogData {
    * The `Log`s that came from the `Transaction`'s script execution.
    */
   readonly logs: readonly RawLog[];
+}
+
+/**
+ * Additional raw data that is typically used for the client APIs.
+ */
+export interface RawApplicationLogData {
+  /**
+   * The `Transaction`'s ID.
+   */
+  readonly txId?: string;
+  /**
+   * The hash of the block that the `Transaction` is in.
+   */
+  readonly blockHash?: string;
+  /**
+   * The `RawExecutionData` provided by the transaction execution.
+   */
+  readonly executions: readonly RawExecutionData[];
 }
 
 export interface ParamJSONArray extends ReadonlyArray<ParamJSON> {}
@@ -2497,7 +2561,6 @@ export interface Peer {
  * Raw storage value
  */
 export interface StorageItem {
-  readonly address: string;
   readonly key: string;
   readonly value: string;
 }

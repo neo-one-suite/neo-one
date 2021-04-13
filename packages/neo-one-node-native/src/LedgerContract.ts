@@ -72,7 +72,7 @@ export class LedgerContract extends NativeContract implements LedgerContractNode
   public async containsTransaction({ storages }: NativeContractStorageContext, hash: UInt256) {
     const item = await storages.tryGet(this.createStorageKey(this.prefixes.transaction).addBuffer(hash).toStorageKey());
 
-    return item === undefined;
+    return item !== undefined;
   }
 
   public async getTrimmedBlock({ storages }: NativeContractStorageContext, hash: UInt256) {

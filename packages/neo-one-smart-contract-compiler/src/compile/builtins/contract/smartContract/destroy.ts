@@ -29,7 +29,7 @@ export class SmartContractDestroy extends BuiltinInstanceMemberCall {
     // [[buffer]]
     sb.emitOp(node, 'PACK');
     // [number, [buffer]]
-    sb.emitPushInt(node, CallFlags.None);
+    sb.emitPushInt(node, CallFlags.All);
     // ['destroy', number, [buffer]]
     sb.emitPushString(node, 'destroy');
     // [buffer, 'destroy', number, [buffer]]

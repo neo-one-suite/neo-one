@@ -1,4 +1,4 @@
-import { common, ScriptBuilder } from '@neo-one/client-common';
+import { CallFlags, common, ScriptBuilder } from '@neo-one/client-common';
 import { BigNumber } from 'bignumber.js';
 import { helpers } from '../../../../__data__';
 
@@ -32,7 +32,13 @@ describe('Calling contract', () => {
 
     expect(result.state).toEqual('HALT');
 
-    const sb = new ScriptBuilder().emitAppCall(common.stringToUInt160(contract.contract.hash), 'run', 'run', []);
+    const sb = new ScriptBuilder().emitDynamicAppCall(
+      common.stringToUInt160(contract.contract.hash),
+      'run',
+      CallFlags.All,
+      'run',
+      [],
+    );
     const resultAgain = await node.userAccountProviders.memory.__execute(sb.build().toString('hex'), {
       from: node.masterWallet.userAccount.id,
       maxSystemFee: new BigNumber(-1),

@@ -153,7 +153,7 @@ export class ContractParametersContext {
       if (item.signatures[publicKeyHex] !== undefined) {
         return false;
       }
-      // TODO: not sure why they mutated this context item in place. But we do it here just for consistency
+
       const newParam = item.parameters[index];
       newParam.setValue(signature);
       const newParams = item.parameters
@@ -164,6 +164,7 @@ export class ContractParametersContext {
         signatures: { ...item.signatures, publicKeyHex: signature },
         parameters: newParams,
       });
+      this.addItemInternal(scriptHashHex, item);
 
       return true;
     }

@@ -61,7 +61,6 @@ export interface Blockchain extends BlockchainStorage {
   readonly getNextBlockValidators: () => Promise<readonly ECPoint[]>;
   readonly getFeePerByte: () => Promise<BN>;
   readonly shouldRefreshCommittee: (offset?: number) => boolean;
-  readonly updateExtensibleWitnessWhiteList: (storage: Storage) => Promise<ImmutableHashSet<UInt160>>;
 
   readonly invokeScript: (options: {
     readonly script: Buffer;

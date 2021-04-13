@@ -72,7 +72,6 @@ export const settings: Settings = {
     previousHash: common.ZERO_UINT256,
     timestamp: 1468595301,
     index: 0,
-    consensusData: new BN(2083236893),
     nextConsensus: crypto.getBFTAddress(standbyValidators),
     script: new Witness({
       invocation: Buffer.from([]),

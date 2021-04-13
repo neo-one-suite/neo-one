@@ -1,3 +1,4 @@
+import { ContractMethodDescriptorClient } from '@neo-one/client-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
@@ -13,9 +14,18 @@ import {
 } from './sb';
 import { CompileResult, LinkedContracts } from './types';
 
+const DUMMY_METHOD: ContractMethodDescriptorClient = {
+  name: 'dummy',
+  parameters: [],
+  returnType: { type: 'Void' },
+  offset: 0,
+  safe: true,
+};
+
 export interface BaseCompileOptions {
   readonly sourceFile: ts.SourceFile;
   readonly context: Context;
+  readonly addDummyMethod?: boolean;
 }
 export interface WithLinked {
   readonly linked?: LinkedContracts;
@@ -38,6 +48,7 @@ export const compile = async ({
   sourceFile,
   linked = {},
   sourceMaps = {},
+  addDummyMethod = false,
 }: CompileOptions): Promise<CompileResult> => {
   const helpers = createHelpers();
   const { name, contractInfo, manifest, debugInfo } = getSmartContractInfo(context, sourceFile);
@@ -75,16 +86,25 @@ export const compile = async ({
   const finalResult = emittingScriptBuilder.getFinalResult(sourceMaps);
   const script = finalResult.code.toString('hex');
 
-  const methods = await processMethods({
-    context,
-    manifest,
-    debugInfo,
-    finalResult,
-    filePath: tsUtils.file.getFilePath(sourceFile),
-  });
+  const methods = (
+    await processMethods({
+      context,
+      manifest,
+      debugInfo,
+      finalResult,
+      filePath: tsUtils.file.getFilePath(sourceFile),
+    })
+  ).concat(addDummyMethod ? [DUMMY_METHOD] : []);
+
+  const compiler = 'neo-one 3.0.0-rc1';
 
   return {
     contract: {
+      nefFile: {
+        compiler,
+        script,
+        tokens: [], // TODO
+      },
       script,
       manifest: {
         name,
@@ -94,7 +114,7 @@ export const compile = async ({
           methods,
         },
       },
-      compilerName: 'neo-one 3.1.0-preview5',
+      compiler,
     },
     context,
     debugInfo,

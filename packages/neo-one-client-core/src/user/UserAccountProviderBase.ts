@@ -37,6 +37,7 @@ import { processConsoleLogMessages } from '@neo-one/client-switch';
 import { Labels, utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import debug from 'debug';
+import _ from 'lodash';
 import { Observable } from 'rxjs';
 import { clientUtils } from '../clientUtils';
 import { InsufficientSystemFeeError, InvokeError, NoAccountError, NotImplementedError } from '../errors';
@@ -235,21 +236,28 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
           ),
         ),
       },
-      onConfirm: ({ receipt, data, transaction }): RawInvokeReceipt => ({
-        blockIndex: receipt.blockIndex,
-        blockHash: receipt.blockHash,
-        blockTime: receipt.blockTime,
-        transactionIndex: receipt.transactionIndex,
-        transactionHash: receipt.transactionHash,
-        globalIndex: receipt.globalIndex,
-        confirmations: receipt.confirmations,
-        state: data.vmState,
-        stack: typeof data.stack === 'string' ? [] : data.stack, // TODO: fix
-        gasConsumed: data.gasConsumed,
-        script: Buffer.from(transaction.script, 'hex'),
-        logs: data.logs,
-        notifications: data.notifications,
-      }),
+      onConfirm: ({ receipt, data: dataIn, transaction }): RawInvokeReceipt => {
+        const data = dataIn.executions.length > 0 ? dataIn.executions[0] : undefined;
+        if (data === undefined) {
+          throw new Error('Expected application log for transaction to have at least one execution');
+        }
+
+        return {
+          blockIndex: receipt.blockIndex,
+          blockHash: receipt.blockHash,
+          blockTime: receipt.blockTime,
+          transactionIndex: receipt.transactionIndex,
+          transactionHash: receipt.transactionHash,
+          globalIndex: receipt.globalIndex,
+          confirmations: receipt.confirmations,
+          state: data.vmState,
+          stack: typeof data.stack === 'string' ? [] : data.stack, // TODO: fix
+          gasConsumed: data.gasConsumed,
+          script: Buffer.from(transaction.script, 'hex'),
+          logs: data.logs,
+          notifications: data.notifications,
+        };
+      },
       // TODO: what to do here? Related to attaching transfers to method invocation
       witnesses: this.getInvokeScripts(
         method,
@@ -282,7 +290,14 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     readonly transaction: TransactionModel;
     readonly maxFee: BigNumber;
   }): Promise<BigNumber> {
-    const callReceipt = await this.provider.testTransaction(network, transaction);
+    const tx = transaction.clone({
+      witnesses: _.fill(
+        // tslint:disable-next-line: prefer-array-literal
+        Array(transaction.signers.length),
+        new WitnessModel({ invocation: Buffer.from([]), verification: Buffer.from([]) }),
+      ),
+    });
+    const callReceipt = await this.provider.testTransaction(network, tx);
 
     await processConsoleLogMessages({ actions: [...callReceipt.logs, ...callReceipt.notifications] });
 

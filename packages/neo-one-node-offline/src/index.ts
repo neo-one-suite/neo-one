@@ -232,7 +232,7 @@ const writeOut = async (blockchain: Blockchain, out: Writable, height: number): 
   // tslint:disable-next-line no-loop-statement
   for (const chunk of _.chunk(_.range(0, height), 1000)) {
     // eslint-disable-next-line
-    const trimmedBlocks = await Promise.all(chunk.map(async (index) => blockchain.blocks.get({ hashOrIndex: index })));
+    const trimmedBlocks = await Promise.all(chunk.map(async (index) => blockchain.getBlock(index)));
 
     // tslint:disable-next-line no-loop-statement
     for (const trimmed of trimmedBlocks) {
