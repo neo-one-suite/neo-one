@@ -13,10 +13,19 @@ class ContractConstructorInterface extends BuiltinInterface {}
 export const add = (builtins: Builtins): void => {
   builtins.addContractInterface('Contract', new ContractInterface());
   builtins.addContractValue('Contract', new ValueInstanceOf('ContractConstructor', (sb) => sb.helpers.isContract));
-  builtins.addContractMember('Contract', 'script', new BuiltinInstanceIndexValue(0, Types.Contract, Types.Buffer));
-  builtins.addContractMember('Contract', 'manifest', new BuiltinInstanceIndexValue(1, Types.Contract, Types.String));
-  builtins.addContractMember('Contract', 'hasStorage', new BuiltinInstanceIndexValue(2, Types.Contract, Types.Boolean));
-  builtins.addContractMember('Contract', 'payable', new BuiltinInstanceIndexValue(3, Types.Contract, Types.Boolean));
+  builtins.addContractMember('Contract', 'id', new BuiltinInstanceIndexValue(0, Types.Contract, Types.Number));
+  builtins.addContractMember(
+    'Contract',
+    'updateCounter',
+    new BuiltinInstanceIndexValue(1, Types.Contract, Types.Number),
+  );
+  builtins.addContractMember('Contract', 'hash', new BuiltinInstanceIndexValue(2, Types.Contract, Types.Buffer));
+  builtins.addContractMember('Contract', 'nef', new BuiltinInstanceIndexValue(3, Types.Contract, Types.Buffer));
+  builtins.addContractMember(
+    'Contract',
+    'manifest',
+    new BuiltinInstanceIndexValue(4, Types.Contract, Types.ContractManifest),
+  );
   builtins.addContractInterface('ContractConstructor', new ContractConstructorInterface());
   builtins.addContractMember(
     'ContractConstructor',
@@ -42,18 +51,19 @@ export const add = (builtins: Builtins): void => {
           options,
           sb.helpers.if({
             condition: () => {
-              // [buffer, buffer]
+              // [contract, contract]
               sb.emitOp(node, 'DUP');
-              // [buffer, buffer, buffer]
-              sb.emitPushBuffer(node, Buffer.from([]));
-              // [boolean, buffer]
-              sb.emitOp(node, 'EQUAL');
+              // [isnull, contract]
+              sb.emitOp(node, 'ISNULL');
             },
             whenTrue: () => {
+              // []
               sb.emitOp(node, 'DROP');
+              // [val]
               sb.emitHelper(node, options, sb.helpers.wrapUndefined);
             },
             whenFalse: () => {
+              // [contractVal]
               sb.emitHelper(node, options, sb.helpers.wrapContract);
             },
           }),

@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Group cannot be implemented 1`] = `
+"snippetCode.ts (4,13): Class 'MyContractGroup' incorrectly implements interface 'ContractGroup'.
+  Type 'MyContractGroup' is missing the following properties from type 'ContractGroup': publicKey, signature, [OpaqueTagSymbol0]
+
+      2 |       import { ContractGroup } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       class MyContractGroup implements ContractGroup {
+        |             ^
+      5 |       }
+      6 |     
+"
+`;

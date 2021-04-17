@@ -1529,6 +1529,10 @@ export interface ContractMethodDescriptor {
    * Used to set the instruction pointer before executing the method.
    */
   readonly offset: number;
+  /**
+   * Indicates whether the method is safe to be called by other contracts.
+   */
+  readonly safe: boolean;
 }
 
 /**
@@ -1747,6 +1751,10 @@ export interface MethodToken {
  */
 export interface NefFile {
   /**
+   * NEO Executable Format 3 (NEF3) magic number.
+   */
+  readonly magic: number;
+  /**
    * The name and version of the compiler that created this NEF file.
    */
   readonly compiler: string;
@@ -1758,6 +1766,10 @@ export interface NefFile {
    * The methods to be called statically.
    */
   readonly tokens: readonly MethodToken[];
+  /**
+   * The NEF checksum.
+   */
+  readonly checksum: number;
 }
 
 declare const OpaqueTagSymbol: unique symbol;
@@ -1873,9 +1885,13 @@ export interface Contract {
    */
   readonly id: number;
   /**
-   * `Contract` code.
+   * The number of times the `Contract` has been updated.
    */
-  readonly script: BufferString;
+  readonly updateCounter: number;
+  /**
+   * The NEO Executable Format (NEF) file of the `Contract`.
+   */
+  readonly nef: NefFile;
   /**
    * The `Contract`'s script hash.
    */

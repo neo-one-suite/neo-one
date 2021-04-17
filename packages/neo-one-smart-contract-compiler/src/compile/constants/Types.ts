@@ -21,9 +21,15 @@ export enum Types {
   Attribute = 20,
   Contract = 21,
   Block = 22,
-  Notification = 23,
+  ContractManifest = 23,
+  ContractABI = 24,
+  ContractMethod = 25,
+  ContractEvent = 26,
+  ContractParameter = 27,
+  ContractGroup = 28,
+  ContractPermission = 29,
   // Fake type, never appears
-  Iterable = 24,
+  Iterable = 30,
 }
 
 export type WrappableType =
@@ -47,7 +53,13 @@ export type WrappableType =
   | Types.Attribute
   | Types.Contract
   | Types.Block
-  | Types.Notification;
+  | Types.ContractManifest
+  | Types.ContractABI
+  | Types.ContractMethod
+  | Types.ContractEvent
+  | Types.ContractParameter
+  | Types.ContractGroup
+  | Types.ContractPermission;
 
 export type IterableTypes =
   | Types.Array

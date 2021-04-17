@@ -126,6 +126,13 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
           attribute: throwInnerTypeError,
           contract: throwInnerTypeError,
           block: throwInnerTypeError,
+          contractManifest: throwInnerTypeError,
+          contractABI: throwInnerTypeError,
+          contractMethod: throwInnerTypeError,
+          contractEvent: throwInnerTypeError,
+          contractParameter: throwInnerTypeError,
+          contractGroup: throwInnerTypeError,
+          contractPermission: throwInnerTypeError,
         }),
       );
     };
@@ -457,6 +464,13 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
           attribute: throwInnerTypeError,
           contract: throwInnerTypeError,
           block: throwInnerTypeError,
+          contractManifest: throwInnerTypeError,
+          contractABI: throwInnerTypeError,
+          contractMethod: throwInnerTypeError,
+          contractEvent: throwInnerTypeError,
+          contractParameter: throwInnerTypeError,
+          contractGroup: throwInnerTypeError,
+          contractPermission: throwInnerTypeError,
         }),
       );
     };
@@ -492,6 +506,13 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
         attribute: createProcessBuiltin('AttributeBase'),
         contract: createProcessBuiltin('Contract'),
         block: createProcessBuiltin('Block'),
+        contractManifest: createProcessBuiltin('ContractManifest'),
+        contractABI: createProcessBuiltin('ContractABI'),
+        contractMethod: createProcessBuiltin('ContractMethodDescriptor'),
+        contractEvent: createProcessBuiltin('ContractEventDescriptor'),
+        contractParameter: createProcessBuiltin('ContractParameterDefinition'),
+        contractGroup: createProcessBuiltin('ContractGroup'),
+        contractPermission: createProcessBuiltin('ContractPermission'),
       }),
     );
   }

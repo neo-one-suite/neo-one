@@ -48,6 +48,13 @@ export class TypeOfExpressionCompiler extends NodeCompiler<ts.TypeOfExpression> 
         attribute: pushObject,
         contract: pushObject,
         block: pushObject,
+        contractManifest: pushObject,
+        contractABI: pushObject,
+        contractMethod: pushObject,
+        contractEvent: pushObject,
+        contractParameter: pushObject,
+        contractGroup: pushObject,
+        contractPermission: pushObject,
       }),
     );
     // [val]

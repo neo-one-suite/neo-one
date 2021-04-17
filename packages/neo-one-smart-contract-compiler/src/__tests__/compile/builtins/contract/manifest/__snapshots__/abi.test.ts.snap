@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ABI cannot be implemented 1`] = `
+"snippetCode.ts (4,13): Class 'MyContractABI' incorrectly implements interface 'ContractABI'.
+  Type 'MyContractABI' is missing the following properties from type 'ContractABI': methods, events
+
+      2 |       import { ContractABI } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       class MyContractABI implements ContractABI {
+        |             ^
+      5 |       }
+      6 |     
+"
+`;

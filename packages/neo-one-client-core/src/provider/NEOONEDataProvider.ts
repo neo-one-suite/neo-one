@@ -3,6 +3,7 @@ import {
   Account,
   AddressString,
   ApplicationLogJSON,
+  assertCallFlags,
   Attribute,
   AttributeJSON,
   AttributeTypeModel,
@@ -33,6 +34,10 @@ import {
   Hash256String,
   IterOptions,
   JSONHelper,
+  MethodToken,
+  MethodTokenJSON,
+  NefFile,
+  NefFileJSON,
   NetworkSettings,
   NetworkSettingsJSON,
   NetworkType,
@@ -383,10 +388,31 @@ export class NEOONEDataProvider implements DeveloperProvider {
     }
   }
 
+  private convertMethodToken(token: MethodTokenJSON): MethodToken {
+    return {
+      hash: token.hash,
+      method: token.method,
+      paramCount: token.paramcount,
+      hasReturnValue: token.hasreturnvalue,
+      callFlags: assertCallFlags(token.callflags),
+    };
+  }
+
+  private convertNefFile(nef: NefFileJSON): NefFile {
+    return {
+      magic: nef.magic,
+      compiler: nef.compiler,
+      tokens: nef.tokens.map(this.convertMethodToken),
+      script: nef.script,
+      checksum: nef.checksum,
+    };
+  }
+
   private convertContract(contract: ContractJSON): Contract {
     return {
       id: contract.id,
-      script: contract.nef.script,
+      updateCounter: contract.updatecounter,
+      nef: this.convertNefFile(contract.nef),
       hash: contract.hash,
       manifest: this.convertContractManifest(contract.manifest),
     };
@@ -438,6 +464,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
       parameters: method.parameters.map(this.convertContractParameterDefinition.bind(this)),
       returnType: this.convertContractParameterType(method.returntype),
       offset: method.offset,
+      safe: method.safe,
     };
   }
 

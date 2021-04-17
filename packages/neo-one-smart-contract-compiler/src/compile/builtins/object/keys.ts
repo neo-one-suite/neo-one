@@ -104,6 +104,13 @@ export class ObjectKeys extends BuiltinMemberCall {
         attribute: emptyArray,
         contract: emptyArray,
         block: emptyArray,
+        contractManifest: emptyArray,
+        contractABI: emptyArray,
+        contractMethod: emptyArray,
+        contractEvent: emptyArray,
+        contractParameter: emptyArray,
+        contractGroup: emptyArray,
+        contractPermission: emptyArray,
       }),
     );
 

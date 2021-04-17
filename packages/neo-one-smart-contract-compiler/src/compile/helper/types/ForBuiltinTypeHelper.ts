@@ -17,6 +17,15 @@ import { hasForwardValue } from './forwardValue';
 import { hasIterable } from './iterable';
 import { hasIterableIterator } from './iterableIterator';
 import { hasIteratorResult } from './iteratorResult';
+import {
+  hasContractABI,
+  hasContractEvent,
+  hasContractGroup,
+  hasContractManifest,
+  hasContractMethod,
+  hasContractParameter,
+  hasContractPermission,
+} from './manifest';
 import { hasMap } from './map';
 import { hasMapStorage } from './mapStorage';
 import { hasNull } from './null';
@@ -61,6 +70,13 @@ export interface ForBuiltinTypeHelperOptions {
   readonly contract: ProcessType;
   readonly block: ProcessType;
   readonly forwardValue: ProcessType;
+  readonly contractManifest: ProcessType;
+  readonly contractABI: ProcessType;
+  readonly contractMethod: ProcessType;
+  readonly contractEvent: ProcessType;
+  readonly contractParameter: ProcessType;
+  readonly contractGroup: ProcessType;
+  readonly contractPermission: ProcessType;
 }
 
 // Input: [val]
@@ -95,6 +111,13 @@ export class ForBuiltinTypeHelper extends Helper {
   private readonly contract: ProcessType;
   private readonly block: ProcessType;
   private readonly forwardValue: ProcessType;
+  private readonly contractManifest: ProcessType;
+  private readonly contractABI: ProcessType;
+  private readonly contractMethod: ProcessType;
+  private readonly contractEvent: ProcessType;
+  private readonly contractParameter: ProcessType;
+  private readonly contractGroup: ProcessType;
+  private readonly contractPermission: ProcessType;
 
   public constructor({
     type,
@@ -126,6 +149,13 @@ export class ForBuiltinTypeHelper extends Helper {
     contract,
     block,
     forwardValue,
+    contractManifest,
+    contractABI,
+    contractMethod,
+    contractEvent,
+    contractParameter,
+    contractGroup,
+    contractPermission,
   }: ForBuiltinTypeHelperOptions) {
     super();
     this.type = type;
@@ -157,6 +187,13 @@ export class ForBuiltinTypeHelper extends Helper {
     this.contract = contract;
     this.block = block;
     this.forwardValue = forwardValue;
+    this.contractManifest = contractManifest;
+    this.contractABI = contractABI;
+    this.contractMethod = contractMethod;
+    this.contractEvent = contractEvent;
+    this.contractParameter = contractParameter;
+    this.contractGroup = contractGroup;
+    this.contractPermission = contractPermission;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
@@ -342,6 +379,55 @@ export class ForBuiltinTypeHelper extends Helper {
             },
             process: this.object,
           },
+          {
+            hasType: (type) => hasContractManifest(sb.context, node, type),
+            isRuntimeType: (innerOptions) => {
+              sb.emitHelper(node, innerOptions, sb.helpers.isContractManifest);
+            },
+            process: this.contractManifest,
+          },
+          {
+            hasType: (type) => hasContractABI(sb.context, node, type),
+            isRuntimeType: (innerOptions) => {
+              sb.emitHelper(node, innerOptions, sb.helpers.isContractABI);
+            },
+            process: this.contractABI,
+          },
+          {
+            hasType: (type) => hasContractMethod(sb.context, node, type),
+            isRuntimeType: (innerOptions) => {
+              sb.emitHelper(node, innerOptions, sb.helpers.isContractMethod);
+            },
+            process: this.contractMethod,
+          },
+          {
+            hasType: (type) => hasContractEvent(sb.context, node, type),
+            isRuntimeType: (innerOptions) => {
+              sb.emitHelper(node, innerOptions, sb.helpers.isContractEvent);
+            },
+            process: this.contractEvent,
+          },
+          {
+            hasType: (type) => hasContractParameter(sb.context, node, type),
+            isRuntimeType: (innerOptions) => {
+              sb.emitHelper(node, innerOptions, sb.helpers.isContractParameter);
+            },
+            process: this.contractParameter,
+          },
+          {
+            hasType: (type) => hasContractGroup(sb.context, node, type),
+            isRuntimeType: (innerOptions) => {
+              sb.emitHelper(node, innerOptions, sb.helpers.isContractGroup);
+            },
+            process: this.contractGroup,
+          },
+          {
+            hasType: (type) => hasContractPermission(sb.context, node, type),
+            isRuntimeType: (innerOptions) => {
+              sb.emitHelper(node, innerOptions, sb.helpers.isContractPermission);
+            },
+            process: this.contractPermission,
+          },
         ],
       }),
     );
@@ -418,6 +504,27 @@ export class ForBuiltinTypeHelper extends Helper {
         break;
       case Types.Block:
         this.block(options);
+        break;
+      case Types.ContractManifest:
+        this.contractManifest(options);
+        break;
+      case Types.ContractABI:
+        this.contractABI(options);
+        break;
+      case Types.ContractMethod:
+        this.contractMethod(options);
+        break;
+      case Types.ContractEvent:
+        this.contractEvent(options);
+        break;
+      case Types.ContractParameter:
+        this.contractParameter(options);
+        break;
+      case Types.ContractGroup:
+        this.contractGroup(options);
+        break;
+      case Types.ContractPermission:
+        this.contractPermission(options);
         break;
       default:
         /* istanbul ignore next */

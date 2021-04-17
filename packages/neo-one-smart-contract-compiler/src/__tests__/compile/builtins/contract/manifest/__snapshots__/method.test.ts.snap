@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MethodDescriptor cannot be implemented 1`] = `
+"snippetCode.ts (4,13): Class 'MyContractMethodDescriptor' incorrectly implements interface 'ContractMethodDescriptor'.
+  Type 'MyContractMethodDescriptor' is missing the following properties from type 'ContractMethodDescriptor': name, parameters, returnType, offset, safe
+
+      2 |       import { ContractMethodDescriptor } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       class MyContractMethodDescriptor implements ContractMethodDescriptor {
+        |             ^
+      5 |       }
+      6 |     
+"
+`;

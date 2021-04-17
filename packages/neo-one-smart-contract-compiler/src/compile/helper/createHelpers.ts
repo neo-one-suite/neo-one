@@ -38,11 +38,14 @@ import {
   ArrSliceHelper,
   ArrSliceHelperOptions,
   CloneArrayHelper,
+  CloneStructHelper,
   ConsoleLogHelper,
   DebugLogHelper,
   DebugLogHelperOptions,
   ExpHelper,
   GenericLogSerializeHelper,
+  SetArrValToObjectPropertyHelper,
+  SetArrValToObjectPropertyHelperOptions,
 } from './common';
 import {
   BreakHelper,
@@ -399,6 +402,29 @@ import {
 } from './types';
 import { IsBlockHelper, UnwrapBlockHelper, WrapBlockHelper } from './types/block';
 import { IsContractHelper, UnwrapContractHelper, WrapContractHelper } from './types/contract';
+import {
+  IsContractABIHelper,
+  IsContractEventHelper,
+  IsContractGroupHelper,
+  IsContractManifestHelper,
+  IsContractMethodHelper,
+  IsContractParameterHelper,
+  IsContractPermissionHelper,
+  UnwrapContractABIHelper,
+  UnwrapContractEventHelper,
+  UnwrapContractGroupHelper,
+  UnwrapContractManifestHelper,
+  UnwrapContractMethodHelper,
+  UnwrapContractParameterHelper,
+  UnwrapContractPermissionHelper,
+  WrapContractABIHelper,
+  WrapContractEventHelper,
+  WrapContractGroupHelper,
+  WrapContractManifestHelper,
+  WrapContractMethodHelper,
+  WrapContractParameterHelper,
+  WrapContractPermissionHelper,
+} from './types/manifest';
 
 export interface Helpers {
   readonly mutableCache: { [K in string]?: Helper };
@@ -474,9 +500,42 @@ export interface Helpers {
   readonly wrapContract: WrapContractHelper;
   readonly unwrapContract: UnwrapContractHelper;
 
+  // types/manifest
+  readonly isContractManifest: IsContractManifestHelper;
+  readonly wrapContractManifest: WrapContractManifestHelper;
+  readonly unwrapContractManifest: UnwrapContractManifestHelper;
+
+  readonly isContractABI: IsContractABIHelper;
+  readonly wrapContractABI: WrapContractABIHelper;
+  readonly unwrapContractABI: UnwrapContractABIHelper;
+
+  readonly isContractEvent: IsContractEventHelper;
+  readonly wrapContractEvent: WrapContractEventHelper;
+  readonly unwrapContractEvent: UnwrapContractEventHelper;
+
+  readonly isContractGroup: IsContractGroupHelper;
+  readonly wrapContractGroup: WrapContractGroupHelper;
+  readonly unwrapContractGroup: UnwrapContractGroupHelper;
+
+  readonly isContractMethod: IsContractMethodHelper;
+  readonly wrapContractMethod: WrapContractMethodHelper;
+  readonly unwrapContractMethod: UnwrapContractMethodHelper;
+
+  readonly isContractParameter: IsContractParameterHelper;
+  readonly wrapContractParameter: WrapContractParameterHelper;
+  readonly unwrapContractParameter: UnwrapContractParameterHelper;
+
+  readonly isContractPermission: IsContractPermissionHelper;
+  readonly wrapContractPermission: WrapContractPermissionHelper;
+  readonly unwrapContractPermission: UnwrapContractPermissionHelper;
+
   // common
   readonly arrSlice: (options?: ArrSliceHelperOptions) => ArrSliceHelper;
   readonly cloneArray: CloneArrayHelper;
+  readonly cloneStruct: CloneStructHelper;
+  readonly setArrValToObjectPropertyHelper: (
+    options: SetArrValToObjectPropertyHelperOptions,
+  ) => SetArrValToObjectPropertyHelper;
   readonly forType: (options: ForTypeHelperOptions) => ForTypeHelper;
   readonly genericLogSerialize: GenericLogSerializeHelper;
   readonly exp: ExpHelper;
@@ -904,9 +963,40 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     wrapContract: new WrapContractHelper(),
     unwrapContract: new UnwrapContractHelper(),
 
+    // types/manifest
+    isContractManifest: new IsContractManifestHelper(),
+    wrapContractManifest: new WrapContractManifestHelper(),
+    unwrapContractManifest: new UnwrapContractManifestHelper(),
+
+    isContractABI: new IsContractABIHelper(),
+    wrapContractABI: new WrapContractABIHelper(),
+    unwrapContractABI: new UnwrapContractABIHelper(),
+
+    isContractEvent: new IsContractEventHelper(),
+    wrapContractEvent: new WrapContractEventHelper(),
+    unwrapContractEvent: new UnwrapContractEventHelper(),
+
+    isContractGroup: new IsContractGroupHelper(),
+    wrapContractGroup: new WrapContractGroupHelper(),
+    unwrapContractGroup: new UnwrapContractGroupHelper(),
+
+    isContractMethod: new IsContractMethodHelper(),
+    wrapContractMethod: new WrapContractMethodHelper(),
+    unwrapContractMethod: new UnwrapContractMethodHelper(),
+
+    isContractParameter: new IsContractParameterHelper(),
+    wrapContractParameter: new WrapContractParameterHelper(),
+    unwrapContractParameter: new UnwrapContractParameterHelper(),
+
+    isContractPermission: new IsContractPermissionHelper(),
+    wrapContractPermission: new WrapContractPermissionHelper(),
+    unwrapContractPermission: new UnwrapContractPermissionHelper(),
+
     // common
     arrSlice: (options = {}) => new ArrSliceHelper(options),
     cloneArray: new CloneArrayHelper(),
+    cloneStruct: new CloneStructHelper(),
+    setArrValToObjectPropertyHelper: (options) => new SetArrValToObjectPropertyHelper(options),
     forType: (options) => new ForTypeHelper(options),
     genericLogSerialize: new GenericLogSerializeHelper(),
     exp: new ExpHelper(),

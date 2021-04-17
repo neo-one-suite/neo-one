@@ -125,6 +125,13 @@ export class ToPrimitiveHelper extends Helper {
               attribute: throwTypeError,
               contract: throwTypeError,
               block: throwTypeError,
+              contractManifest: throwTypeError,
+              contractABI: throwTypeError,
+              contractMethod: throwTypeError,
+              contractEvent: throwTypeError,
+              contractParameter: throwTypeError,
+              contractGroup: throwTypeError,
+              contractPermission: throwTypeError,
             }),
           );
         };
@@ -167,6 +174,13 @@ export class ToPrimitiveHelper extends Helper {
             attribute: throwInnerTypeError,
             contract: throwInnerTypeError,
             block: throwInnerTypeError,
+            contractManifest: throwInnerTypeError,
+            contractABI: throwInnerTypeError,
+            contractMethod: throwInnerTypeError,
+            contractEvent: throwInnerTypeError,
+            contractParameter: throwInnerTypeError,
+            contractGroup: throwInnerTypeError,
+            contractPermission: throwInnerTypeError,
           }),
         );
       };
@@ -248,6 +262,13 @@ export class ToPrimitiveHelper extends Helper {
         attribute: toString(Types.Attribute),
         contract: toString(Types.Contract),
         block: toString(Types.Block),
+        contractManifest: toString(Types.ContractManifest),
+        contractABI: toString(Types.ContractABI),
+        contractMethod: toString(Types.ContractMethod),
+        contractEvent: toString(Types.ContractEvent),
+        contractParameter: toString(Types.ContractParameter),
+        contractGroup: toString(Types.ContractGroup),
+        contractPermission: toString(Types.ContractPermission),
       }),
     );
   }

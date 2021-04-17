@@ -811,6 +811,8 @@ export const assertNefFile = (name: string, value?: unknown): NefFile => {
   }
 
   return {
+    // magic: assertProperty(value, 'NefFile', 'magic', assertNumber),
+    // checksum: assertProperty(value, 'NefFile', 'checksum', assertNumber),
     compiler: assertProperty(value, 'NefFile', 'compiler', assertString),
     script: assertProperty(value, 'NefFile', 'script', assertString),
     tokens: assertProperty(value, 'NefFile', 'tokens', assertArray).map((token) =>

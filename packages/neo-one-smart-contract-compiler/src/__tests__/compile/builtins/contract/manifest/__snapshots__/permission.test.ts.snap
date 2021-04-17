@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Permission cannot be implemented 1`] = `
+"snippetCode.ts (4,13): 'MyContractPermission' is declared but never used.
+
+      2 |       import { ContractPermission } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       class MyContractPermission implements ContractPermission {
+        |             ^
+      5 |       }
+      6 |     
+"
+`;

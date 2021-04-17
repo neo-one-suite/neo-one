@@ -92,6 +92,13 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
             attribute: throwTypeError,
             contract: throwTypeError,
             block: throwTypeError,
+            contractManifest: throwTypeError,
+            contractABI: throwTypeError,
+            contractMethod: throwTypeError,
+            contractEvent: throwTypeError,
+            contractParameter: throwTypeError,
+            contractGroup: throwTypeError,
+            contractPermission: throwTypeError,
           }),
         );
       } else {
