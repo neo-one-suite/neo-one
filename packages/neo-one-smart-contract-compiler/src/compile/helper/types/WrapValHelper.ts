@@ -80,6 +80,27 @@ export class WrapValHelper extends Helper {
       case Types.Block:
         sb.emitHelper(node, options, sb.helpers.wrapBlock);
         break;
+      case Types.ContractManifest:
+        sb.emitHelper(node, options, sb.helpers.wrapContractManifest);
+        break;
+      case Types.ContractABI:
+        sb.emitHelper(node, options, sb.helpers.wrapContractABI);
+        break;
+      case Types.ContractMethod:
+        sb.emitHelper(node, options, sb.helpers.wrapContractMethod);
+        break;
+      case Types.ContractEvent:
+        sb.emitHelper(node, options, sb.helpers.wrapContractEvent);
+        break;
+      case Types.ContractParameter:
+        sb.emitHelper(node, options, sb.helpers.wrapContractParameter);
+        break;
+      case Types.ContractGroup:
+        sb.emitHelper(node, options, sb.helpers.wrapContractGroup);
+        break;
+      case Types.ContractPermission:
+        sb.emitHelper(node, options, sb.helpers.wrapContractPermission);
+        break;
       default:
         /* istanbul ignore next */
         utils.assertNever(this.type);

@@ -24,3 +24,19 @@ export const assertCallFlags = (value: number): CallFlags => {
 
   throw new InvalidFormatError(`Expected StackItemType, found: ${value}`);
 };
+
+export type CallFlagsJSON = keyof typeof CallFlags;
+
+export const isCallFlagsJSON = (type: string): type is CallFlagsJSON =>
+  // tslint:disable-next-line: strict-type-predicates no-any
+  CallFlags[type as any] !== undefined;
+
+export const assertCallFlagsJSON = (type: string): CallFlagsJSON => {
+  if (isCallFlagsJSON(type)) {
+    return type;
+  }
+
+  throw new InvalidFormatError();
+};
+
+export const toCallFlagsJSON = (type: CallFlags) => assertCallFlagsJSON(CallFlags[type]);

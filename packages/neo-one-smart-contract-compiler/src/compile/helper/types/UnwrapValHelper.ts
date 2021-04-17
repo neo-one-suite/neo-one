@@ -80,6 +80,27 @@ export class UnwrapValHelper extends Helper {
       case Types.Block:
         sb.emitHelper(node, options, sb.helpers.unwrapBlock);
         break;
+      case Types.ContractManifest:
+        sb.emitHelper(node, options, sb.helpers.unwrapContractManifest);
+        break;
+      case Types.ContractABI:
+        sb.emitHelper(node, options, sb.helpers.unwrapContractABI);
+        break;
+      case Types.ContractMethod:
+        sb.emitHelper(node, options, sb.helpers.unwrapContractMethod);
+        break;
+      case Types.ContractEvent:
+        sb.emitHelper(node, options, sb.helpers.unwrapContractEvent);
+        break;
+      case Types.ContractParameter:
+        sb.emitHelper(node, options, sb.helpers.unwrapContractParameter);
+        break;
+      case Types.ContractGroup:
+        sb.emitHelper(node, options, sb.helpers.unwrapContractGroup);
+        break;
+      case Types.ContractPermission:
+        sb.emitHelper(node, options, sb.helpers.unwrapContractPermission);
+        break;
       default:
         /* istanbul ignore next */
         utils.assertNever(this.type);

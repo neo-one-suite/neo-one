@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EventDescriptor cannot be implemented 1`] = `
+"snippetCode.ts (4,13): Class 'MyContractEventDescriptor' incorrectly implements interface 'ContractEventDescriptor'.
+  Type 'MyContractEventDescriptor' is missing the following properties from type 'ContractEventDescriptor': name, parameters
+
+      2 |       import { ContractEventDescriptor } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       class MyContractEventDescriptor implements ContractEventDescriptor {
+        |             ^
+      5 |       }
+      6 |     
+"
+`;

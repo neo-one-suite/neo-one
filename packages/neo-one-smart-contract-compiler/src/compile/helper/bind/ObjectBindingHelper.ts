@@ -263,6 +263,13 @@ export class ObjectBindingHelper extends TypedHelper<ts.ObjectBindingPattern> {
               attribute: throwInnerTypeError,
               contract: throwInnerTypeError,
               block: throwInnerTypeError,
+              contractManifest: throwInnerTypeError,
+              contractABI: throwInnerTypeError,
+              contractMethod: throwInnerTypeError,
+              contractEvent: throwInnerTypeError,
+              contractParameter: throwInnerTypeError,
+              contractGroup: throwInnerTypeError,
+              contractPermission: throwInnerTypeError,
             }),
           );
         } else {
@@ -389,6 +396,13 @@ export class ObjectBindingHelper extends TypedHelper<ts.ObjectBindingPattern> {
         attribute: createProcessBuiltin('AttributeBase'),
         contract: createProcessBuiltin('Contract'),
         block: createProcessBuiltin('Block'),
+        contractManifest: createProcessBuiltin('ContractManifest'),
+        contractABI: createProcessBuiltin('ContractABI'),
+        contractMethod: createProcessBuiltin('ContractMethodDescriptor'),
+        contractEvent: createProcessBuiltin('ContractEventDescriptor'),
+        contractParameter: createProcessBuiltin('ContractParameterDefinition'),
+        contractGroup: createProcessBuiltin('ContractGroup'),
+        contractPermission: createProcessBuiltin('ContractPermission'),
       }),
     );
   }

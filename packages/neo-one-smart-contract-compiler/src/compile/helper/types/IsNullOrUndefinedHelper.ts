@@ -52,6 +52,13 @@ export class IsNullOrUndefinedHelper extends TypedHelper {
         attribute: pushFalse,
         contract: pushFalse,
         block: pushFalse,
+        contractManifest: pushFalse,
+        contractABI: pushFalse,
+        contractMethod: pushFalse,
+        contractEvent: pushFalse,
+        contractParameter: pushFalse,
+        contractGroup: pushFalse,
+        contractPermission: pushFalse,
       }),
     );
   }

@@ -11,7 +11,7 @@ export const getContractProperties = (context: Context, smartContract: ts.ClassD
   const name = tsUtils.node.getName(smartContract);
   const defaultContractProperties = {
     ...DEFAULT_CONTRACT_PROPERTIES,
-    name: name === undefined ? DEFAULT_CONTRACT_PROPERTIES.name : name,
+    name: name ?? DEFAULT_CONTRACT_PROPERTIES.name,
   };
 
   if (type === undefined) {

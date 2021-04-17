@@ -13,6 +13,7 @@ import { add as addDeploy } from './deploy';
 import { add as addForwardValue } from './forwardValue';
 import { add as addHash256 } from './hash256';
 import { add as addLinkedSmartContract } from './linkedSmartContract';
+import { add as addManifest } from './manifest';
 import { add as addMapStorage } from './mapStorage';
 import { add as addPublicKey } from './publicKey';
 import { add as addSetStorage } from './setStorage';
@@ -21,6 +22,7 @@ import { add as addTransaction } from './transaction';
 
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {
+  addManifest(builtins);
   addAddress(builtins);
   addArrayStorage(builtins);
   addBlock(builtins);

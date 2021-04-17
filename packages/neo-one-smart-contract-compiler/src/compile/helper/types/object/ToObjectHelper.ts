@@ -57,6 +57,13 @@ export class ToObjectHelper extends TypedHelper {
         attribute: emptyObject,
         contract: emptyObject,
         block: emptyObject,
+        contractManifest: emptyObject,
+        contractABI: emptyObject,
+        contractMethod: emptyObject,
+        contractEvent: emptyObject,
+        contractParameter: emptyObject,
+        contractGroup: emptyObject,
+        contractPermission: emptyObject,
       }),
     );
   }

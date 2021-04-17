@@ -250,6 +250,13 @@ export class ToNumberHelper extends TypedHelper {
           attribute: throwTypeError,
           contract: throwTypeError,
           block: throwTypeError,
+          contractManifest: throwTypeError,
+          contractABI: throwTypeError,
+          contractMethod: throwTypeError,
+          contractEvent: throwTypeError,
+          contractParameter: throwTypeError,
+          contractGroup: throwTypeError,
+          contractPermission: throwTypeError,
         }),
       );
     };

@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ParameterDefinition cannot be implemented 1`] = `
+"snippetCode.ts (4,13): Class 'MyContractParameterDefinition' incorrectly implements interface 'ContractParameterDefinition'.
+  Type 'MyContractParameterDefinition' is missing the following properties from type 'ContractParameterDefinition': name, type
+
+      2 |       import { ContractParameterDefinition } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       class MyContractParameterDefinition implements ContractParameterDefinition {
+        |             ^
+      5 |       }
+      6 |     
+"
+`;

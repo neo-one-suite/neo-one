@@ -26,7 +26,7 @@ export interface ContractRegister {
   readonly script: BufferString;
   readonly manifest: ContractManifestClient;
   readonly compiler: string;
-  readonly nefFile: NefFile;
+  readonly nefFile: Omit<NefFile, 'checksum' | 'magic'>;
 }
 
 export interface PublishReceipt extends TransactionReceipt {

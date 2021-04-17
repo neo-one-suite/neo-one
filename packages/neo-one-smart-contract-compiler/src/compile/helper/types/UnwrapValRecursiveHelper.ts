@@ -183,6 +183,27 @@ export class UnwrapValRecursiveHelper extends Helper {
         block: (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.unwrapBlock);
         },
+        contractManifest: (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.unwrapContractManifest);
+        },
+        contractABI: (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.unwrapContractABI);
+        },
+        contractMethod: (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.unwrapContractMethod);
+        },
+        contractEvent: (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.unwrapContractEvent);
+        },
+        contractParameter: (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.unwrapContractParameter);
+        },
+        contractGroup: (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.unwrapContractGroup);
+        },
+        contractPermission: (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.unwrapContractPermission);
+        },
       }),
     );
   }

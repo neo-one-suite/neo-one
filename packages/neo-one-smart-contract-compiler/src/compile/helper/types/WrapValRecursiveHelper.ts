@@ -305,6 +305,27 @@ export class WrapValRecursiveHelper extends Helper {
         block: createHandleValue(true, (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.wrapBlock);
         }),
+        contractManifest: createHandleValue(true, (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.wrapContractManifest);
+        }),
+        contractABI: createHandleValue(true, (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.wrapContractABI);
+        }),
+        contractMethod: createHandleValue(true, (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.wrapContractMethod);
+        }),
+        contractEvent: createHandleValue(true, (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.wrapContractEvent);
+        }),
+        contractParameter: createHandleValue(true, (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.wrapContractParameter);
+        }),
+        contractGroup: createHandleValue(true, (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.wrapContractGroup);
+        }),
+        contractPermission: createHandleValue(true, (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.wrapContractPermission);
+        }),
       }),
     );
   }

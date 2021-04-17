@@ -326,21 +326,25 @@ export interface TransactionConstructor {
 export const Contract: ContractConstructor;
 export interface Contract {
   /**
-   * `Contract` code.
+   * The ID of the `Contract`
    */
-  readonly script: Buffer;
+  readonly id: number;
   /**
-   * A string representation of the contract's manifest
+   * The number of times the `Contract` has been updated.
    */
-  readonly manifest: string;
+  readonly updateCounter: number;
   /**
-   * If `true` then contract uses blockchain storage.
+   * The `Contract` hash.
    */
-  readonly hasStorage: boolean;
+  readonly hash: Address;
   /**
-   * If `true` then contract is payable.
+   * The NEO Executable Format 3 (NEF) of the `Contract`.
    */
-  readonly payable: boolean;
+  readonly nef: Buffer;
+  /**
+   * The `ContractManifest` of the `Contract`.
+   */
+  readonly manifest: ContractManifest;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface ContractConstructor {
@@ -351,6 +355,202 @@ export interface ContractConstructor {
    */
   readonly for: (address: Address) => Contract | undefined;
   readonly [OpaqueTagSymbol0]: unique symbol;
+}
+
+/**
+ * Represents the manifest of a smart contract.
+ *
+ * Every deployed smart contract must explicitly declare the features and permissions it will use
+ * in its manifest.
+ *
+ * @example
+ *
+ * const contractAddress = Address.from('0xcef0c0fdcfe7838eff6ff104f9cdec2922297537');
+ * const contract = Contract.for(contractAddress);
+ * const manifest: ContractManifest = contract.manifest;
+ */
+export const ContractManifest: ContractManifestConstructor;
+export interface ContractManifest {
+  /**
+   * The name of the contract.
+   */
+  readonly name: string;
+  /**
+   * A group represents a set of mutually trusted contracts. A contract will trust and allow any contract in the same group to invoke it, and the user interface will not give any warnings.
+   */
+  readonly groups: readonly ContractGroup[];
+  /**
+   * The Neo Enhancement Proposals (NEPs) and other standards that this smart contract supports.
+   */
+  readonly supportedStandards: readonly string[];
+  /**
+   * Full specification of the functions and events of a smart contract. Used by the Client APIs
+   * to generate the smart contract interface.
+   */
+  readonly abi: ContractABI;
+  /**
+   * The permissions field is an array containing a set of `ContractPermission` objects. It describes which contracts may be invoked and which methods are called.
+   */
+  readonly permissions: readonly ContractPermission[];
+  /**
+   * The trusts field is an array containing a set of contract hashes. It can also be `undefined`. If it is `undefined`, then it means that it trusts any contract.
+   * If a contract is trusted, the user interface will not give any warnings when called by the contract.
+   */
+  readonly trusts?: readonly Address[];
+  /**
+   * Custom user-defined JSON object, which is represented as a stringified JSON string. If it's not defined on deploy it will default to "{}".
+   */
+  readonly extra: string;
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+export interface ContractManifestConstructor {
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+
+/**
+ * A `ContractGroup` represents a set of mutually trusted contracts. A contract will allow any contract in the same
+ * group to invoke it, and the user interface will not give any warnings. A group is identified by a public key
+ * and must be accompanied by a signature for the contract hash to prove the contract is included in the group.
+ */
+export const ContractGroup: ContractGroupConstructor;
+export interface ContractGroup {
+  /**
+   * The public key identifying the group.
+   */
+  readonly publicKey: PublicKey;
+  /**
+   * Signature of the contract hash.
+   */
+  readonly signature: Buffer;
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+export interface ContractGroupConstructor {
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+
+/**
+ * Describes which contracts may be invoked and which methods are called.
+ */
+export const ContractPermission: ContractPermissionConstructor;
+export interface ContractPermission {
+  /**
+   * Indicates the contract to be invoked. Can be either a contract hash, the public key of a group, or a wildcard.
+   */
+  readonly contract?: Address | PublicKey;
+  /**
+   * An array containing a set of methods to be called. If it is a wildcard then any method can be called.
+   * If a contract invokes a contract or method that is not declared in the manifest at runtime, the invocation will fail.
+   */
+  readonly methods?: readonly string[];
+}
+export interface ContractPermissionConstructor {
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+
+/**
+ * Full specification of the methods and events of a smart contract. Used by the client APIs to generate the smart contract interface.
+ *
+ * See the [Smart Contract APIs](https://neo-one.io/docs/smart-contract-apis) chapter of the main guide for more information.
+ */
+export const ContractABI: ContractABIConstructor;
+export interface ContractABI {
+  /**
+   * Specification of the smart contract methods.
+   */
+  readonly methods: readonly ContractMethodDescriptor[];
+  /**
+   * Specification of the smart contract events.
+   */
+  readonly events: readonly ContractEventDescriptor[];
+}
+export interface ContractABIConstructor {
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+
+/**
+ * Method specification in the `ContractABI` of a smart contract.
+ */
+export const ContractMethodDescriptor: ContractMethodDescriptorConstructor;
+export interface ContractMethodDescriptor {
+  /**
+   * Name of the method.
+   */
+  readonly name: string;
+  /**
+   * Parameters of the method.
+   */
+  readonly parameters: readonly ContractParameterDefinition[];
+  /**
+   * Return type of the method.
+   */
+  readonly returnType: ContractParameterType;
+  /**
+   * Used to set the instruction pointer before executing the method.
+   */
+  readonly offset: number;
+  /**
+   * Indicates whether the method is safe to be called by other contracts.
+   */
+  readonly safe: boolean;
+}
+export interface ContractMethodDescriptorConstructor {
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+
+/**
+ * Event specification in the `ContractABIClient` of a smart contract generated by the NEO•ONE compiler
+ * for use with NEO•ONE Client APIs.
+ */
+export const ContractEventDescriptor: ContractEventDescriptorConstructor;
+export interface ContractEventDescriptor {
+  /**
+   * Name of the event.
+   */
+  readonly name: string;
+  /**
+   * Parameters of the event.
+   */
+  readonly parameters: readonly ContractParameterDefinition[];
+}
+export interface ContractEventDescriptorConstructor {
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+
+/**
+ * Describes the details of a contract parameter.
+ */
+export const ContractParameterDefinition: ContractParameterDefinitionConstructor;
+export interface ContractParameterDefinition {
+  /**
+   * The name of the contract parameter.
+   */
+  readonly name: string;
+  /**
+   * The type of the contract parameter. @see `ContractParameterType` for information on possible contract parameter types.
+   */
+  readonly type: ContractParameterType;
+}
+export interface ContractParameterDefinitionConstructor {
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+
+/**
+ * The possible types of contract parameters.
+ */
+export enum ContractParameterType {
+  Any = 0x00,
+  Boolean = 0x10,
+  Integer = 0x11,
+  ByteArray = 0x12,
+  String = 0x13,
+  Hash160 = 0x14,
+  Hash256 = 0x15,
+  PublicKey = 0x16,
+  Signature = 0x17,
+  Array = 0x20,
+  Map = 0x22,
+  InteropInterface = 0x30,
+  Void = 0xff,
 }
 
 // export enum StackItemType {
@@ -979,7 +1179,7 @@ type IsValidSmartContract<T> = {
  *
  * See the [Deployment](https://neo-one.io/docs/deployment#Properties) chapter of the main guide for more information.
  */
-export interface ContractGroup {
+export interface ContractPropertyGroup {
   /**
    * The public key of the group.
    */
@@ -995,7 +1195,7 @@ export interface ContractGroup {
  *
  * See the [Deployment](https://neo-one.io/docs/deployment#Properties) chapter of the main guide for more information.
  */
-export interface ContractPermission {
+export interface ContractPropertyPermission {
   /**
    * An object indicating the contract to be invoked. It can be the hash of a single contract or the public key of a contract group.
    * If it specifies the hash of a contract then the contract can be invoked.
@@ -1018,11 +1218,11 @@ export interface ContractProperties {
   /**
    * A group represents a set of mutually trusted contracts. A contract will trust and allow any contract in the same group to invoke it, and the user interface will not give any warnings.
    */
-  readonly groups: readonly ContractGroup[];
+  readonly groups: readonly ContractPropertyGroup[];
   /**
-   * The permissions field is an array containing a set of `ContractPermission` objects. It describes which contracts may be invoked and which methods are called.
+   * The permissions field is an array containing a set of `ContractPropertyPermission` objects. It describes which contracts may be invoked and which methods are called.
    */
-  readonly permissions: readonly ContractPermission[];
+  readonly permissions: readonly ContractPropertyPermission[];
   /**
    * The trusts field is an array containing a set of contract hashes or group public keys. It can also be assigned with a wildcard *. If it is a wildcard *, then it means that this contract trusts any contract.
    * If a contract is trusted, the user interface will not give any warnings when called by the contract.

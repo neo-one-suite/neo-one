@@ -200,6 +200,13 @@ export class ToStringHelper extends TypedHelper {
           attribute: convertEmptyString,
           contract: convertEmptyString,
           block: convertEmptyString,
+          contractManifest: convertEmptyString,
+          contractABI: convertEmptyString,
+          contractMethod: convertEmptyString,
+          contractEvent: convertEmptyString,
+          contractParameter: convertEmptyString,
+          contractGroup: convertEmptyString,
+          contractPermission: convertEmptyString,
         }),
       );
     };
