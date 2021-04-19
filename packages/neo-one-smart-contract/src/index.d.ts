@@ -442,6 +442,7 @@ export interface ContractPermission {
    * If a contract invokes a contract or method that is not declared in the manifest at runtime, the invocation will fail.
    */
   readonly methods?: readonly string[];
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface ContractPermissionConstructor {
   readonly [OpaqueTagSymbol0]: unique symbol;
@@ -462,6 +463,7 @@ export interface ContractABI {
    * Specification of the smart contract events.
    */
   readonly events: readonly ContractEventDescriptor[];
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface ContractABIConstructor {
   readonly [OpaqueTagSymbol0]: unique symbol;
@@ -492,6 +494,7 @@ export interface ContractMethodDescriptor {
    * Indicates whether the method is safe to be called by other contracts.
    */
   readonly safe: boolean;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface ContractMethodDescriptorConstructor {
   readonly [OpaqueTagSymbol0]: unique symbol;
@@ -511,6 +514,7 @@ export interface ContractEventDescriptor {
    * Parameters of the event.
    */
   readonly parameters: readonly ContractParameterDefinition[];
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface ContractEventDescriptorConstructor {
   readonly [OpaqueTagSymbol0]: unique symbol;
@@ -529,6 +533,7 @@ export interface ContractParameterDefinition {
    * The type of the contract parameter. @see `ContractParameterType` for information on possible contract parameter types.
    */
   readonly type: ContractParameterType;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface ContractParameterDefinitionConstructor {
   readonly [OpaqueTagSymbol0]: unique symbol;

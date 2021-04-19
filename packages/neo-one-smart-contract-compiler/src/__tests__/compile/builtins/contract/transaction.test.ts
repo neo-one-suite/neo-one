@@ -4,22 +4,22 @@ import { DiagnosticCode } from '../../../../DiagnosticCode';
 describe('Transaction', () => {
   test('properties', async () => {
     const node = await helpers.startNode();
-    const block = await node.readClient.getBlock(0);
-    const transaction = block.transactions[0];
+    const { transaction } = await node.executeString(``);
     await node.executeString(
       `
       import { Transaction, Address, Hash256 } from '@neo-one/smart-contract';
 
-      const transaction = Transaction.for(Hash256.from('${block.transactions[0].hash}'));
+      const transaction = Transaction.for(Hash256.from('${transaction.hash}'));
 
       assertEqual(transaction instanceof Transaction, true);
-      assertEqual(transaction.height, ${block.index});
+      assertEqual(transaction.hash, Hash256.from('${transaction.hash}'));
       assertEqual(transaction.version, ${transaction.version});
       assertEqual(transaction.nonce, ${transaction.nonce});
       assertEqual(transaction.sender, Address.from('${transaction.sender}'));
-      assertEqual(transaction.validUntilBlock, ${transaction.validUntilBlock});
       assertEqual(transaction.systemFee, ${transaction.systemFee.toString()});
       assertEqual(transaction.networkFee, ${transaction.networkFee.toString()});
+      assertEqual(transaction.validUntilBlock, ${transaction.validUntilBlock});
+      assertEqual(transaction.height, 1);
       assertEqual(transaction.script, ${helpers.getBufferHash(transaction.script, 'base64')});
     `,
     );

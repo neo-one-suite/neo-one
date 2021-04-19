@@ -94,7 +94,7 @@ export const add = (builtins: Builtins): void => {
         // [[buffer]]
         sb.emitOp(node, 'PACK');
         // [number, [buffer]]
-        sb.emitPushInt(node, CallFlags.None);
+        sb.emitPushInt(node, CallFlags.ReadStates);
         // ['getTransaction', number, [buffer]]
         sb.emitPushString(node, 'getTransaction');
         // [buffer, 'getTransaction', number, [buffer]]

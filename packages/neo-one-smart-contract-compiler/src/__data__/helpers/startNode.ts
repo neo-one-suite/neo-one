@@ -216,9 +216,10 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
 
       throwOnDiagnosticErrorOrWarning(context.diagnostics, outerOptions.ignoreWarnings);
 
-      mutableSourceMaps[
-        scriptHashToAddress(common.uInt160ToString(crypto.toScriptHash(Buffer.from(outputScript, 'hex'))))
-      ] = await sourceMap;
+      const contractAddress = scriptHashToAddress(
+        common.uInt160ToString(crypto.toScriptHash(Buffer.from(outputScript, 'hex'))),
+      );
+      mutableSourceMaps[contractAddress] = await sourceMap;
       const result = await userAccountProviders.memory.__execute(
         outputScript,
         {
