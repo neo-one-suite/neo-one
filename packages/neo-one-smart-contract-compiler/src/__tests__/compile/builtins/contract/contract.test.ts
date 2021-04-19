@@ -7,7 +7,6 @@ import {
   ContractPermission,
   MethodTokenModel,
   NefFileModel,
-  toContractParameterType,
 } from '@neo-one/client-common';
 import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
@@ -98,7 +97,7 @@ describe('Contract', () => {
       }
       ${method.parameters?.map((param, idxIn) => checkParam(idxIn, param, method.name)).join('') ?? ''};
 
-      assertEqual(abiMethod.returnType, ${toContractParameterType(method.returnType)});
+      assertEqual(abiMethod.returnType, ContractParameterType.${method.returnType});
       assertEqual(abiMethod.offset, ${method.offset});
       assertEqual(abiMethod.safe, ${method.safe});
     `;
@@ -145,7 +144,7 @@ describe('Contract', () => {
         ${permissions.some((perm) => perm.contract.group !== undefined) ? 'PublicKey,' : ''}
         ${groups.length > 0 ? 'ContractGroup,' : ''}
         ${permissions.length > 0 ? 'ContractPermission,' : ''}
-        ${methods.length > 0 ? 'ContractMethodDescriptor,' : ''}
+        ${methods.length > 0 ? 'ContractMethodDescriptor, ContractParameterType,' : ''}
         ${events.length > 0 ? 'ContractEventDescriptor,' : ''}
         ${
           methods.some((method) => method.parameters !== undefined && method.parameters.length > 0) ||
