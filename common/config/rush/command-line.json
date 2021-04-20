@@ -486,7 +486,13 @@
       "longName": "--prod",
       "shortName": "-P",
       "description": "Deploy to production",
-      "associatedCommands": ["deploy-all-live", "deploy-static-live", "deploy-preview-live", "deploy-server-live", "deploy-test-runner-live"]
+      "associatedCommands": [
+        "deploy-all-live",
+        "deploy-static-live",
+        "deploy-preview-live",
+        "deploy-server-live",
+        "deploy-test-runner-live"
+      ]
     }
   ]
 }

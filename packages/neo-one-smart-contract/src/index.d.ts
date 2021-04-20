@@ -398,7 +398,7 @@ export interface ContractManifest {
    */
   readonly trusts?: readonly Address[];
   /**
-   * Custom user-defined JSON object, which is represented as a stringified JSON string. If it's not defined on deploy it will default to "{}".
+   * Custom user-defined JSON object, which is represented as a stringified JSON string. If it's not defined on deploy it will default to \"{}\".
    */
   readonly extra: string;
   readonly [OpaqueTagSymbol0]: unique symbol;
