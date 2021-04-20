@@ -152,7 +152,7 @@ export const Home = (props: {}) => (
       </ProofsWrapper>
     </CenterContentWrapper>
     {/* <EditorContent /> */}
-    <Divider />
+    {/* <Divider /> */}
     <FeaturesWrapper>
       <Authoring />
       <Testing />
