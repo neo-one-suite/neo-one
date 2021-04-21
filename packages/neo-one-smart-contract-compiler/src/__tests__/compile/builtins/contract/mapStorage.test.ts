@@ -184,7 +184,7 @@ describe('MapStorage', () => {
     `);
   });
 
-  test.only('multi-tier', async () => {
+  test('multi-tier', async () => {
     const node = await helpers.startNode();
 
     const contract = await node.addContract(`
@@ -285,7 +285,7 @@ describe('MapStorage', () => {
     `);
   });
 
-  test('multi-tier - level 0', async () => {
+  test.only('multi-tier - level 0', async () => {
     const node = await helpers.startNode();
 
     const contract = await node.addContract(`

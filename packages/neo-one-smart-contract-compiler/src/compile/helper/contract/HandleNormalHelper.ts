@@ -57,7 +57,7 @@ export class HandleNormalHelper extends Helper {
             }),
           );
           sb.emitHelper(decl, innerOptions, sb.helpers.invokeSmartContractMethod({ method: decl }));
-          sb.emitHelper(decl, innerOptions, sb.helpers.unwrapValRecursive({ type: returnType }));
+          sb.emitHelper(decl, innerOptions, sb.helpers.unwrapValRecursive({ dropVoid: true, type: returnType }));
         });
 
         return;
@@ -68,7 +68,11 @@ export class HandleNormalHelper extends Helper {
 
         sb.emitPushString(decl, propInfo.name);
         sb.emitHelper(decl, options, sb.helpers.getCommonStorage);
-        sb.emitHelper(decl, options, sb.helpers.unwrapValRecursive({ type: sb.context.analysis.getType(decl) }));
+        sb.emitHelper(
+          decl,
+          options,
+          sb.helpers.unwrapValRecursive({ dropVoid: true, type: sb.context.analysis.getType(decl) }),
+        );
 
         return;
       }
@@ -82,7 +86,7 @@ export class HandleNormalHelper extends Helper {
 
             sb.withScope(decl, options, (innerOptions) => {
               sb.emitHelper(decl, innerOptions, sb.helpers.invokeSmartContractMethod({ method: decl }));
-              sb.emitHelper(decl, innerOptions, sb.helpers.unwrapValRecursive({ type: propertyType }));
+              sb.emitHelper(decl, innerOptions, sb.helpers.unwrapValRecursive({ dropVoid: true, type: propertyType }));
             });
           }
         } else {

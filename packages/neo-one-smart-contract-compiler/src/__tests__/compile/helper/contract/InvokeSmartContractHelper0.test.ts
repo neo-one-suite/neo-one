@@ -9,7 +9,7 @@ const properties = `
 `;
 
 describe('InvokeSmartContractHelper', () => {
-  test.only('basic class no constructor', async () => {
+  test('basic class no constructor', async () => {
     const node = await helpers.startNode();
     const contract = await node.addContract(`
       import { SmartContract } from '@neo-one/smart-contract';
