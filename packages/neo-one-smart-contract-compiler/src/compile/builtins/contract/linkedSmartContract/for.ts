@@ -52,7 +52,7 @@ export class LinkedSmartContractFor extends SmartContractForBase {
       // [string, [string, params]]
       sb.emitOp(node, 'SWAP');
       // [number, string, [string, params]]
-      sb.emitPushInt(node, CallFlags.None);
+      sb.emitPushInt(node, CallFlags.All);
       // [string, number, [string, params]]
       sb.emitOp(node, 'SWAP');
       // [buffer, string, number, [string, params]]

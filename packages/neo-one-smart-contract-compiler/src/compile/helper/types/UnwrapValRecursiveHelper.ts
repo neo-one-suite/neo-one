@@ -7,6 +7,7 @@ import { isOnlyMap } from './map';
 
 export interface UnwrapValRecursiveHelperOptions {
   readonly deserializeBeforeUnwrap?: boolean;
+  readonly dropVoid?: boolean;
   readonly type: ts.Type | undefined;
 }
 
@@ -14,11 +15,13 @@ export interface UnwrapValRecursiveHelperOptions {
 // Output: [value]
 export class UnwrapValRecursiveHelper extends Helper {
   private readonly deserializeBeforeUnwrap: boolean;
+  private readonly dropVoid: boolean;
   private readonly type: ts.Type | undefined;
   public constructor(options: UnwrapValRecursiveHelperOptions) {
     super();
     this.type = options.type;
     this.deserializeBeforeUnwrap = options.deserializeBeforeUnwrap ?? false;
+    this.dropVoid = options.dropVoid ?? false;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
@@ -28,6 +31,12 @@ export class UnwrapValRecursiveHelper extends Helper {
 
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
+    }
+
+    if (this.dropVoid && tsUtils.type_.isOnlyVoid(this.type)) {
+      sb.emitOp(node, 'DROP');
+
+      return;
     }
 
     const type = tsUtils.type_.getNonNullableType(this.type);

@@ -1,7 +1,6 @@
 import { Types } from '../../../constants';
 import { BuiltinInterface } from '../../BuiltinInterface';
 import { Builtins } from '../../Builtins';
-import { BuiltinInstanceIndexArrayValue } from '../BuiltinInstanceIndexArrayValue';
 import { BuiltinInstanceIndexValue } from '../BuiltinInstanceIndexValue';
 import { ValueInstanceOf } from '../ValueInstanceOf';
 
@@ -27,6 +26,6 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractMember(
     'ContractParameterDefinition',
     'type',
-    new BuiltinInstanceIndexArrayValue(1, Types.ContractParameter, Types.Number),
+    new BuiltinInstanceIndexValue(1, Types.ContractParameter, Types.Number),
   );
 };

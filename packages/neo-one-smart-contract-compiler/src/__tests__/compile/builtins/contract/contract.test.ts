@@ -16,7 +16,19 @@ describe('Contract', () => {
     const node = await helpers.startNode();
 
     const contract = await node.addContract(`
-      assertEqual(1, 1);
+    import { SmartContract } from '@neo-one/smart-contract';
+
+    export class MyContract extends SmartContract {
+      public readonly properties = {
+        groups: [],
+        permissions: [],
+        trusts: "*",
+      };
+
+      public run(): void {
+        assertEqual(1, 1);
+      }
+    }
     `);
     const { compiler, checksum: checkSum, script, tokens: tokensOut } = contract.contract.nef;
     const { name, groups, supportedStandards, abi, permissions, trusts, extra } = contract.contract.manifest;
@@ -76,12 +88,20 @@ describe('Contract', () => {
 
     `;
 
-    const checkParam = (idx: number, param: ContractParameterDefinition, nameIn: string) => `
+    const checkEventParam = (idx: number, param: ContractParameterDefinition, nameIn: string) => `
+    abiEventParam${nameIn} = abiMethod.parameters[${idx}];
+
+    assertEqual(abiEventParam${nameIn} instanceof ContractParameterDefinition, true);
+    assertEqual(abiEventParam${nameIn}.name, '${param.name}');
+    assertEqual(abiEventParam${nameIn}.type, ContractParameterType.${param.type});
+  `;
+
+    const checkMethodParam = (idx: number, param: ContractParameterDefinition, nameIn: string) => `
       abiMethodParam${nameIn} = abiMethod.parameters[${idx}];
 
       assertEqual(abiMethodParam${nameIn} instanceof ContractParameterDefinition, true);
       assertEqual(abiMethodParam${nameIn}.name, '${param.name}');
-      assertEqual(abiMethodParam${nameIn}.type, ${param.type});
+      assertEqual(abiMethodParam${nameIn}.type, ContractParameterType.${param.type});
     `;
 
     const checkContractMethod = (idx: number, method: ContractMethodDescriptor) => `
@@ -92,10 +112,10 @@ describe('Contract', () => {
       ${method.parameters ? `assertEqual(abiMethod.parameters.length, ${method.parameters?.length});` : ''}
       ${
         method.parameters !== undefined && method.parameters.length > 0
-          ? `let abiMethodParams${method.name}: ContractMethodDescriptor;`
+          ? `let abiMethodParam${method.name}: ContractParameterDefinition;`
           : ''
       }
-      ${method.parameters?.map((param, idxIn) => checkParam(idxIn, param, method.name)).join('') ?? ''};
+      ${method.parameters?.map((param, idxIn) => checkMethodParam(idxIn, param, method.name)).join('') ?? ''};
 
       assertEqual(abiMethod.returnType, ContractParameterType.${method.returnType});
       assertEqual(abiMethod.offset, ${method.offset});
@@ -108,8 +128,8 @@ describe('Contract', () => {
       assertEqual(abiEvent instanceof ContractEventDescriptor, true);
       assertEqual(abiEvent.name, '${event.name}');
       assertEqual(abiEvent.parameters.length, ${event.parameters.length});
-      let abiEventParams${event.name}: ContractEventDescriptor;
-      ${event.parameters.map((param, idxIn) => checkParam(idxIn, param, event.name)).join('')}
+      let abiEventParam${event.name}: ContractParameterDefinition;
+      ${event.parameters.map((param, idxIn) => checkEventParam(idxIn, param, event.name)).join('')}
     `;
 
     const checkTrust = (idx: number, trust: string) => `

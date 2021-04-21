@@ -2,7 +2,7 @@ import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Block', () => {
-  test.only('properties', async () => {
+  test('properties', async () => {
     const node = await helpers.startNode();
     const block = await node.readClient.getBlock(0);
     await node.executeString(`

@@ -56,7 +56,7 @@ export class SmartContractFor extends SmartContractForBase {
       // [bufferVal, string, params]
       sb.scope.get(sb, arg, options, addressName);
       // [number, bufferVal, string, params]
-      sb.emitPushInt(node, CallFlags.None);
+      sb.emitPushInt(node, CallFlags.All);
       // [string, bufferVal, number, params]
       sb.emitOp(node, 'REVERSE3');
       // [bufferVal, string, number, params]
@@ -69,7 +69,7 @@ export class SmartContractFor extends SmartContractForBase {
       // [buffer, string, params]
       sb.emitPushBuffer(prop, scriptHash);
       // [number, buffer, string, params]
-      sb.emitPushInt(node, CallFlags.None);
+      sb.emitPushInt(node, CallFlags.All);
       // [string, buffer, number, params]
       sb.emitOp(node, 'REVERSE3');
       // [buffer, string, number, params]
