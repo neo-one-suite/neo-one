@@ -1,3 +1,4 @@
+import { TriggerType } from '@neo-one/client-common';
 import ts from 'typescript';
 import { GlobalProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
@@ -29,7 +30,7 @@ export class CacheStorageHelper extends Helper {
     // [number, map]
     sb.emitSysCall(node, 'System.Runtime.GetTrigger');
     // [number, number, map]
-    sb.emitPushInt(node, 0x10);
+    sb.emitPushInt(node, TriggerType.Application);
     sb.emitHelper(
       node,
       options,

@@ -1,3 +1,4 @@
+import { TriggerType } from '@neo-one/client-common';
 import ts from 'typescript';
 import { GlobalProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
@@ -22,7 +23,7 @@ export class InvocationIsCallerHelper extends Helper {
     // [trigger, boolean]
     sb.emitSysCall(node, 'System.Runtime.GetTrigger');
     // [number, trigger, boolean]
-    sb.emitPushInt(node, 0x00);
+    sb.emitPushInt(node, TriggerType.Verification);
     // [boolean, boolean]
     sb.emitOp(node, 'NUMEQUAL');
     // [boolean]

@@ -1,3 +1,4 @@
+import { TriggerType } from '@neo-one/client-common';
 import ts from 'typescript';
 import { GlobalProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
@@ -89,7 +90,7 @@ export class CommonStorageHelper extends Helper {
           // [number, valueBuffer]
           sb.emitSysCall(node, 'System.Runtime.GetTrigger');
           // [number, number, valueBuffer]
-          sb.emitPushInt(node, 0x10);
+          sb.emitPushInt(node, TriggerType.Application);
           sb.emitHelper(
             node,
             options,
