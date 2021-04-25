@@ -1,5 +1,4 @@
 import {
-  assertValidScript,
   AttributeTypeModel,
   BinaryReader,
   common,
@@ -10,6 +9,7 @@ import {
   MAX_TRANSACTION_SIZE,
   MAX_VALID_UNTIL_BLOCK_INCREMENT,
   multiSignatureContractCost,
+  Script,
   scriptHashToAddress,
   signatureContractCost,
   TransactionJSON,
@@ -261,7 +261,8 @@ export class Transaction
       return VerifyResultModel.Invalid;
     }
     try {
-      assertValidScript(this.script);
+      // tslint:disable-next-line: no-unused-expression
+      new Script(this.script, true);
     } catch {
       return VerifyResultModel.Invalid;
     }
