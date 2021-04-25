@@ -16,4 +16,5 @@ export * from './types';
 export * from './utils';
 export * from './StackItemType';
 export * from './disassembleByteCode';
-export * from './script';
+export * from './Script';
+export * from './Instruction';

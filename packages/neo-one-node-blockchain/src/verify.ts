@@ -1,11 +1,4 @@
-import {
-  assertValidScript,
-  CallFlags,
-  ContractParameterTypeModel,
-  TriggerType,
-  UInt160,
-  VMState,
-} from '@neo-one/client-common';
+import { CallFlags, ContractParameterTypeModel, Script, TriggerType, UInt160, VMState } from '@neo-one/client-common';
 import {
   ContractState,
   ExecuteScriptResult,
@@ -82,7 +75,8 @@ export const verifyWitness = async ({
   const { verification, invocation } = witness;
 
   try {
-    assertValidScript(invocation);
+    // tslint:disable-next-line: no-unused-expression
+    new Script(invocation, true);
   } catch {
     return { result: false, gas: initFee };
   }
@@ -133,7 +127,8 @@ export const verifyWitness = async ({
         }
 
         try {
-          assertValidScript(verification);
+          // tslint:disable-next-line: no-unused-expression
+          new Script(verification, true);
         } catch {
           return { result: false, gas: initFee };
         }

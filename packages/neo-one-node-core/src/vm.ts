@@ -51,6 +51,7 @@ export interface RunEngineOptions {
   readonly persistingBlock?: Block;
   readonly offset?: number;
   readonly gas?: BN;
+  readonly flags?: CallFlags;
 }
 
 export interface LoadScriptOptions {
