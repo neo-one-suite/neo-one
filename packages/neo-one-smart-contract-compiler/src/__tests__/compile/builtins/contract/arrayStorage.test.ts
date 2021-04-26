@@ -443,6 +443,94 @@ describe('ArrayStorage', () => {
     `);
   });
 
+  test('iteration after modification', async () => {
+    const node = await helpers.startNode();
+
+    const contract = await node.addContract(`
+      import { ArrayStorage, SmartContract } from '@neo-one/smart-contract';
+
+      export class StorageContract extends SmartContract {
+        ${properties}
+        private readonly prefix = ArrayStorage.for<string>();
+
+        public setupStorage(): void {
+          const storage = this.prefix;
+          const keyA = 'keyA';
+          const keyB = 'keyB';
+          const keyC = 'keyC';
+          const keyD = 'keyD';
+
+          storage.push(keyA);
+          storage.push(keyB);
+          storage.push(keyC);
+          storage.push(keyD);
+        }
+
+        public run(): void {
+          const keyA = 'keyA';
+          const keyB = 'keyB';
+          const keyC = 'keyC';
+          const keyD = 'keyD';
+
+          const storage = this.prefix;
+          assertEqual(storage.length, 4);
+          let count = 0;
+          let indices = 0;
+          let keys = '';
+          storage.forEach((key, idx) => {
+            count += 1;
+            indices += idx;
+            keys += key;
+          });
+          assertEqual(count, 4);
+          assertEqual(indices, 6);
+          assertEqual(keys, keyA + keyB + keyC + keyD);
+
+          const keyE = 'keyE';
+          const keyF = 'keyF';
+          storage.push(keyE);
+          storage.push(keyF);
+          assertEqual(storage.length, 6);
+          count = 0;
+          indices = 0;
+          keys = '';
+          storage.forEach((key, idx) => {
+            count += 1;
+            indices += idx;
+            keys += key;
+          });
+          assertEqual(count, 6);
+          assertEqual(indices, 15);
+          assertEqual(keys, keyA + keyB + keyC + keyD + keyE + keyF);
+        }
+      }
+    `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        deploy(): void;
+        setupStorage(): void;
+        run(): void;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+      contract.deploy();
+      contract.setupStorage();
+    `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        setupStorage(): void;
+        run(): void;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+      contract.run();
+    `);
+  });
+
   test('canCall', () => {
     expect(new ArrayStorageIterator().canCall()).toEqual(true);
     expect(new ArrayStoragePush().canCall()).toEqual(true);
