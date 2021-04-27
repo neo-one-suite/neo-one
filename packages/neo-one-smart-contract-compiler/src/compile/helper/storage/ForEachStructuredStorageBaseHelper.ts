@@ -24,7 +24,7 @@ export class ForEachStructuredStorageBaseHelper extends StructuredStorageBaseHel
     sb.emitHelper(node, options, sb.helpers.createIteratorStructuredStorage({ type: this.type }));
     // []
     sb.emitHelper(node, options, sb.helpers.rawIteratorForEachBase({ each: this.each }));
-    if (options.pushValue) {
+    if (optionsIn.pushValue) {
       // [val]
       sb.emitHelper(node, options, sb.helpers.wrapUndefined);
     }
