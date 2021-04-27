@@ -5,3 +5,6 @@ export * from './MapForEachHelper';
 export * from './MapMapHelper';
 export * from './MapReduceHelper';
 export * from './MapSomeHelper';
+export * from './MapToNestedArrHelper';
+export * from './NestedArrToMapHelper';
+export * from './IteratorToMapHelper';

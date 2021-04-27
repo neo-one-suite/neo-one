@@ -169,6 +169,7 @@ import {
 import { CreateIteratorResultHelper } from './iteratorResult';
 import { KeyedHelper } from './KeyedHelper';
 import {
+  IteratorToMapHelper,
   MapDeleteHelper,
   MapEveryHelper,
   MapEveryHelperOptions,
@@ -182,6 +183,8 @@ import {
   MapReduceHelperOptions,
   MapSomeHelper,
   MapSomeHelperOptions,
+  MapToNestedArrHelper,
+  NestedArrToMapHelper,
 } from './map';
 import {
   AddEmptyModuleHelper,
@@ -690,6 +693,9 @@ export interface Helpers {
   readonly mapMap: (options: MapMapHelperOptions) => MapMapHelper;
   readonly mapReduce: (options: MapReduceHelperOptions) => MapReduceHelper;
   readonly mapSome: (options: MapSomeHelperOptions) => MapSomeHelper;
+  readonly mapToNestedArr: MapToNestedArrHelper;
+  readonly nestedArrToMap: NestedArrToMapHelper;
+  readonly iteratorToMap: IteratorToMapHelper;
 
   // storage
   readonly cacheStorage: CacheStorageHelper;
@@ -1139,6 +1145,9 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     mapMap: (options) => new MapMapHelper(options),
     mapReduce: (options) => new MapReduceHelper(options),
     mapSome: (options) => new MapSomeHelper(options),
+    mapToNestedArr: new MapToNestedArrHelper(),
+    nestedArrToMap: new NestedArrToMapHelper(),
+    iteratorToMap: new IteratorToMapHelper(),
 
     // storage
     cacheStorage: new CacheStorageHelper(),

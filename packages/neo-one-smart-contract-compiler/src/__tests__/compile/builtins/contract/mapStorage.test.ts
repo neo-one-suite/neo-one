@@ -116,7 +116,37 @@ describe('MapStorage', () => {
         assertEqual(storage.delete(17 - 1), false);
         assertEqual(storage.get(17 - 1), undefined);
         assertEqual(storage.has(17 - 1), false);
+      }
 
+      export class StorageContract extends SmartContract {
+        ${properties}
+
+        private readonly storage = MapStorage.for<number, number>();
+
+        public run(): void {
+          test(this.storage);
+        }
+      }
+    `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        run(): void;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+      contract.run();
+    `);
+  });
+
+  test('get, set, delete, has - computed values #2', async () => {
+    const node = await helpers.startNode();
+
+    const contract = await node.addContract(`
+      import { MapStorage, SmartContract } from '@neo-one/smart-contract';
+
+      const test = (storage: MapStorage<number, number>) => {
         storage.set(1 - 1, 10).set(2 - 1, 5).set(17 - 1, 16);
         assertEqual(storage.get(0), 10);
         assertEqual(storage.get(1), 5);
@@ -184,7 +214,7 @@ describe('MapStorage', () => {
     `);
   });
 
-  test('multi-tier', async () => {
+  test('multi-tier #1', async () => {
     const node = await helpers.startNode();
 
     const contract = await node.addContract(`
@@ -229,6 +259,43 @@ describe('MapStorage', () => {
         assertEqual(storage.at(addressA).at(hashA).has(keyA), true);
       };
 
+      export class StorageContract extends SmartContract {
+        ${properties}
+
+        private readonly storage = MapStorage.for<[Address, Hash256, string], number>();
+
+        public run(): void {
+          testAtGetSetHasDelete(this.storage);
+        }
+      }
+    `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        run(): void;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+      contract.run();
+    `);
+  });
+
+  test('multi-tier #2', async () => {
+    const node = await helpers.startNode();
+
+    const contract = await node.addContract(`
+      import { MapStorage, SmartContract, Address, Hash256 } from '@neo-one/smart-contract';
+
+      const addressA = Address.from('${keys[0].address}');
+      const hashA = Hash256.from('${hashes.OLD_NEO_ASSET_HASH}');
+      const keyA = 'keyA';
+      const valueA = 1;
+      const valueB = 2;
+      const valueC = 3;
+
+      type Storage = MapStorage<[Address, Hash256, string], number>;
+
       const testAtGetSetHasDelete1 = (storage: Storage) => {
         storage.set([addressA, hashA, keyA], valueA);
         assertEqual(storage.has([addressA, hashA, keyA]), true);
@@ -268,11 +335,103 @@ describe('MapStorage', () => {
         private readonly storage = MapStorage.for<[Address, Hash256, string], number>();
 
         public run(): void {
-          testAtGetSetHasDelete(this.storage);
           testAtGetSetHasDelete1(this.storage);
         }
       }
     `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        run(): void;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+      contract.run();
+    `);
+  });
+
+  test('iteration only', async () => {
+    const node = await helpers.startNode();
+
+    const contract = await node.addContract(`
+    import { MapStorage, SmartContract } from '@neo-one/smart-contract';
+
+    const keyA = 'keyA';
+    const keyB = 'keyB';
+    const keyC = 'keyC';
+    const valueA = 1;
+    const valueB = 2;
+    const valueC = 3;
+    const valueD = 4;
+
+    type Storage = MapStorage<string, number>;
+
+    const testLevel0 = (storage: Storage) => {
+      storage.set(keyA, valueA);
+      storage.set(keyB, valueB);
+      storage.set(keyC, valueC);
+      storage.set(keyC, valueD);
+
+      assertEqual(storage.get(keyC), valueD);
+
+      let count = 0;
+      let result = 0;
+      let keys = '';
+      storage.forEach((value, key) => {
+        count += 1;
+        result += value;
+        keys += key;
+      });
+      assertEqual(count, 3);
+      assertEqual(result, valueA + valueB + valueD);
+      assertEqual(keys, keyA + keyB + keyC);
+
+      count = 0;
+      result = 0;
+      keys = '';
+      for (const [key, value] of storage) {
+        count += 1;
+        result += value;
+        keys += key;
+      }
+      assertEqual(count, 3);
+      assertEqual(result, valueA + valueB + valueD);
+      assertEqual(keys, keyA + keyB + keyC);
+
+      storage[Symbol.iterator]();
+      const firstIterator = storage[Symbol.iterator]();
+
+      let firstResult = firstIterator.next();
+      assertEqual(firstResult.value[0], keyA);
+      assertEqual(firstResult.value[1], valueA);
+      assertEqual(firstResult.done, false);
+      firstResult = firstIterator.next();
+      assertEqual(firstResult.value[0], keyB);
+      assertEqual(firstResult.value[1], valueB);
+      assertEqual(firstResult.done, false);
+      firstResult = firstIterator.next();
+      assertEqual(firstResult.value[0], keyC);
+      assertEqual(firstResult.value[1], valueD);
+      assertEqual(firstResult.done, false);
+      firstResult = firstIterator.next();
+      assertEqual(firstResult.value as [string, number] | undefined, undefined);
+      assertEqual(firstResult.done, true);
+    }
+
+    export class StorageContract extends SmartContract {
+      ${properties}
+
+      private readonly storage = MapStorage.for<string, number>();
+
+      public run(): void {
+        this.storage.set(keyA, valueA);
+        this.storage.set(keyB, valueB);
+        this.storage.set(keyC, valueC);
+        testLevel0(this.storage);
+      }
+    }
+  `);
 
     await node.executeString(`
       import { Address, SmartContract } from '@neo-one/smart-contract';
@@ -545,7 +704,7 @@ describe('MapStorage', () => {
     `);
   });
 
-  test('multi-tier - level 2', async () => {
+  test('multi-tier - level 2 #1', async () => {
     const node = await helpers.startNode();
 
     const contract = await node.addContract(`
@@ -643,6 +802,67 @@ describe('MapStorage', () => {
         assertEqual(count, 0);
         assertEqual(result, 0);
         assertEqual(keys, '');
+      }
+
+      export class StorageContract extends SmartContract {
+        ${properties}
+
+        private readonly storage = MapStorage.for<[Address, Hash256, string], number>();
+
+        public run(): void {
+          this.storage.set([addressA, hashA, keyA], valueA);
+          this.storage.set([addressA, hashB, keyB], valueB);
+          this.storage.set([addressB, hashB, keyB], valueC);
+          this.storage.set([addressB, hashB, keyC], valueD);
+
+          testLevel2(this.storage);
+        }
+      }
+    `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        run(): void;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+      contract.run();
+    `);
+  });
+
+  test('multi-tier - level 2 #2', async () => {
+    const node = await helpers.startNode();
+
+    const contract = await node.addContract(`
+      import { MapStorage, SmartContract, Address, Hash256 } from '@neo-one/smart-contract';
+
+      const addressA = Address.from('${keys[0].address}');
+      const addressB = Address.from('${keys[1].address}');
+      const hashA = Hash256.from('${hashes.OLD_NEO_ASSET_HASH}');
+      const hashB = Hash256.from('${hashes.OLD_GAS_ASSET_HASH}');
+      const keyA = 'keyA';
+      const keyB = 'keyB';
+      const keyC = 'keyC';
+      const valueA = 1;
+      const valueB = 2;
+      const valueC = 3;
+      const valueD = 4;
+
+      type Storage = MapStorage<[Address, Hash256, string], number>;
+
+      const testLevel2 = (storage: Storage) => {
+        let count = 0;
+        let result = 0;
+        let keys = '';
+        storage.at([addressA, hashA]).forEach((value, key) => {
+          count += 1;
+          result += value;
+          keys += key;
+        });
+        assertEqual(count, 1);
+        assertEqual(result, valueA);
+        assertEqual(keys, keyA);
 
         const sixthIterator = storage.at([addressB, hashA])[Symbol.iterator]();
         let sixthResult = sixthIterator.next();

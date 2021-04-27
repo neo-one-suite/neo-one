@@ -192,6 +192,7 @@ export enum Op {
   ISNULL = 0xd8,
   ISTYPE = 0xd9,
   CONVERT = 0xdb,
+  PRINT = 0xff,
 }
 
 export type OpCode = keyof typeof Op;
@@ -251,10 +252,6 @@ export enum SysCall {
   'System.Storage.Find' = 'System.Storage.Find',
   'System.Storage.Put' = 'System.Storage.Put',
   'System.Storage.Delete' = 'System.Storage.Delete',
-  'System.Binary.Base58Encode' = 'System.Binary.Base58Encode',
-  'System.Binary.Base58Decode' = 'System.Binary.Base58Decode',
-  'System.Binary.Itoa' = 'System.Binary.Itoa',
-  'System.Binary.Atoi' = 'System.Binary.Atoi',
 }
 
 export enum SysCallHashNum {
@@ -290,10 +287,6 @@ export enum SysCallHashNum {
   'System.Storage.Find' = 0xdf30b89a,
   'System.Storage.Put' = 0xe63f1884,
   'System.Storage.Delete' = 0x2f58c5ed,
-  'System.Binary.Base58Encode' = 0x3f57b067,
-  'System.Binary.Base58Decode' = 0x6df79237,
-  'System.Binary.Itoa' = 0x7be3ba7d,
-  'System.Binary.Atoi' = 0x1c3840eb,
 }
 
 export type SysCallName = keyof typeof SysCall;
