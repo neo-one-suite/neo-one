@@ -1,4 +1,4 @@
-import { assertByteCode, Byte, Op, operandSizePrefixTable, operandSizeTable } from './models';
+import { assertByteCode, Op, operandSizePrefixTable, operandSizeTable } from './models';
 
 export class Instruction {
   public static readonly RET = new Instruction(Buffer.from([Op.RET]), 0);
@@ -43,10 +43,6 @@ export class Instruction {
     const prefixSize = operandSizePrefixTable[this.opCode];
 
     if (prefixSize > 0) {
-      if (this.operand.equals(Buffer.from([]))) {
-        throw new Error(`Expected an operand for opcode: ${Byte[this.opCode]}`);
-      }
-
       return prefixSize + this.operand.length + 1;
     }
 

@@ -39,10 +39,8 @@ class BlockchainCurrentCallerContract extends BuiltinMemberValue {
         options,
         sb.helpers.if({
           condition: () => {
-            // [buffer, contract, buffer]
-            sb.emitPushBuffer(node, Buffer.from([]));
-            // [boolean, buffer]
-            sb.emitOp(node, 'EQUAL');
+            // [buffer, buffer]
+            sb.emitOp(node, 'ISNULL');
           },
           whenTrue: () => {
             // []
