@@ -50,10 +50,8 @@ export class IsCallerHelper extends Helper {
             options,
             sb.helpers.if({
               condition: () => {
-                // [buffer, maybeContract, addressBuffer]
-                sb.emitPushBuffer(node, Buffer.alloc(0, 0));
                 // [boolean, addressBuffer]
-                sb.emitOp(node, 'EQUAL');
+                sb.emitOp(node, 'ISNULL');
               },
               // Address must not be a smart contract.
               // They are the caller IFF they signed the transaction AND
