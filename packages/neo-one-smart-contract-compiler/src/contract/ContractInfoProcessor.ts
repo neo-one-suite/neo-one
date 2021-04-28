@@ -132,7 +132,7 @@ export class ContractInfoProcessor {
           classDecl: this.smartContract,
           isPublic: true,
           isMixinDeploy: false,
-          isSafe: true, // TODO: check
+          isSafe: false, // TODO: check
         },
       ]),
     };
@@ -226,7 +226,7 @@ export class ContractInfoProcessor {
           classDecl,
           decl: ctor,
           isPublic: true,
-          isSafe: true, // TODO: check
+          isSafe: false, // TODO: check
           callSignature,
           isMixinDeploy: maybeFunc !== undefined && this.context.analysis.isSmartContractMixinFunction(maybeFunc),
         },
@@ -276,7 +276,7 @@ export class ContractInfoProcessor {
             classDecl: this.smartContract,
             isPublic: true,
             isMixinDeploy: false,
-            isSafe: true, // TODO: check
+            isSafe: false, // TODO: check
           },
         ]),
       };
