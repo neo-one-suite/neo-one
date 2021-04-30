@@ -2,6 +2,12 @@
   "name": "@neo-one/http",
   "entries": [
     {
+      "version": "2.7.2",
+      "tag": "@neo-one/http_v2.7.2",
+      "date": "Fri, 30 Apr 2021 01:53:33 GMT",
+      "comments": {}
+    },
+    {
       "version": "2.7.0",
       "tag": "@neo-one/http_v2.7.0",
       "date": "Thu, 23 Jul 2020 22:11:12 GMT",

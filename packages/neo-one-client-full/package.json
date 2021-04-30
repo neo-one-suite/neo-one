@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client-full",
-  "version": "2.7.1",
+  "version": "2.7.2",
   "description": "NEO•ONE client extended API.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -14,7 +14,7 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/client": "^2.7.2",
-    "@neo-one/client-full-core": "^2.7.1"
+    "@neo-one/client-full-core": "^2.7.2"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",

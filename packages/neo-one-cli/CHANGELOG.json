@@ -2,6 +2,24 @@
   "name": "@neo-one/cli",
   "entries": [
     {
+      "version": "2.7.2",
+      "tag": "@neo-one/cli_v2.7.2",
+      "date": "Fri, 30 Apr 2021 01:53:33 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Dependency @neo-one/node version bump from ^2.7.1 to ^2.7.2."
+          },
+          {
+            "comment": "Dependency @neo-one/node-core version bump from ^2.7.1 to ^2.7.2."
+          },
+          {
+            "comment": "Dependency @neo-one/node-neo-settings version bump from ^2.7.1 to ^2.7.2."
+          }
+        ]
+      }
+    },
+    {
       "version": "2.8.0",
       "tag": "@neo-one/cli_v2.8.0",
       "date": "Tue, 23 Feb 2021 23:29:30 GMT",

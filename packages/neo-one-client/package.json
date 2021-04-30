@@ -15,7 +15,7 @@
   "dependencies": {
     "@neo-one/client-common": "^2.7.2",
     "@neo-one/client-core": "^2.7.2",
-    "@neo-one/developer-tools": "^2.7.1"
+    "@neo-one/developer-tools": "^2.7.2"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
