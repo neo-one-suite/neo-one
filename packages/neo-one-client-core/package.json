@@ -14,7 +14,7 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/client-common": "^2.7.2",
-    "@neo-one/client-switch": "^2.7.1",
+    "@neo-one/client-switch": "^2.7.2",
     "@neo-one/utils": "^2.6.1",
     "@reactivex/ix-es2015-cjs": "^2.5.3",
     "@reactivex/ix-esnext-esm": "^2.5.3",

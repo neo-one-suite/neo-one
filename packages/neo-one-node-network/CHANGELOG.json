@@ -2,6 +2,18 @@
   "name": "@neo-one/node-network",
   "entries": [
     {
+      "version": "2.7.2",
+      "tag": "@neo-one/node-network_v2.7.2",
+      "date": "Fri, 30 Apr 2021 01:53:33 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Dependency @neo-one/client-switch version bump from ^2.7.1 to ^2.7.2."
+          }
+        ]
+      }
+    },
+    {
       "version": "2.7.0",
       "tag": "@neo-one/node-network_v2.7.0",
       "date": "Thu, 23 Jul 2020 22:11:12 GMT",

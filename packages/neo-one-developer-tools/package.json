@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/developer-tools",
-  "version": "2.7.1",
+  "version": "2.7.2",
   "description": "NEO•ONE developer tools.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",

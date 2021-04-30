@@ -1,6 +1,11 @@
 # Change Log - @neo-one/client-full-core
 
-This log was last generated on Tue, 23 Feb 2021 23:29:30 GMT and should not be manually modified.
+This log was last generated on Fri, 30 Apr 2021 01:53:33 GMT and should not be manually modified.
+
+## 2.7.2
+Fri, 30 Apr 2021 01:53:33 GMT
+
+*Version update only*
 
 ## 2.7.1
 Tue, 23 Feb 2021 23:29:30 GMT
