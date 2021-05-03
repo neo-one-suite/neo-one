@@ -57,25 +57,37 @@ Here's how to setup your local development environment:
 
 2. Follow the [installation instructions for Create React App](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) to make a new project.
 
-- Be sure to invoke Create React App with the `--template typescript` flag in order to enable TypeScript support: `npx create-react-app token --template typescript`
+- Be sure to invoke Create React App with the `--typescript` flag in order to enable TypeScript support: `npx create-react-app token --typescript`
 
-3. Install NEO•ONE using either [yarn](https://yarnpkg.com/)
+3. Change your current working directory into your new `token` directory created by `create-react-app` by running `cd token` or `cd <path/to/your/new/token/directory>`
+
+4. Install NEO•ONE using either [yarn](https://yarnpkg.com/)
 
 ```bash
-yarn add @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
+yarn add @neo-one/suite
 ```
 
 or [npm](https://www.npmjs.com/)
 
 ```bash
+npm install @neo-one/suite
+```
+
+alternatively, install the individual packages `@neo-one/suite` wraps for you:
+
+```bash
+yarn add @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
+```
+
+```bash
 npm install @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
 ```
 
-4. Run `yarn neo-one init` or `npx neo-one init`
+5. Run `yarn neo-one init` or `npx neo-one init`
 
 This command initializes a NEO•ONE project with a `Hello World` smart contract under `neo-one/contracts/HelloWorld.ts`, a unit test under `src/__tests__/HelloWorld.test.ts`, and a config file,`.neo-one.config.ts`. For this tutorial, we will be building a `Token` from the ground up, so you can go ahead and delete the two `HelloWorld` files. We also recommend taking a moment to [setup your editor](/docs/environment-setup#Editor-Setup) to take advantage of inline NEO•ONE compiler diagnostics.
 
-5. Review the available [configuration options](/docs/config-options) and update your `.neo-one.config.ts` file as needed.
+6. Review the available [configuration options](/docs/config-options) and update your `.neo-one.config.ts` file as needed.
 
 - This tutorial uses the default options. To follow along, nothing needs to be changed.
 
