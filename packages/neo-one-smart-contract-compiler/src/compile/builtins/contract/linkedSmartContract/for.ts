@@ -43,13 +43,23 @@ export class LinkedSmartContractFor extends SmartContractForBase {
     const scriptHash = this.getScriptHash(sb, node);
     if (scriptHash !== undefined) {
       // TODO: remove this and change how we call smart contracts, including our own
-      // [string, params, string]
-      sb.emitOp(node, 'TUCK');
-      // [2, string, params, string]
-      sb.emitPushInt(node, 2);
-      // [[string, params], string]
+      // [params, string]
+      sb.emitOp(node, 'SWAP');
+      // [size, ...params, string]
+      sb.emitOp(node, 'UNPACK');
+      // [size, size, ...params, string]
+      sb.emitOp(node, 'DUP');
+      // [size + 1, size, ...params, string]
+      sb.emitOp(node, 'INC');
+      // [string, size, ...params, string]
+      sb.emitOp(node, 'PICK');
+      // [size, string, ...params, string]
+      sb.emitOp(node, 'SWAP');
+      // [size + 1, string, ...params, string]
+      sb.emitOp(node, 'INC');
+      // [params, string]
       sb.emitOp(node, 'PACK');
-      // [string, [string, params]]
+      // [string, params]
       sb.emitOp(node, 'SWAP');
       // [number, string, [string, params]]
       sb.emitPushInt(node, CallFlags.All);
