@@ -17,7 +17,6 @@ import {
   StackItemJSON,
 } from '@neo-one/client-common';
 import { utils } from '@neo-one/utils';
-import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
 
 export function convertCallReceipt(receipt: CallReceiptJSON): RawCallReceipt {
@@ -50,7 +49,7 @@ export function convertStackItem(item: StackItemJSON): RawStackItem {
     case 'Pointer':
       return { type: 'Pointer', value: item.value };
     case 'Integer':
-      return { type: 'Integer', value: new BigNumber(item.value) };
+      return { type: 'Integer', value: new BN(item.value, 10) };
     case 'Buffer':
       return { type: 'Buffer', value: Buffer.from(item.value, 'hex') };
     case 'ByteString':

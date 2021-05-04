@@ -26,7 +26,7 @@ export const deployContract = async (
   const result = await client.publishAndDeploy(
     contract,
     manifest,
-    ['deploy', []], // TODO: for now this has to be ['deploy', []] ?
+    [],
     { maxSystemFee: new BigNumber(-1), maxNetworkFee: new BigNumber(-1) },
     sourceMaps,
   );

@@ -27,7 +27,7 @@ describe('Calling contract', () => {
       }
     `);
 
-    const result = await node.client.__call('priv', contract.address, 'run', ['run', []]);
+    const result = await node.client.__call('priv', contract.address, 'run', ['run']);
     console.log(result);
 
     expect(result.state).toEqual('HALT');
@@ -65,7 +65,7 @@ describe('Calling contract', () => {
       }
     `);
 
-    const result = await node.client.publishAndDeploy(contract.contract, contract.contract.manifest, ['deploy', []], {
+    const result = await node.client.publishAndDeploy(contract.contract, contract.contract.manifest, [], {
       maxSystemFee: new BigNumber(-1),
       maxNetworkFee: new BigNumber(-1),
     });

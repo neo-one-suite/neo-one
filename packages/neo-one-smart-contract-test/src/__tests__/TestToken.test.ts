@@ -11,14 +11,13 @@ describe('TestToken', () => {
       smartContractName: 'testToken',
       symbol: 'TT',
       decimals: 8,
+      isNEP17: true,
       deploy: async ({ masterAccountID, smartContract }) =>
         smartContract.deploy(masterAccountID.address, {
           from: masterAccountID,
         }) as Promise<TransactionResult<InvokeReceipt>>,
       issueValue: new BigNumber('100'),
       transferValue: new BigNumber('10'),
-      description: 'The TestToken',
-      payable: false,
     });
   });
 });

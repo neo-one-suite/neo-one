@@ -6,10 +6,9 @@ export class TestICO extends ICO(NEP17Token(SmartContract)) {
   public readonly decimals: 8 = 8;
   public readonly symbol: string = 'TT';
   public readonly properties = {
-    codeVersion: '1.0',
-    author: 'dicarlo2',
-    email: 'alex.dicarlo@neotracker.io',
-    description: 'The TestICO',
+    trusts: '*',
+    groups: [],
+    permissions: [],
   };
   public readonly icoStartTimeSeconds: Integer;
   public readonly icoDurationSeconds: Integer = 7 * 24 * 60 * 60; // 7 days * 24 hours * 60 minutes * 60 second

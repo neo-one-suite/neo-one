@@ -12,7 +12,7 @@ export class ScriptBuilder extends BaseScriptBuilder {
     super();
 
     this.pushParamCallbacks = {
-      undefined: () => this.emitOp('PUSHNULL'),
+      undefined: () => this.emitPush(Buffer.alloc(0, 0)),
       array: (param) => this.emitPushArray(param),
       map: (param) => this.emitPushMap(param),
       uInt160: (param) => this.emitPushUInt160(common.asUInt160(param)),

@@ -14,6 +14,7 @@ import {
 } from '@neo-one/client-common';
 import BigNumber from 'bignumber.js';
 import { Client } from './Client';
+import { NEO_ONE_METHOD_RESERVED_PARAM } from './sc';
 import { SmartContract } from './types';
 
 export type NEP17Event = NEP17TransferEvent;
@@ -26,11 +27,11 @@ export interface NEP17TransferEventParameters {
 export interface NEP17TransferEvent extends Event<'transfer', NEP17TransferEventParameters> {}
 
 export interface NEP17SmartContract<TClient extends Client = Client> extends SmartContract<TClient, NEP17Event> {
-  readonly balanceOf: (address: AddressString, options?: SmartContractReadOptions) => Promise<BigNumber>;
-  readonly decimals: (options?: SmartContractReadOptions) => Promise<BigNumber>;
-  readonly owner: (options?: SmartContractReadOptions) => Promise<AddressString>;
   readonly symbol: (options?: SmartContractReadOptions) => Promise<string>;
+  readonly decimals: (options?: SmartContractReadOptions) => Promise<BigNumber>;
   readonly totalSupply: (options?: SmartContractReadOptions) => Promise<BigNumber>;
+  readonly balanceOf: (address: AddressString, options?: SmartContractReadOptions) => Promise<BigNumber>;
+  readonly owner: (options?: SmartContractReadOptions) => Promise<AddressString>;
   readonly transfer: (
     from: AddressString,
     to: AddressString,
@@ -39,26 +40,23 @@ export interface NEP17SmartContract<TClient extends Client = Client> extends Sma
   ) => TransactionResult<InvokeReceipt<boolean, NEP17Event>>;
 }
 
-const defaultNEOONEParams: ReadonlyArray<ABIParameter> = [
-  { type: 'String', name: 'method' },
-  { type: 'Array', value: { type: 'Any' }, name: 'params' },
-];
+const DEFAULT_NEO_ONE_PARAM: ABIParameter = { type: 'String', name: NEO_ONE_METHOD_RESERVED_PARAM };
 
-const decimalsFunction: ContractMethodDescriptorClient = {
+const getDecimalsMethod = (decimals: number): ContractMethodDescriptorClient => ({
   name: 'decimals',
   constant: true,
-  parameters: [...defaultNEOONEParams],
-  returnType: { type: 'Integer', decimals: 0 },
+  parameters: [DEFAULT_NEO_ONE_PARAM],
+  returnType: { type: 'Integer', decimals },
   offset: 0,
   safe: true,
-};
+});
 
 export const abi = (decimals: number): ContractABIClient => ({
   methods: [
     {
       name: 'name',
       constant: true,
-      parameters: [...defaultNEOONEParams],
+      parameters: [DEFAULT_NEO_ONE_PARAM],
       returnType: { type: 'String' },
       offset: 0,
       safe: true,
@@ -66,40 +64,19 @@ export const abi = (decimals: number): ContractABIClient => ({
     {
       name: 'symbol',
       constant: true,
-      parameters: [...defaultNEOONEParams],
+      parameters: [DEFAULT_NEO_ONE_PARAM],
       returnType: { type: 'String' },
       offset: 0,
       safe: true,
     },
-    decimalsFunction,
+    getDecimalsMethod(decimals),
     {
       name: 'totalSupply',
       constant: true,
-      parameters: [...defaultNEOONEParams],
+      parameters: [DEFAULT_NEO_ONE_PARAM],
       returnType: { type: 'Integer', decimals },
       offset: 0,
       safe: true,
-    },
-    {
-      name: 'transfer',
-      parameters: [
-        {
-          type: 'Hash160',
-          name: 'from',
-        },
-        {
-          type: 'Hash160',
-          name: 'to',
-        },
-        {
-          type: 'Integer',
-          name: 'value',
-          decimals,
-        },
-      ],
-      returnType: { type: 'Boolean' },
-      offset: 0,
-      safe: false,
     },
     {
       name: 'balanceOf',
@@ -114,20 +91,45 @@ export const abi = (decimals: number): ContractABIClient => ({
       offset: 0,
       safe: false,
     },
-  ],
-  events: [
     {
       name: 'transfer',
       parameters: [
         {
           type: 'Hash160',
           name: 'from',
-          optional: true,
         },
         {
           type: 'Hash160',
           name: 'to',
-          optional: true,
+        },
+        {
+          type: 'Integer',
+          name: 'amount',
+          decimals,
+        },
+        {
+          type: 'Any',
+          name: 'data',
+        },
+      ],
+      returnType: { type: 'Boolean' },
+      offset: 0,
+      safe: false,
+    },
+  ],
+  events: [
+    {
+      name: 'Transfer',
+      parameters: [
+        {
+          type: 'Hash160',
+          name: 'from',
+          optional: false,
+        },
+        {
+          type: 'Hash160',
+          name: 'to',
+          optional: false,
         },
         {
           type: 'Integer',
@@ -140,9 +142,9 @@ export const abi = (decimals: number): ContractABIClient => ({
 });
 
 export const manifest = (decimals: number): ContractManifestClient => ({
-  name: '',
+  name: 'A NEO•ONE NEP-17 Smart Contract',
   groups: [],
-  supportedStandards: [],
+  supportedStandards: ['NEP-17'],
   abi: abi(decimals),
   permissions: [],
   trusts: '*',
@@ -158,7 +160,7 @@ export const getDecimals = async (
       networks: networksDefinition,
       manifest: {
         ...manifest(0),
-        abi: { events: [], methods: [decimalsFunction] },
+        abi: { events: [], methods: [getDecimalsMethod(0)] },
       },
     })
     .decimals({ network });

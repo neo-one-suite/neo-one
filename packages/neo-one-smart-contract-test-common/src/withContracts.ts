@@ -1,11 +1,16 @@
 import { setupWallets } from '@neo-one/cli-common';
 import {
+  assertCallFlags,
   common,
   crypto,
+  MethodTokenModel,
+  NefFileModel,
   scriptHashToAddress,
+  SignerModel,
   SourceMaps,
   TransactionResult,
   UserAccountID,
+  WitnessScopeModel,
 } from '@neo-one/client-common';
 import { DeveloperClient, LocalKeyStore, NEOONEDataProvider, NEOONEProvider } from '@neo-one/client-core';
 import { Client, LocalUserAccountProvider, PublishReceipt } from '@neo-one/client-full-core';
@@ -150,9 +155,35 @@ export const withContracts = async <T>(
         mutableLinked,
         ignoreWarnings,
       );
-      const address = scriptHashToAddress(
-        common.uInt160ToString(crypto.toScriptHash(Buffer.from(contract.script, 'hex'))),
-      );
+
+      const signerAddress = masterWallet.userAccount.id.address;
+      const signer = new SignerModel({
+        account: crypto.addressToScriptHash({
+          address: signerAddress,
+          addressVersion: common.NEO_ADDRESS_VERSION,
+        }),
+        scopes: WitnessScopeModel.Global,
+      });
+
+      const nefFile = new NefFileModel({
+        compiler: contract.nefFile.compiler,
+        script: Buffer.from(contract.nefFile.script, 'hex'),
+        tokens: contract.nefFile.tokens.map(
+          (token) =>
+            new MethodTokenModel({
+              hash: common.stringToUInt160(token.hash),
+              method: token.method,
+              paramCount: token.paramCount,
+              hasReturnValue: token.hasReturnValue,
+              callFlags: assertCallFlags(token.callFlags),
+            }),
+        ),
+      });
+
+      // TODO: create function for getting contract address from register/signer?
+      const contractHash = crypto.getContractHash(signer.account, nefFile.checkSum, contract.manifest.name);
+      const address = scriptHashToAddress(common.uInt160ToString(contractHash));
+
       mutableSourceMaps[address] = await sourceMap;
       let result: TransactionResult<PublishReceipt>;
       // tslint:disable-next-line prefer-conditional-expression
@@ -160,7 +191,7 @@ export const withContracts = async <T>(
         result = await client.publishAndDeploy(
           contract,
           contract.manifest,
-          ['deploy', []], // TODO: fix contract calling here
+          [], // TODO: fix contract calling here if necessary. Probably just stays empty array here
           { maxSystemFee: new BigNumber(-1), maxNetworkFee: new BigNumber(-1) },
           mutableSourceMaps,
         );

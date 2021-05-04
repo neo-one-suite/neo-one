@@ -205,7 +205,7 @@ const createCall = ({
   });
 
   // TODO: this needs to be reverted when we change how we call contracts
-  const receipt = await client.__call(network, address, name, [name, [...params]]);
+  const receipt = await client.__call(network, address, name, [name, ...params]);
 
   return common.convertCallResult({
     returnType,
@@ -238,8 +238,8 @@ const createInvoke = ({
     const result: TransactionResult<RawInvokeReceipt> = await client.__invoke(
       address,
       name,
-      // TODO: this needs to be reverted when we change how we call contracts
-      [name, [...params]],
+      // TODO: fix here when reverting how we call contracts
+      [name, ...params],
       paramsZipped,
       receive,
       options,

@@ -4,6 +4,7 @@ import {
   crypto,
   Event,
   InvokeReceipt,
+  NefFileModel,
   privateKeyToAddress,
   TransactionResult,
   UserAccountID,
@@ -27,8 +28,7 @@ export interface Options {
   readonly deploy?: (options: DeployOptions) => Promise<TransactionResult<InvokeReceipt>>;
   readonly issueValue: BigNumber;
   readonly transferValue: BigNumber;
-  readonly description: string;
-  readonly payable: boolean;
+  readonly isNEP17?: boolean;
 }
 
 const TO = {
@@ -50,8 +50,7 @@ export const testToken = async ({
   deploy,
   issueValue,
   transferValue,
-  description,
-  payable,
+  isNEP17 = false,
 }: Options) => {
   crypto.addPublicKey(common.stringToPrivateKey(TO.PRIVATE_KEY), common.stringToECPoint(TO.PUBLIC_KEY));
   crypto.addPublicKey(common.stringToPrivateKey(ZERO.PRIVATE_KEY), common.stringToECPoint(ZERO.PUBLIC_KEY));
@@ -69,6 +68,7 @@ export const testToken = async ({
       const smartContract: SmartContractAny = (options as any)[smartContractName];
       let event: Event;
       if (deploy !== undefined) {
+        // TODO: need to make sure masterAccountID is now coming from the deployed contract transaction?
         const deployResult = await deploy({
           masterPrivateKey,
           masterAccountID,
@@ -82,13 +82,12 @@ export const testToken = async ({
         }
 
         expect(deployReceipt.result.gasConsumed.toString()).toMatchSnapshot('deploy consumed');
-        expect(deployReceipt.result.gasCost.toString()).toMatchSnapshot('deploy cost');
         expect(deployReceipt.result.value).toBeTruthy();
         expect(deployReceipt.events).toHaveLength(1);
         event = deployReceipt.events[0];
-        expect(event.name).toEqual('transfer');
+        expect(event.name).toEqual('Transfer');
         expect(event.parameters.from).toEqual(undefined);
-        expect(event.parameters.to).toEqual(privateKeyToAddress(masterPrivateKey));
+        expect(event.parameters.to).toEqual(masterAccountID.address);
         if (event.parameters.amount === undefined) {
           expect(event.parameters.amount).toBeTruthy();
           throw new Error('For TS');
@@ -127,10 +126,9 @@ export const testToken = async ({
       }
 
       expect(transferReceipt.result.gasConsumed.toString()).toMatchSnapshot('transfer consume');
-      expect(transferReceipt.result.gasCost.toString()).toMatchSnapshot('transfer cost');
       expect(transferReceipt.events).toHaveLength(1);
       event = transferReceipt.events[0];
-      expect(event.name).toEqual('transfer');
+      expect(event.name).toEqual('Transfer');
       expect(event.parameters.from).toEqual(masterAccountID.address);
       expect(event.parameters.to).toEqual(account0.address);
       if (event.parameters.amount === undefined) {
@@ -159,14 +157,25 @@ export const testToken = async ({
 
       const readClient = client.read(networkName);
       const contract = await readClient.getContract(smartContract.definition.networks[networkName].address);
-      expect(contract.codeVersion).toEqual('1.0');
-      expect(contract.author).toEqual('dicarlo2');
-      expect(contract.email).toEqual('alex.dicarlo@neotracker.io');
-      expect(contract.description).toEqual(description);
-      expect(contract.parameters).toEqual(['String', 'Array']);
-      expect(contract.returnType).toEqual('Buffer');
-      expect(contract.manifest.hasStorage).toBeTruthy();
-      expect(contract.manifest.payable).toEqual(payable);
+      expect(contract.id).toEqual(1);
+      expect(contract.updateCounter).toEqual(0);
+      expect(contract.hash).toMatchSnapshot('contract hash');
+      expect(contract.nef.tokens).toMatchSnapshot('nef tokens');
+      expect(contract.nef.compiler).toEqual('neo-one 3.0.0-rc1');
+      expect(contract.nef.magic).toEqual(NefFileModel.magic);
+      expect(contract.manifest.abi.events).toMatchSnapshot('contract events');
+      expect(contract.manifest.abi.methods).toMatchSnapshot('contract methods');
+      expect(contract.manifest.name).toMatchSnapshot('contract name');
+      expect(contract.manifest.supportedStandards).toMatchSnapshot('contract standards');
+      if (isNEP17) {
+        expect(contract.manifest.supportedStandards).toContain('NEP-17');
+      } else {
+        expect(contract.manifest.supportedStandards).toContain('NEP-17');
+      }
+      expect(contract.manifest.trusts).toEqual('*');
+      expect(contract.manifest.extra).toEqual({});
+      expect(contract.manifest.groups).toEqual([]);
+      expect(contract.manifest.permissions).toEqual([]);
     },
     { deploy: deploy === undefined },
   );
