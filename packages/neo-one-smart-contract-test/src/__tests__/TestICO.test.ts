@@ -1,5 +1,5 @@
 import { common, crypto, privateKeyToAddress } from '@neo-one/client-common';
-import { Hash256, SmartContractAny } from '@neo-one/client-core';
+import { SmartContractAny } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import * as path from 'path';
 import { withContracts } from '../withContracts';
@@ -30,7 +30,6 @@ describe('TestICO', () => {
         }
 
         expect(deployReceipt.result.gasConsumed.toString()).toMatchSnapshot('deploy consumed');
-        expect(deployReceipt.result.gasCost.toString()).toMatchSnapshot('deploy cost');
         expect(deployReceipt.result.value).toBeTruthy();
 
         const [nameResult, decimalsResult, symbolResult, minter] = await Promise.all([

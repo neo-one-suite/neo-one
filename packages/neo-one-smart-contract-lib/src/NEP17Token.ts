@@ -12,9 +12,9 @@ import {
 interface TokenPayableContract {
   readonly approveReceiveTransfer: (from: Address, amount: Fixed<0>, asset: Address) => boolean;
   readonly onRevokeSendTransfer: (from: Address, amount: Fixed<0>, asset: Address) => void;
+  readonly onNEP17Payment: (from: Address, amount: Fixed<0>) => void;
 }
 
-// TODO: this whole definition will need to be updated to actually meet the current standard
 // see https://github.com/neo-project/proposals/pull/126
 export function NEP17Token<TBase extends Constructor<SmartContract>>(Base: TBase) {
   abstract class NEP17TokenClass extends Base {
@@ -26,7 +26,7 @@ export function NEP17Token<TBase extends Constructor<SmartContract>>(Base: TBase
     private mutableSupply: Fixed<8> = 0;
 
     private readonly notifyTransfer = createEventNotifier<Address | undefined, Address | undefined, Fixed<8>>(
-      'transfer',
+      'Transfer',
       'from',
       'to',
       'amount',
@@ -91,6 +91,10 @@ export function NEP17Token<TBase extends Constructor<SmartContract>>(Base: TBase
       this.balances.set(from, fromBalance - amount);
       this.balances.set(to, toBalance + amount);
       this.notifyTransfer(from, to, amount);
+      if (contract !== undefined) {
+        const smartContract = SmartContract.for<TokenPayableContract>(to);
+        smartContract.onNEP17Payment(from, amount);
+      }
 
       if (reduceApproved) {
         this.approvedTransfers.set([from, to], approved - amount);
@@ -116,6 +120,10 @@ export function NEP17Token<TBase extends Constructor<SmartContract>>(Base: TBase
 
     public approveReceiveTransfer(_from: Address, _amount: Fixed<8>, _asset: Address): boolean {
       return false;
+    }
+
+    public onNEP17Payment(_from: Address, _amount: Fixed<8>, _data: Buffer): void {
+      throw new Error('This contract cannot receive transfers');
     }
 
     public revokeSendTransfer(from: Address, to: Address, amount: Fixed<8>): boolean {

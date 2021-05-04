@@ -937,7 +937,7 @@ export const assertSmartContractDefinition = (name: string, value?: unknown): Sm
 
   return {
     networks: assertProperty(value, 'SmartContractDefinition', 'networks', assertSmartContractNetworksDefinition),
-    manifest: assertProperty(value, 'SmartContractDefinition', 'manfifest', assertContractManifestClient),
+    manifest: assertProperty(value, 'SmartContractDefinition', 'manifest', assertContractManifestClient),
     sourceMaps: assertProperty(value, 'SmartContractDefinition', 'sourceMaps', assertSourceMaps),
   };
 };

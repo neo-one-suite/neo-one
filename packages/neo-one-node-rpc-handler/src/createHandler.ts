@@ -613,7 +613,7 @@ export const createHandler = ({
     [RPC_METHODS.invokescript]: async (args) => {
       const script = JSONHelper.readBase64Buffer(args[0]);
       const signers = args[1] !== undefined ? Signers.fromJSON(args[1]) : undefined;
-      const result = blockchain.invokeScript({ script, signers, gas: new BN(20) }); // TODO: should be 20 or 20 fixed8FromDecimal?
+      const result = blockchain.invokeScript({ script, signers }); // TODO: should be 20 or 20 fixed8FromDecimal?
 
       return getInvokeResult(script, result);
     },

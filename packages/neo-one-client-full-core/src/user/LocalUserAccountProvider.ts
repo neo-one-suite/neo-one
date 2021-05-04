@@ -218,6 +218,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
             hash,
             'deploy',
             CallFlags.All,
+            'deploy', // TODO: remove this when fixing how contracts are called
             ...convertParams({
               parameters: deployFunc.parameters === undefined ? [] : deployFunc.parameters,
               params,

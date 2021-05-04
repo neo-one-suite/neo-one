@@ -31,6 +31,8 @@ import { events as traceEvents } from '../trace';
 import { params as paramCheckers } from './params';
 import { createForwardedValueFuncArgsName, createForwardedValueFuncReturnName } from './utils';
 
+export const NEO_ONE_METHOD_RESERVED_PARAM = '__neoonemethodstring';
+
 export const convertContractParameter = ({
   type,
   parameter,
@@ -390,12 +392,16 @@ export const convertParams = ({
   readonly converted: ReadonlyArray<ScriptBuilderParam | undefined>;
   readonly zipped: ReadonlyArray<readonly [string, Param | undefined]>;
 } => {
-  const parameters =
+  const parametersFirst =
     parametersIn.length === 0 || !parametersIn[parametersIn.length - 1].rest ? parametersIn : parametersIn.slice(0, -1);
   const restParameter =
     parametersIn.length === 0 || !parametersIn[parametersIn.length - 1].rest
       ? undefined
       : parametersIn[parametersIn.length - 1];
+
+  // TODO: this is brittle. it removes the reserved method that is used by our compiled contracts to know what method to call
+  // Remove this when fixing how we call contracts
+  const parameters = parametersFirst.filter((param) => param.name !== NEO_ONE_METHOD_RESERVED_PARAM);
 
   const nonOptionalParameters = parameters.filter((param) => !param.optional);
   if (params.length < nonOptionalParameters.length) {

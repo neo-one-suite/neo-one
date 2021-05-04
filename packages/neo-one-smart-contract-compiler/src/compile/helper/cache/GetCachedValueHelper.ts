@@ -25,6 +25,7 @@ export class GetCachedValueHelper extends Helper {
       /* istanbul ignore next */
       return;
     }
+    sb.emitHelper(node, options, sb.helpers.binarySerialize);
     // [map, keyVal]
     sb.emitHelper(node, options, sb.helpers.getCache);
     // [map, keyVal, map]

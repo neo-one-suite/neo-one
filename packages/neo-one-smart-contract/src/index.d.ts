@@ -1382,8 +1382,6 @@ export interface Transfer {
  *
  * Method must return a boolean indicating whether the `SmartContract` wishes to receive the transferred `Asset`s.
  *
- * May be used in combination with `@sendUnsafe`.
- *
  * See the [Native Assets](https://neo-one.io/docs/native-assets) chapter of the advanced guide for more information.
  */
 export function receive(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
@@ -1393,3 +1391,9 @@ export function receive(target: any, propertyKey: string, descriptor: PropertyDe
  * See the [Methods](https://neo-one.io/docs/methods) chapter of the main guide for more information.
  */
 export function constant(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
+/**
+ * Marks a `SmartContract` method as safe.
+ *
+ * See the [Methods](https://neo-one.io/docs/methods) chapter of the main guide for more information.
+ */
+export function safe(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;

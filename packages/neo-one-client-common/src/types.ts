@@ -2351,7 +2351,7 @@ export interface RawBooleanStackItem extends RawStackItemBase {
 
 export interface RawIntegerStackItem extends RawStackItemBase {
   readonly type: 'Integer';
-  readonly value: BigNumber;
+  readonly value: BN;
 }
 
 export interface RawByteStringStackItem extends RawStackItemBase {

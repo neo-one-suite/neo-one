@@ -12,8 +12,7 @@ import {
 interface TokenPayableContract {
   readonly approveReceiveTransfer: (from: Address, amount: Fixed<0>, asset: Address) => boolean;
   readonly onRevokeSendTransfer: (from: Address, amount: Fixed<0>, asset: Address) => void;
-  // tslint:disable-next-line: no-any
-  readonly onNEP17Payable: (from: Address, amount: Fixed<8>, data: any) => void;
+  readonly onNEP17Payable: (from: Address, amount: Fixed<8>, data: Buffer) => void;
 }
 
 // tslint:disable-next-line: export-name
@@ -23,7 +22,7 @@ export class NEP17Contract extends SmartContract {
     trusts: '*',
     permissions: [],
   };
-  public readonly name = 'NEO•ONE NEP17 Example';
+  public readonly name = 'NEO•ONE Sample NEP-17 Contract';
   public readonly decimals = 8;
   public readonly symbol = 'N1N17';
   private readonly balances = MapStorage.for<Address, Fixed<8>>();
@@ -73,8 +72,7 @@ export class NEP17Contract extends SmartContract {
     return approved === undefined ? 0 : approved;
   }
 
-  // tslint:disable-next-line: no-any
-  public transfer(from: Address, to: Address, amount: Fixed<8>, data?: any): boolean {
+  public transfer(from: Address, to: Address, amount: Fixed<8>, data: Buffer): boolean {
     if (amount < 0) {
       throw new Error(`Amount must be greater than 0: ${amount}`);
     }
@@ -164,8 +162,7 @@ export class NEP17Contract extends SmartContract {
     // do nothing
   }
 
-  // tslint:disable-next-line: no-any
-  public onNEP17Payment(from: Address, amount: Fixed<8>, _data: any): void {
+  public onNEP17Payment(from: Address, amount: Fixed<8>, _data: Buffer): void {
     this.notifyTransferRecevied(from, amount);
 
     throw new Error('This contract cannot receive transfers');

@@ -135,5 +135,27 @@ export class DeployHelper extends Helper {
         },
       }),
     );
+
+    // TODO: this is a quick fix for a floating empty args array
+    sb.emitHelper(
+      node,
+      options,
+      sb.helpers.if({
+        condition: () => {
+          // [size, ...stack]
+          sb.emitOp(node, 'DEPTH');
+          // [1, size, ...stack]
+          sb.emitPushInt(node, 1);
+          // [size > 1, ...stack]
+          sb.emitOp(node, 'GT');
+        },
+        whenTrue: () => {
+          // [args, boolean]
+          sb.emitOp(node, 'SWAP');
+          // [boolean]
+          sb.emitOp(node, 'DROP');
+        },
+      }),
+    );
   }
 }

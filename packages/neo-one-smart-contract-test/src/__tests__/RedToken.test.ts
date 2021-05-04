@@ -14,8 +14,6 @@ describe('RedToken', () => {
       decimals: 8,
       issueValue,
       transferValue: new BigNumber('10'),
-      description: 'The RedToken',
-      payable: false,
     });
   });
 });

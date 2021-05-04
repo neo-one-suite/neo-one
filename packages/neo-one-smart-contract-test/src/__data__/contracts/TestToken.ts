@@ -7,10 +7,9 @@ export class TestToken extends NEP17Token(SmartContract) {
   public readonly decimals: 8 = 8;
   public readonly symbol: string = 'TT';
   public readonly properties = {
-    codeVersion: '1.0',
-    author: 'dicarlo2',
-    email: 'alex.dicarlo@neotracker.io',
-    description: 'The TestToken',
+    trusts: '*',
+    groups: [],
+    permissions: [],
   };
 
   public constructor(owner: Address) {

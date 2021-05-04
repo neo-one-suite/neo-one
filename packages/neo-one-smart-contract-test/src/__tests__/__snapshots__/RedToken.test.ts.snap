@@ -1,5 +1,362 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: transfer consume 1`] = `"0"`;
+exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: contract events 1`] = `
+Array [
+  Object {
+    "name": "transfer_primary",
+    "parameters": Array [
+      Object {
+        "name": "from",
+        "type": "Hash160",
+      },
+      Object {
+        "name": "to",
+        "type": "Hash160",
+      },
+    ],
+  },
+  Object {
+    "name": "transfer_ownership",
+    "parameters": Array [
+      Object {
+        "name": "from",
+        "type": "Hash160",
+      },
+      Object {
+        "name": "to",
+        "type": "Hash160",
+      },
+    ],
+  },
+  Object {
+    "name": "Transfer",
+    "parameters": Array [
+      Object {
+        "name": "from",
+        "type": "Hash160",
+      },
+      Object {
+        "name": "to",
+        "type": "Hash160",
+      },
+      Object {
+        "name": "amount",
+        "type": "Integer",
+      },
+    ],
+  },
+  Object {
+    "name": "approveSendTransfer",
+    "parameters": Array [
+      Object {
+        "name": "from",
+        "type": "Hash160",
+      },
+      Object {
+        "name": "to",
+        "type": "Hash160",
+      },
+      Object {
+        "name": "amount",
+        "type": "Integer",
+      },
+    ],
+  },
+  Object {
+    "name": "revokeSendTransfer",
+    "parameters": Array [
+      Object {
+        "name": "from",
+        "type": "Hash160",
+      },
+      Object {
+        "name": "to",
+        "type": "Hash160",
+      },
+      Object {
+        "name": "amount",
+        "type": "Integer",
+      },
+    ],
+  },
+]
+`;
 
-exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: transfer cost 1`] = `"3.683"`;
+exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: contract hash 1`] = `"0xbf3dc484cb76d57b90bad42ed9cecdb1279fa397"`;
+
+exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: contract methods 1`] = `
+Array [
+  Object {
+    "name": "name",
+    "offset": 0,
+    "parameters": Array [
+      Object {
+        "name": "__neoonemethodstring",
+        "type": "String",
+      },
+    ],
+    "returnType": "String",
+    "safe": true,
+  },
+  Object {
+    "name": "symbol",
+    "offset": 0,
+    "parameters": Array [
+      Object {
+        "name": "__neoonemethodstring",
+        "type": "String",
+      },
+    ],
+    "returnType": "String",
+    "safe": true,
+  },
+  Object {
+    "name": "owner",
+    "offset": 0,
+    "parameters": Array [
+      Object {
+        "name": "__neoonemethodstring",
+        "type": "String",
+      },
+    ],
+    "returnType": "Hash160",
+    "safe": true,
+  },
+  Object {
+    "name": "decimals",
+    "offset": 0,
+    "parameters": Array [
+      Object {
+        "name": "__neoonemethodstring",
+        "type": "String",
+      },
+    ],
+    "returnType": "Integer",
+    "safe": true,
+  },
+  Object {
+    "name": "totalSupply",
+    "offset": 0,
+    "parameters": Array [
+      Object {
+        "name": "__neoonemethodstring",
+        "type": "String",
+      },
+    ],
+    "returnType": "Integer",
+    "safe": true,
+  },
+  Object {
+    "name": "balanceOf",
+    "offset": 0,
+    "parameters": Array [
+      Object {
+        "name": "__neoonemethodstring",
+        "type": "String",
+      },
+      Object {
+        "name": "address",
+        "type": "Hash160",
+      },
+    ],
+    "returnType": "Integer",
+    "safe": true,
+  },
+  Object {
+    "name": "approvedTransfer",
+    "offset": 0,
+    "parameters": Array [
+      Object {
+        "name": "__neoonemethodstring",
+        "type": "String",
+      },
+      Object {
+        "name": "from",
+        "type": "Hash160",
+      },
+      Object {
+        "name": "to",
+        "type": "Hash160",
+      },
+    ],
+    "returnType": "Integer",
+    "safe": true,
+  },
+  Object {
+    "name": "transfer",
+    "offset": 0,
+    "parameters": Array [
+      Object {
+        "name": "__neoonemethodstring",
+        "type": "String",
+      },
+      Object {
+        "name": "from",
+        "type": "Hash160",
+      },
+      Object {
+        "name": "to",
+        "type": "Hash160",
+      },
+      Object {
+        "name": "amount",
+        "type": "Integer",
+      },
+    ],
+    "returnType": "Boolean",
+    "safe": false,
+  },
+  Object {
+    "name": "approveSendTransfer",
+    "offset": 0,
+    "parameters": Array [
+      Object {
+        "name": "__neoonemethodstring",
+        "type": "String",
+      },
+      Object {
+        "name": "from",
+        "type": "Hash160",
+      },
+      Object {
+        "name": "to",
+        "type": "Hash160",
+      },
+      Object {
+        "name": "amount",
+        "type": "Integer",
+      },
+    ],
+    "returnType": "Boolean",
+    "safe": false,
+  },
+  Object {
+    "name": "approveReceiveTransfer",
+    "offset": 0,
+    "parameters": Array [
+      Object {
+        "name": "__neoonemethodstring",
+        "type": "String",
+      },
+      Object {
+        "name": "from",
+        "type": "Hash160",
+      },
+      Object {
+        "name": "amount",
+        "type": "Integer",
+      },
+      Object {
+        "name": "asset",
+        "type": "Hash160",
+      },
+    ],
+    "returnType": "Boolean",
+    "safe": false,
+  },
+  Object {
+    "name": "onNEP17Payment",
+    "offset": 0,
+    "parameters": Array [
+      Object {
+        "name": "__neoonemethodstring",
+        "type": "String",
+      },
+      Object {
+        "name": "from",
+        "type": "Hash160",
+      },
+      Object {
+        "name": "amount",
+        "type": "Integer",
+      },
+      Object {
+        "name": "data",
+        "type": "Buffer",
+      },
+    ],
+    "returnType": "Void",
+    "safe": false,
+  },
+  Object {
+    "name": "revokeSendTransfer",
+    "offset": 0,
+    "parameters": Array [
+      Object {
+        "name": "__neoonemethodstring",
+        "type": "String",
+      },
+      Object {
+        "name": "from",
+        "type": "Hash160",
+      },
+      Object {
+        "name": "to",
+        "type": "Hash160",
+      },
+      Object {
+        "name": "amount",
+        "type": "Integer",
+      },
+    ],
+    "returnType": "Boolean",
+    "safe": false,
+  },
+  Object {
+    "name": "onRevokeSendTransfer",
+    "offset": 0,
+    "parameters": Array [
+      Object {
+        "name": "__neoonemethodstring",
+        "type": "String",
+      },
+      Object {
+        "name": "from",
+        "type": "Hash160",
+      },
+      Object {
+        "name": "amount",
+        "type": "Integer",
+      },
+      Object {
+        "name": "asset",
+        "type": "Hash160",
+      },
+    ],
+    "returnType": "Void",
+    "safe": false,
+  },
+  Object {
+    "name": "deploy",
+    "offset": 0,
+    "parameters": Array [
+      Object {
+        "name": "__neoonemethodstring",
+        "type": "String",
+      },
+      Object {
+        "name": "owner",
+        "type": "Hash160",
+      },
+      Object {
+        "name": "amount",
+        "type": "Integer",
+      },
+    ],
+    "returnType": "Boolean",
+    "safe": false,
+  },
+]
+`;
+
+exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: contract name 1`] = `"RedToken"`;
+
+exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: contract standards 1`] = `
+Array [
+  "NEP-17",
+]
+`;
+
+exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: nef tokens 1`] = `Array []`;
+
+exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: transfer consume 1`] = `"127570820"`;

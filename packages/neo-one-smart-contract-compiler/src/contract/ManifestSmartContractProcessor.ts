@@ -8,6 +8,7 @@ import {
   UInt160Hex,
   WildcardContainer,
 } from '@neo-one/client-common';
+import { NEO_ONE_METHOD_RESERVED_PARAM } from '@neo-one/client-core';
 import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
@@ -73,30 +74,32 @@ export class ManifestSmartContractProcessor {
   }
 
   private processSupportedStandards(): readonly string[] {
-    return [this.isNep5Contract() ? 'NEP-5' : undefined].filter(utils.notNull);
+    return [this.isNep17Contract() ? 'NEP-17' : undefined].filter(utils.notNull);
   }
 
-  // TODO: change to NEP17
-  // Throw error if contract is marked at NEP17 but doesn't pass this test?
-  private isNep5Contract(): boolean {
+  private isNep17Contract(): boolean {
     const propInfos = this.contractInfo.propInfos.filter((propInfo) => propInfo.isPublic && propInfo.type !== 'deploy');
-    const hasTransferEvent = this.processEvents().some((event) => event.name === 'transfer');
+    const hasTransferEvent = this.processEvents().some((event) => event.name === 'Transfer');
     const hasTotalSupply = propInfos.some(
-      (info) => info.type === 'function' && info.name === 'totalSupply' && info.constant,
+      (info) =>
+        info.name === 'totalSupply' &&
+        ((info.type === 'function' && info.constant && info.isSafe) ||
+          (info.type === 'accessor' && info.getter?.constant && info.getter?.isSafe)),
     );
     const hasBalanceOf = propInfos.some(
-      (info) => info.type === 'function' && info.name === 'balanceOf' && info.constant,
+      (info) => info.type === 'function' && info.name === 'balanceOf' && info.constant && info.isSafe,
     );
     const hasTransfer = propInfos.some(
-      (info) => info.type === 'function' && info.name === 'transfer' && !info.constant,
+      (info) => info.type === 'function' && info.name === 'transfer' && !info.constant && !info.isSafe,
     );
     const hasDecimals = propInfos.some(
-      (info) => info.type === 'property' && info.name === 'decimals' && info.isReadonly,
+      (info) => info.type === 'property' && info.name === 'decimals' && info.isReadonly && info.isSafe,
     );
-    const hasSymbol = propInfos.some((info) => info.type === 'property' && info.name === 'symbol' && info.isReadonly);
-    const hasName = propInfos.some((info) => info.type === 'property' && info.name === 'name' && info.isReadonly);
+    const hasSymbol = propInfos.some(
+      (info) => info.type === 'property' && info.name === 'symbol' && info.isReadonly && info.isSafe,
+    );
 
-    return hasTotalSupply && hasBalanceOf && hasTransfer && hasDecimals && hasSymbol && hasName && hasTransferEvent;
+    return hasTotalSupply && hasBalanceOf && hasTransfer && hasDecimals && hasSymbol && hasTransferEvent;
   }
 
   private processABI(): SmartContractInfoABI {
@@ -119,17 +122,13 @@ export class ManifestSmartContractProcessor {
   }
 
   // TODO: remove this later when changing how smart contracts are called
-  private addDefaultEntryParams(_params: readonly ABIParameter[]): readonly ABIParameter[] {
+  private addDefaultEntryParams(params: readonly ABIParameter[]): readonly ABIParameter[] {
     return [
       {
         type: 'String',
-        name: 'method',
+        name: NEO_ONE_METHOD_RESERVED_PARAM,
       },
-      {
-        type: 'Array',
-        name: 'args',
-        value: { type: 'Any' },
-      },
+      ...params,
     ];
   }
 
