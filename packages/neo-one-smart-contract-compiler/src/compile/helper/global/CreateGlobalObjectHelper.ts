@@ -9,24 +9,38 @@ import { Helper } from '../Helper';
 export class CreateGlobalObjectHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     // TODO: remove this section when fixing how we call contracts
-    // [length, method, ...args]
-    sb.emitOp(node, 'DEPTH');
-    // [...argsReversed, method]
-    sb.emitOp(node, 'REVERSEN');
-    // [length, ...argsReversed, method]
-    sb.emitOp(node, 'DEPTH');
-    // [length - 1, ...argsReversed, method]
-    sb.emitOp(node, 'DEC');
-    // [...args, method]
-    sb.emitOp(node, 'REVERSEN');
-    // [length, ...args, method]
-    sb.emitOp(node, 'DEPTH');
-    // [length - 1, ...args, method]
-    sb.emitOp(node, 'DEC');
-    // [[args], method]
-    sb.emitOp(node, 'PACK');
-    // [method, [args]]
-    sb.emitOp(node, 'SWAP');
+    sb.emitHelper(
+      node,
+      optionsIn,
+      sb.helpers.if({
+        condition: () => {
+          // [depth]
+          sb.emitOp(node, 'DEPTH');
+          // [notZero]
+          sb.emitOp(node, 'NZ');
+        },
+        whenTrue: () => {
+          // [length, method, ...args]
+          sb.emitOp(node, 'DEPTH');
+          // [...argsReversed, method]
+          sb.emitOp(node, 'REVERSEN');
+          // [length, ...argsReversed, method]
+          sb.emitOp(node, 'DEPTH');
+          // [length - 1, ...argsReversed, method]
+          sb.emitOp(node, 'DEC');
+          // [...args, method]
+          sb.emitOp(node, 'REVERSEN');
+          // [length, ...args, method]
+          sb.emitOp(node, 'DEPTH');
+          // [length - 1, ...args, method]
+          sb.emitOp(node, 'DEC');
+          // [[args], method]
+          sb.emitOp(node, 'PACK');
+          // [method, [args]]
+          sb.emitOp(node, 'SWAP');
+        },
+      }),
+    );
     // TODO: remove end
     // [length, ...args]
     sb.emitOp(node, 'DEPTH');
