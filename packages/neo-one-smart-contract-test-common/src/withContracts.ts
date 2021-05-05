@@ -191,7 +191,7 @@ export const withContracts = async <T>(
         result = await client.publishAndDeploy(
           contract,
           contract.manifest,
-          [], // TODO: fix contract calling here if necessary. Probably just stays empty array here
+          [signerAddress], // TODO: fix contract calling here if necessary. Probably just stays empty array here
           { maxSystemFee: new BigNumber(-1), maxNetworkFee: new BigNumber(-1) },
           mutableSourceMaps,
         );

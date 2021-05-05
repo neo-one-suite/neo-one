@@ -85,6 +85,10 @@ export const processMethods = async ({
       .sort((a: number, b: number) => (a === b ? 0 : a > b ? 1 : -1))
       .filter((value) => value < jmpAddress);
 
+  (SourceMapConsumer as any).initialize({
+    'lib/mappings.wasm': 'https://unpkg.com/source-map@0.7.3/lib/mappings.wasm',
+  });
+
   return SourceMapConsumer.with(
     sourceMap,
     // tslint:disable-next-line: no-null-keyword

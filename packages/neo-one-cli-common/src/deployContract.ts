@@ -1,4 +1,4 @@
-import { AddressString, common, ContractManifestClient, crypto, SourceMaps } from '@neo-one/client-common';
+import { AddressString, common, ContractManifestClient, SourceMaps, UInt160 } from '@neo-one/client-common';
 import { NEOONEDataProvider } from '@neo-one/client-core';
 import { ContractRegister } from '@neo-one/client-full-core';
 import { constants } from '@neo-one/utils';
@@ -8,15 +8,15 @@ import { getClients } from './getClients';
 export const deployContract = async (
   provider: NEOONEDataProvider,
   contract: ContractRegister,
+  contractHash: UInt160,
   manifest: ContractManifestClient,
   sourceMaps: SourceMaps,
   masterPrivateKey: string = constants.PRIVATE_NET_PRIVATE_KEY,
 ): Promise<AddressString> => {
-  const { client, developerClient } = await getClients(provider, masterPrivateKey);
+  const { client, developerClient, masterWallet } = await getClients(provider, masterPrivateKey);
 
-  const hash = crypto.toScriptHash(Buffer.from(contract.script, 'hex'));
   try {
-    const existing = await client.read(provider.network).getContract(common.uInt160ToString(hash));
+    const existing = await client.read(provider.network).getContract(common.uInt160ToString(contractHash));
 
     return common.uInt160ToString(existing.hash);
   } catch {
@@ -26,7 +26,7 @@ export const deployContract = async (
   const result = await client.publishAndDeploy(
     contract,
     manifest,
-    [],
+    [masterWallet.userAccount.id.address],
     { maxSystemFee: new BigNumber(-1), maxNetworkFee: new BigNumber(-1) },
     sourceMaps,
   );

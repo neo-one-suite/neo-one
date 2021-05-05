@@ -1,4 +1,5 @@
 import { ABIParameter, ContractMethodDescriptorClient } from '@neo-one/client-common';
+import { NEO_ONE_METHOD_RESERVED_PARAM } from '@neo-one/client-core';
 import _ from 'lodash';
 import { toTypeScriptType } from '../utils';
 
@@ -31,9 +32,11 @@ const getRestParameter = (param: ABIParameter, migration = false) =>
 
 export const genFunctionParameters = (
   abi: ContractMethodDescriptorClient,
-  parameters: ReadonlyArray<ABIParameter> = abi.parameters === undefined ? [] : abi.parameters,
+  parametersIn: ReadonlyArray<ABIParameter> = abi.parameters === undefined ? [] : abi.parameters,
   options: Options = {},
 ): ReadonlyArray<string> => {
+  // TODO: remove this when we fix calling contracts. This removes the method string param
+  const parameters = parametersIn.filter((param) => param.name !== NEO_ONE_METHOD_RESERVED_PARAM);
   const [otherParameters, restParameter]: [ReadonlyArray<ABIParameter>, ABIParameter | undefined] =
     parameters.length > 0 && parameters[parameters.length - 1].rest
       ? [parameters.slice(0, -1), parameters[parameters.length - 1]]

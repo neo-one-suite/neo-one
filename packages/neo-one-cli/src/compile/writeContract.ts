@@ -67,8 +67,8 @@ export const writeContract = async (
   const byteCode = Buffer.from(contract.script, 'hex');
 
   const writer = new BinaryWriter();
-  writer.writeUInt32LE();
-  writer.writeFixedString(contractIn.contract.compilerName, 64);
+  writer.writeUInt32LE(0);
+  writer.writeFixedString(contractIn.contract.compiler, 64);
 
   if (nefFlag) {
     await Promise.all([

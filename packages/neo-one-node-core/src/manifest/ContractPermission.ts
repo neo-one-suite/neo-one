@@ -14,13 +14,14 @@ export class ContractPermission extends ContractPermissionModel<ContractPermissi
   public static fromStackItem(stackItem: StackItem): ContractPermission {
     const { array } = assertStructStackItem(stackItem);
     const contractIn = array[0];
-    const contractInBuff = contractIn.getBuffer();
-    const ecPointOrUInt160 = common.isECPoint(contractIn)
-      ? common.bufferToECPoint(contractInBuff)
-      : common.bufferToUInt160(contractInBuff);
+    const contractInBuff = contractIn.isNull ? '*' : contractIn.getBuffer();
     const contract = contractIn.isNull
       ? new ContractPermissionDescriptor()
-      : new ContractPermissionDescriptor({ hashOrGroup: ecPointOrUInt160 });
+      : new ContractPermissionDescriptor({
+          hashOrGroup: common.isECPoint(contractIn)
+            ? common.bufferToECPoint(contractInBuff)
+            : common.bufferToUInt160(contractInBuff),
+        });
 
     const methodsIn = array[1];
     const methods = methodsIn.isNull ? '*' : assertArrayStackItem(array[1]).array.map((method) => method.getString());
