@@ -252,6 +252,8 @@ const nativeHashes = {
   NameService: hexToUInt160(nativeScriptHashes.NameService),
 };
 
+const MAP_STACK_ITEM_MAX_KEY_SIZE = 64;
+
 export const common = {
   D8,
   NEO_ADDRESS_VERSION: 0x35,
@@ -278,6 +280,7 @@ export const common = {
   FIVE_THOUSAND_FIXED8,
   TEN_THOUSAND_FIXED8,
   ONE_HUNDRED_MILLION_FIXED8,
+  MAP_STACK_ITEM_MAX_KEY_SIZE,
   uInt160ToBuffer,
   add0x,
   strip0x,

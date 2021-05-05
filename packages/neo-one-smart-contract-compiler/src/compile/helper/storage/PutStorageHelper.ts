@@ -8,6 +8,8 @@ import { Helper } from '../Helper';
 export class PutStorageHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
+    // [keyBuffer, valBuffer]
+    sb.emitHelper(node, options, sb.helpers.sliceKey);
     // [keyBuffer, valBuffer, keyBuffer]
     sb.emitOp(node, 'TUCK');
     // [map, keyBuffer, valBuffer, keyBuffer]

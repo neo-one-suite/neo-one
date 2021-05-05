@@ -1,11 +1,11 @@
-import { StackItemType } from '@neo-one/client-common';
+import { common, StackItemType } from '@neo-one/client-common';
 import { ContractParameter, MapContractParameter } from '../contractParameter';
 import { CircularReferenceError } from './errors';
 import { StackItemBase } from './StackItemBase';
 import { PrimitiveStackItem, StackItem } from './StackItems';
 
 export class MapStackItem extends StackItemBase {
-  public static readonly maxKeySize = 64;
+  public static readonly maxKeySize = common.MAP_STACK_ITEM_MAX_KEY_SIZE;
 
   public readonly dictionary: Map<PrimitiveStackItem, StackItem>;
 

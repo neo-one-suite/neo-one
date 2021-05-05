@@ -8,6 +8,8 @@ import { Helper } from '../Helper';
 export class DeleteStorageBaseHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
+    // [keyBuffer]
+    sb.emitHelper(node, options, sb.helpers.sliceKey);
     // [storage, keyBuffer]
     sb.emitHelper(node, options, sb.helpers.cacheStorage);
     // [keyBuffer, storage, keyBuffer]

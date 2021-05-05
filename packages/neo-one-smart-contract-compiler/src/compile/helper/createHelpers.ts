@@ -46,6 +46,7 @@ import {
   GenericLogSerializeHelper,
   SetArrValToObjectPropertyHelper,
   SetArrValToObjectPropertyHelperOptions,
+  SliceKeyHelper,
 } from './common';
 import {
   BreakHelper,
@@ -544,6 +545,7 @@ export interface Helpers {
   readonly exp: ExpHelper;
   readonly consoleLog: ConsoleLogHelper;
   readonly debugLog: (options: DebugLogHelperOptions) => DebugLogHelper;
+  readonly sliceKey: SliceKeyHelper;
 
   readonly equalsEqualsEquals: (options: EqualsEqualsEqualsHelperOptions) => EqualsEqualsEqualsHelper;
   readonly equalsEquals: (options: EqualsEqualsHelperOptions) => EqualsEqualsHelper;
@@ -1008,6 +1010,7 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     exp: new ExpHelper(),
     consoleLog: new ConsoleLogHelper(),
     debugLog: (options) => new DebugLogHelper(options),
+    sliceKey: new SliceKeyHelper(),
 
     equalsEqualsEquals: (options) => new EqualsEqualsEqualsHelper(options),
     equalsEquals: (options) => new EqualsEqualsHelper(options),
