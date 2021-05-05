@@ -13,6 +13,8 @@ export class GetStorageHelper extends Helper {
       return;
     }
 
+    // [keyBuffer]
+    sb.emitHelper(node, options, sb.helpers.sliceKey);
     // [map, keyBuffer]
     sb.emitHelper(node, options, sb.helpers.deleteCacheStorage);
     // [keyBuffer, map, keyBuffer]
