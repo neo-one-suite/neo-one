@@ -2,6 +2,7 @@ import { codeFrameColumns } from '@babel/code-frame';
 import { scriptHashToAddress } from '@neo-one/client-common';
 import _ from 'lodash';
 import { RawSourceMap, SourceMapConsumer } from 'source-map';
+import { initializeSourceMap } from '../node';
 import { SourceMaps } from './processActionsAndMessage';
 import { getChunk } from './utils';
 
@@ -77,6 +78,8 @@ const processGenericError = async (message: string, sourceMaps: SourceMaps): Pro
     return message;
   }
 
+  initializeSourceMap();
+
   return SourceMapConsumer.with(sourceMap, undefined, async (consumer) => {
     const lineNumber = parseInt(line.split(':')[1], 10);
     const positionMessage = getSourceMapPosition({ lineNumber, consumer });
@@ -98,6 +101,8 @@ const processTraceError = async (
   if ((sourceMaps[error.address] as RawSourceMap | undefined) !== undefined) {
     sourceMap = sourceMaps[error.address];
   }
+
+  initializeSourceMap();
 
   return SourceMapConsumer.with(sourceMap, undefined, async (consumer) => {
     const positionMessage = getSourceMapPosition({ lineNumber: error.line, consumer });

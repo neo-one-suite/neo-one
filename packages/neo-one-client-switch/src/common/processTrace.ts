@@ -1,5 +1,6 @@
 import * as path from 'path';
 import { RawSourceMap, SourceMapConsumer } from 'source-map';
+import { initializeSourceMap } from '../node';
 import { SourceMaps } from './processActionsAndMessage';
 import { getChunk } from './utils';
 
@@ -77,6 +78,8 @@ export const processTrace = async ({
     }
 
     const [currentAddress, currentSourceMap] = remainingSourceMaps[0];
+
+    initializeSourceMap();
 
     return SourceMapConsumer.with(currentSourceMap, undefined, async (consumer) =>
       withSourceMaps(
