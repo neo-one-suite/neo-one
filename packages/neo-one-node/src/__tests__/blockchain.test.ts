@@ -14,12 +14,12 @@ describe('Blockchain invocation / storage tests', () => {
     const blockchainSettings = createTest();
     const levelDBPath = '/Users/spencercorwin/Desktop/node-data';
     const db = LevelUp(RocksDB(levelDBPath));
-    const blockData = getData(blockchainSettings.messageMagic);
+    const blockData = getData(blockchainSettings.network, blockchainSettings.maxValidUntilBlockIncrement);
 
     const storage = levelupStorage({
       db,
       context: {
-        messageMagic: blockchainSettings.messageMagic,
+        network: blockchainSettings.network,
         validatorsCount: blockchainSettings.validatorsCount,
       },
     });
@@ -73,7 +73,7 @@ describe('Update and read dispatcher store and snapshot', () => {
 describe('VM memory store for testing', () => {
   test('can persist 2 blocks in memory', async () => {
     const settings = createTest();
-    const blockData = getData(settings.messageMagic);
+    const blockData = getData(settings.network, settings.maxValidUntilBlockIncrement);
     const db = LevelUp(Memdown());
 
     const getChanges = async () =>
@@ -96,7 +96,7 @@ describe('VM memory store for testing', () => {
     const storage = levelupStorage({
       db,
       context: {
-        messageMagic: settings.messageMagic,
+        network: settings.network,
         validatorsCount: settings.validatorsCount,
       },
     });

@@ -7,7 +7,7 @@ const isEmpty = (buf: Buffer) => buf.equals(Buffer.from([]));
 
 describe('Script', () => {
   test('Parse', () => {
-    const syscall = 'Neo.Crypto.CheckMultisig';
+    const syscall = 'System.Crypto.CheckMultisig';
     const syscallBuff = Buffer.from([0x7b, 0xce, 0x6c, 0xa5]);
     const sb = new ScriptBuilder();
     sb.emitOp('PUSH0');

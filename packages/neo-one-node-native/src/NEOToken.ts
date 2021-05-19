@@ -59,6 +59,25 @@ export class NEOToken extends FungibleToken implements NEOContract {
       symbol: 'NEO',
       decimals: 0,
       methods: neoTokenMethods,
+      events: [
+        {
+          name: 'Transfer',
+          parameters: [
+            {
+              name: 'from',
+              type: 'Hash160',
+            },
+            {
+              name: 'to',
+              type: 'Hash160',
+            },
+            {
+              name: 'amount',
+              type: 'Integer',
+            },
+          ],
+        },
+      ],
       settings,
     });
 

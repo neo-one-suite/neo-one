@@ -11,6 +11,25 @@ export class GASToken extends FungibleToken implements GASContract {
       symbol: 'GAS',
       decimals: 8,
       methods: gasTokenMethods,
+      events: [
+        {
+          name: 'Transfer',
+          parameters: [
+            {
+              name: 'from',
+              type: 'Hash160',
+            },
+            {
+              name: 'to',
+              type: 'Hash160',
+            },
+            {
+              name: 'amount',
+              type: 'Integer',
+            },
+          ],
+        },
+      ],
       settings,
     });
   }

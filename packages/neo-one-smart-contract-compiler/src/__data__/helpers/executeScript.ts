@@ -49,7 +49,7 @@ export const executeScript = async (
   const blockchain = await Blockchain.create({
     settings,
     storage: storage({
-      context: { messageMagic: settings.messageMagic, validatorsCount: settings.validatorsCount },
+      context: { network: settings.network, validatorsCount: settings.validatorsCount },
       db: LevelUp(MemDown()),
     }),
     vm: dispatcher,

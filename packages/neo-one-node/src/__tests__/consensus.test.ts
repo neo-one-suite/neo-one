@@ -15,7 +15,7 @@ const config = {
   },
   blockchain: {
     genesisBlock: Block.deserializeWire({
-      context: { messageMagic: 7630401, validatorsCount: 1 },
+      context: { network: 7630401, validatorsCount: 1, maxValidUntilBlockIncrement: 86400000 / 15000 },
       buffer: Buffer.from(
         '000000000000000000000000000000000000000000000000000000000000000000000000a2f039e5cb15af6ab9eecfcb383ddac95c9ddc7f5c09d96c88dd26003a793a81759cf1e17501000000000000d83cd15a5036b5399bb7e6b91db9365a77ddb2510100011102001dac2b7c000000000000000000000000000000000000000000000000000000000001ca61e52e881d41374e640f819cd118cc153b21a700000541123e7fe801000111',
         'hex',
@@ -23,7 +23,7 @@ const config = {
     }),
     decrementInterval: 2000000,
     generationAmount: [8, 7, 6],
-    messageMagic: 7630401,
+    network: 7630401,
     addressVersion: common.NEO_ADDRESS_VERSION,
     privateKeyVersion: 128,
     standbyValidators: ['0248be3c070df745a60f3b8b494efcc6caf90244d803a9a72fe95d9bae2120ec70'].map((p) =>

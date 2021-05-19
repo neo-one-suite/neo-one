@@ -42,13 +42,10 @@ export function getNep17UpdateOptions({
     appExecuted.notifications.forEach((notifyEventArgs) => {
       const { container, scriptHash, eventName, state: stateItems } = notifyEventArgs;
 
-      if (stateItems.length === 0) {
-        return;
-      }
       if (eventName !== 'Transfer') {
         return;
       }
-      if (stateItems.length < 3) {
+      if (stateItems.length !== 3) {
         return;
       }
       if (!stateItems[0].isNull && !isByteStringStackItem(stateItems[0])) {

@@ -167,7 +167,12 @@ export const contractRegisterToContractManifest = (contractIn: ContractRegister)
           methods: perm.methods,
         }),
     ),
-    trusts: contractIn.manifest.trusts === '*' ? '*' : contractIn.manifest.trusts.map(common.stringToUInt160),
+    trusts:
+      contractIn.manifest.trusts === '*'
+        ? '*'
+        : contractIn.manifest.trusts.map(
+            (perm) => new ContractPermissionDescriptorModel({ hashOrGroup: getPermission(perm) }),
+          ),
     extra: contractIn.manifest.extra,
   });
 };
@@ -179,7 +184,8 @@ export interface Provider extends ProviderLite {
 
 export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider extends Provider>
   extends LocalUserAccountProviderLite<TKeyStore, TProvider>
-  implements UserAccountProvider {
+  implements UserAccountProvider
+{
   public read(network: NetworkType): DataProvider {
     return this.provider.read(network);
   }

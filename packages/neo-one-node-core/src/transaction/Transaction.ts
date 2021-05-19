@@ -7,7 +7,6 @@ import {
   IOHelper,
   JSONHelper,
   MAX_TRANSACTION_SIZE,
-  MAX_VALID_UNTIL_BLOCK_INCREMENT,
   multiSignatureContractCost,
   Script,
   scriptHashToAddress,
@@ -45,18 +44,11 @@ export interface VerboseData {
 
 export class Transaction
   extends TransactionModel<Attribute, Witness, Signer>
-  implements SerializableContainer, Verifiable {
+  implements SerializableContainer, Verifiable
+{
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Transaction {
-    const {
-      version,
-      nonce,
-      systemFee,
-      networkFee,
-      validUntilBlock,
-      signers,
-      attributes,
-      script,
-    } = this.deserializeWireBaseUnsigned(options);
+    const { version, nonce, systemFee, networkFee, validUntilBlock, signers, attributes, script } =
+      this.deserializeWireBaseUnsigned(options);
     const { reader } = options;
     const witnesses = reader.readArray(() => Witness.deserializeWireBase(options), signers?.length);
     if (witnesses.length !== signers?.length) {
@@ -75,7 +67,8 @@ export class Transaction
       attributes,
       script,
       witnesses,
-      messageMagic: options.context.messageMagic,
+      network: options.context.network,
+      maxValidUntilBlockIncrement: options.context.maxValidUntilBlockIncrement,
     });
   }
 
@@ -119,7 +112,8 @@ export class Transaction
       signers,
       attributes,
       script,
-      messageMagic: options.context.messageMagic,
+      network: options.context.network,
+      maxValidUntilBlockIncrement: options.context.maxValidUntilBlockIncrement,
     };
   }
 
@@ -188,7 +182,7 @@ export class Transaction
   ): Promise<VerifyResultModel> {
     const { storage, native, verifyWitness, vm, headerCache } = verifyOptions;
     const index = await native.Ledger.currentIndex(storage);
-    if (this.validUntilBlock <= index || this.validUntilBlock > index + MAX_VALID_UNTIL_BLOCK_INCREMENT) {
+    if (this.validUntilBlock <= index || this.validUntilBlock > index + this.maxValidUntilBlockIncrement) {
       return VerifyResultModel.Expired;
     }
 

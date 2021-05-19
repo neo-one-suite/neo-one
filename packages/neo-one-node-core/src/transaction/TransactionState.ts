@@ -15,7 +15,7 @@ export class TransactionState {
     const blockIndex = array[0].getInteger();
     const transaction = Transaction.deserializeWire({
       buffer: array[1].getBuffer(),
-      context: { messageMagic: 0, validatorsCount: 0 }, // TODO: Fix this
+      context: { network: 0, validatorsCount: 0, maxValidUntilBlockIncrement: 0 }, // TODO: Fix this
     });
 
     return new TransactionState({

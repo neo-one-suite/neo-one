@@ -88,7 +88,7 @@ export class Block implements SerializableContainer, SerializableJSON<BlockJSON>
   private readonly sizeInternal = utils.lazy(
     () => this.header.size + IOHelper.sizeOfArray(this.transactions, (tx) => tx.size),
   );
-  private readonly messageInternal = utils.lazy(() => getSignData(this.hash, this.messageMagic));
+  private readonly messageInternal = utils.lazy(() => getSignData(this.hash, this.network));
 
   public constructor({ header, transactions }: BlockAdd) {
     this.header = header;
@@ -99,8 +99,8 @@ export class Block implements SerializableContainer, SerializableJSON<BlockJSON>
     return this.messageInternal();
   }
 
-  public get messageMagic(): number {
-    return this.header.messageMagic;
+  public get network(): number {
+    return this.header.network;
   }
 
   public get size(): number {

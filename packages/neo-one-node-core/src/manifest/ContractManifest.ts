@@ -1,24 +1,37 @@
-import { common, ContractManifestJSON, InvalidFormatError, JSONHelper, UInt160 } from '@neo-one/client-common';
+import { common, ContractManifestJSON, InvalidFormatError, UInt160 } from '@neo-one/client-common';
 import { ContractManifestModel } from '@neo-one/client-full-common';
 import { Set as iSet } from 'immutable';
-import { assertArrayStackItem, assertStructStackItem, StackItem } from '../StackItems';
-import { utils } from '../utils';
+import { assertArrayStackItem, assertMapStackItem, assertStructStackItem, StackItem } from '../StackItems';
 import { ContractABI } from './ContractABI';
 import { ContractGroup } from './ContractGroup';
 import { ContractPermission } from './ContractPermission';
+import { ContractPermissionDescriptor } from './ContractPermissionDescriptor';
 
 export class ContractManifest extends ContractManifestModel<ContractABI, ContractGroup, ContractPermission> {
   public static fromStackItem(stackItem: StackItem): ContractManifest {
     const { array } = assertStructStackItem(stackItem);
     const name = array[0].getString();
     const groups = assertArrayStackItem(array[1]).array.map((group) => ContractGroup.fromStackItem(group));
-    const supportedStandards = assertArrayStackItem(array[2]).array.map((std) => std.getString());
-    const abi = ContractABI.fromStackItem(array[3]);
-    const permissions = assertArrayStackItem(array[4]).array.map((perm) => ContractPermission.fromStackItem(perm));
-    const trusts = array[5].isNull
+    if (assertMapStackItem(array[2]).count !== 2) {
+      throw new InvalidFormatError('Expected manifest features map to have two properties');
+    }
+    const supportedStandards = assertArrayStackItem(array[3]).array.map((std) => std.getString());
+    const abi = ContractABI.fromStackItem(array[4]);
+    const permissions = assertArrayStackItem(array[5]).array.map((perm) => ContractPermission.fromStackItem(perm));
+    const trusts = array[6].isNull
       ? '*'
-      : assertArrayStackItem(array[5]).array.map((trust) => common.bufferToUInt160(trust.getBuffer()));
-    const extra = JSON.parse(array[6].getBuffer().toString('utf8'));
+      : assertArrayStackItem(array[6]).array.map((trust) => {
+          const buf = trust.getBuffer();
+          if (common.isUInt160(buf)) {
+            return new ContractPermissionDescriptor({ hashOrGroup: common.bufferToUInt160(buf) });
+          }
+          if (common.isECPoint(buf)) {
+            return new ContractPermissionDescriptor({ hashOrGroup: common.bufferToECPoint(buf) });
+          }
+
+          throw new InvalidFormatError('Expected trust to be a valid UInt160 or ECPoint');
+        });
+    const extra = JSON.parse(array[7].getBuffer().toString('utf8'));
 
     return new ContractManifest({
       name,
@@ -62,11 +75,15 @@ export class ContractManifest extends ContractManifestModel<ContractABI, Contrac
     if (iSet(permissions.map((p) => p.contract)).size !== permissions.length) {
       throw new InvalidFormatError('Manifest permissions cannot contain duplicates');
     }
-    const trusts = utils.wildCardFromJSON<UInt160>(json.trusts, JSONHelper.readUInt160);
+    const trusts =
+      json.trusts === '*' ? '*' : json.trusts.map((input) => ContractPermissionDescriptor.deserializeJSON(input));
     if (typeof trusts !== 'string' && iSet(trusts).size !== trusts.length) {
       throw new InvalidFormatError('Manifest trusts cannot contain duplicates');
     }
     const extra = json.extra;
+    if (Object.keys(json.features).length !== 0) {
+      throw new InvalidFormatError('Manifest features must be an empty JavaScript object');
+    }
 
     return new this({
       name,

@@ -3,7 +3,7 @@ import { Block, Header, Signer, Transaction, Witness } from '@neo-one/node-core'
 import { BN } from 'bn.js';
 import { genesisJSON, secondBlockJSON, thirdBlockJSON } from './jsonBlocks';
 
-const convertBlock = (json: BlockJSON, messageMagic: number) =>
+const convertBlock = (json: BlockJSON, network: number, maxValidUntilBlockIncrement: number) =>
   new Block({
     header: new Header({
       previousHash: JSONHelper.readUInt256(json.previousblockhash),
@@ -19,7 +19,7 @@ const convertBlock = (json: BlockJSON, messageMagic: number) =>
         invocation: JSONHelper.readBase64Buffer(json.witnesses[0].invocation),
         verification: JSONHelper.readBase64Buffer(json.witnesses[0].verification),
       }),
-      messageMagic,
+      network,
     }),
     transactions: json.tx.map(
       (tx) =>
@@ -47,14 +47,15 @@ const convertBlock = (json: BlockJSON, messageMagic: number) =>
                 scopes: (signer.scopes as any) === 'FeeOnly' ? WitnessScopeModel.None : toWitnessScope(signer.scopes),
               }),
           ),
-          messageMagic,
+          network,
+          maxValidUntilBlockIncrement,
         }),
     ),
   });
 
 // tslint:disable no-any export-name
-export const getData = (messageMagic: number) => ({
-  genesisBlock: convertBlock(genesisJSON as any, messageMagic),
-  secondBlock: convertBlock(secondBlockJSON as any, messageMagic),
-  thirdBlock: convertBlock(thirdBlockJSON as any, messageMagic),
+export const getData = (network: number, maxValidUntilBlockIncrement: number) => ({
+  genesisBlock: convertBlock(genesisJSON as any, network, maxValidUntilBlockIncrement),
+  secondBlock: convertBlock(secondBlockJSON as any, network, maxValidUntilBlockIncrement),
+  thirdBlock: convertBlock(thirdBlockJSON as any, network, maxValidUntilBlockIncrement),
 });

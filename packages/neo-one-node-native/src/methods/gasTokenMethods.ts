@@ -21,17 +21,33 @@ export const gasTokenMethods: ReadonlyArray<ContractMethodJSON> = [
     safe: true,
   },
   {
+    name: 'refuel',
+    parameters: [
+      {
+        name: 'account',
+        type: 'Hash160',
+      },
+      {
+        name: 'amount',
+        type: 'Integer',
+      },
+    ],
+    returntype: 'Void',
+    offset: 14,
+    safe: false,
+  },
+  {
     name: 'symbol',
     parameters: [],
     returntype: 'String',
-    offset: 14,
+    offset: 21,
     safe: true,
   },
   {
     name: 'totalSupply',
     parameters: [],
     returntype: 'Integer',
-    offset: 21,
+    offset: 28,
     safe: true,
   },
   {
@@ -55,7 +71,7 @@ export const gasTokenMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Boolean',
-    offset: 28,
+    offset: 35,
     safe: false,
   },
 ];

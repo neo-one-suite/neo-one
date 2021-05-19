@@ -792,7 +792,7 @@ export interface TransactionOptions {
    */
   maxSystemFee?: BigNumber;
   /**
-   * The maximum number of blocks from the current block this transaction should stay valid until. Defaults to `TransactionModel.maxValidBlockIncrement - 1`.
+   * The maximum number of blocks from the current block this transaction should stay valid until. Defaults to the network's `maxValidBlockIncrement` minus 1.
    *
    * Useful for when there is high traffic on the network and automatic re-sending of transactions takes place but you want more control.
    */
@@ -1676,7 +1676,7 @@ export interface ContractManifestClient {
    * The trusts field is an array containing a set of contract hashes or group public keys. It can also be assigned with a wildcard *. If it is a wildcard *, then it means that it trusts any contract.
    * If a contract is trusted, the user interface will not give any warnings when called by the contract.
    */
-  readonly trusts: WildcardContainer<UInt160Hex>;
+  readonly trusts: WildcardContainer<ContractPermissionDescriptor>;
   /**
    * Custom user-defined JSON object.
    */
@@ -1713,7 +1713,7 @@ export interface ContractManifest {
    * The trusts field is an array containing a set of contract hashes or group public keys. It can also be assigned with a wildcard *. If it is a wildcard *, then it means that it trusts any contract.
    * If a contract is trusted, the user interface will not give any warnings when called by the contract.
    */
-  readonly trusts: WildcardContainer<UInt160Hex>;
+  readonly trusts: WildcardContainer<ContractPermissionDescriptor>;
   /**
    * Custom user-defined JSON object.
    */
@@ -2556,7 +2556,8 @@ export interface NetworkSettings {
   readonly generationAmount: readonly number[];
   readonly privateKeyVersion: number;
   readonly standbyvalidators: readonly string[];
-  readonly messageMagic: number;
+  readonly network: number;
+  readonly maxValidUntilBlockIncrement: number;
   readonly addressVersion: number;
   readonly standbyCommittee: readonly string[];
   readonly committeeMemberscount: number;

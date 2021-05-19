@@ -6,6 +6,7 @@ import {
   StackItemJSON,
   StackItemType,
 } from '@neo-one/client-common';
+import { utils } from '@neo-one/utils';
 import { InvalidPrimitiveStackItemError, InvalidStackItemError, InvalidStackItemTypeError } from '../errors';
 import { ArrayStackItem } from './ArrayStackItem';
 import { BooleanStackItem } from './BooleanStackItem';
@@ -48,21 +49,25 @@ export const assertStackItem = (item: any): StackItem => {
   throw new InvalidStackItemError();
 };
 
-export const getIsStackItemType = <T>(type: StackItemType) => (item: any): item is T => {
-  if (isStackItem(item)) {
-    return item.type === type;
-  }
+export const getIsStackItemType =
+  <T>(type: StackItemType) =>
+  (item: any): item is T => {
+    if (isStackItem(item)) {
+      return item.type === type;
+    }
 
-  return false;
-};
+    return false;
+  };
 
-export const getAssertStackItemType = <T>(isFunc: (item: any) => item is T, type: StackItemType) => (item: any) => {
-  if (isFunc(item)) {
-    return item;
-  }
+export const getAssertStackItemType =
+  <T>(isFunc: (item: any) => item is T, type: StackItemType) =>
+  (item: any) => {
+    if (isFunc(item)) {
+      return item;
+    }
 
-  throw new InvalidStackItemTypeError(StackItemType[type], item.type);
-};
+    throw new InvalidStackItemTypeError(StackItemType[type], item.type);
+  };
 
 export const isNullStackItem: (item: any) => item is NullStackItem = getIsStackItemType(StackItemType.Any);
 export const isPointerStackItem: (item: any) => item is PointerStackItem = getIsStackItemType(StackItemType.Pointer);
@@ -138,7 +143,6 @@ export const assertPrimitiveStackItem = (item: any): PrimitiveStackItem => {
   throw new InvalidPrimitiveStackItemError();
 };
 
-// TODO: this can/should probably be deleted so it can't be confused with ContractParameter/ContractParameterJSON
 export const stackItemToJSON = (item: StackItem, context?: Set<StackItem>): StackItemJSON => {
   switch (item.type) {
     case StackItemType.Array:
@@ -192,7 +196,17 @@ export const stackItemToJSON = (item: StackItem, context?: Set<StackItem>): Stac
 
       return { type: 'Pointer', value: pointer.position };
 
-    default:
+    case StackItemType.Struct:
       return { type: 'Any', value: undefined };
+
+    case StackItemType.InteropInterface:
+      return { type: 'Any', value: undefined };
+
+    case StackItemType.Any:
+      return { type: 'Any', value: undefined };
+
+    default:
+      utils.assertNever(item.type);
+      throw new Error('For TS');
   }
 };

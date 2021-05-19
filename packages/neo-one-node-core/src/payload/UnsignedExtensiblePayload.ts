@@ -16,7 +16,7 @@ export interface UnsignedExtensiblePayloadAdd {
   readonly validBlockEnd: number;
   readonly sender: UInt160;
   readonly data: Buffer;
-  readonly messageMagic: number;
+  readonly network: number;
 }
 
 export class UnsignedExtensiblePayload implements SerializableWire {
@@ -39,7 +39,7 @@ export class UnsignedExtensiblePayload implements SerializableWire {
       validBlockEnd,
       sender,
       data,
-      messageMagic: options.context.messageMagic,
+      network: options.context.network,
     };
   }
 
@@ -59,7 +59,7 @@ export class UnsignedExtensiblePayload implements SerializableWire {
   public readonly validBlockEnd: number;
   public readonly sender: UInt160;
   public readonly data: Buffer;
-  public readonly magic: number;
+  public readonly network: number;
 
   public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly hashInternal = utils.lazy(() => crypto.calculateHash(this.serializeWire()));
@@ -70,14 +70,14 @@ export class UnsignedExtensiblePayload implements SerializableWire {
     validBlockEnd,
     sender,
     data,
-    messageMagic,
+    network,
   }: UnsignedExtensiblePayloadAdd) {
     this.category = category;
     this.validBlockStart = validBlockStart;
     this.validBlockEnd = validBlockEnd;
     this.sender = sender;
     this.data = data;
-    this.magic = messageMagic;
+    this.network = network;
   }
 
   public get hash() {

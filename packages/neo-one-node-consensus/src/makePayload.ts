@@ -54,10 +54,10 @@ export const makeSignedPayload = async ({
       validBlockEnd: consensusMessage.validatorIndex,
       data: consensusMessage.serializeWire(),
       sender: crypto.privateKeyToScriptHash(privateKey), // TODO: not sure this is correct
-      messageMagic: node.blockchain.deserializeWireContext.messageMagic,
+      network: node.blockchain.deserializeWireContext.network,
     }),
     privateKey,
-    node.blockchain.deserializeWireContext.messageMagic,
+    node.blockchain.deserializeWireContext.network,
   );
 
 export const makeCommit = async ({

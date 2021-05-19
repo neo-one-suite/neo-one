@@ -68,7 +68,7 @@ export class FullNode {
     });
     const storage = levelupStorage({
       db: LevelUp(this.options.type === 'persistent' ? Level(this.options.id) : MemDown()),
-      context: { messageMagic: settings.messageMagic },
+      context: { network: settings.network },
     });
 
     const blockchain = await Blockchain.create({

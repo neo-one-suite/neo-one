@@ -25,6 +25,7 @@ import {
   Blockchain,
   CallReceipt,
   getEndpointConfig,
+  isInteropInterface,
   NativeContainer,
   Nep17Transfer,
   Nep17TransferKey,
@@ -331,14 +332,49 @@ export const createHandler = ({
     // position: log.position,
   });
 
-  const getInvokeResult = (script: Buffer, receipt: CallReceipt): CallReceiptJSON => {
+  // TODO: probably some bugs in here. See RpcServer.SmartContract.cs
+  const stackItemToJson = (item: StackItem, maxIn: number) => {
+    // tslint:disable-next-line: no-null-keyword triple-equals no-any
+    const isIterable = (obj: any) => obj != null && typeof obj[Symbol.iterator] === 'function';
+    const json = item.toContractParameter().serializeJSON();
+    if (isInteropInterface(item)) {
+      // tslint:disable-next-line: no-any
+      const interopInterface = item.getInterface((_): _ is any => true);
+      if (interopInterface !== undefined && isIterable(interopInterface)) {
+        const iterator = [...interopInterface][Symbol.iterator]();
+        const finalArr = [];
+        let truncated = false;
+        let max = maxIn;
+        // tslint:disable-next-line: no-loop-statement
+        for (const val of iterator) {
+          if (max <= 0) {
+            truncated = true;
+            break;
+          }
+          // tslint:disable-next-line: no-array-mutation
+          finalArr.push((val as StackItem).toContractParameter().serializeJSON());
+          max -= 1;
+        }
+
+        return {
+          ...json,
+          iterator: finalArr,
+          truncated,
+        };
+      }
+    }
+
+    return json;
+  };
+
+  const getInvokeResult = (script: Buffer, receipt: CallReceipt, maxIteratorResultItems: number): CallReceiptJSON => {
     const { stack: stackIn, state, notifications, gasConsumed, logs } = receipt;
 
     let stack;
     try {
-      stack = stackIn.map((item: StackItem) => item.toContractParameter().serializeJSON());
+      stack = stackIn.map((item: StackItem) => stackItemToJson(item, maxIteratorResultItems));
     } catch {
-      stack = 'error: recursive reference';
+      stack = 'error: invalid operation';
     }
 
     // TODO: need to add ProcessInvokeWithWallet()? Probably not but check
@@ -566,10 +602,10 @@ export const createHandler = ({
     }),
     [RPC_METHODS.getversion]: async () => {
       const { tcpPort: tcpport, wsPort: wsport, nonce, useragent } = node.version;
-      const { messageMagic: magic } = blockchain.settings;
+      const { network } = blockchain.settings;
 
       return {
-        magic,
+        network,
         tcpport,
         wsport,
         nonce,
@@ -615,7 +651,7 @@ export const createHandler = ({
       const signers = args[1] !== undefined ? Signers.fromJSON(args[1]) : undefined;
       const result = blockchain.invokeScript({ script, signers }); // TODO: should be 20 or 20 fixed8FromDecimal?
 
-      return getInvokeResult(script, result);
+      return getInvokeResult(script, result, blockchain.settings.maxIteratorResultItems);
     },
     [RPC_METHODS.testtransaction]: async (args) => {
       const transaction = Transaction.deserializeWire({
@@ -625,7 +661,7 @@ export const createHandler = ({
 
       const result = blockchain.testTransaction(transaction);
 
-      return getInvokeResult(transaction.script, result);
+      return getInvokeResult(transaction.script, result, blockchain.settings.maxIteratorResultItems);
     },
     [RPC_METHODS.getunclaimedgas]: async (args) => {
       const address = args[0];
@@ -933,7 +969,8 @@ export const createHandler = ({
         generationAmount,
         privateKeyVersion,
         standbyValidators,
-        messageMagic,
+        network,
+        maxValidUntilBlockIncrement,
         addressVersion,
         standbyCommittee,
         committeeMembersCount,
@@ -953,7 +990,8 @@ export const createHandler = ({
         generationamount: generationAmount,
         privatekeyversion: privateKeyVersion,
         standbyvalidators: standbyValidators.map((val) => common.ecPointToString(val)),
-        messagemagic: messageMagic,
+        network,
+        maxvaliduntilblockincrement: maxValidUntilBlockIncrement,
         addressversion: addressVersion,
         standbycommittee: standbyCommittee.map((val) => common.ecPointToString(val)),
         committeememberscount: committeeMembersCount,

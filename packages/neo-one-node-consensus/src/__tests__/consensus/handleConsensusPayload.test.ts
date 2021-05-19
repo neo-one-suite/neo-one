@@ -27,7 +27,7 @@ describe('handleConsensusPayload', () => {
     getNextBlockValidators: jest.fn(() => keys.map(({ publicKey }) => publicKey)),
     getValidators: jest.fn(() => keys.map(({ publicKey }) => publicKey)),
     deserializeWireContext: {
-      messageMagic: 2345123,
+      network: 2345123,
     },
   };
   beforeEach(() => {
@@ -98,7 +98,7 @@ describe('handleConsensusPayload', () => {
       nextConsensus: consensusAddress,
       witness: deployWitness,
       transactions: [],
-      messageMagic: 7630401,
+      network: 7630401,
     });
   });
 });

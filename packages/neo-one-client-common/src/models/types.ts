@@ -381,8 +381,9 @@ export interface ContractManifestJSON {
   readonly abi: ContractABIJSON;
   readonly groups: readonly ContractGroupJSON[];
   readonly permissions: readonly ContractPermissionJSON[];
-  readonly trusts: WildcardContainerJSON;
+  readonly trusts: WildcardContainerJSON<ContractPermissionDescriptorJSON>;
   readonly supportedstandards: readonly string[];
+  readonly features: JSONObject;
   readonly extra?: JSONObject;
 }
 
@@ -475,7 +476,8 @@ export interface NetworkSettingsJSON {
   readonly generationamount: readonly number[];
   readonly privatekeyversion: number;
   readonly standbyvalidators: readonly string[];
-  readonly messagemagic: number;
+  readonly network: number;
+  readonly maxvaliduntilblockincrement: number;
   readonly addressversion: number;
   readonly standbycommittee: readonly string[];
   readonly committeememberscount: number;
@@ -546,7 +548,7 @@ export interface PluginJSON {
 }
 
 export interface VersionJSON {
-  readonly magic: number;
+  readonly network: number;
   readonly tcpport: number;
   readonly wsport: number;
   readonly nonce: number;

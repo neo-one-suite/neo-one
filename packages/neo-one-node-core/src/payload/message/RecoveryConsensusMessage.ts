@@ -3,6 +3,7 @@ import { BN } from 'bn.js';
 import _ from 'lodash';
 import { ConsensusContext } from '../../consensus/ConsensusContext';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from '../../Serializable';
+import { ProtocolSettings } from '../../Settings';
 import { ChangeViewPayloadCompact } from '../ChangeViewPayloadCompact';
 import { CommitPayloadCompact } from '../CommitPayloadCompact';
 import { ExtensiblePayload } from '../ExtensiblePayload';
@@ -31,7 +32,7 @@ export class RecoveryConsensusMessage extends ConsensusMessageBase {
     const { viewNumber, blockIndex, validatorIndex } = super.deserializeConsensusMessageBaseWireBase(options);
     const changeViewMessagesIn = reader.readArray(
       () => ChangeViewPayloadCompact.deserializeWireBase(options),
-      options.validatorsCount,
+      common.BYTE_MAX_VALUE,
     );
     let prepareRequestMessage: PrepareRequestConsensusMessage | undefined;
     let preparationHash: UInt256 | undefined;
@@ -42,12 +43,12 @@ export class RecoveryConsensusMessage extends ConsensusMessageBase {
     }
     const preparationMessagesIn = reader.readArray(
       () => PreparationPayloadCompact.deserializeWireBase(options),
-      options.validatorsCount,
+      common.BYTE_MAX_VALUE,
     );
 
     const commitMessagesIn = reader.readArray(
       () => CommitPayloadCompact.deserializeWireBase(options),
-      options.validatorsCount,
+      common.BYTE_MAX_VALUE,
     );
 
     const changeViewMessages = _.fromPairs(
@@ -122,7 +123,7 @@ export class RecoveryConsensusMessage extends ConsensusMessageBase {
     writer.writeArray(Object.values(this.commitMessages), (message) => message.serializeWireBase(writer));
   }
 
-  public getChangeViewPayloads(context: ConsensusContext, magic: number): readonly ExtensiblePayload[] {
+  public getChangeViewPayloads(context: ConsensusContext, network: number): readonly ExtensiblePayload[] {
     return Object.values(this.changeViewMessages).map((item: ChangeViewPayloadCompact) =>
       context.createPayload(
         new ChangeViewConsensusMessage({
@@ -132,13 +133,16 @@ export class RecoveryConsensusMessage extends ConsensusMessageBase {
           timestamp: item.timestamp,
           reason: ChangeViewReason.Timeout, // TODO: pretty sure this is wrong but also possible that this doesn't matter anyway
         }),
-        magic,
+        network,
         item.invocationScript,
       ),
     );
   }
 
-  public getCommitPayloadsFromRecoveryMessage(context: ConsensusContext, magic: number): readonly ExtensiblePayload[] {
+  public getCommitPayloadsFromRecoveryMessage(
+    context: ConsensusContext,
+    network: number,
+  ): readonly ExtensiblePayload[] {
     return Object.values(this.commitMessages).map((item: CommitPayloadCompact) =>
       context.createPayload(
         new CommitConsensusMessage({
@@ -147,13 +151,13 @@ export class RecoveryConsensusMessage extends ConsensusMessageBase {
           viewNumber: item.viewNumber,
           signature: item.signature,
         }),
-        magic,
+        network,
         item.invocationScript,
       ),
     );
   }
 
-  public getPrepareRequestPayload(context: ConsensusContext, magic: number): ExtensiblePayload | undefined {
+  public getPrepareRequestPayload(context: ConsensusContext, network: number): ExtensiblePayload | undefined {
     if (this.prepareRequestMessage === undefined) {
       return undefined;
     }
@@ -165,10 +169,10 @@ export class RecoveryConsensusMessage extends ConsensusMessageBase {
       return undefined;
     }
 
-    return context.createPayload(this.prepareRequestMessage, magic, maybePreparationMessage.invocationScript);
+    return context.createPayload(this.prepareRequestMessage, network, maybePreparationMessage.invocationScript);
   }
 
-  public getPrepareResponsePayloads(context: ConsensusContext, magic: number): readonly ExtensiblePayload[] {
+  public getPrepareResponsePayloads(context: ConsensusContext, network: number): readonly ExtensiblePayload[] {
     const index = context.blockBuilder.primaryIndex;
     const preparationHash = this.preparationHash ?? context.preparationPayloads[index]?.hash;
     if (preparationHash === undefined) {
@@ -185,9 +189,22 @@ export class RecoveryConsensusMessage extends ConsensusMessageBase {
             viewNumber: this.viewNumber,
             preparationHash,
           }),
-          magic,
+          network,
           item.invocationScript,
         ),
       );
+  }
+
+  public verify(protocolSettings: ProtocolSettings): boolean {
+    if (!super.verify(protocolSettings)) {
+      return false;
+    }
+
+    return (
+      (this.prepareRequestMessage === undefined || this.prepareRequestMessage.verify(protocolSettings)) &&
+      Object.values(this.changeViewMessages).every((p) => p.validatorIndex < protocolSettings.validatorsCount) &&
+      Object.values(this.preparationMessages).every((p) => p.validatorIndex < protocolSettings.validatorsCount) &&
+      Object.values(this.commitMessages).every((p) => p.validatorIndex < protocolSettings.validatorsCount)
+    );
   }
 }

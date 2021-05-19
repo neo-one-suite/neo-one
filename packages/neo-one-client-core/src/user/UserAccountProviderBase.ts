@@ -319,7 +319,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
       maxNetworkFee = utils.ZERO_BIG_NUMBER,
       maxSystemFee = utils.ZERO_BIG_NUMBER,
       from: fromIn,
-      validBlockCount = TransactionModel.maxValidBlockIncrement - 1,
+      validBlockCount = 86400000 / 15000 - 1, // TODO: should not be hardcoded. should come from network settings
     } = options;
     let from = fromIn;
 
@@ -529,9 +529,10 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     );
   }
 
-  private getScriptAndInvokeMethodOptions(
-    invokeMethodOptionsOrScript: InvokeMethodOptions | Buffer,
-  ): { readonly script: Buffer; readonly invokeMethodOptions: InvokeMethodOptions | undefined } {
+  private getScriptAndInvokeMethodOptions(invokeMethodOptionsOrScript: InvokeMethodOptions | Buffer): {
+    readonly script: Buffer;
+    readonly invokeMethodOptions: InvokeMethodOptions | undefined;
+  } {
     let script: Buffer;
     let invokeMethodOptions: InvokeMethodOptions | undefined;
     if (invokeMethodOptionsOrScript instanceof Buffer) {

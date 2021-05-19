@@ -13,22 +13,24 @@ export interface BlockchainSettings extends ProtocolSettings {
   readonly standbyValidators: readonly ECPoint[];
 }
 export interface ProtocolSettings {
-  readonly messageMagic: number;
+  readonly network: number;
   readonly addressVersion: number;
   readonly standbyCommittee: readonly ECPoint[];
   readonly committeeMembersCount: number;
   readonly validatorsCount: number;
   readonly millisecondsPerBlock: number;
+  readonly maxValidUntilBlockIncrement: number;
   readonly memoryPoolMaxTransactions: number;
   readonly maxTraceableBlocks: number;
   readonly maxBlockSize: number;
   readonly maxBlockSystemFee: BN;
   readonly maxTransactionsPerBlock: number;
+  readonly maxIteratorResultItems: number;
   readonly nativeUpdateHistory: { readonly [key: string]: readonly number[] };
 }
 
 export interface VMProtocolSettingsIn {
-  readonly magic?: number;
+  readonly network?: number;
   readonly addressVersion?: number;
   readonly standbyCommittee?: readonly string[];
   readonly committeeMembersCount?: number;
@@ -42,7 +44,7 @@ export interface VMProtocolSettingsIn {
 }
 
 export interface VMProtocolSettingsReturn {
-  readonly magic: number;
+  readonly network: number;
   readonly addressVersion: number;
   readonly standbyCommittee: readonly string[];
   readonly committeeMembersCount: number;

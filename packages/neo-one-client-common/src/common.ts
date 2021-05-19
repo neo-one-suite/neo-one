@@ -236,7 +236,6 @@ const nativeScriptHashes = {
   Policy: '0xcc5e4edd9f5f8dba8bb65734541df7a1c081c67b',
   RoleManagement: '0x49cf4e5378ffcd4dec034fd98a174c5491e395e2',
   Oracle: '0xfe924b7cfe89ddd271abaf7210a80a7e11178758',
-  NameService: '0x7a8fcf0392cd625647907afa8e45cc66872b596b',
 };
 
 const nativeHashes = {
@@ -249,7 +248,6 @@ const nativeHashes = {
   Policy: hexToUInt160(nativeScriptHashes.Policy),
   RoleManagement: hexToUInt160(nativeScriptHashes.RoleManagement),
   Oracle: hexToUInt160(nativeScriptHashes.Oracle),
-  NameService: hexToUInt160(nativeScriptHashes.NameService),
 };
 
 const MAP_STACK_ITEM_MAX_KEY_SIZE = 64;
@@ -281,6 +279,7 @@ export const common = {
   TEN_THOUSAND_FIXED8,
   ONE_HUNDRED_MILLION_FIXED8,
   MAP_STACK_ITEM_MAX_KEY_SIZE,
+  BYTE_MAX_VALUE: 255,
   uInt160ToBuffer,
   add0x,
   strip0x,

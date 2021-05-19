@@ -1,7 +1,6 @@
 import { BN } from 'bn.js';
 import { keys } from '../../../__data__/keys';
 import { BinaryWriter } from '../../../BinaryWriter';
-import { common } from '../../../common';
 import {
   FeelessTransactionModel,
   FeelessTransactionModelAdd,
@@ -21,6 +20,8 @@ const optionsBuilder = ({
   signers = [new SignerModel({ account: testSender, scopes: WitnessScopeModel.None })],
   hash,
   script = Buffer.from([0x10]),
+  network = 34,
+  maxValidUntilBlockIncrement = 86400000 / 15000,
 }: Partial<FeelessTransactionModelAdd>): FeelessTransactionModelAdd => ({
   version,
   nonce,
@@ -30,6 +31,8 @@ const optionsBuilder = ({
   signers,
   hash,
   script,
+  maxValidUntilBlockIncrement,
+  network,
 });
 
 // tslint:disable-next-line:no-let

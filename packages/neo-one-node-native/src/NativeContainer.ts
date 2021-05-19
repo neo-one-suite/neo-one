@@ -4,7 +4,6 @@ import { ContractManagement } from './ContractManagement';
 import { CryptoLib } from './CryptoLib';
 import { GASToken } from './GASToken';
 import { LedgerContract } from './LedgerContract';
-import { NameService } from './NameService';
 import { NEOToken } from './NEOToken';
 import { OracleContract } from './OracleContract';
 import { PolicyContract } from './Policy';
@@ -19,7 +18,6 @@ export class NativeContainer implements NativeContainerNode {
   public readonly Policy: PolicyContract;
   public readonly RoleManagement: RoleManagement;
   public readonly Oracle: OracleContract;
-  public readonly NameService: NameService;
   public readonly CryptoLib: CryptoLib;
   public readonly StdLib: StdLib;
   public readonly nativeHashes: readonly UInt160[];
@@ -33,7 +31,6 @@ export class NativeContainer implements NativeContainerNode {
     this.Policy = new PolicyContract(settings);
     this.RoleManagement = new RoleManagement(settings);
     this.Oracle = new OracleContract(settings);
-    this.NameService = new NameService(settings);
     this.CryptoLib = new CryptoLib(settings);
     this.StdLib = new StdLib(settings);
     this.nativeContracts = [
@@ -44,7 +41,6 @@ export class NativeContainer implements NativeContainerNode {
       this.Policy,
       this.RoleManagement,
       this.Oracle,
-      this.NameService,
       this.CryptoLib,
       this.StdLib,
     ];

@@ -20,7 +20,8 @@ const createGetBlockScript = (hash: UInt256) => {
 
 // if these tests break when we go to mainnet it is likely the message magic
 describe('TS <--> C# Storage Test', () => {
-  const messageMagic = 5195086;
+  const network = 5195086;
+  const maxValidUntilBlockIncrement = 86400000 / 15000;
   test('add a block to the snapshot -- returns Block StackItems -- memory', () => {
     const dispatcher = new Dispatcher(); // initialization creates store using MemoryStore()
     const tx = new Transaction({
@@ -38,7 +39,8 @@ describe('TS <--> C# Storage Test', () => {
           invocation: Buffer.from([]),
         }),
       ],
-      messageMagic,
+      network,
+      maxValidUntilBlockIncrement,
     });
 
     const block = new Block({
@@ -54,7 +56,7 @@ describe('TS <--> C# Storage Test', () => {
       nonce: new BN(1),
       primaryIndex: 1,
       transactions: [tx],
-      messageMagic,
+      network,
     });
 
     const script = createGetBlockScript(block.hash);
@@ -101,7 +103,8 @@ describe('TS <--> C# Storage Test', () => {
           invocation: Buffer.from([]),
         }),
       ],
-      messageMagic,
+      network,
+      maxValidUntilBlockIncrement,
     });
 
     const block = new Block({
@@ -117,7 +120,7 @@ describe('TS <--> C# Storage Test', () => {
       nonce: 1,
       primaryIndex: 1,
       transactions: [tx],
-      messageMagic,
+      network,
     });
 
     const script = createGetBlockScript(block.hash);

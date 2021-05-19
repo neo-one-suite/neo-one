@@ -18,6 +18,21 @@ export class RoleManagement extends NativeContract implements RoleManagementNode
       name: 'RoleManagement',
       id: -8,
       methods: roleManagementMethods,
+      events: [
+        {
+          name: 'Designation',
+          parameters: [
+            {
+              name: 'Role',
+              type: 'Integer',
+            },
+            {
+              name: 'BlockIndex',
+              type: 'Integer',
+            },
+          ],
+        },
+      ],
       settings,
     });
   }

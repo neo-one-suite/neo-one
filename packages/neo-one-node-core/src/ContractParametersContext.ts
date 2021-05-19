@@ -15,10 +15,12 @@ import { Contract } from './Contract';
 import { Witness } from './Witness';
 
 export class ContractParametersContext {
+  public readonly network: number;
   public readonly scriptHashes: readonly UInt160[];
   private mutableContextItems: { readonly [k in UInt160Hex]: ContextItem | undefined };
 
-  public constructor(scriptHashes: readonly UInt160[]) {
+  public constructor(scriptHashes: readonly UInt160[], network: number) {
+    this.network = network;
     this.scriptHashes = scriptHashes;
     this.mutableContextItems = {};
   }

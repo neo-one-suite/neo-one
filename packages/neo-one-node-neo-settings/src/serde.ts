@@ -9,7 +9,7 @@ export const serializeSettings = (settings: Settings) => {
     generationAmount,
     privateKeyVersion,
     standbyValidators,
-    messageMagic,
+    network,
     addressVersion,
     standbyCommittee,
     committeeMembersCount,
@@ -21,6 +21,8 @@ export const serializeSettings = (settings: Settings) => {
     maxBlockSize,
     maxBlockSystemFee,
     maxTransactionsPerBlock,
+    maxValidUntilBlockIncrement,
+    maxIteratorResultItems,
   } = settings;
 
   return {
@@ -32,7 +34,9 @@ export const serializeSettings = (settings: Settings) => {
     standbyCommittee: standbyCommittee.map((validator) => common.ecPointToString(validator)),
     committeeMembersCount,
     validatorsCount,
-    messageMagic,
+    network,
+    maxValidUntilBlockIncrement,
+    maxIteratorResultItems,
     addressVersion,
     millisecondsPerBlock,
     memoryPoolMaxTransactions,
@@ -52,7 +56,9 @@ export const deserializeSettings = (settings: any): Settings => {
     generationAmount,
     privateKeyVersion,
     standbyValidators,
-    messageMagic,
+    network,
+    maxValidUntilBlockIncrement,
+    maxIteratorResultItems,
     addressVersion,
     standbyCommittee,
     committeeMembersCount,
@@ -66,13 +72,15 @@ export const deserializeSettings = (settings: any): Settings => {
     maxTransactionsPerBlock,
   } = settings;
 
-  const context = { messageMagic, validatorsCount };
+  const context = { network, validatorsCount, maxValidUntilBlockIncrement };
 
   return {
     genesisBlock: Block.deserializeWire({ context, buffer: Buffer.from(genesisBlock, 'hex') }),
     decrementInterval,
     generationAmount,
-    messageMagic,
+    network,
+    maxIteratorResultItems,
+    maxValidUntilBlockIncrement,
     addressVersion,
     privateKeyVersion,
     standbyValidators: standbyValidators.map((validator: string) => common.stringToECPoint(validator)),

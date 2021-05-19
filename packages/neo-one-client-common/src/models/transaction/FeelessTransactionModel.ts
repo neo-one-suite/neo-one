@@ -12,7 +12,7 @@ import { AttributeModel } from './attribute';
 export interface TransactionConsensusOptions {
   readonly nonce: number;
   readonly validUntilBlock: number;
-  readonly messageMagic: number;
+  readonly network: number;
 }
 
 export interface TransactionFeesAdd {
@@ -23,7 +23,7 @@ export interface TransactionFeesAdd {
 export interface FeelessTransactionModelAdd<
   TAttribute extends AttributeModel = AttributeModel,
   TWitness extends WitnessModel = WitnessModel,
-  TSigner extends SignerModel = SignerModel
+  TSigner extends SignerModel = SignerModel,
 > {
   readonly version?: number;
   readonly nonce?: number;
@@ -33,72 +33,20 @@ export interface FeelessTransactionModelAdd<
   readonly script: Buffer;
   readonly witnesses?: readonly TWitness[];
   readonly hash?: UInt256;
-  readonly messageMagic: number;
+  readonly network: number;
+  readonly maxValidUntilBlockIncrement: number;
 }
 
 export const MAX_TRANSACTION_ATTRIBUTES = 16;
 export const MAX_TRANSACTION_SIZE = 102400;
-export const MAX_VALID_UNTIL_BLOCK_INCREMENT = 5760; // 24 hours
 export const DEFAULT_VERSION = 0;
 
 export class FeelessTransactionModel<
   TAttribute extends AttributeModel = AttributeModel,
   TWitness extends WitnessModel = WitnessModel,
-  TSigner extends SignerModel = SignerModel
-> implements SerializableWire {
-  public static readonly VERSION: number = 0;
-  public static readonly maxTransactionSize = MAX_TRANSACTION_SIZE;
-  public static readonly maxValidBlockIncrement = MAX_VALID_UNTIL_BLOCK_INCREMENT;
-  public static readonly maxTransactionAttributes = MAX_TRANSACTION_ATTRIBUTES;
-  protected static readonly WitnessConstructor: Constructor<WitnessModel> = WitnessModel;
-
-  public readonly version: number;
-  public readonly nonce: number;
-  public readonly validUntilBlock: number;
-  public readonly signers: readonly TSigner[];
-  public readonly sender?: UInt160;
-  public readonly attributes: readonly TAttribute[];
-  public readonly script: Buffer;
-  public readonly witnesses: readonly TWitness[];
-  public readonly messageMagic: number;
-
-  public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
-  public readonly serializeUnsigned: SerializeWire = createSerializeWire(this.serializeUnsignedBase.bind(this));
-  private readonly hashInternal: () => UInt256;
-  private readonly hashHexInternal = utils.lazy(() => common.uInt256ToHex(this.hash));
-  private readonly messageInternal = utils.lazy(() => getSignData(this.hash, this.messageMagic));
-
-  public constructor({
-    version,
-    nonce = 0,
-    attributes = [],
-    witnesses = [],
-    signers = [],
-    validUntilBlock,
-    script,
-    hash,
-    messageMagic,
-  }: FeelessTransactionModelAdd<TAttribute, TWitness, TSigner>) {
-    this.version = version === undefined ? DEFAULT_VERSION : version;
-    this.nonce = nonce;
-    this.sender = signers[0]?.account;
-    this.attributes = attributes;
-    this.witnesses = witnesses;
-    this.signers = signers;
-    this.validUntilBlock = validUntilBlock;
-    this.script = script;
-    this.messageMagic = messageMagic;
-    const hashIn = hash;
-    this.hashInternal =
-      hashIn === undefined ? utils.lazy(() => crypto.calculateHash(this.serializeUnsigned())) : () => hashIn;
-
-    if (this.attributes.length > MAX_TRANSACTION_ATTRIBUTES) {
-      throw new InvalidFormatError(
-        `Expected less than ${MAX_TRANSACTION_ATTRIBUTES} attributes, found: ${attributes.length}`,
-      );
-    }
-  }
-
+  TSigner extends SignerModel = SignerModel,
+> implements SerializableWire
+{
   public get message(): Buffer {
     return this.messageInternal();
   }
@@ -109,6 +57,60 @@ export class FeelessTransactionModel<
 
   public get hashHex(): UInt256Hex {
     return this.hashHexInternal();
+  }
+  public static readonly VERSION: number = 0;
+  public static readonly maxTransactionSize = MAX_TRANSACTION_SIZE;
+  public static readonly maxTransactionAttributes = MAX_TRANSACTION_ATTRIBUTES;
+  protected static readonly WitnessConstructor: Constructor<WitnessModel> = WitnessModel;
+  public readonly maxValidUntilBlockIncrement: number;
+
+  public readonly version: number;
+  public readonly nonce: number;
+  public readonly validUntilBlock: number;
+  public readonly signers: readonly TSigner[];
+  public readonly sender?: UInt160;
+  public readonly attributes: readonly TAttribute[];
+  public readonly script: Buffer;
+  public readonly witnesses: readonly TWitness[];
+  public readonly network: number;
+
+  public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
+  public readonly serializeUnsigned: SerializeWire = createSerializeWire(this.serializeUnsignedBase.bind(this));
+  private readonly hashInternal: () => UInt256;
+  private readonly hashHexInternal = utils.lazy(() => common.uInt256ToHex(this.hash));
+  private readonly messageInternal = utils.lazy(() => getSignData(this.hash, this.network));
+
+  public constructor({
+    version,
+    nonce = 0,
+    attributes = [],
+    witnesses = [],
+    signers = [],
+    validUntilBlock,
+    script,
+    hash,
+    network,
+    maxValidUntilBlockIncrement,
+  }: FeelessTransactionModelAdd<TAttribute, TWitness, TSigner>) {
+    this.version = version === undefined ? DEFAULT_VERSION : version;
+    this.nonce = nonce;
+    this.sender = signers[0]?.account;
+    this.attributes = attributes;
+    this.witnesses = witnesses;
+    this.signers = signers;
+    this.validUntilBlock = validUntilBlock;
+    this.script = script;
+    this.network = network;
+    this.maxValidUntilBlockIncrement = maxValidUntilBlockIncrement;
+    const hashIn = hash;
+    this.hashInternal =
+      hashIn === undefined ? utils.lazy(() => crypto.calculateHash(this.serializeUnsigned())) : () => hashIn;
+
+    if (this.attributes.length > MAX_TRANSACTION_ATTRIBUTES) {
+      throw new InvalidFormatError(
+        `Expected less than ${MAX_TRANSACTION_ATTRIBUTES} attributes, found: ${attributes.length}`,
+      );
+    }
   }
 
   public cloneWithConsensusOptions(
@@ -123,7 +125,8 @@ export class FeelessTransactionModel<
       witnesses: this.witnesses,
       nonce: options.nonce,
       validUntilBlock: options.validUntilBlock,
-      messageMagic: this.messageMagic,
+      network: this.network,
+      maxValidUntilBlockIncrement: this.maxValidUntilBlockIncrement,
     });
   }
 

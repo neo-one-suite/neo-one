@@ -18,7 +18,7 @@ export class BlockBuilder {
   public readonly nextConsensus?: UInt160;
   public readonly witness?: Witness;
   public readonly hash?: UInt256;
-  public readonly messageMagic?: number;
+  public readonly network?: number;
 
   public constructor(options: BlockPartial) {
     this.merkleRoot = options.merkleRoot;
@@ -31,7 +31,7 @@ export class BlockBuilder {
     this.nextConsensus = options.nextConsensus;
     this.witness = options.witness;
     this.hash = options.hash;
-    this.messageMagic = options.messageMagic;
+    this.network = options.network;
   }
 
   public clone({
@@ -73,7 +73,7 @@ export class BlockBuilder {
         primaryIndex: this.primaryIndex,
         nextConsensus: this.nextConsensus,
         witness: this.witness,
-        messageMagic: this.messageMagic,
+        network: this.network,
         // tslint:disable-next-line: no-any
       } as any),
     });

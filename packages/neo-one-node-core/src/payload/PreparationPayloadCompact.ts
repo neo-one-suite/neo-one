@@ -1,10 +1,4 @@
-import {
-  BinaryReader,
-  BinaryWriter,
-  createSerializeWire,
-  InvalidFormatError,
-  SerializableWire,
-} from '@neo-one/client-common';
+import { BinaryReader, BinaryWriter, createSerializeWire, SerializableWire } from '@neo-one/client-common';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from '../Serializable';
 
 export interface PreparationPayloadCompactAdd {
@@ -16,9 +10,6 @@ export class PreparationPayloadCompact implements SerializableWire {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): PreparationPayloadCompact {
     const { reader } = options;
     const validatorIndex = reader.readUInt16LE();
-    if (validatorIndex >= options.context.validatorsCount) {
-      throw new InvalidFormatError('Validator index cannot be greater than validators count');
-    }
     const invocationScript = reader.readVarBytesLE(1024);
 
     return new PreparationPayloadCompact({

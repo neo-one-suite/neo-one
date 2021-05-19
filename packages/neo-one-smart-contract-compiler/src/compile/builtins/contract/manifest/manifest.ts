@@ -30,26 +30,26 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractMember(
     'ContractManifest',
     'supportedStandards',
-    new BuiltinInstanceIndexArrayValue(2, Types.ContractManifest, Types.String),
+    new BuiltinInstanceIndexArrayValue(3, Types.ContractManifest, Types.String),
   );
   builtins.addContractMember(
     'ContractManifest',
     'abi',
-    new BuiltinInstanceIndexValue(3, Types.ContractManifest, Types.ContractABI),
+    new BuiltinInstanceIndexValue(4, Types.ContractManifest, Types.ContractABI),
   );
   builtins.addContractMember(
     'ContractManifest',
     'permissions',
-    new BuiltinInstanceIndexArrayValue(4, Types.ContractManifest, Types.ContractPermission),
+    new BuiltinInstanceIndexArrayValue(5, Types.ContractManifest, Types.ContractPermission),
   );
   builtins.addContractMember(
     'ContractManifest',
     'trusts',
-    new BuiltinInstanceIndexArrayNullableValue(5, Types.ContractManifest, Types.Buffer),
+    new BuiltinInstanceIndexArrayNullableValue(6, Types.ContractManifest, Types.Buffer),
   );
   builtins.addContractMember(
     'ContractManifest',
     'extra',
-    new BuiltinInstanceIndexValue(6, Types.ContractManifest, Types.String),
+    new BuiltinInstanceIndexValue(7, Types.ContractManifest, Types.String),
   );
 };

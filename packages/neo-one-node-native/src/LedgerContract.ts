@@ -82,7 +82,7 @@ export class LedgerContract extends NativeContract implements LedgerContractNode
       ? undefined
       : TrimmedBlock.deserializeWire({
           buffer: item.value,
-          context: { validatorsCount: this.settings.validatorsCount, messageMagic: this.settings.messageMagic },
+          context: { validatorsCount: this.settings.validatorsCount, network: this.settings.network },
         });
   }
 

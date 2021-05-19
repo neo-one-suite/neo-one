@@ -9,7 +9,7 @@ import {
 import { Set } from 'immutable';
 
 export interface VersionPayloadAdd {
-  readonly magic: number;
+  readonly network: number;
   readonly version: number;
   readonly timestamp: number;
   readonly nonce: number;
@@ -21,7 +21,7 @@ export class VersionPayload {
   public static readonly maxCapabilities = 32;
   public static deserializeWireBase(options: DeserializeWireBaseOptions): VersionPayload {
     const { reader } = options;
-    const magic = reader.readUInt32LE();
+    const network = reader.readUInt32LE();
     const version = reader.readUInt32LE();
     const timestamp = reader.readUInt32LE();
     const nonce = reader.readUInt32LE();
@@ -34,7 +34,7 @@ export class VersionPayload {
     }
 
     return new VersionPayload({
-      magic,
+      network,
       version,
       timestamp,
       nonce,
@@ -51,14 +51,14 @@ export class VersionPayload {
   }
 
   public static create({
-    magic,
+    network,
     version,
     nonce,
     userAgent,
     capabilities,
   }: Omit<VersionPayloadAdd, 'timestamp'>): VersionPayload {
     return new VersionPayload({
-      magic,
+      network,
       version,
       timestamp: Math.round(Date.now() / 1000),
       nonce,
@@ -67,7 +67,7 @@ export class VersionPayload {
     });
   }
 
-  public readonly magic: number;
+  public readonly network: number;
   public readonly version: number;
   public readonly timestamp: number;
   public readonly nonce: number;
@@ -76,8 +76,8 @@ export class VersionPayload {
 
   public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
-  public constructor({ magic, version, timestamp, nonce, userAgent, capabilities }: VersionPayloadAdd) {
-    this.magic = magic;
+  public constructor({ network, version, timestamp, nonce, userAgent, capabilities }: VersionPayloadAdd) {
+    this.network = network;
     this.version = version;
     this.timestamp = timestamp;
     this.nonce = nonce;
@@ -86,7 +86,7 @@ export class VersionPayload {
   }
 
   public serializeWireBase(writer: BinaryWriter) {
-    writer.writeUInt32LE(this.magic);
+    writer.writeUInt32LE(this.network);
     writer.writeUInt32LE(this.version);
     writer.writeUInt32LE(this.timestamp);
     writer.writeUInt32LE(this.nonce);

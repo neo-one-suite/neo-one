@@ -16,7 +16,7 @@ import { storage as levelUpStorage } from '../';
 describe('levelUpStorage', () => {
   let storage: Storage;
   beforeEach(async () => {
-    storage = levelUpStorage({ db: LevelUp(MemDown()), context: { messageMagic: 1953787457, validatorsCount: 7 } });
+    storage = levelUpStorage({ db: LevelUp(MemDown()), context: { network: 1953787457, validatorsCount: 7 } });
   });
   test('deleted items are undefined', async () => {
     const hash = common.bufferToUInt160(Buffer.from('3775292229eccdf904f16fff8e83e7cffdc0f0ce', 'hex'));

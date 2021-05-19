@@ -1,5 +1,9 @@
-import { ContractParameterTypeJSON, toContractParameterType } from '@neo-one/client-common';
-import { ContractMethodDescriptor, ContractParameterDefinition } from '@neo-one/node-core';
+import {
+  ContractEventDescriptorJSON,
+  ContractParameterTypeJSON,
+  toContractParameterType,
+} from '@neo-one/client-common';
+import { ContractEventDescriptor, ContractMethodDescriptor, ContractParameterDefinition } from '@neo-one/node-core';
 
 interface ParamJSON {
   readonly name: string;
@@ -34,3 +38,6 @@ export const contractMethodFromJSON = ({
     offset,
     safe,
   });
+
+export const contractEventDescriptorFromJSON = ({ parameters, name }: ContractEventDescriptorJSON) =>
+  new ContractEventDescriptor({ name, parameters: parameters.map(contractParamFromJSON) });
