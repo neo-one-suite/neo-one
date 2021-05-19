@@ -1,4 +1,11 @@
-import { common, crypto, NativeContractJSON, ScriptBuilder, UInt160 } from '@neo-one/client-common';
+import {
+  common,
+  ContractEventDescriptorJSON,
+  crypto,
+  NativeContractJSON,
+  ScriptBuilder,
+  UInt160,
+} from '@neo-one/client-common';
 import {
   BlockchainSettings,
   ContractABI,
@@ -9,12 +16,13 @@ import {
   NefFile,
 } from '@neo-one/node-core';
 import { KeyBuilder } from './KeyBuilder';
-import { contractMethodFromJSON, ContractMethodJSON } from './methods';
+import { contractEventDescriptorFromJSON, contractMethodFromJSON, ContractMethodJSON } from './methods';
 
 export interface NativeContractAdd {
   readonly name: string;
   readonly id: number;
   readonly methods: readonly ContractMethodJSON[];
+  readonly events?: readonly ContractEventDescriptorJSON[];
   readonly settings: BlockchainSettings;
 }
 
@@ -26,7 +34,7 @@ export abstract class NativeContract implements NativeContractNode {
   public readonly manifest: ContractManifest;
   public readonly nativeUpdateHistory: readonly number[];
 
-  public constructor({ name, id, methods: methodsIn, settings }: NativeContractAdd) {
+  public constructor({ name, id, methods: methodsIn, settings, events = [] }: NativeContractAdd) {
     this.name = name;
     this.id = id;
     this.nativeUpdateHistory = settings.nativeUpdateHistory[this.name] ?? [0];
@@ -50,7 +58,7 @@ export abstract class NativeContract implements NativeContractNode {
       groups: [],
       supportedStandards: [],
       abi: new ContractABI({
-        events: [],
+        events: events.map(contractEventDescriptorFromJSON),
         methods,
       }),
       permissions: [new ContractPermission({ contract: new ContractPermissionDescriptor(), methods: '*' })],

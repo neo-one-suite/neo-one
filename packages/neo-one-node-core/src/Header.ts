@@ -36,7 +36,7 @@ export interface HeaderAdd {
   readonly timestamp: BN;
   readonly index: number;
   readonly nextConsensus: UInt160;
-  readonly messageMagic: number;
+  readonly network: number;
   readonly witness?: Witness;
   readonly hash?: UInt256;
   readonly primaryIndex: number;
@@ -111,20 +111,12 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
       index,
       primaryIndex,
       nextConsensus,
-      messageMagic: options.context.messageMagic,
+      network: options.context.network,
     });
   }
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Header {
-    const {
-      version,
-      previousHash,
-      merkleRoot,
-      timestamp,
-      index,
-      nextConsensus,
-      messageMagic,
-      primaryIndex,
-    } = this.deserializeUnsignedHeaderWireBase(options);
+    const { version, previousHash, merkleRoot, timestamp, index, nextConsensus, network, primaryIndex } =
+      this.deserializeUnsignedHeaderWireBase(options);
     const witnesses = options.reader.readArray(() => Witness.deserializeWireBase(options), 1);
     if (witnesses.length !== 1) {
       throw new InvalidFormatError(`Expected only 1 witness. Got: ${witnesses.length}`);
@@ -138,7 +130,7 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
       index,
       nextConsensus,
       witness: witnesses[0],
-      messageMagic,
+      network,
       primaryIndex,
     });
   }
@@ -159,7 +151,7 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
   public readonly timestamp: BN;
   public readonly index: number;
   public readonly nextConsensus: UInt160;
-  public readonly messageMagic: number;
+  public readonly network: number;
   public readonly primaryIndex: number;
   public readonly getScriptHashesForVerifying = utils.lazyAsync(
     async (context: { readonly storage: BlockchainStorage; readonly native: NativeContainer }) =>
@@ -193,7 +185,7 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
     nextConsensus,
     witness,
     hash,
-    messageMagic,
+    network,
     primaryIndex,
   }: HeaderAdd) {
     this.version = version;
@@ -203,7 +195,7 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
     this.index = index;
     this.nextConsensus = nextConsensus;
     this.witnessInternal = witness;
-    this.messageMagic = messageMagic;
+    this.network = network;
     this.primaryIndex = primaryIndex;
     const hashIn = hash;
     this.hashInternal =

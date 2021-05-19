@@ -14,6 +14,7 @@ import { Signer } from '../Signer';
 import { Transaction } from '../transaction';
 import { Witness } from '../Witness';
 
+const network = 73450591;
 const getTransaction = (sender: UInt160) =>
   new Transaction({
     script: Buffer.from([0x00]),
@@ -33,7 +34,8 @@ const getTransaction = (sender: UInt160) =>
     networkFee: new BN(0),
     systemFee: new BN(0),
     validUntilBlock: 2000,
-    messageMagic: 73450591,
+    network,
+    maxValidUntilBlockIncrement: 86400000 / 15000,
   });
 
 describe('ContractParametersContext Test', () => {
@@ -48,7 +50,7 @@ describe('ContractParametersContext Test', () => {
   });
 
   test('addWithIndex', () => {
-    const context = new ContractParametersContext([common.ZERO_UINT160]);
+    const context = new ContractParametersContext([common.ZERO_UINT160], network);
     const testContract = new AccountContract({
       script: Buffer.from([0x00]),
       parameterList: [0x10],
@@ -65,7 +67,7 @@ describe('ContractParametersContext Test', () => {
   });
 
   test('add', () => {
-    const context = new ContractParametersContext([common.ZERO_UINT160]);
+    const context = new ContractParametersContext([common.ZERO_UINT160], network);
     const testContract = new AccountContract({
       script: Buffer.from([0x00]),
       parameterList: [0x10],
@@ -85,7 +87,7 @@ describe('ContractParametersContext Test', () => {
     const singleSender = common.hexToUInt160('0x282646ee0afa5508bb999318f35074b84a17c9f0');
     const tx = getTransaction(singleSender);
 
-    const context = new ContractParametersContext(tx.getScriptHashesForVerifying());
+    const context = new ContractParametersContext(tx.getScriptHashesForVerifying(), network);
     const result = context.addSignature(contract, publicKey, Buffer.from([0x01]));
 
     expect(result).toEqual(true);
@@ -103,7 +105,7 @@ describe('ContractParametersContext Test', () => {
       address: contract.address,
     };
 
-    const context = new ContractParametersContext(tx.getScriptHashesForVerifying());
+    const context = new ContractParametersContext(tx.getScriptHashesForVerifying(), network);
     const result = context.addSignature(newContract, publicKey, Buffer.from([0x01]));
 
     expect(result).toEqual(false);
@@ -120,7 +122,7 @@ describe('ContractParametersContext Test', () => {
       address: contract.address,
     };
 
-    const context = new ContractParametersContext(tx.getScriptHashesForVerifying());
+    const context = new ContractParametersContext(tx.getScriptHashesForVerifying(), network);
     const throwFunc = () => context.addSignature(newContract, publicKey, Buffer.from([0x01]));
     expect(throwFunc).toThrow();
   });

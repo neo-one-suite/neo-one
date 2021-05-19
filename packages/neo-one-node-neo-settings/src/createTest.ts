@@ -1,8 +1,8 @@
 import { common as clientCommon, crypto } from '@neo-one/client-common';
 import { Settings } from '@neo-one/node-core';
-import { common } from './common';
+import { common, getMaxValidUntilBlockIncrement } from './common';
 
-const testNetMessageMagic = 1951352142;
+const testNetNetwork = 1951352142;
 
 const DEFAULT_VALIDATORS_COUNT = 7;
 const DEFAULT_VALIDATORS: readonly string[] = [
@@ -39,8 +39,11 @@ export const createTest = ({
   const commonSettings = common({
     privateNet,
     consensusAddress,
-    messageMagic: testNetMessageMagic,
+    network: testNetNetwork,
   });
+
+  const millisecondsPerBlockFinal =
+    millisecondsPerBlock === undefined ? commonSettings.millisecondsPerBlock : millisecondsPerBlock;
 
   return {
     genesisBlock: commonSettings.genesisBlock,
@@ -48,11 +51,13 @@ export const createTest = ({
     generationAmount: commonSettings.generationAmount,
     millisecondsPerBlock:
       millisecondsPerBlock === undefined ? commonSettings.millisecondsPerBlock : millisecondsPerBlock,
+    maxValidUntilBlockIncrement: getMaxValidUntilBlockIncrement(millisecondsPerBlockFinal),
     standbyCommittee,
     committeeMembersCount: standbyCommittee.length,
     memoryPoolMaxTransactions: commonSettings.memoryPoolMaxTransactions,
     validatorsCount,
-    messageMagic: testNetMessageMagic,
+    network: testNetNetwork,
+    maxIteratorResultItems: commonSettings.maxIteratorResultItems,
     addressVersion: clientCommon.NEO_ADDRESS_VERSION,
     privateKeyVersion: clientCommon.NEO_PRIVATE_KEY_VERSION,
     standbyValidators,

@@ -120,7 +120,7 @@ export class Blockchain {
 
   public get protocolSettings(): VMProtocolSettingsIn {
     const {
-      messageMagic,
+      network,
       addressVersion,
       standbyCommittee,
       committeeMembersCount,
@@ -133,7 +133,7 @@ export class Blockchain {
     } = this.settings;
 
     return {
-      magic: messageMagic,
+      network,
       addressVersion,
       standbyCommittee: standbyCommittee.map((ecp) => common.ecPointToString(ecp)),
       committeeMembersCount,
@@ -177,7 +177,7 @@ export class Blockchain {
   public get serializeJSONContext(): SerializeJSONContext {
     return {
       addressVersion: this.settings.addressVersion,
-      messageMagic: this.settings.messageMagic,
+      network: this.settings.network,
     };
   }
   public static async create({
@@ -249,8 +249,9 @@ export class Blockchain {
     this.postPersistNativeContractScript =
       options.postPersistNativeContractScript ?? utils.getPostPersistNativeContractScript();
     this.deserializeWireContext = {
-      messageMagic: this.settings.messageMagic,
+      network: this.settings.network,
       validatorsCount: this.settings.validatorsCount,
+      maxValidUntilBlockIncrement: this.settings.maxValidUntilBlockIncrement,
     };
     this.mutableCurrentBlock = options.currentBlock;
     this.mutablePreviousBlock = options.previousBlock;
@@ -465,16 +466,6 @@ export class Blockchain {
     const validators = await this.native.NEO.getNextBlockValidators(storage);
     builder.add(crypto.getBFTAddress(validators));
     builder.unionWith(validators.map((val) => crypto.toScriptHash(crypto.createSignatureRedeemScript(val))));
-    const oracles = await this.native.RoleManagement.getDesignatedByRole(
-      storage,
-      DesignationRole.Oracle,
-      currentHeight, // TODO: check this
-      currentHeight,
-    );
-    if (oracles.length > 0) {
-      builder.add(crypto.getBFTAddress(oracles));
-      builder.unionWith(oracles.map((or) => crypto.toScriptHash(crypto.createSignatureRedeemScript(or))));
-    }
     const stateValidators = await this.native.RoleManagement.getDesignatedByRole(
       storage,
       DesignationRole.StateValidator,
@@ -847,7 +838,7 @@ export class Blockchain {
           invocation: Buffer.from([]),
           verification: Buffer.from([]),
         }),
-        messageMagic: this.settings.messageMagic,
+        network: this.settings.network,
       }),
       transactions: [],
     });

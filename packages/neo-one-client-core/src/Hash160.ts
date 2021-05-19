@@ -32,8 +32,4 @@ export const Hash160 = {
    * `AddressString` of the native Oracle conract.
    */
   Oracle: scriptHashToAddress(common.nativeScriptHashes.Oracle),
-  /**
-   * `AddressString` of the native NameService conract.
-   */
-  NameService: scriptHashToAddress(common.nativeScriptHashes.NameService),
 };

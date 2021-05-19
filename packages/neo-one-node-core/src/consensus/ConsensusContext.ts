@@ -167,7 +167,7 @@ export class ConsensusContext {
 
     const message = deserializeConsensusMessageWire({
       buffer: payload.data,
-      context: { messageMagic: payload.magic, validatorsCount: this.validators.length },
+      context: { network: payload.network, validatorsCount: this.validators.length },
     });
     // tslint:disable-next-line: no-object-mutation
     this.mutableCachedMessages[common.uInt256ToString(payload.hash)] = message;
@@ -175,7 +175,7 @@ export class ConsensusContext {
     return message as T;
   }
 
-  public createPayload(message: ConsensusMessage, magic: number, invocationScript: Buffer) {
+  public createPayload(message: ConsensusMessage, network: number, invocationScript: Buffer) {
     const payload = new ExtensiblePayload({
       category: 'dBFT',
       validBlockStart: 0,
@@ -186,7 +186,7 @@ export class ConsensusContext {
         invocation: invocationScript,
         verification: crypto.createSignatureRedeemScript(this.validators[message.validatorIndex]),
       }),
-      messageMagic: magic,
+      network,
     });
 
     this.mutableCachedMessages[common.uInt256ToString(payload.hash)] = message;

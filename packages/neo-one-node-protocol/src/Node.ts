@@ -506,7 +506,7 @@ export class Node implements INode {
       Message.create({
         command: Command.Version,
         payload: VersionPayload.create({
-          magic: this.blockchain.settings.messageMagic,
+          network: this.blockchain.settings.network,
           version: 0,
           nonce: this.nonce,
           userAgent: this.userAgent,

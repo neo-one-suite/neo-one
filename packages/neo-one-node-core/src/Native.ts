@@ -86,16 +86,6 @@ export interface OracleContract extends NativeContract {
   readonly getRequestsByUrl: (storage: NativeContractStorageContext, url: string) => Promise<readonly OracleRequest[]>;
 }
 
-export interface NonfungibleToken {
-  readonly symbol: string;
-  readonly decimals: number;
-  readonly totalSupply: (storage: NativeContractStorageContext) => Promise<BN>;
-  readonly ownerOf: (storage: NativeContractStorageContext, tokenId: Buffer) => Promise<UInt160>; // TODO: check input
-  readonly balanceOf: (storage: NativeContractStorageContext, owner: UInt160) => Promise<BN>;
-  readonly tokens: (storage: NativeContractStorageContext) => Promise<ReadonlyArray<StorageItem>>; // TODO: check return
-  readonly tokensOf: (storage: NativeContractStorageContext, owner: UInt160) => Promise<readonly Buffer[]>; // TODO: check return
-}
-
 export interface LedgerContract extends NativeContract {
   readonly isInitialized: (storage: NativeContractStorageContext) => Promise<boolean>;
   readonly getBlockHash: (storage: NativeContractStorageContext, index: number) => Promise<UInt256 | undefined>;
@@ -119,33 +109,6 @@ export interface LedgerContract extends NativeContract {
   readonly getTransaction: (storage: NativeContractStorageContext, hash: UInt256) => Promise<Transaction | undefined>;
 }
 
-export enum RecordType {
-  A = 1,
-  CNAME = 5,
-  TXT = 16,
-  AAAA = 28,
-}
-
-export interface NameService extends NonfungibleToken {
-  readonly getRoots: (storage: NativeContractStorageContext) => Promise<readonly string[]>;
-  readonly getPrice: (storage: NativeContractStorageContext) => Promise<BN>;
-  readonly isAvailable: (storage: NativeContractStorageContext, name: string) => Promise<boolean>;
-  readonly getRecord: (
-    storage: NativeContractStorageContext,
-    name: string,
-    record: RecordType,
-  ) => Promise<string | undefined>;
-  readonly getRecords: (
-    storage: NativeContractStorageContext,
-    name: string,
-  ) => Promise<ReadonlyArray<readonly [RecordType, string]>>;
-  readonly resolve: (
-    storage: NativeContractStorageContext,
-    name: string,
-    type: RecordType,
-  ) => Promise<string | undefined>;
-}
-
 export interface CryptoLib {}
 
 export interface StdLib {}
@@ -158,7 +121,6 @@ export interface NativeContainer {
   readonly Policy: PolicyContract;
   readonly RoleManagement: RoleManagement;
   readonly Oracle: OracleContract;
-  readonly NameService: NameService;
   readonly CryptoLib: CryptoLib;
   readonly StdLib: StdLib;
   readonly nativeHashes: readonly UInt160[];

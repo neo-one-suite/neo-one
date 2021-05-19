@@ -49,8 +49,9 @@ export const serializeScriptContainer = (item: SerializableContainer): Serialize
 });
 
 export interface DeserializeWireContext {
-  readonly messageMagic: number;
+  readonly network: number;
   readonly validatorsCount: number;
+  readonly maxValidUntilBlockIncrement: number;
 }
 
 export interface DeserializeWireBaseOptions {
@@ -76,7 +77,7 @@ export function createDeserializeWire<T>(deserializeWireBase: DeserializeWireBas
 
 export interface SerializeJSONContext {
   readonly addressVersion: number;
-  readonly messageMagic: number;
+  readonly network: number;
 }
 
 export type SerializeJSON<TJSON> = (context: SerializeJSONContext) => TJSON | Promise<TJSON>;

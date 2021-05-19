@@ -17,6 +17,8 @@ const optionsBuilder = ({
   signers = [new SignerModel({ account: testSender, scopes: WitnessScopeModel.None })],
   hash,
   script = Buffer.from([0x10]),
+  network = 34,
+  maxValidUntilBlockIncrement = 86400000 / 15000,
 }: Partial<TransactionModelAdd>): TransactionModelAdd => ({
   version,
   nonce,
@@ -28,6 +30,8 @@ const optionsBuilder = ({
   signers,
   hash,
   script,
+  network,
+  maxValidUntilBlockIncrement,
 });
 
 // tslint:disable-next-line:no-let

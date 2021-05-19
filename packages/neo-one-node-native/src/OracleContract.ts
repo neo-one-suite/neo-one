@@ -27,6 +27,42 @@ export class OracleContract extends NativeContract implements OracleContractNode
       name: 'OracleContract',
       id: -9,
       methods: oracleMethods,
+      events: [
+        {
+          name: 'OracleRequest',
+          parameters: [
+            {
+              name: 'Id',
+              type: 'Integer',
+            },
+            {
+              name: 'RequestContract',
+              type: 'Hash160',
+            },
+            {
+              name: 'Url',
+              type: 'String',
+            },
+            {
+              name: 'Filter',
+              type: 'String',
+            },
+          ],
+        },
+        {
+          name: 'OracleResponse',
+          parameters: [
+            {
+              name: 'Id',
+              type: 'Integer',
+            },
+            {
+              name: 'OriginalTx',
+              type: 'Hash256',
+            },
+          ],
+        },
+      ],
       settings,
     });
   }

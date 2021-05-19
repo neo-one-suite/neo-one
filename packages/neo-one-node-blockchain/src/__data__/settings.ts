@@ -116,7 +116,7 @@ export const settings: Settings = {
   },
 
   registerValidatorFee: common.fixed8FromDecimal(1000),
-  messageMagic: 7630401,
+  network: 7630401,
   addressVersion: common.NEO_ADDRESS_VERSION,
   privateKeyVersion: common.NEO_PRIVATE_KEY_VERSION,
   standbyValidators,

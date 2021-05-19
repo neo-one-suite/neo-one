@@ -6,6 +6,7 @@ import {
   SerializableWire,
   SerializeWire,
 } from '../../Serializable';
+import { ProtocolSettings } from '../../Settings';
 import { ConsensusMessageType } from './ConsensusMessageType';
 
 export interface ConsensusMessageBaseAdd {
@@ -20,16 +21,10 @@ export interface ConsensusMessageBaseAddWithType extends ConsensusMessageBaseAdd
 
 export class ConsensusMessageBase implements SerializableWire {
   public static readonly VERSION = 0;
-  public static readonly deserializeConsensusMessageBaseWireBase = ({
-    reader,
-    context,
-  }: DeserializeWireBaseOptions) => {
+  public static readonly deserializeConsensusMessageBaseWireBase = ({ reader }: DeserializeWireBaseOptions) => {
     const type = reader.readUInt8();
     const blockIndex = reader.readUInt32LE();
     const validatorIndex = reader.readUInt8();
-    if (validatorIndex >= context.validatorsCount) {
-      throw new Error('Validator index greater than validators count');
-    }
     const viewNumber = reader.readUInt8();
 
     return {
@@ -62,6 +57,10 @@ export class ConsensusMessageBase implements SerializableWire {
     this.viewNumber = viewNumber;
     this.blockIndex = blockIndex;
     this.validatorIndex = validatorIndex;
+  }
+
+  public verify(protocolSettings: ProtocolSettings): boolean {
+    return this.validatorIndex < protocolSettings.validatorsCount;
   }
 
   public serializeWireBase(writer: BinaryWriter): void {

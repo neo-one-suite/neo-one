@@ -9,7 +9,5 @@ export * from './Policy';
 export * from './ContractManagement';
 export * from './FungibleToken';
 export * from './LedgerContract';
-export * from './NameService';
-export * from './NonfungibleToken';
 export * from './OracleContract';
 export * from './RoleManagement';

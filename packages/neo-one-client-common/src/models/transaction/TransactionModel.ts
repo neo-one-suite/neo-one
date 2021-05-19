@@ -17,7 +17,7 @@ import {
 export interface TransactionModelAdd<
   TAttribute extends AttributeModel = AttributeModel,
   TWitness extends WitnessModel = WitnessModel,
-  TSigner extends SignerModel = SignerModel
+  TSigner extends SignerModel = SignerModel,
 > extends FeelessTransactionModelAdd<TAttribute, TWitness, TSigner> {
   readonly systemFee: BN;
   readonly networkFee: BN;
@@ -26,10 +26,11 @@ export interface TransactionModelAdd<
 export class TransactionModel<
     TAttribute extends AttributeModel = AttributeModel,
     TWitness extends WitnessModel = WitnessModel,
-    TSigner extends SignerModel = SignerModel
+    TSigner extends SignerModel = SignerModel,
   >
   extends FeelessTransactionModel<TAttribute, TWitness, TSigner>
-  implements SerializableWire {
+  implements SerializableWire
+{
   public static readonly headerSize =
     IOHelper.sizeOfUInt8 +
     IOHelper.sizeOfUInt32LE +
@@ -53,7 +54,8 @@ export class TransactionModel<
     hash,
     systemFee,
     networkFee,
-    messageMagic,
+    network,
+    maxValidUntilBlockIncrement,
   }: TransactionModelAdd<TAttribute, TWitness, TSigner>) {
     super({
       version,
@@ -64,7 +66,8 @@ export class TransactionModel<
       validUntilBlock,
       script,
       hash,
-      messageMagic,
+      network,
+      maxValidUntilBlockIncrement,
     });
 
     this.systemFee = systemFee;
@@ -97,7 +100,8 @@ export class TransactionModel<
       networkFee: this.networkFee,
       nonce: this.nonce,
       validUntilBlock: this.validUntilBlock,
-      messageMagic: this.messageMagic,
+      network: this.network,
+      maxValidUntilBlockIncrement: this.maxValidUntilBlockIncrement,
     });
   }
 
@@ -116,7 +120,8 @@ export class TransactionModel<
       networkFee: this.networkFee,
       nonce: options.nonce,
       validUntilBlock: options.validUntilBlock,
-      messageMagic: this.messageMagic,
+      network: this.network,
+      maxValidUntilBlockIncrement: this.maxValidUntilBlockIncrement,
     });
   }
 

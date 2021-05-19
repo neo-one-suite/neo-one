@@ -74,11 +74,13 @@ export const createBlock = async ({
   context: contextIn,
   storage,
   native,
+  network,
 }: {
   readonly context: ConsensusContext;
   readonly storage: BlockchainStorage;
   readonly headerCache: HeaderCache;
   readonly native: NativeContainer;
+  readonly network: number;
 }) => {
   let { context } = ensureHeader(contextIn);
   const contract = AccountContract.createMultiSigContract(context.M, context.validators);
@@ -100,7 +102,7 @@ export const createBlock = async ({
     // when a witness SHOULD already be defined on the block.
     throw new Error();
   }
-  const sc = new ContractParametersContext(scriptHashes.filter(utils.notNull));
+  const sc = new ContractParametersContext(scriptHashes.filter(utils.notNull), network);
   // tslint:disable-next-line: no-loop-statement
   for (let i = 0, j = 0; i < context.validators.length && j < context.M; i += 1) {
     const commitPayload = context.commitPayloads[i];
@@ -256,7 +258,7 @@ export const reset = async ({
         blockchain.shouldRefreshCommittee(currentIndex + 1) ? validators : nextValidators,
       ),
       merkleRoot: undefined,
-      messageMagic: blockchain.settings.messageMagic,
+      network: blockchain.settings.network,
     };
 
     const previousValidators = context.validators;

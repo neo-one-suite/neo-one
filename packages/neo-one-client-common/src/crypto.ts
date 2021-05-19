@@ -264,7 +264,7 @@ const createInvocationScript = (message: Buffer, privateKey: PrivateKey): Buffer
 const createVerificationScript = (publicKey: ECPoint): Buffer => {
   const builder = new ScriptBuilder();
   builder.emitPushECPoint(publicKey);
-  builder.emitSysCall('Neo.Crypto.CheckSig');
+  builder.emitSysCall('System.Crypto.CheckSig');
 
   return builder.build();
 };
@@ -283,7 +283,7 @@ const createWitnessForSignature = <TWitness extends WitnessModel>(
 const createSignatureRedeemScript = (publicKey: ECPoint): Buffer => {
   const builder = new ScriptBuilder();
   builder.emitPushECPoint(publicKey);
-  builder.emitSysCall('Neo.Crypto.CheckSig');
+  builder.emitSysCall('System.Crypto.CheckSig');
 
   return builder.build();
 };
@@ -331,7 +331,7 @@ const createMultiSignatureVerificationScript = (mIn: number, publicKeys: readonl
     builder.emitPushECPoint(ecPoint);
   });
   builder.emitPushInt(publicKeysSorted.length);
-  builder.emitSysCall('Neo.Crypto.CheckMultisig');
+  builder.emitSysCall('System.Crypto.CheckMultisig');
 
   return builder.build();
 };
@@ -384,7 +384,7 @@ const createMultiSignatureRedeemScript = (mIn: number, publicKeys: readonly ECPo
   builder.emitPushInt(m);
   publicKeysSorted.forEach((key) => builder.emitPushECPoint(key));
   builder.emitPushInt(publicKeysSorted.length);
-  builder.emitSysCall('Neo.Crypto.CheckMultisig');
+  builder.emitSysCall('System.Crypto.CheckMultisig');
 
   return builder.build();
 };
@@ -568,8 +568,8 @@ const decryptNEP2 = async ({
 };
 
 // TODO: find a way to not hard-code these. they should come directly from the SysCallHashNum enum ideally
-const checkMultisig = Buffer.from('7bce6ca5', 'hex');
-const checkSig = Buffer.from('747476aa', 'hex');
+const checkMultisig = Buffer.from('9ed0dc3a', 'hex');
+const checkSig = Buffer.from('56e7b327', 'hex');
 
 type MultiSigResult =
   | { readonly result: true; readonly m: number; readonly n: number; readonly points: readonly ECPoint[] }

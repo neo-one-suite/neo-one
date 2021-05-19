@@ -142,7 +142,7 @@ describe('Application Engine SysCall Tests', () => {
     script.emitPush(Buffer.from([]));
     script.emitPushInt(1);
     script.emitOp('PACK');
-    script.emitSysCallName('Neo.Crypto.SHA256');
+    script.emitSysCallName('System.Crypto.SHA256');
     script.emitSysCall('System.Callback.CreateFromSyscall');
     script.emitSysCall('System.Callback.Invoke');
 
@@ -167,7 +167,7 @@ describe('Application Engine SysCall Tests', () => {
       merkleRoot: common.ZERO_UINT256,
       nextConsensus: common.ZERO_UINT160,
       transactions: [],
-      messageMagic: 1951352142,
+      network: 1951352142,
     });
 
     test('With Snapshot option -- Halt', () => {

@@ -109,7 +109,7 @@ Enables trace collection for the NEO•ONE Node. This must be used in tangent wi
     "generationAmount": number,
     "fees": Record<string, string>,
     "registerValidatorFee": string,
-    "messageMagic": number,
+    "network": number,
     "addressVersion": number,
     "privateKeyVersion": number,
     "standbyValidators": string[],

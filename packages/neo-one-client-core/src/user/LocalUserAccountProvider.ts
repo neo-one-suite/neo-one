@@ -90,7 +90,8 @@ export interface Provider extends ProviderBase {
  */
 export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TProvider extends Provider = Provider>
   extends UserAccountProviderBase<TProvider>
-  implements UserAccountProvider {
+  implements UserAccountProvider
+{
   public readonly currentUserAccount$: Observable<UserAccount | undefined>;
   public readonly userAccounts$: Observable<readonly UserAccount[]>;
   public readonly networks$: Observable<readonly NetworkType[]>;
@@ -172,10 +173,12 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
 
     let size = initSize;
     let fee = new BigNumber(0);
+    let index = -1;
 
     // tslint:disable-next-line
     for (const hash of hashes) {
       try {
+        index += 1;
         let witnessScript: Buffer | undefined;
         witnessScript = this.tryGetUserAccount({
           network,
@@ -186,13 +189,16 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
         })?.contract.script;
 
         if (witnessScript === undefined && transaction.witnesses.length !== 0) {
-          // tslint:disable-next-line: no-loop-statement
-          for (const witness of transaction.witnesses) {
-            if (common.uInt160Equal(crypto.toScriptHash(witness.verification), hash)) {
-              witnessScript = witness.verification;
-              break;
-            }
-          }
+          const witness = transaction.witnesses[index];
+          witnessScript = witness?.verification;
+          // TODO: might need to revert this later due to lack of ApplicationEngine in client
+          // // tslint:disable-next-line: no-loop-statement
+          // for (const witness of transaction.witnesses) {
+          //   if (common.uInt160Equal(crypto.toScriptHash(witness.verification), hash)) {
+          //     witnessScript = witness.verification;
+          //     break;
+          //   }
+          // }
         }
 
         // it may seem odd to throw here and continue logic, but it helps keep our other checks type safe when it IS defined.
@@ -326,7 +332,9 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
   ): Promise<TransactionResult> {
     const sb = new ScriptBuilder();
 
-    const { addressVersion, blockCount, messageMagic } = await this.provider.getNetworkSettings(from.network);
+    const { addressVersion, blockCount, network, maxValidUntilBlockIncrement } = await this.provider.getNetworkSettings(
+      from.network,
+    );
 
     transfers.forEach((transfer) => {
       sb.emitDynamicAppCall(
@@ -359,7 +367,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
       attributes: this.convertAttributes(attributes),
       systemFee: utils.bigNumberToBN(utils.ZERO_BIG_NUMBER, 8),
       networkFee: utils.bigNumberToBN(utils.ZERO_BIG_NUMBER, 8),
-      messageMagic,
+      network,
+      maxValidUntilBlockIncrement,
     });
 
     const [systemFee, networkFee] = await Promise.all([
@@ -384,7 +393,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
       attributes: this.convertAttributes(attributes),
       systemFee: utils.bigNumberToBN(systemFee, 0),
       networkFee: utils.bigNumberToBN(networkFee, 0),
-      messageMagic,
+      network,
+      maxValidUntilBlockIncrement,
     });
 
     return this.sendTransaction({
@@ -421,7 +431,9 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     onConfirm,
     sourceMaps,
   }: ExecuteInvokeScriptOptions<T>): Promise<TransactionResult<T>> {
-    const { blockCount, messageMagic, addressVersion } = await this.provider.getNetworkSettings(from.network);
+    const { blockCount, network, addressVersion, maxValidUntilBlockIncrement } = await this.provider.getNetworkSettings(
+      from.network,
+    );
 
     const signer = new SignerModel({
       account: crypto.addressToScriptHash({ address: from.address, addressVersion }),
@@ -441,7 +453,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
       attributes: this.convertAttributes(attributes),
       systemFee: utils.bigNumberToBN(utils.ZERO_BIG_NUMBER, 8),
       networkFee: utils.bigNumberToBN(utils.ZERO_BIG_NUMBER, 8),
-      messageMagic,
+      network,
+      maxValidUntilBlockIncrement,
     });
 
     const [systemFee, networkFee] = await Promise.all([
@@ -467,7 +480,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
       attributes: this.convertAttributes(attributes),
       systemFee: utils.bigNumberToBN(systemFee, 0),
       networkFee: utils.bigNumberToBN(networkFee, 0),
-      messageMagic,
+      network,
+      maxValidUntilBlockIncrement,
     });
 
     try {

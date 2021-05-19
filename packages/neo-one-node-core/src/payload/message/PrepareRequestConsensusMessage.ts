@@ -1,6 +1,7 @@
 import { BinaryWriter, UInt256, utils } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { DeserializeWireBaseOptions } from '../../Serializable';
+import { ProtocolSettings } from '../../Settings';
 import { ConsensusMessageBase, ConsensusMessageBaseAdd } from './ConsensusMessageBase';
 import { ConsensusMessageType } from './ConsensusMessageType';
 
@@ -56,6 +57,14 @@ export class PrepareRequestConsensusMessage extends ConsensusMessageBase {
     this.transactionHashes = transactionHashes;
     this.version = version;
     this.prevHash = prevHash;
+  }
+
+  public verify(protocolSettings: ProtocolSettings): boolean {
+    if (!super.verify(protocolSettings)) {
+      return false;
+    }
+
+    return this.transactionHashes.length <= protocolSettings.maxTransactionsPerBlock;
   }
 
   public serializeWireBase(writer: BinaryWriter) {

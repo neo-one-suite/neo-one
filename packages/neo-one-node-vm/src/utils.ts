@@ -36,7 +36,7 @@ export const createCSharpDispatchInvoke = <Methods extends DefaultMethods>(
 };
 
 export const blockchainSettingsToProtocolSettings = (settingsIn: Settings): VMProtocolSettingsIn => ({
-  magic: settingsIn.messageMagic,
+  network: settingsIn.network,
   addressVersion: settingsIn.addressVersion,
   standbyCommittee: settingsIn.standbyCommittee.map((ecpoint: ECPoint) => common.ecPointToString(ecpoint)),
   committeeMembersCount: settingsIn.standbyCommittee.length,
@@ -54,7 +54,7 @@ const numIsByte = (num: number) => num >= 0 && num <= 2 ** 8 - 1;
 
 export const validateProtocolSettings = (settings: VMProtocolSettingsIn) => {
   const {
-    magic,
+    network,
     addressVersion,
     committeeMembersCount,
     validatorsCount,
@@ -63,8 +63,8 @@ export const validateProtocolSettings = (settings: VMProtocolSettingsIn) => {
     maxTraceableBlocks,
     maxTransactionsPerBlock,
   } = settings;
-  if (magic !== undefined && !numIsUint(magic)) {
-    throw new InvalidUIntError(magic);
+  if (network !== undefined && !numIsUint(network)) {
+    throw new InvalidUIntError(network);
   }
   if (addressVersion !== undefined && !numIsByte(addressVersion)) {
     throw new InvalidByteError(addressVersion);

@@ -4,7 +4,6 @@ import {
   crypto,
   privateKeyToAddress,
   privateKeyToScriptHash,
-  publicKeyToAddress,
   ScriptBuilder,
   scriptHashToAddress,
   SignerModel,
@@ -14,12 +13,12 @@ import {
 } from '@neo-one/client-common';
 import { constants } from '@neo-one/utils';
 import { BN } from 'bn.js';
-import { Hash160 } from '../../Hash160';
 import { LocalKeyStore, LocalMemoryStore } from '../../user';
 
 describe('RPC Call sendrawtransaction', () => {
   const keystore = new LocalKeyStore(new LocalMemoryStore());
-  const messageMagic = 1951352142; // This is TestNet number. Make sure it matches the network's magic number
+  const network = 1951352142; // This is TestNet number. Make sure it matches the network's magic number
+  const maxValidUntilBlockIncrement = 86400000 / 15000;
 
   test('Create a valid private net transaction with one signer', async () => {
     await keystore.addUserAccount({
@@ -39,7 +38,8 @@ describe('RPC Call sendrawtransaction', () => {
       networkFee: new BN(1590000),
       validUntilBlock: 800000,
       signers: [signer],
-      messageMagic,
+      network,
+      maxValidUntilBlockIncrement,
     });
 
     const signature = await keystore.sign({
@@ -86,7 +86,8 @@ describe('RPC Call sendrawtransaction', () => {
       networkFee: new BN(1590000),
       validUntilBlock: 800000,
       signers: [signer],
-      messageMagic,
+      network,
+      maxValidUntilBlockIncrement,
     });
 
     const signature = await keystore.sign({
@@ -130,7 +131,8 @@ describe('RPC Call sendrawtransaction', () => {
           common.stringToECPoint(p),
         ),
         addressVersion: common.NEO_ADDRESS_VERSION,
-        messageMagic: 7630401,
+        network: 7630401,
+        maxValidUntilBlockIncrement,
       },
     };
     const privateKeyString = 'e35fa5d1652c4c65e296c86e63a3da6939bc471b741845be636e2daa320dc770';
@@ -171,7 +173,8 @@ describe('RPC Call sendrawtransaction', () => {
       networkFee: new BN(245000),
       validUntilBlock: 800000,
       signers: [signer],
-      messageMagic: config.blockchain.messageMagic,
+      network: config.blockchain.network,
+      maxValidUntilBlockIncrement: config.blockchain.maxValidUntilBlockIncrement,
     });
 
     const signature = await keystore.sign({

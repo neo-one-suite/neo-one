@@ -400,13 +400,13 @@ const handleRecoveryMessage = async ({
   readonly timerContext: TimerContext;
 }): Promise<Result> => {
   let context = contextIn;
-  const messageMagic = node.blockchain.deserializeWireContext.messageMagic;
+  const network = node.blockchain.deserializeWireContext.network;
   if (message.viewNumber > context.viewNumber) {
     if (context.commitSent) {
       return { context };
     }
 
-    const changeViewPayloads = message.getChangeViewPayloads(context, messageMagic);
+    const changeViewPayloads = message.getChangeViewPayloads(context, network);
     const { context: postChangeViewsContext } = await reverifyAndProcessPayloads({
       context,
       node,
@@ -425,7 +425,7 @@ const handleRecoveryMessage = async ({
     !context.commitSent
   ) {
     if (!context.requestSentOrReceived) {
-      const prepareRequestPayload = message.getPrepareRequestPayload(context, messageMagic);
+      const prepareRequestPayload = message.getPrepareRequestPayload(context, network);
       if (prepareRequestPayload !== undefined) {
         const { context: postPrepareRequestContext } = await reverifyAndProcessPayload({
           context,
@@ -443,7 +443,7 @@ const handleRecoveryMessage = async ({
       }
     }
 
-    const prepareResponsePayloads = message.getPrepareResponsePayloads(context, messageMagic);
+    const prepareResponsePayloads = message.getPrepareResponsePayloads(context, network);
     const { context: postPrepareResponsesContext } = await reverifyAndProcessPayloads({
       context,
       node,
@@ -457,7 +457,7 @@ const handleRecoveryMessage = async ({
   }
 
   if (message.viewNumber <= context.viewNumber) {
-    const commitPayloads = message.getCommitPayloadsFromRecoveryMessage(context, messageMagic);
+    const commitPayloads = message.getCommitPayloadsFromRecoveryMessage(context, network);
     const { context: postCommitsContext } = await reverifyAndProcessPayloads({
       context,
       node,
@@ -572,6 +572,7 @@ export const handleConsensusPayload = async ({
 }): Promise<Result> => {
   const consensusMessage = contextIn.getMessage(payload);
   if (
+    !consensusMessage.verify(node.blockchain.settings) ||
     consensusMessage.blockIndex !== contextIn.myIndex ||
     consensusMessage.validatorIndex >= contextIn.validators.length ||
     !common.uInt160Equal(

@@ -19,6 +19,7 @@ export const checkCommits = async (contextIn: ConsensusContext, node: Node) => {
       native,
       storage,
       headerCache,
+      network: node.blockchain.settings.network,
     });
     context = newContext;
     await node.relayBlock(block);

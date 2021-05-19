@@ -24,13 +24,9 @@ export interface ExtensiblePayloadAdd extends UnsignedExtensiblePayloadAdd {
   readonly witness: Witness;
 }
 export class ExtensiblePayload extends UnsignedExtensiblePayload implements SerializableContainer {
-  public static sign(
-    payload: UnsignedExtensiblePayload,
-    privateKey: PrivateKey,
-    messageMagic: number,
-  ): ExtensiblePayload {
-    const context = new ContractParametersContext(payload.getScriptHashesForVerifying());
-    const hashData = getSignData(payload.hash, messageMagic);
+  public static sign(payload: UnsignedExtensiblePayload, privateKey: PrivateKey, network: number): ExtensiblePayload {
+    const context = new ContractParametersContext(payload.getScriptHashesForVerifying(), network);
+    const hashData = getSignData(payload.hash, network);
     const publicKey = crypto.privateKeyToPublicKey(privateKey);
     const signatureContract = AccountContract.createSignatureContract(publicKey);
     const signature = crypto.sign({ message: hashData, privateKey });
@@ -43,18 +39,13 @@ export class ExtensiblePayload extends UnsignedExtensiblePayload implements Seri
       sender: payload.sender,
       data: payload.data,
       witness: context.getWitnesses()[0],
-      messageMagic,
+      network,
     });
   }
   public static deserializeWireBase(options: DeserializeWireBaseOptions): ExtensiblePayload {
     const { reader } = options;
-    const {
-      category,
-      validBlockStart,
-      validBlockEnd,
-      sender,
-      data,
-    } = super.deserializeUnsignedExtensiblePayloadWireBase(options);
+    const { category, validBlockStart, validBlockEnd, sender, data } =
+      super.deserializeUnsignedExtensiblePayloadWireBase(options);
     const count = reader.readInt8();
     if (count !== 1) {
       throw new InvalidFormatError('Expected exactly 1 witness.');
@@ -69,7 +60,7 @@ export class ExtensiblePayload extends UnsignedExtensiblePayload implements Seri
       sender,
       data,
       witness,
-      messageMagic: options.context.messageMagic,
+      network: options.context.network,
     });
   }
 

@@ -521,7 +521,7 @@ describe('LocalUserAccountProvider', () => {
     };
 
     const context = {
-      messageMagic: 0,
+      network: 0,
     };
 
     test('throws on reused inputs', async () => {

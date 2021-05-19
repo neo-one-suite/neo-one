@@ -8,7 +8,7 @@ describe('levelUpStorage', () => {
   let storage: Storage;
   beforeEach(async () => {
     const rocks = new RocksDB('/Users/spencercorwin/Desktop/test-location');
-    storage = levelUpStorage({ db: LevelUp(rocks), context: { messageMagic: 1953787457, validatorsCount: 7 } });
+    storage = levelUpStorage({ db: LevelUp(rocks), context: { network: 1953787457, validatorsCount: 7 } });
   });
   test('deleted items are undefined', async () => {
     const hash = common.bufferToUInt160(Buffer.from('3775292229eccdf904f16fff8e83e7cffdc0f0ce', 'hex'));

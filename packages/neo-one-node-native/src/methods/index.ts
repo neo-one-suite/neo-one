@@ -2,7 +2,6 @@ export * from './contractMethodFromJSON';
 export * from './contractManagementMethods';
 export * from './gasTokenMethods';
 export * from './ledgerMethods';
-export * from './nameServiceMethods';
 export * from './neoTokenMethods';
 export * from './oracleMethods';
 export * from './policyMethods';

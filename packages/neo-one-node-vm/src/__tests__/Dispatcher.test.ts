@@ -77,7 +77,7 @@ describe('Dispatcher Tests', () => {
     ];
     const standbyCommittee = standbyValidators.concat(standbyMembers).concat('random hash');
     const input = {
-      magic: 5195086 + 1,
+      network: 5195086 + 1,
       addressVersion: 0x35 + 1,
       standbyCommittee,
       committeeMembersCount: standbyCommittee.length,
@@ -94,7 +94,7 @@ describe('Dispatcher Tests', () => {
 
     const newDis = new Dispatcher({ protocolSettings: input });
     const result = newDis.getConfig();
-    expect(result.magic).toEqual(input.magic);
+    expect(result.network).toEqual(input.network);
     expect(result.addressVersion).toEqual(input.addressVersion);
     expect(result.standbyCommittee).toEqual(standbyCommittee);
     expect(result.committeeMembersCount).toEqual(input.committeeMembersCount);
