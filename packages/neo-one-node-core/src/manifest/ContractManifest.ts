@@ -12,7 +12,7 @@ export class ContractManifest extends ContractManifestModel<ContractABI, Contrac
     const { array } = assertStructStackItem(stackItem);
     const name = array[0].getString();
     const groups = assertArrayStackItem(array[1]).array.map((group) => ContractGroup.fromStackItem(group));
-    if (assertMapStackItem(array[2]).count !== 2) {
+    if (assertMapStackItem(array[2]).count !== 0) {
       throw new InvalidFormatError('Expected manifest features map to have two properties');
     }
     const supportedStandards = assertArrayStackItem(array[3]).array.map((std) => std.getString());

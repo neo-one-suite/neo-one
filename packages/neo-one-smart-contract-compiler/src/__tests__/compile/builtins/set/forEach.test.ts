@@ -5,7 +5,7 @@ import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Set.prototype.forEach', () => {
   test('should apply a function over a set', async () => {
-    await helpers.executeString(`
+    await helpers.executeStringWithContract(`
       const x = new Set<number>();
       x.add(1);
       x.add(1);

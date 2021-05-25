@@ -21,7 +21,7 @@ export class ArrFindHelper extends Helper {
     // [map]
     sb.emitHelper(node, options, sb.helpers.arrToMap);
     // [enumerator]
-    sb.emitSysCall(node, 'System.Iterator.Create');
+    sb.emitHelper(node, options, sb.helpers.createMapIterator);
     // [val]
     sb.emitHelper(
       node,

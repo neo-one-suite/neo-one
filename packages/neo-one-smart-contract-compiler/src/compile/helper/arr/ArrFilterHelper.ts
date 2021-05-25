@@ -51,7 +51,7 @@ export class ArrFilterHelper extends Helper {
     sb.emitHelper(node, options, sb.helpers.arrToMap);
     if (this.withIndex) {
       // [iterator]
-      sb.emitSysCall(node, 'System.Iterator.Create');
+      sb.emitHelper(node, options, sb.helpers.createMapIterator);
       // [0, iterator]
       sb.emitPushInt(node, 0);
       // [accum, iterator]
@@ -79,7 +79,7 @@ export class ArrFilterHelper extends Helper {
       );
     } else {
       // [enumerator]
-      sb.emitSysCall(node, 'System.Iterator.Create');
+      sb.emitHelper(node, options, sb.helpers.createMapIterator);
       // [0, enumerator]
       sb.emitPushInt(node, 0);
       // [accum, enumerator]

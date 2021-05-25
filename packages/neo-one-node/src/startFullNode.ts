@@ -92,7 +92,11 @@ export const startFullNode = async ({
 
     const storage = levelupStorage({
       db,
-      context: { network: blockchainSettings.network, validatorsCount: blockchainSettings.validatorsCount },
+      context: {
+        network: blockchainSettings.network,
+        validatorsCount: blockchainSettings.validatorsCount,
+        maxValidUntilBlockIncrement: blockchainSettings.maxValidUntilBlockIncrement,
+      },
     });
 
     disposable = composeDisposable(async () => storage.close(), disposable);

@@ -5,12 +5,11 @@ import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Map.prototype.forEach', () => {
   test('should apply a function over a map', async () => {
-    await helpers.executeString(`
+    await helpers.executeStringWithContract(`
       const x = new Map<string, number>();
       x.set('a', 1);
       x.set('b', 2);
       x.set('c', 3);
-      let result = 0;
       let valueResult = 0;
       const y = x.forEach((value) => {
         valueResult += value;
@@ -22,7 +21,7 @@ describe('Map.prototype.forEach', () => {
   });
 
   test('should apply a function over a map with key', async () => {
-    await helpers.executeString(`
+    await helpers.executeStringWithContract(`
       const x = new Map<string, number>();
       x.set('a', 1);
       x.set('b', 2);

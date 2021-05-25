@@ -19,7 +19,7 @@ export class MapForEachHelper extends Helper {
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [iterator]
-    sb.emitSysCall(node, 'System.Iterator.Create');
+    sb.emitHelper(node, options, sb.helpers.createMapIterator);
     // []
     sb.emitHelper(
       node,

@@ -93,52 +93,50 @@ export class EqualsEqualsEqualsHelper extends Helper {
       sb.emitOp(node, 'NUMEQUAL');
     };
 
-    const createProcess = (
-      value: keyof ForBuiltinTypeHelperOptions,
-      type: WrappableType,
-      compareValue = compare(type),
-    ) => (innerOptions: VisitOptions) => {
-      sb.emitOp(node, 'SWAP');
-      sb.emitHelper(
-        node,
-        innerOptions,
-        sb.helpers.forBuiltinType({
-          type: this.leftType,
-          knownType: this.leftKnownType,
-          array: pushFalse,
-          arrayStorage: pushFalse,
-          boolean: pushFalse,
-          buffer: pushFalse,
-          null: pushFalse,
-          number: pushFalse,
-          object: pushFalse,
-          string: pushFalse,
-          symbol: pushFalse,
-          undefined: pushFalse,
-          map: pushFalse,
-          mapStorage: pushFalse,
-          set: pushFalse,
-          setStorage: pushFalse,
-          error: pushFalse,
-          forwardValue: pushFalse,
-          iteratorResult: pushFalse,
-          iterable: pushFalse,
-          iterableIterator: pushFalse,
-          transaction: pushFalse,
-          attribute: pushFalse,
-          contract: pushFalse,
-          block: pushFalse,
-          contractManifest: pushFalse,
-          contractABI: pushFalse,
-          contractMethod: pushFalse,
-          contractEvent: pushFalse,
-          contractParameter: pushFalse,
-          contractGroup: pushFalse,
-          contractPermission: pushFalse,
-          [value]: compareValue,
-        }),
-      );
-    };
+    const createProcess =
+      (value: keyof ForBuiltinTypeHelperOptions, type: WrappableType, compareValue = compare(type)) =>
+      (innerOptions: VisitOptions) => {
+        sb.emitOp(node, 'SWAP');
+        sb.emitHelper(
+          node,
+          innerOptions,
+          sb.helpers.forBuiltinType({
+            type: this.leftType,
+            knownType: this.leftKnownType,
+            array: pushFalse,
+            arrayStorage: pushFalse,
+            boolean: pushFalse,
+            buffer: pushFalse,
+            null: pushFalse,
+            number: pushFalse,
+            object: pushFalse,
+            string: pushFalse,
+            symbol: pushFalse,
+            undefined: pushFalse,
+            map: pushFalse,
+            mapStorage: pushFalse,
+            set: pushFalse,
+            setStorage: pushFalse,
+            error: pushFalse,
+            forwardValue: pushFalse,
+            iteratorResult: pushFalse,
+            iterable: pushFalse,
+            iterableIterator: pushFalse,
+            transaction: pushFalse,
+            attribute: pushFalse,
+            contract: pushFalse,
+            block: pushFalse,
+            contractManifest: pushFalse,
+            contractABI: pushFalse,
+            contractMethod: pushFalse,
+            contractEvent: pushFalse,
+            contractParameter: pushFalse,
+            contractGroup: pushFalse,
+            contractPermission: pushFalse,
+            [value]: compareValue,
+          }),
+        );
+      };
 
     const createProcessStorage = (value: keyof ForBuiltinTypeHelperOptions) => (innerOptions: VisitOptions) => {
       sb.emitOp(node, 'SWAP');

@@ -8,4 +8,5 @@ export enum GlobalProperty {
   Cache = 6,
   CacheStorage = 7,
   DeleteCacheStorage = 8,
+  DeleteIteratorCacheStorage = 9,
 }

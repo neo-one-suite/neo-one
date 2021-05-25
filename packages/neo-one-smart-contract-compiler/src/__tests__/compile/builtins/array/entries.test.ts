@@ -4,7 +4,7 @@ import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Array.prototype.entries', () => {
   test('should return an iterator over the array', async () => {
-    await helpers.executeString(`
+    await helpers.executeStringWithContract(`
       const x = [1, 2, 3];
       x.entries();
       let y = x.entries();
@@ -32,7 +32,7 @@ describe('Array.prototype.entries', () => {
   });
 
   test('should return an iterator over an empty array', async () => {
-    await helpers.executeString(`
+    await helpers.executeStringWithContract(`
       const x: Array<number> = [];
       const y = x.entries();
 
@@ -43,7 +43,7 @@ describe('Array.prototype.entries', () => {
   });
 
   test('should return an iterator over an array with one undefined element', async () => {
-    await helpers.executeString(`
+    await helpers.executeStringWithContract(`
       const x = [undefined];
       const y = x.entries();
 
@@ -58,7 +58,7 @@ describe('Array.prototype.entries', () => {
   });
 
   test('should return an iterator over the array as possible object', async () => {
-    await helpers.executeString(`
+    await helpers.executeStringWithContract(`
       interface Arr<T> {
         entries(): IterableIterator<[T, number]>;
       }

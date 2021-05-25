@@ -16,7 +16,7 @@ export class ArrEveryFuncHelper extends Helper {
     // [map, callable]
     sb.emitHelper(node, options, sb.helpers.arrToMap);
     // [enumerator, callable]
-    sb.emitSysCall(node, 'System.Iterator.Create');
+    sb.emitHelper(node, options, sb.helpers.createMapIterator);
     // [idx, enumerator, callable]
     sb.emitPushInt(node, 0);
     // [result, idx, enumerator, callable]

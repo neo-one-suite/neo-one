@@ -7,6 +7,7 @@ import { Context } from '../../Context';
 import { createContextForPath, createContextForSnippet } from '../../createContext';
 import { EXECUTE_OPTIONS_DEFAULT, ExecuteOptions, executeScript } from './executeScript';
 import { checkResult } from './extractors';
+import { startNode } from './startNode';
 
 const execute = async (
   context: Context,
@@ -43,4 +44,39 @@ export const executeSnippet = async (snippetPath: string, options: ExecuteOption
   const sourceFile = tsUtils.file.getSourceFileOrThrow(context.program, filePath);
 
   return execute(context, sourceFile, options);
+};
+
+const getContractString = (testIn: string) => `
+  import { SmartContract } from '@neo-one/smart-contract';
+
+  const test = () => {
+    ${testIn}
+  }
+
+  export class TestContract extends SmartContract {
+    public readonly properties = {
+      groups: [],
+      permissions: [],
+      trusts: "*",
+    };
+
+    public run(): void {
+      test();
+    }
+  }
+`;
+
+export const executeStringWithContract = async (code: string) => {
+  const node = await startNode();
+  const contract = await node.addContract(getContractString(code));
+
+  return node.executeString(`
+    import { Address, SmartContract } from '@neo-one/smart-contract';
+
+    interface Contract {
+      run(): void;
+    }
+    const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+    contract.run();
+  `);
 };

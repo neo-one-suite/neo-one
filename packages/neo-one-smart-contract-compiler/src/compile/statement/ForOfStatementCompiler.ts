@@ -81,7 +81,7 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
       // [map]
       sb.emitHelper(expression, innerOptions, sb.helpers.unwrapMap);
       // [iterator]
-      sb.emitSysCall(expression, 'System.Iterator.Create');
+      sb.emitHelper(expression, innerOptions, sb.helpers.createMapIterator);
       // []
       sb.emitHelper(
         node,
@@ -128,7 +128,7 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
       // [map]
       sb.emitHelper(expression, innerOptions, sb.helpers.unwrapSet);
       // [iterator]
-      sb.emitSysCall(expression, 'System.Iterator.Create');
+      sb.emitHelper(expression, innerOptions, sb.helpers.createMapIterator);
       // []
       sb.emitHelper(node, innerOptions, sb.helpers.rawIteratorForEachKey({ each, deserializeKey: true }));
     };

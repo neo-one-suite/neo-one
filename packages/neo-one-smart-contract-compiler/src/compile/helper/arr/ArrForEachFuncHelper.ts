@@ -30,7 +30,6 @@ export class ArrForEachFuncHelper extends Helper {
           sb.emitOp(node, 'TUCK');
           // [idx, size, idx, size, arr, callable]
           sb.emitOp(node, 'OVER');
-          // size > idx
           // [size > idx, idx, size, arr, callable]
           sb.emitOp(node, 'GT');
         },

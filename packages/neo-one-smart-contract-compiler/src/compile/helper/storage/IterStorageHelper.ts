@@ -66,6 +66,6 @@ export class IterStorageHelper extends Helper {
     // [map]
     sb.emitHelper(node, options, sb.helpers.nestedArrToMap);
     // [iterator]
-    sb.emitSysCall(node, 'System.Iterator.Create');
+    sb.emitHelper(node, options, sb.helpers.createMapIterator);
   }
 }

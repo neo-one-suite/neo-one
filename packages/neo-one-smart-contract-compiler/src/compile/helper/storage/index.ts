@@ -8,6 +8,7 @@ export * from './CreateKeyIterableIteratorStructuredStorageHelper';
 export * from './CreateStructuredStorageHelper';
 export * from './CreateValIterableIteratorStructuredStorageHelper';
 export * from './DeleteCacheStorageHelper';
+export * from './DeleteIteratorCacheStorageHelper';
 export * from './DeleteStorageBaseHelper';
 export * from './DeleteStorageHelper';
 export * from './DeleteStructuredStorageHelper';

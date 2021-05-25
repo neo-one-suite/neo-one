@@ -3,7 +3,7 @@ import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Map.prototype[Symbol.iterator]', () => {
   test('should return an iterator over the map', async () => {
-    await helpers.executeString(`
+    await helpers.executeStringWithContract(`
       const x = new Map<string, number>();
       x.set('a', 1);
       x.set('b', 2);
@@ -34,7 +34,7 @@ describe('Map.prototype[Symbol.iterator]', () => {
   });
 
   test('should return an iterator over an empty map', async () => {
-    await helpers.executeString(`
+    await helpers.executeStringWithContract(`
       const x = new Map<string, number>();
       const y = x[Symbol.iterator]();
 
@@ -45,7 +45,7 @@ describe('Map.prototype[Symbol.iterator]', () => {
   });
 
   test('should return an iterator over the map as possible object', async () => {
-    await helpers.executeString(`
+    await helpers.executeStringWithContract(`
       interface Mp<K, V> {
         readonly set: (key: K, value: V) => this;
         [Symbol.iterator](): IterableIterator<[K, V]>;
