@@ -9,11 +9,12 @@ import {
 import { Blockchain } from '@neo-one/node-blockchain';
 import { NativeContainer } from '@neo-one/node-native';
 import { test as testNet } from '@neo-one/node-neo-settings';
-import { storage } from '@neo-one/node-storage-levelup';
+import { storage, streamToObservable } from '@neo-one/node-storage-levelup';
 import { blockchainSettingsToProtocolSettings, Dispatcher } from '@neo-one/node-vm';
 // import fs from 'fs-extra';
 import LevelUp from 'levelup';
 import MemDown from 'memdown';
+import { toArray } from 'rxjs/operators';
 // import RocksDB from 'rocksdb';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
@@ -29,6 +30,17 @@ export const EXECUTE_OPTIONS_DEFAULT = {
   ignoreWarnings: false,
 };
 
+// tslint:disable-next-line: no-any
+const getUpdateVMMemoryStore = (vm: Dispatcher, db: any) => async () => {
+  const updates = await streamToObservable<{ readonly key: Buffer; readonly value: Buffer }>(() =>
+    db.createReadStream(),
+  )
+    .pipe(toArray())
+    .toPromise();
+
+  vm.updateStore(updates);
+};
+
 export const executeScript = async (
   diagnostics: ReadonlyArray<ts.Diagnostic>,
   compiledCode: string,
@@ -42,18 +54,24 @@ export const executeScript = async (
   // await fs.ensureDir(path);
   // const db = LevelUp(RocksDB(path));
   const settings = testNet();
-  const dispatcher = new Dispatcher({
+  const vm = new Dispatcher({
     // levelDBPath: path,
     protocolSettings: blockchainSettingsToProtocolSettings(settings),
   });
+  const db = LevelUp(MemDown());
   const blockchain = await Blockchain.create({
     settings,
     storage: storage({
-      context: { network: settings.network, validatorsCount: settings.validatorsCount },
-      db: LevelUp(MemDown()),
+      context: {
+        network: settings.network,
+        validatorsCount: settings.validatorsCount,
+        maxValidUntilBlockIncrement: settings.maxValidUntilBlockIncrement,
+      },
+      db,
     }),
-    vm: dispatcher,
+    vm,
     native: new NativeContainer(settings),
+    onPersist: getUpdateVMMemoryStore(vm, db),
   });
 
   throwOnDiagnosticErrorOrWarning(diagnostics, ignoreWarnings);

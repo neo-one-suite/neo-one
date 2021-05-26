@@ -154,7 +154,7 @@ namespace NEOONE
 
       public LogReturn(LogEventArgs log)
       {
-        containerHash = log.ScriptContainer != null ? Crypto.Hash256(log.ScriptContainer.GetSignData(ProtocolSettings.Default.Magic)) : null;
+        containerHash = log.ScriptContainer != null ? Crypto.Hash256(log.ScriptContainer.GetSignData(ProtocolSettings.Default.Network)) : null;
         callingScriptHash = log.ScriptHash != null ? log.ScriptHash.ToArray() : null;
         message = log.Message;
         position = -1; // log.Position
@@ -181,7 +181,7 @@ namespace NEOONE
 
       public ProtocolSettingsReturn(ProtocolSettings value)
       {
-        this.magic = Convert.ToInt32(value.Magic);
+        this.magic = Convert.ToInt32(value.Network);
         this.addressVersion = Convert.ToInt32(value.AddressVersion);
         this.standbyCommittee = value.StandbyCommittee.Select(p => p.ToString()).ToArray();
         this.committeeMembersCount = value.CommitteeMembersCount;

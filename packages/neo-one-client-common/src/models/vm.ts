@@ -252,6 +252,7 @@ export enum SysCall {
   'System.Storage.Find' = 'System.Storage.Find',
   'System.Storage.Put' = 'System.Storage.Put',
   'System.Storage.Delete' = 'System.Storage.Delete',
+  'System.Iterator.Print' = 'System.Iterator.Print',
 }
 
 export enum SysCallHashNum {
@@ -287,6 +288,7 @@ export enum SysCallHashNum {
   'System.Storage.Find' = 0xdf30b89a,
   'System.Storage.Put' = 0xe63f1884,
   'System.Storage.Delete' = 0x2f58c5ed,
+  'System.Iterator.Print' = 0x4dff5eda,
 }
 
 export type SysCallName = keyof typeof SysCall;

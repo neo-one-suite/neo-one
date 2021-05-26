@@ -3,7 +3,7 @@ import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Set.prototype[Symbol.iterator]', () => {
   test('should return an iterator over the set', async () => {
-    await helpers.executeString(`
+    await helpers.executeStringWithContract(`
       const x = new Set<number>();
       x.add(1);
       x.add(2);
@@ -31,7 +31,7 @@ describe('Set.prototype[Symbol.iterator]', () => {
   });
 
   test('should return an iterator over an empty set', async () => {
-    await helpers.executeString(`
+    await helpers.executeStringWithContract(`
       const x: Set<number> = new Set();
       const y = x[Symbol.iterator]();
 
@@ -42,7 +42,7 @@ describe('Set.prototype[Symbol.iterator]', () => {
   });
 
   test('should return an iterator over an set with one undefined element', async () => {
-    await helpers.executeString(`
+    await helpers.executeStringWithContract(`
       const x = new Set<number | undefined>();
       x.add(undefined);
       const y = x[Symbol.iterator]();
@@ -57,7 +57,7 @@ describe('Set.prototype[Symbol.iterator]', () => {
   });
 
   test('should return an iterator over the set as possible object', async () => {
-    await helpers.executeString(`
+    await helpers.executeStringWithContract(`
       interface St<T> {
         [Symbol.iterator](): IterableIterator<T>;
         readonly add: (value: T) => this;

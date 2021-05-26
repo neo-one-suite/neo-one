@@ -24,7 +24,7 @@ export class MapFilterHelper extends Helper {
       return;
     }
     // [iterator]
-    sb.emitSysCall(node, 'System.Iterator.Create');
+    sb.emitHelper(node, options, sb.helpers.createMapIterator);
     // [accum, iterator]
     sb.emitOp(node, 'NEWMAP');
     // [accum]

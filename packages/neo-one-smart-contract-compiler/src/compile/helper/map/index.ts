@@ -8,3 +8,6 @@ export * from './MapSomeHelper';
 export * from './MapToNestedArrHelper';
 export * from './NestedArrToMapHelper';
 export * from './IteratorToMapHelper';
+export * from './MapForEachWithoutIteratorHelper';
+export * from './MapReduceWithoutIteratorHelper';
+export * from './MapToNestedArrWithoutIteratorHelper';

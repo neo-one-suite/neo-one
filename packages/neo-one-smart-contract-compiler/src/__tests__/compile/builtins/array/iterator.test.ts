@@ -3,7 +3,7 @@ import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Array.prototype[Symbol.iterator]', () => {
   test('should return an iterator over the array', async () => {
-    await helpers.executeString(`
+    await helpers.executeStringWithContract(`
       const x = [1, 2, 3];
       x[Symbol.iterator]();
       let y = x[Symbol.iterator]();
@@ -28,7 +28,7 @@ describe('Array.prototype[Symbol.iterator]', () => {
   });
 
   test('should return an iterator over an empty array', async () => {
-    await helpers.executeString(`
+    await helpers.executeStringWithContract(`
       const x: Array<number> = [];
       const y = x[Symbol.iterator]();
 
@@ -39,7 +39,7 @@ describe('Array.prototype[Symbol.iterator]', () => {
   });
 
   test('should return an iterator over an array with one undefined element', async () => {
-    await helpers.executeString(`
+    await helpers.executeStringWithContract(`
       const x = [undefined];
       const y = x[Symbol.iterator]();
 
@@ -53,7 +53,7 @@ describe('Array.prototype[Symbol.iterator]', () => {
   });
 
   test('should return an iterator over the array as possible object', async () => {
-    await helpers.executeString(`
+    await helpers.executeStringWithContract(`
       interface Arr<T> {
         [Symbol.iterator](): IterableIterator<T>;
       }

@@ -33,8 +33,10 @@ export class SetForEach extends BuiltinInstanceMemberCall {
     sb.emitHelper(node, options, sb.helpers.unwrapMap);
     // [keysArr]
     sb.emitOp(node, 'KEYS');
+    // [keysMap]
+    sb.emitHelper(node, options, sb.helpers.arrToMap);
     // [iterator]
-    sb.emitSysCall(node, 'System.Iterator.Create');
+    sb.emitHelper(node, options, sb.helpers.createMapIterator);
     // [objectVal, iterator]
     sb.visit(tsUtils.argumented.getArguments(node)[0], options);
     // []

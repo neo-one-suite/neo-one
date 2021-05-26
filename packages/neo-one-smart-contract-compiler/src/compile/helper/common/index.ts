@@ -8,3 +8,4 @@ export * from './serialize';
 export * from './CloneStructHelper';
 export * from './SetArrValToObjectPropertyHelper';
 export * from './SliceKeyHelper';
+export * from './DeserializeIteratorKeyHelper';

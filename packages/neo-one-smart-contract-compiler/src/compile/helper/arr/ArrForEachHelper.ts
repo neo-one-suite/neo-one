@@ -25,7 +25,7 @@ export class ArrForEachHelper extends Helper {
     sb.emitHelper(node, options, sb.helpers.arrToMap);
     if (this.withIndex) {
       // [iterator]
-      sb.emitSysCall(node, 'System.Iterator.Create');
+      sb.emitHelper(node, options, sb.helpers.createMapIterator);
       // []
       sb.emitHelper(
         node,
@@ -41,7 +41,7 @@ export class ArrForEachHelper extends Helper {
       );
     } else {
       // [enumerator]
-      sb.emitSysCall(node, 'System.Iterator.Create');
+      sb.emitHelper(node, options, sb.helpers.createMapIterator);
       sb.emitHelper(
         node,
         options,

@@ -35,8 +35,10 @@ export class SetIterator extends BuiltinInstanceMemberCall {
     sb.emitHelper(node, options, sb.helpers.unwrapMap);
     // [keysArr]
     sb.emitOp(node, 'KEYS');
+    // [keysMap]
+    sb.emitHelper(node, options, sb.helpers.arrToMap);
     // [iterator]
-    sb.emitSysCall(node, 'System.Iterator.Create');
+    sb.emitHelper(node, options, sb.helpers.createMapIterator);
     // [val]
     sb.emitHelper(node, options, sb.helpers.createEnumeratorIterableIterator({ deserializeKey: true }));
   }

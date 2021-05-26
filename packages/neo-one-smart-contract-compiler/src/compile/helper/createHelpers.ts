@@ -42,6 +42,7 @@ import {
   ConsoleLogHelper,
   DebugLogHelper,
   DebugLogHelperOptions,
+  DeserializeIteratorKeyHelper,
   ExpHelper,
   GenericLogSerializeHelper,
   SetArrValToObjectPropertyHelper,
@@ -128,6 +129,7 @@ import {
   IterableIteratorReduceHelperOptions,
 } from './iterableIterator';
 import {
+  CreateMapIteratorHelper,
   GetMapIteratorKeyHelper,
   GetMapIteratorValueHelper,
   RawEnumeratorEveryHelper,
@@ -178,13 +180,18 @@ import {
   MapFilterHelperOptions,
   MapForEachHelper,
   MapForEachHelperOptions,
+  MapForEachWithoutIteratorHelper,
+  MapForEachWithoutIteratorHelperOptions,
   MapMapHelper,
   MapMapHelperOptions,
   MapReduceHelper,
   MapReduceHelperOptions,
+  MapReduceWithoutIteratorHelper,
+  MapReduceWithoutIteratorHelperOptions,
   MapSomeHelper,
   MapSomeHelperOptions,
   MapToNestedArrHelper,
+  MapToNestedArrWithoutIteratorHelper,
   NestedArrToMapHelper,
 } from './map';
 import {
@@ -229,6 +236,7 @@ import {
   CreateStructuredStorageHelperOptions,
   CreateValIterableIteratorStructuredStorageHelper,
   DeleteCacheStorageHelper,
+  DeleteIteratorCacheStorageHelper,
   DeleteStorageBaseHelper,
   DeleteStorageHelper,
   DeleteStructuredStorageHelper,
@@ -546,6 +554,7 @@ export interface Helpers {
   readonly consoleLog: ConsoleLogHelper;
   readonly debugLog: (options: DebugLogHelperOptions) => DebugLogHelper;
   readonly sliceKey: SliceKeyHelper;
+  readonly deserializeIteratorKey: DeserializeIteratorKeyHelper;
 
   readonly equalsEqualsEquals: (options: EqualsEqualsEqualsHelperOptions) => EqualsEqualsEqualsHelper;
   readonly equalsEquals: (options: EqualsEqualsHelperOptions) => EqualsEqualsHelper;
@@ -683,6 +692,7 @@ export interface Helpers {
   readonly rawIteratorReduceBase: (options: RawIteratorReduceBaseHelperOptions) => RawIteratorReduceBaseHelper;
   readonly getMapIteratorKey: GetMapIteratorKeyHelper;
   readonly getMapIteratorValue: GetMapIteratorValueHelper;
+  readonly createMapIterator: CreateMapIteratorHelper;
 
   // iteratorResult
   readonly createIteratorResult: CreateIteratorResultHelper;
@@ -691,11 +701,16 @@ export interface Helpers {
   readonly mapDelete: MapDeleteHelper;
   readonly mapEvery: (options: MapEveryHelperOptions) => MapEveryHelper;
   readonly mapForEach: (options: MapForEachHelperOptions) => MapForEachHelper;
+  readonly mapForEachWithoutIterator: (
+    options: MapForEachWithoutIteratorHelperOptions,
+  ) => MapForEachWithoutIteratorHelper;
   readonly mapFilter: (options: MapFilterHelperOptions) => MapFilterHelper;
   readonly mapMap: (options: MapMapHelperOptions) => MapMapHelper;
   readonly mapReduce: (options: MapReduceHelperOptions) => MapReduceHelper;
+  readonly mapReduceWithoutIterator: (options: MapReduceWithoutIteratorHelperOptions) => MapReduceWithoutIteratorHelper;
   readonly mapSome: (options: MapSomeHelperOptions) => MapSomeHelper;
   readonly mapToNestedArr: MapToNestedArrHelper;
+  readonly mapToNestedArrWithoutIterator: MapToNestedArrWithoutIteratorHelper;
   readonly nestedArrToMap: NestedArrToMapHelper;
   readonly iteratorToMap: IteratorToMapHelper;
 
@@ -705,6 +720,7 @@ export interface Helpers {
   readonly handleUndefinedStorage: (options: HandleUndefinedStorageHelperOptions) => HandleUndefinedStorageHelper;
   readonly commonStorage: CommonStorageHelper;
   readonly deleteCacheStorage: DeleteCacheStorageHelper;
+  readonly deleteIteratorCacheStorage: DeleteIteratorCacheStorageHelper;
   readonly deleteStorageBase: DeleteStorageBaseHelper;
   readonly deleteStorage: DeleteStorageHelper;
   readonly iterStorage: IterStorageHelper;
@@ -1011,6 +1027,7 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     consoleLog: new ConsoleLogHelper(),
     debugLog: (options) => new DebugLogHelper(options),
     sliceKey: new SliceKeyHelper(),
+    deserializeIteratorKey: new DeserializeIteratorKeyHelper(),
 
     equalsEqualsEquals: (options) => new EqualsEqualsEqualsHelper(options),
     equalsEquals: (options) => new EqualsEqualsHelper(options),
@@ -1136,6 +1153,7 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     rawIteratorReduceBase: (options) => new RawIteratorReduceBaseHelper(options),
     getMapIteratorKey: new GetMapIteratorKeyHelper(),
     getMapIteratorValue: new GetMapIteratorValueHelper(),
+    createMapIterator: new CreateMapIteratorHelper(),
 
     // iteratorResult
     createIteratorResult: new CreateIteratorResultHelper(),
@@ -1144,11 +1162,14 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     mapDelete: new MapDeleteHelper(),
     mapEvery: (options) => new MapEveryHelper(options),
     mapForEach: (options) => new MapForEachHelper(options),
+    mapForEachWithoutIterator: (options) => new MapForEachWithoutIteratorHelper(options),
     mapFilter: (options) => new MapFilterHelper(options),
     mapMap: (options) => new MapMapHelper(options),
     mapReduce: (options) => new MapReduceHelper(options),
+    mapReduceWithoutIterator: (options) => new MapReduceWithoutIteratorHelper(options),
     mapSome: (options) => new MapSomeHelper(options),
     mapToNestedArr: new MapToNestedArrHelper(),
+    mapToNestedArrWithoutIterator: new MapToNestedArrWithoutIteratorHelper(),
     nestedArrToMap: new NestedArrToMapHelper(),
     iteratorToMap: new IteratorToMapHelper(),
 
@@ -1158,6 +1179,7 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     handleUndefinedStorage: (options) => new HandleUndefinedStorageHelper(options),
     commonStorage: new CommonStorageHelper(),
     deleteCacheStorage: new DeleteCacheStorageHelper(),
+    deleteIteratorCacheStorage: new DeleteIteratorCacheStorageHelper(),
     deleteStorageBase: new DeleteStorageBaseHelper(),
     deleteStorage: new DeleteStorageHelper(),
     iterStorage: new IterStorageHelper(),

@@ -27,7 +27,7 @@ export class ArrReduceHelper extends Helper {
     sb.emitHelper(node, options, sb.helpers.arrToMap);
     if (this.withIndex) {
       // [iterator, accum]
-      sb.emitSysCall(node, 'System.Iterator.Create');
+      sb.emitHelper(node, options, sb.helpers.createMapIterator);
       // [accum, iterator]
       sb.emitOp(node, 'SWAP');
       // [accum]
@@ -47,7 +47,7 @@ export class ArrReduceHelper extends Helper {
       );
     } else {
       // [enumerator, accum]
-      sb.emitSysCall(node, 'System.Iterator.Create');
+      sb.emitHelper(node, options, sb.helpers.createMapIterator);
       // [accum, enumerator]
       sb.emitOp(node, 'SWAP');
       // [accum]

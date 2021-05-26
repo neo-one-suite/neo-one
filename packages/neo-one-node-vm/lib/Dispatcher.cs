@@ -187,10 +187,10 @@ namespace NEOONE
     private IConfigurationSection parseConfig(dynamic input)
     {
       Dictionary<string, string> config = new Dictionary<string, string> { };
-      if (input.magic != null)
+      if (input.network != null)
       {
-        uint Magic = (uint)input.magic;
-        config.Add("ProtocolConfiguration:Magic", Magic.ToString());
+        uint Network = (uint)input.network;
+        config.Add("ProtocolConfiguration:Network", Network.ToString());
       }
       if (input.addressVersion != null)
       {

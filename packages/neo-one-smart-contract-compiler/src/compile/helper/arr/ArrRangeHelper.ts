@@ -28,7 +28,7 @@ export class ArrRangeHelper extends Helper {
     // [arr]
     sb.emitOp(node, 'NEWARRAY');
     // [enumerator]
-    sb.emitSysCall(node, 'System.Iterator.Create');
+    sb.emitHelper(node, options, sb.helpers.createMapIterator);
     // [number, enumerator]
     sb.emitPushInt(node, 0);
     // [arr, enumerator]

@@ -18,3 +18,4 @@ export * from './RawIteratorSomeBaseHelper';
 export * from './RawIteratorSomeHelper';
 export * from './GetMapIteratorKeyHelper';
 export * from './GetMapIteratorValueHelper';
+export * from './CreateMapIteratorHelper';

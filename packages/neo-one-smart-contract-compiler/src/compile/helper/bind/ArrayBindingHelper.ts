@@ -22,77 +22,79 @@ export class ArrayBindingHelper extends TypedHelper<ts.ArrayBindingPattern> {
     const restElement = node.elements.find((element) => tsUtils.node.getDotDotDotToken(element) !== undefined);
     const elements = restElement === undefined ? [...node.elements] : node.elements.slice(0, -1);
 
-    const handleCommon = (
-      setup: (innerOptions: VisitOptions) => void,
-      getNext: (node: ts.Node, innerOptions: VisitOptions, idx: number) => void,
-      getRemaining: (node: ts.Node, innerOptions: VisitOptions) => void,
-    ) => (innerOptions: VisitOptions) => {
-      setup(innerOptions);
+    const handleCommon =
+      (
+        setup: (innerOptions: VisitOptions) => void,
+        getNext: (node: ts.Node, innerOptions: VisitOptions, idx: number) => void,
+        getRemaining: (node: ts.Node, innerOptions: VisitOptions) => void,
+      ) =>
+      (innerOptions: VisitOptions) => {
+        setup(innerOptions);
 
-      elements.forEach((element, idx) => {
-        if (ts.isOmittedExpression(element)) {
-          /* istanbul ignore next */
-          return;
-        }
+        elements.forEach((element, idx) => {
+          if (ts.isOmittedExpression(element)) {
+            /* istanbul ignore next */
+            return;
+          }
 
-        const name = tsUtils.node.getNameNode(element);
-        const initializer = tsUtils.initializer.getInitializer(element);
-        const elementType = sb.context.analysis.getType(name);
+          const name = tsUtils.node.getNameNode(element);
+          const initializer = tsUtils.initializer.getInitializer(element);
+          const elementType = sb.context.analysis.getType(name);
 
-        if (ts.isIdentifier(name)) {
-          sb.scope.add(tsUtils.node.getText(name));
-        }
+          if (ts.isIdentifier(name)) {
+            sb.scope.add(tsUtils.node.getText(name));
+          }
 
-        // [arrayVal, arrayVal]
-        sb.emitOp(element, 'DUP');
-        // [val, arrayVal]
-        getNext(element, innerOptions, idx);
+          // [arrayVal, arrayVal]
+          sb.emitOp(element, 'DUP');
+          // [val, arrayVal]
+          getNext(element, innerOptions, idx);
 
-        if (initializer !== undefined) {
-          sb.emitHelper(
-            node,
-            options,
-            sb.helpers.if({
-              condition: () => {
-                // [val, val, arrayVal]
-                sb.emitOp(node, 'DUP');
-                // [boolean, val, arrayVal]
-                sb.emitHelper(node, options, sb.helpers.isUndefined);
-              },
-              whenTrue: () => {
-                // [arrayVal]
-                sb.emitOp(node, 'DROP');
-                // [val, arrayVal]
-                sb.visit(initializer, options);
-              },
-            }),
-          );
-        }
+          if (initializer !== undefined) {
+            sb.emitHelper(
+              node,
+              options,
+              sb.helpers.if({
+                condition: () => {
+                  // [val, val, arrayVal]
+                  sb.emitOp(node, 'DUP');
+                  // [boolean, val, arrayVal]
+                  sb.emitHelper(node, options, sb.helpers.isUndefined);
+                },
+                whenTrue: () => {
+                  // [arrayVal]
+                  sb.emitOp(node, 'DROP');
+                  // [val, arrayVal]
+                  sb.visit(initializer, options);
+                },
+              }),
+            );
+          }
 
-        if (ts.isIdentifier(name)) {
-          // [arrayVal]
-          sb.scope.set(sb, node, options, tsUtils.node.getText(name));
-        } else if (ts.isArrayBindingPattern(name)) {
-          sb.emitHelper(name, options, sb.helpers.arrayBinding({ type: elementType }));
+          if (ts.isIdentifier(name)) {
+            // [arrayVal]
+            sb.scope.set(sb, node, options, tsUtils.node.getText(name));
+          } else if (ts.isArrayBindingPattern(name)) {
+            sb.emitHelper(name, options, sb.helpers.arrayBinding({ type: elementType }));
+          } else {
+            sb.emitHelper(name, options, sb.helpers.objectBinding({ type: elementType }));
+          }
+        });
+
+        if (restElement === undefined) {
+          // []
+          sb.emitOp(node, 'DROP');
         } else {
-          sb.emitHelper(name, options, sb.helpers.objectBinding({ type: elementType }));
+          sb.scope.add(tsUtils.node.getNameOrThrow(restElement));
+
+          // [arr]
+          getRemaining(restElement, innerOptions);
+          // [arrayVal]
+          sb.emitHelper(node, options, sb.helpers.wrapArray);
+          // []
+          sb.scope.set(sb, node, options, tsUtils.node.getNameOrThrow(restElement));
         }
-      });
-
-      if (restElement === undefined) {
-        // []
-        sb.emitOp(node, 'DROP');
-      } else {
-        sb.scope.add(tsUtils.node.getNameOrThrow(restElement));
-
-        // [arr]
-        getRemaining(restElement, innerOptions);
-        // [arrayVal]
-        sb.emitHelper(node, options, sb.helpers.wrapArray);
-        // []
-        sb.scope.set(sb, node, options, tsUtils.node.getNameOrThrow(restElement));
-      }
-    };
+      };
 
     const handleArray = handleCommon(
       () => {
@@ -136,7 +138,7 @@ export class ArrayBindingHelper extends TypedHelper<ts.ArrayBindingPattern> {
         // [map]
         sb.emitHelper(node, innerOptions, sb.helpers.unwrapMap);
         // [iterator]
-        sb.emitSysCall(node, 'System.Iterator.Create');
+        sb.emitHelper(node, options, sb.helpers.createMapIterator);
       },
       (element, innerOptions) => {
         // [iterator, iterator]
@@ -197,7 +199,7 @@ export class ArrayBindingHelper extends TypedHelper<ts.ArrayBindingPattern> {
         // [map]
         sb.emitHelper(node, innerOptions, sb.helpers.unwrapSet);
         // [iterator]
-        sb.emitSysCall(node, 'System.Iterator.Create');
+        sb.emitHelper(node, options, sb.helpers.createMapIterator);
       },
       (element) => {
         // [iterator, iterator]

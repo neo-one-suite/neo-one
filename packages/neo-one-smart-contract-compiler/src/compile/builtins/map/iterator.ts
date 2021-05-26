@@ -34,7 +34,7 @@ export class MapIterator extends BuiltinInstanceMemberCall {
     // [map]
     sb.emitHelper(node, options, sb.helpers.unwrapMap);
     // [iterator]
-    sb.emitSysCall(node, 'System.Iterator.Create');
+    sb.emitHelper(node, options, sb.helpers.createMapIterator);
     // [val]
     sb.emitHelper(node, options, sb.helpers.createIteratorIterableIterator({ deserializeKey: true }));
   }

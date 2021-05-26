@@ -12,7 +12,7 @@ export class ArrConcatHelper extends Helper {
     // [map, result]
     sb.emitHelper(node, options, sb.helpers.arrToMap);
     // [enumerator, result]
-    sb.emitSysCall(node, 'System.Iterator.Create');
+    sb.emitHelper(node, options, sb.helpers.createMapIterator);
     // [result]
     sb.emitHelper(
       node,
