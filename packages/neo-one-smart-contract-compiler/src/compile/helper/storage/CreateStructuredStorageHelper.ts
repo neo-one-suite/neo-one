@@ -26,10 +26,8 @@ export class CreateStructuredStorageHelper extends StructuredStorageBaseHelper {
       return;
     }
 
-    // [0]
-    sb.emitPushInt(node, 0);
     // [arr]
-    sb.emitOp(node, 'NEWARRAY');
+    sb.emitOp(node, 'NEWARRAY0');
     // [size, arr]
     sb.emitPushInt(node, 0);
     // [prefix, size, arr]

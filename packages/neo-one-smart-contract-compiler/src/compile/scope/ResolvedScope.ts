@@ -182,10 +182,8 @@ export class ResolvedScope implements Scope {
       sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.wrapUndefined);
       // [this, global]
       sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.wrapUndefined);
-      // [0, this, global]
-      sb.emitPushInt(node, 0);
       // [scopes, this, global]
-      sb.emitOp(node, 'NEWARRAY');
+      sb.emitOp(node, 'NEWARRAY0');
       // [3, scopes, this, global]
       sb.emitPushInt(node, 3);
       // [[scopes, this, global]]

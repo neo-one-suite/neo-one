@@ -44,10 +44,8 @@ export class RawEnumeratorFilterHelper extends Helper {
       );
     };
 
-    // [0, enumerator]
-    sb.emitPushInt(node, 0);
     // [accum, enumerator]
-    sb.emitOp(node, 'NEWARRAY');
+    sb.emitOp(node, 'NEWARRAY0');
     // [accum]
     sb.emitHelper(
       node,

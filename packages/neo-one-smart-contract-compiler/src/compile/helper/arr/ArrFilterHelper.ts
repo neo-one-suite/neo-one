@@ -52,10 +52,8 @@ export class ArrFilterHelper extends Helper {
     if (this.withIndex) {
       // [iterator]
       sb.emitHelper(node, options, sb.helpers.createMapIterator);
-      // [0, iterator]
-      sb.emitPushInt(node, 0);
       // [accum, iterator]
-      sb.emitOp(node, 'NEWARRAY');
+      sb.emitOp(node, 'NEWARRAY0');
       // [accum]
       sb.emitHelper(
         node,
@@ -80,10 +78,8 @@ export class ArrFilterHelper extends Helper {
     } else {
       // [enumerator]
       sb.emitHelper(node, options, sb.helpers.createMapIterator);
-      // [0, enumerator]
-      sb.emitPushInt(node, 0);
       // [accum, enumerator]
-      sb.emitOp(node, 'NEWARRAY');
+      sb.emitOp(node, 'NEWARRAY0');
       // [accum]
       sb.emitHelper(
         node,

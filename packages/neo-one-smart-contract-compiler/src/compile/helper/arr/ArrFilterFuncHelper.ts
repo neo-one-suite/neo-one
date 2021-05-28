@@ -23,10 +23,8 @@ export class ArrFilterFuncHelper extends Helper {
     sb.emitOp(node, 'ROLL');
     // [size, callable, ...arr]
     sb.emitOp(node, 'SWAP');
-    // [0, size, callable, ...arr]
-    sb.emitPushInt(node, 0);
     // [arr, size, callable, ...arr]
-    sb.emitOp(node, 'NEWARRAY');
+    sb.emitOp(node, 'NEWARRAY0');
     // [size, arr, callable, ...arr]
     sb.emitOp(node, 'SWAP');
     // [idx, size, arr, callable, ...arr]

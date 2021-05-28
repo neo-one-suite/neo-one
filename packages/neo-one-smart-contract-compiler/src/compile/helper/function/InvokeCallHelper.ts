@@ -41,10 +41,8 @@ export class InvokeCallHelper extends Helper {
       sb.helpers.getCallable({ bindThis: this.bindThis, overwriteThis: this.overwriteThis }),
     );
     if (this.noArgs) {
-      // [0, func]
-      sb.emitPushInt(node, 0);
       // [argsarray, func]
-      sb.emitOp(node, 'NEWARRAY');
+      sb.emitOp(node, 'NEWARRAY0');
       // [func, argsarray]
       sb.emitOp(node, 'SWAP');
     }

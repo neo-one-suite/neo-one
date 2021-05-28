@@ -27,10 +27,8 @@ export class InvokeConstructHelper extends Helper {
     // [func, ?argsarray]
     sb.emitHelper(node, options, sb.helpers.bindFunctionThis({ overwrite: true }));
     if (this.noArgs) {
-      // [0, func]
-      sb.emitPushInt(node, 0);
       // [argsarray, func]
-      sb.emitOp(node, 'NEWARRAY');
+      sb.emitOp(node, 'NEWARRAY0');
       // [func, argsarray]
       sb.emitOp(node, 'SWAP');
     }

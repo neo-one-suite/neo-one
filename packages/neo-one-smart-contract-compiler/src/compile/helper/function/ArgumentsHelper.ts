@@ -56,10 +56,8 @@ export class ArgumentsHelper extends Helper<ts.CallExpression | ts.NewExpression
     }
 
     if (args.some((arg) => ts.isSpreadElement(arg))) {
-      // [0]
-      sb.emitPushInt(node, 0);
       // [arr]
-      sb.emitOp(node, 'NEWARRAY');
+      sb.emitOp(node, 'NEWARRAY0');
       // [arr]
       args.forEach((arg) => {
         const handleArrayLike = () => {

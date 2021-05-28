@@ -36,10 +36,8 @@ export class ParametersHelper extends Helper {
     parameters =
       parameters.length > 0 && tsUtils.node.getName(parameters[0]) === 'this' ? parameters.slice(1) : parameters;
     if (this.asArgsArr) {
-      // [0, argsarr]
-      sb.emitPushInt(node, 0);
       // [outputarr, argsarr]
-      sb.emitOp(node, 'NEWARRAY');
+      sb.emitOp(node, 'NEWARRAY0');
       // [argsarr, outputarr]
       sb.emitOp(node, 'SWAP');
     }

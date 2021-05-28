@@ -8,10 +8,8 @@ import { Helper } from '../../Helper';
 export class CreateArrayHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (options.pushValue) {
-      // [0]
-      sb.emitPushInt(node, 0);
       // [arr]
-      sb.emitOp(node, 'NEWARRAY');
+      sb.emitOp(node, 'NEWARRAY0');
       // [val]
       sb.emitHelper(node, options, sb.helpers.wrapArray);
     }
