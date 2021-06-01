@@ -138,7 +138,13 @@ export const getParamsAndOptions = ({
   readonly transfer?: Transfer;
   readonly hash?: Hash256String;
 } => {
-  const { requiredArgs, forwardOptions, options: optionsIn, transfer, hash } = getParamAndOptionsResults({
+  const {
+    requiredArgs,
+    forwardOptions,
+    options: optionsIn,
+    transfer,
+    hash,
+  } = getParamAndOptionsResults({
     parameters,
     args,
   });
@@ -186,33 +192,35 @@ export const getParamsAndOptions = ({
   };
 };
 
-const createCall = ({
-  definition,
-  client,
-  func: { name, parameters = [], returnType, receive = false },
-}: {
-  readonly definition: SmartContractDefinition;
-  readonly client: Client;
-  readonly func: ContractMethodDescriptorClient;
-  // tslint:disable-next-line no-any
-}) => async (...args: any[]): Promise<Return | undefined> => {
-  const { params, network, address } = getParamsAndOptions({
+const createCall =
+  ({
     definition,
-    parameters,
-    args,
-    receive,
     client,
-  });
+    func: { name, parameters = [], returnType, receive = false },
+  }: {
+    readonly definition: SmartContractDefinition;
+    readonly client: Client;
+    readonly func: ContractMethodDescriptorClient;
+    // tslint:disable-next-line no-any
+  }) =>
+  async (...args: any[]): Promise<Return | undefined> => {
+    const { params, network, address } = getParamsAndOptions({
+      definition,
+      parameters,
+      args,
+      receive,
+      client,
+    });
 
-  // TODO: this needs to be reverted when we change how we call contracts
-  const receipt = await client.__call(network, address, name, [name, ...params]);
+    // TODO: this needs to be reverted when we change how we call contracts
+    const receipt = await client.__call(network, address, name, [name, ...params]);
 
-  return common.convertCallResult({
-    returnType,
-    receipt,
-    sourceMaps: definition.sourceMaps,
-  });
-};
+    return common.convertCallResult({
+      returnType,
+      receipt,
+      sourceMaps: definition.sourceMaps,
+    });
+  };
 
 const createInvoke = ({
   definition,

@@ -77,7 +77,7 @@ export class ArgumentsHelper extends Helper<ts.CallExpression | ts.NewExpression
           sb.emitHelper(
             arg,
             innerOptions,
-            sb.helpers.arrReduce({
+            sb.helpers.arrReduceWithoutIterator({
               each: handleArrayLike,
             }),
           );

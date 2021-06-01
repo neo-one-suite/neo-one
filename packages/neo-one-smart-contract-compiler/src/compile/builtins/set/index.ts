@@ -51,7 +51,7 @@ class SetValue extends BuiltinNew {
       sb.emitHelper(
         node,
         options,
-        sb.helpers.arrReduce({
+        sb.helpers.arrReduceWithoutIterator({
           each: () => {
             // [map, val, map]
             sb.emitOp(node, 'TUCK');

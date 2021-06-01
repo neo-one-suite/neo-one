@@ -18,15 +18,13 @@ export class MapMapHelper extends Helper {
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
-    // [iterator]
-    sb.emitHelper(node, options, sb.helpers.createMapIterator);
-    // [accum, iterator]
+    // [accum, map]
     sb.emitOp(node, 'NEWMAP');
     // [accum]
     sb.emitHelper(
       node,
       options,
-      sb.helpers.rawIteratorReduce({
+      sb.helpers.mapReduceWithoutIterator({
         each: (innerOptions) => {
           // [accum, accum, key, val]
           sb.emitOp(node, 'DUP');

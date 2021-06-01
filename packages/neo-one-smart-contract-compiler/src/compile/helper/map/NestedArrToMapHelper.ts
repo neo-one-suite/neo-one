@@ -12,7 +12,7 @@ export class NestedArrToMapHelper extends Helper {
     sb.emitHelper(
       node,
       options,
-      sb.helpers.arrReduce({
+      sb.helpers.arrReduceWithoutIterator({
         each: () => {
           // [map, [key, val], map]
           sb.emitOp(node, 'TUCK');

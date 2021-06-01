@@ -30,6 +30,7 @@ export class MapReduceWithoutIteratorHelper extends Helper {
     sb.emitOp(node, 'SIZE');
     // [idx, size, keysArr, map, accum]
     sb.emitPushInt(node, 0);
+    // [accum]
     sb.emitHelper(
       node,
       options,
@@ -67,25 +68,29 @@ export class MapReduceWithoutIteratorHelper extends Helper {
           sb.emitOp(node, 'SWAP');
           // [6, key, value, idx, size, keysArr, map, accum]
           sb.emitPushInt(node, 6);
-          // [accum, key, value, idx, size, keysArr, map, accum]
-          sb.emitOp(node, 'PICK');
-          // [accum, idx, size, keysArr, map, accum]
+          // [accum, key, value, idx, size, keysArr, map]
+          sb.emitOp(node, 'ROLL');
+          // [accum, idx, size, keysArr, map]
           this.each(options);
+          // [5, accum, idx, size, keysArr, map]
+          sb.emitPushInt(node, 5);
+          // [map, keysArr, size, idx, accum]
+          sb.emitOp(node, 'REVERSEN');
           // [idx, size, keysArr, map, accum]
-          sb.emitOp(node, 'DROP');
+          sb.emitOp(node, 'REVERSE4');
         },
         incrementor: () => {
           // [idx, size, keysArr, map, accum]
           sb.emitOp(node, 'INC');
         },
         cleanup: () => {
+          // [size, keysArr, map, accum]
+          sb.emitOp(node, 'DROP');
           // [keysArr, map, accum]
           sb.emitOp(node, 'DROP');
           // [map, accum]
           sb.emitOp(node, 'DROP');
           // [accum]
-          sb.emitOp(node, 'DROP');
-          // []
           sb.emitOp(node, 'DROP');
         },
       }),

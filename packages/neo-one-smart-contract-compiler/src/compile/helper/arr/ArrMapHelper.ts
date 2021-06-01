@@ -21,25 +21,20 @@ export class ArrMapHelper extends Helper {
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
-    // [map]
-    sb.emitHelper(node, options, sb.helpers.arrToMap);
     if (this.withIndex) {
-      // [iterator]
-      sb.emitHelper(node, options, sb.helpers.createMapIterator);
-      // [accum, iterator]
+      // [accum, arr]
       sb.emitOp(node, 'NEWARRAY0');
       // [accum]
       sb.emitHelper(
         node,
         options,
-        sb.helpers.rawIteratorReduce({
+        sb.helpers.arrReduceWithoutIterator({
+          withIndex: true,
           each: (innerOptions) => {
-            // [val, accum, idx]
-            sb.emitOp(node, 'ROT');
-            // [idx, val, accum]
+            // [idx, accum, val]
             sb.emitOp(node, 'ROT');
             // [val, idx, accum]
-            sb.emitOp(node, 'SWAP');
+            sb.emitOp(node, 'ROT');
             // [val, accum]
             // tslint:disable-next-line no-map-without-usage
             this.map(innerOptions);
@@ -53,15 +48,13 @@ export class ArrMapHelper extends Helper {
         }),
       );
     } else {
-      // [enumerator]
-      sb.emitHelper(node, options, sb.helpers.createMapIterator);
-      // [accum, enumerator]
+      // [accum, arr]
       sb.emitOp(node, 'NEWARRAY0');
       // [accum]
       sb.emitHelper(
         node,
         options,
-        sb.helpers.rawEnumeratorReduce({
+        sb.helpers.arrReduceWithoutIterator({
           each: (innerOptions) => {
             // [accum, val, accum]
             sb.emitOp(node, 'TUCK');

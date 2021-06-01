@@ -117,13 +117,13 @@ export const getForwardValues = ({
   );
 };
 
-const createForwardValueArgs = (
-  parameters: readonly ABIParameter[],
-  events: readonly ContractEventDescriptorClient[],
-) => (
-  // tslint:disable-next-line no-any readonly-array
-  ...args: any[]
-) => getForwardValues({ parameters, events, args });
+const createForwardValueArgs =
+  (parameters: readonly ABIParameter[], events: readonly ContractEventDescriptorClient[]) =>
+  (
+    // tslint:disable-next-line no-any readonly-array
+    ...args: any[]
+  ) =>
+    getForwardValues({ parameters, events, args });
 
 export const convertActions = ({
   actions,
@@ -161,38 +161,40 @@ export const filterLogs = (actions: ReadonlyArray<Event | Log>): readonly Log[] 
 const isInvokeReceipt = (value: any): value is InvokeReceipt<ContractParameter> =>
   typeof value === 'object' && value.result !== undefined && value.events !== undefined && value.logs !== undefined;
 
-const createForwardValueReturn = (returnType: ABIReturn, forwardEvents: readonly ContractEventDescriptorClient[]) => (
-  receiptOrValue: InvokeReceipt<ContractParameter> | ContractParameter,
-  // tslint:disable-next-line no-any
-): any => {
-  if (isInvokeReceipt(receiptOrValue)) {
-    const actions = convertActions({
-      actions: receiptOrValue.raw.actions,
-      events: forwardEvents,
-    });
-    const foundForwardEvents = filterEvents(actions);
-    const events = _.uniqBy(
-      _.sortBy(receiptOrValue.events.concat(foundForwardEvents), [(event: Event) => event.index]),
-      (event: Event) => event.index,
-    );
-    if (receiptOrValue.result.state === 'HALT') {
-      const value = convertContractParameter({ type: returnType, parameter: receiptOrValue.result.value });
+const createForwardValueReturn =
+  (returnType: ABIReturn, forwardEvents: readonly ContractEventDescriptorClient[]) =>
+  (
+    receiptOrValue: InvokeReceipt<ContractParameter> | ContractParameter,
+    // tslint:disable-next-line no-any
+  ): any => {
+    if (isInvokeReceipt(receiptOrValue)) {
+      const actions = convertActions({
+        actions: receiptOrValue.raw.actions,
+        events: forwardEvents,
+      });
+      const foundForwardEvents = filterEvents(actions);
+      const events = _.uniqBy(
+        _.sortBy(receiptOrValue.events.concat(foundForwardEvents), [(event: Event) => event.index]),
+        (event: Event) => event.index,
+      );
+      if (receiptOrValue.result.state === 'HALT') {
+        const value = convertContractParameter({ type: returnType, parameter: receiptOrValue.result.value });
 
-      return {
-        ...receiptOrValue,
-        events,
-        result: {
-          ...receiptOrValue.result,
-          value,
-        },
-      };
+        return {
+          ...receiptOrValue,
+          events,
+          result: {
+            ...receiptOrValue.result,
+            value,
+          },
+        };
+      }
+
+      return { ...receiptOrValue, events };
     }
 
-    return { ...receiptOrValue, events };
-  }
-
-  return convertContractParameter({ type: returnType, parameter: receiptOrValue });
-};
+    return convertContractParameter({ type: returnType, parameter: receiptOrValue });
+  };
 
 export const getParametersObject = ({
   abiParameters,

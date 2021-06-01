@@ -44,7 +44,7 @@ export class CacheStorageHelper extends Helper {
           sb.emitHelper(
             node,
             options,
-            sb.helpers.mapForEach({
+            sb.helpers.mapForEachWithoutIterator({
               each: () => {
                 // [context, keyBuffer, valBuffer]
                 sb.emitSysCall(node, 'System.Storage.GetContext');

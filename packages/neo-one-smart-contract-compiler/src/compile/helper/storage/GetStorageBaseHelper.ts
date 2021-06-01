@@ -29,8 +29,12 @@ export class GetStorageBaseHelper extends Helper {
           sb.emitSysCall(node, 'System.Iterator.Next');
         },
         whenTrue: () => {
+          // [[key, value]]
+          sb.emitSysCall(node, 'System.Iterator.Value');
+          // [1, [key, value]]
+          sb.emitPushInt(node, 1);
           // [value]
-          sb.emitHelper(node, options, sb.helpers.getMapIteratorValue);
+          sb.emitOp(node, 'PICKITEM');
         },
         whenFalse: () => {
           // []

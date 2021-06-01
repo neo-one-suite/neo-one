@@ -40,12 +40,16 @@ export class DeleteIteratorCacheStorageHelper extends Helper {
           sb.emitOp(node, 'NUMEQUAL');
         },
         whenTrue: () => {
+          // [map]
+          sb.emitHelper(node, options, sb.helpers.arrToMap);
           // []
           sb.emitHelper(
             node,
             options,
-            sb.helpers.arrForEach({
+            sb.helpers.mapForEachWithoutIterator({
               each: () => {
+                // [valBuffer]
+                sb.emitOp(node, 'DROP');
                 // [context, valBuffer]
                 sb.emitSysCall(node, 'System.Storage.GetContext');
                 // []

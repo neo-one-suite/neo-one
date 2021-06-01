@@ -82,7 +82,7 @@ Array [
 ]
 `;
 
-exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: contract hash 1`] = `"0xcaf8bc2be457bb9608fbc0389e2231d8e8a6a865"`;
+exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: contract hash 1`] = `"0xcb8f588dc44ec1361cdd5371119e7af6a0c89db8"`;
 
 exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: contract methods 1`] = `
 Array [
@@ -353,8 +353,8 @@ Array [
 ]
 `;
 
-exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: deploy consumed 1`] = `"88904180"`;
+exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: deploy consumed 1`] = `"73148300"`;
 
 exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: nef tokens 1`] = `Array []`;
 
-exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: transfer consume 1`] = `"127470820"`;
+exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: transfer consume 1`] = `"90319720"`;
