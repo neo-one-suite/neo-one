@@ -29,7 +29,7 @@ export abstract class UnwrapCopyStructHelper extends UnwrapHelper {
     sb.emitHelper(
       node,
       options,
-      sb.helpers.arrReduce({
+      sb.helpers.arrReduceWithoutIterator({
         withIndex: true,
         each: () => {
           // [accum, accum, val, idx]

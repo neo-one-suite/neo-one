@@ -28,6 +28,7 @@ export class MapForEachWithoutIteratorHelper extends Helper {
     sb.emitOp(node, 'SIZE');
     // [idx, size, arr]
     sb.emitPushInt(node, 0);
+    // []
     sb.emitHelper(
       node,
       loopOptions,

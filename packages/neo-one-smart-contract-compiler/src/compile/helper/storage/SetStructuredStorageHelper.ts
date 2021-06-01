@@ -30,7 +30,7 @@ export class SetStructuredStorageHelper extends KeyStructuredStorageBaseHelper {
     sb.emitHelper(
       node,
       options,
-      sb.helpers.arrReduce({
+      sb.helpers.arrReduceWithoutIterator({
         each: (innerOptions) => {
           // [struct]
           sb.emitHelper(node, innerOptions, sb.helpers.handlePrefixArrayStructuredStorage);

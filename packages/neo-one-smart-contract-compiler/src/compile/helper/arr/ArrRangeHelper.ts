@@ -29,10 +29,8 @@ export class ArrRangeHelper extends Helper {
     sb.emitOp(node, 'NEWARRAY');
     // [enumerator]
     sb.emitHelper(node, options, sb.helpers.createMapIterator);
-    // [number, enumerator]
-    sb.emitPushInt(node, 0);
     // [arr, enumerator]
-    sb.emitOp(node, 'NEWARRAY');
+    sb.emitOp(node, 'NEWARRAY0');
     // [enumerator, arr]
     sb.emitOp(node, 'SWAP');
     // [number, enumerator, arr]

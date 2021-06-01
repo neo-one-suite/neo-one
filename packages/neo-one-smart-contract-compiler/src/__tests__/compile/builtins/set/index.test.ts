@@ -11,6 +11,14 @@ describe('Set', () => {
     `);
   });
 
+  test('can create new set with args', async () => {
+    await helpers.executeString(`
+      const x = new Set<string>(['neo']);
+
+      assertEqual(x.has('neo'), true);
+    `);
+  });
+
   test('cannot be extended', async () => {
     await helpers.compileString(
       `

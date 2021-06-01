@@ -30,10 +30,8 @@ export class ArrayConcat extends BuiltinInstanceMemberCall {
     };
 
     const handleOther = () => {
-      // [number, val]
-      sb.emitPushInt(node, 0);
       // [arr, val]
-      sb.emitOp(node, 'NEWARRAY');
+      sb.emitOp(node, 'NEWARRAY0');
       // [arr, val, arr]
       sb.emitOp(node, 'TUCK');
       // [val, arr, arr]

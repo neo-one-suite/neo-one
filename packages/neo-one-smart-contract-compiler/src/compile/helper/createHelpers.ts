@@ -21,6 +21,8 @@ import {
   ArrReduceFuncHelper,
   ArrReduceHelper,
   ArrReduceHelperOptions,
+  ArrReduceWithoutIteratorHelper,
+  ArrReduceWithoutIteratorHelperOptions,
   ArrSomeFuncHelper,
   ArrSomeHelper,
   ArrSomeHelperOptions,
@@ -456,6 +458,7 @@ export interface Helpers {
   readonly arrForEachFunc: ArrForEachFuncHelper;
   readonly arrRange: (options: ArrRangeHelperOptions) => ArrRangeHelper;
   readonly arrReduce: (options: ArrReduceHelperOptions) => ArrReduceHelper;
+  readonly arrReduceWithoutIterator: (options: ArrReduceWithoutIteratorHelperOptions) => ArrReduceWithoutIteratorHelper;
   readonly arrReduceFunc: ArrReduceFuncHelper;
   readonly arrSomeFunc: ArrSomeFuncHelper;
   readonly arrSome: (options: ArrSomeHelperOptions) => ArrSomeHelper;
@@ -933,6 +936,7 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     arrForEachFunc: new ArrForEachFuncHelper(),
     arrRange: (options) => new ArrRangeHelper(options),
     arrReduce: (options) => new ArrReduceHelper(options),
+    arrReduceWithoutIterator: (options) => new ArrReduceWithoutIteratorHelper(options),
     arrReduceFunc: new ArrReduceFuncHelper(),
     arrSomeFunc: new ArrSomeFuncHelper(),
     arrSome: (options) => new ArrSomeHelper(options),

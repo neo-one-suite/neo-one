@@ -43,7 +43,7 @@ export class ArrToStringHelper extends TypedHelper {
     sb.emitHelper(
       node,
       options,
-      sb.helpers.arrReduce({
+      sb.helpers.arrReduceWithoutIterator({
         withIndex: true,
         each: (innerOptions) => {
           sb.emitHelper(

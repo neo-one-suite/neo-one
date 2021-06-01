@@ -137,17 +137,13 @@ export const testToken = async ({
       }
       expect(event.parameters.amount.toString()).toEqual(transferValue.toString());
 
-      const [
-        transferMasterBalance,
-        transferAccountBalance,
-        transferTotalSupply,
-        transferZeroBalance,
-      ] = await Promise.all([
-        smartContract.balanceOf(masterAccountID.address),
-        smartContract.balanceOf(account0.address),
-        smartContract.totalSupply(),
-        smartContract.balanceOf(privateKeyToAddress(ZERO.PRIVATE_KEY)),
-      ]);
+      const [transferMasterBalance, transferAccountBalance, transferTotalSupply, transferZeroBalance] =
+        await Promise.all([
+          smartContract.balanceOf(masterAccountID.address),
+          smartContract.balanceOf(account0.address),
+          smartContract.totalSupply(),
+          smartContract.balanceOf(privateKeyToAddress(ZERO.PRIVATE_KEY)),
+        ]);
 
       const remainingValue = issueValue.minus(transferValue);
       expect(transferMasterBalance.toString()).toEqual(remainingValue.toString());

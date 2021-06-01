@@ -57,86 +57,88 @@ export class ObjectBindingHelper extends TypedHelper<ts.ObjectBindingPattern> {
       );
     };
 
-    const createProcessBuiltin = (builtinName: string, isBuiltinValue = false) => (innerOptions: VisitOptions) => {
-      if (restElement !== undefined) {
-        sb.context.reportUnsupportedEfficiency(restElement);
-      }
-
-      elements.forEach((element) => {
-        const nameNode = tsUtils.node.getNameNode(element);
-        const propertyName = tsUtils.node.getPropertyNameNode(element);
-        const initializer = tsUtils.initializer.getInitializer(element);
-        const elementType = sb.context.analysis.getType(nameNode);
-
-        if (ts.isIdentifier(nameNode)) {
-          sb.scope.add(tsUtils.node.getText(nameNode));
+    const createProcessBuiltin =
+      (builtinName: string, isBuiltinValue = false) =>
+      (innerOptions: VisitOptions) => {
+        if (restElement !== undefined) {
+          sb.context.reportUnsupportedEfficiency(restElement);
         }
+
+        elements.forEach((element) => {
+          const nameNode = tsUtils.node.getNameNode(element);
+          const propertyName = tsUtils.node.getPropertyNameNode(element);
+          const initializer = tsUtils.initializer.getInitializer(element);
+          const elementType = sb.context.analysis.getType(nameNode);
+
+          if (ts.isIdentifier(nameNode)) {
+            sb.scope.add(tsUtils.node.getText(nameNode));
+          }
+
+          if (!isBuiltinValue) {
+            // [objectVal, objectVal]
+            sb.emitOp(element, 'DUP');
+          }
+
+          if (
+            propertyName === undefined ||
+            ts.isIdentifier(propertyName) ||
+            ts.isStringLiteral(propertyName) ||
+            ts.isNumericLiteral(propertyName)
+          ) {
+            const memberName =
+              propertyName === undefined
+                ? tsUtils.node.getNameOrThrow(element)
+                : ts.isIdentifier(propertyName)
+                ? tsUtils.node.getText(propertyName)
+                : ts.isStringLiteral(propertyName)
+                ? tsUtils.literal.getLiteralValue(propertyName)
+                : `${tsUtils.literal.getLiteralValue(propertyName)}`;
+            const member = sb.context.builtins.getOnlyMember(builtinName, memberName);
+
+            if (member === undefined) {
+              throwInnerTypeError(innerOptions);
+            } else {
+              handleBuiltin(member, element, innerOptions);
+            }
+          } else {
+            sb.context.reportUnsupported(element);
+          }
+
+          if (initializer !== undefined) {
+            sb.emitHelper(
+              node,
+              innerOptions,
+              sb.helpers.if({
+                condition: () => {
+                  // [val, val, objectVal]
+                  sb.emitOp(node, 'DUP');
+                  // [boolean, val, objectVal]
+                  sb.emitHelper(node, innerOptions, sb.helpers.isUndefined);
+                },
+                whenTrue: () => {
+                  // [objectVal]
+                  sb.emitOp(node, 'DROP');
+                  // [val, objectVal]
+                  sb.visit(initializer, innerOptions);
+                },
+              }),
+            );
+          }
+
+          if (ts.isIdentifier(nameNode)) {
+            // [objectVal]
+            sb.scope.set(sb, element, innerOptions, tsUtils.node.getText(nameNode));
+          } else if (ts.isArrayBindingPattern(nameNode)) {
+            sb.emitHelper(nameNode, innerOptions, sb.helpers.arrayBinding({ type: elementType }));
+          } else {
+            sb.emitHelper(nameNode, innerOptions, sb.helpers.objectBinding({ type: elementType }));
+          }
+        });
 
         if (!isBuiltinValue) {
-          // [objectVal, objectVal]
-          sb.emitOp(element, 'DUP');
+          sb.emitOp(node, 'DROP');
         }
-
-        if (
-          propertyName === undefined ||
-          ts.isIdentifier(propertyName) ||
-          ts.isStringLiteral(propertyName) ||
-          ts.isNumericLiteral(propertyName)
-        ) {
-          const memberName =
-            propertyName === undefined
-              ? tsUtils.node.getNameOrThrow(element)
-              : ts.isIdentifier(propertyName)
-              ? tsUtils.node.getText(propertyName)
-              : ts.isStringLiteral(propertyName)
-              ? tsUtils.literal.getLiteralValue(propertyName)
-              : `${tsUtils.literal.getLiteralValue(propertyName)}`;
-          const member = sb.context.builtins.getOnlyMember(builtinName, memberName);
-
-          if (member === undefined) {
-            throwInnerTypeError(innerOptions);
-          } else {
-            handleBuiltin(member, element, innerOptions);
-          }
-        } else {
-          sb.context.reportUnsupported(element);
-        }
-
-        if (initializer !== undefined) {
-          sb.emitHelper(
-            node,
-            innerOptions,
-            sb.helpers.if({
-              condition: () => {
-                // [val, val, objectVal]
-                sb.emitOp(node, 'DUP');
-                // [boolean, val, objectVal]
-                sb.emitHelper(node, innerOptions, sb.helpers.isUndefined);
-              },
-              whenTrue: () => {
-                // [objectVal]
-                sb.emitOp(node, 'DROP');
-                // [val, objectVal]
-                sb.visit(initializer, innerOptions);
-              },
-            }),
-          );
-        }
-
-        if (ts.isIdentifier(nameNode)) {
-          // [objectVal]
-          sb.scope.set(sb, element, innerOptions, tsUtils.node.getText(nameNode));
-        } else if (ts.isArrayBindingPattern(nameNode)) {
-          sb.emitHelper(nameNode, innerOptions, sb.helpers.arrayBinding({ type: elementType }));
-        } else {
-          sb.emitHelper(nameNode, innerOptions, sb.helpers.objectBinding({ type: elementType }));
-        }
-      });
-
-      if (!isBuiltinValue) {
-        sb.emitOp(node, 'DROP');
-      }
-    };
+      };
 
     const processObject = (innerOptions: VisitOptions) => {
       let addSymbolProp = () => {
@@ -146,14 +148,10 @@ export class ObjectBindingHelper extends TypedHelper<ts.ObjectBindingPattern> {
         // do nothing
       };
       if (restElement !== undefined) {
-        // [0]
-        sb.emitPushInt(node, 0);
         // [symbolArr]
-        sb.emitOp(node, 'NEWARRAY');
-        // [0]
-        sb.emitPushInt(node, 0);
+        sb.emitOp(node, 'NEWARRAY0');
         // [propertyArr, symbolArr]
-        sb.emitOp(node, 'NEWARRAY');
+        sb.emitOp(node, 'NEWARRAY0');
         // [objectVal, propertyArr, symbolArr]
         sb.emitOp(node, 'ROT');
         addSymbolProp = () => {

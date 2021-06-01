@@ -42,10 +42,8 @@ export class GenericLogSerializeHelper extends Helper {
     const handleMap = (innerOptions: VisitOptions) => {
       // [map]
       sb.emitHelper(node, innerOptions, sb.helpers.unwrapMap);
-      // [0, map]
-      sb.emitPushInt(node, 0);
       // [arr, map]
-      sb.emitOp(node, 'NEWARRAY');
+      sb.emitOp(node, 'NEWARRAY0');
       sb.emitHelper(
         node,
         innerOptions,
@@ -80,10 +78,8 @@ export class GenericLogSerializeHelper extends Helper {
     const handleSet = (innerOptions: VisitOptions) => {
       // [map]
       sb.emitHelper(node, innerOptions, sb.helpers.unwrapSet);
-      // [0, map]
-      sb.emitPushInt(node, 0);
       // [arr, map]
-      sb.emitOp(node, 'NEWARRAY');
+      sb.emitOp(node, 'NEWARRAY0');
       sb.emitHelper(
         node,
         innerOptions,

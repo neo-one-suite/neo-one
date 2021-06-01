@@ -29,10 +29,8 @@ export class IterableIteratorReduceHelper extends Helper {
     sb.emitPushInt(node, IterableIteratorSlots.next);
     // [callable, accum]
     sb.emitOp(node, 'PICKITEM');
-    // [0, argsarr, callable, accum]
-    sb.emitPushInt(node, 0);
     // [argsarr, callable, accum]
-    sb.emitOp(node, 'NEWARRAY');
+    sb.emitOp(node, 'NEWARRAY0');
     // [accum, argsarr, callable]
     sb.emitOp(node, 'ROT');
     sb.emitHelper(
@@ -74,10 +72,8 @@ export class IterableIteratorReduceHelper extends Helper {
           sb.emitPushInt(node, IteratorResultSlots.value);
           // [val, accum, callable]
           sb.emitOp(node, 'PICKITEM');
-          // [0, val, accum, callable]
-          sb.emitPushInt(node, 0);
           // [argsarr, val, accum, callable]
-          sb.emitOp(node, 'NEWARRAY');
+          sb.emitOp(node, 'NEWARRAY0');
           // [val, argsarr, accum, callable]
           sb.emitOp(node, 'SWAP');
           // [accum, val, argsarr, callable]

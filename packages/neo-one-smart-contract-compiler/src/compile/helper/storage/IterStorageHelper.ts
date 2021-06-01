@@ -58,7 +58,7 @@ export class IterStorageHelper extends Helper {
     // It's important that these arrays are in this order before being concatenated
     // so that the cached values are read later in the iteration when converting the
     // concatenated array into a map. If there are duplicate keys in the map then the later
-    // ones the cache will override the previous ones from storage
+    // ones in the cache will override the previous ones from storage
     // [cacheArr, storageArr]
     sb.emitHelper(node, options, sb.helpers.mapToNestedArr);
     // [nestedArr]

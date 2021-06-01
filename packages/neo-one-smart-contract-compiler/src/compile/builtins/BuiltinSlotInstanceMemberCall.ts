@@ -34,10 +34,8 @@ export class BuiltinSlotInstanceMemberCall extends BuiltinInstanceMemberCall {
     sb.emitPushInt(node, this.slot);
     // [callable]
     sb.emitOp(node, 'PICKITEM');
-    // [0, callable]
-    sb.emitPushInt(node, 0);
     // [argsarr, callable]
-    sb.emitOp(node, 'NEWARRAY');
+    sb.emitOp(node, 'NEWARRAY0');
     // [callable, argsarr]
     sb.emitOp(node, 'SWAP');
     // [val]

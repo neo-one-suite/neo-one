@@ -27,10 +27,8 @@ export class IterableIteratorForEachHelper extends Helper {
     sb.emitPushInt(node, IterableIteratorSlots.next);
     // [callable]
     sb.emitOp(node, 'PICKITEM');
-    // [0, argsarr, callable]
-    sb.emitPushInt(node, 0);
     // [argsarr, callable]
-    sb.emitOp(node, 'NEWARRAY');
+    sb.emitOp(node, 'NEWARRAY0');
     sb.emitHelper(
       node,
       options,
@@ -58,10 +56,8 @@ export class IterableIteratorForEachHelper extends Helper {
           sb.emitPushInt(node, IteratorResultSlots.value);
           // [val, callable]
           sb.emitOp(node, 'PICKITEM');
-          // [0, val, callable]
-          sb.emitPushInt(node, 0);
           // [argsarr, val, callable]
-          sb.emitOp(node, 'NEWARRAY');
+          sb.emitOp(node, 'NEWARRAY0');
           // [val, argsarr, callable]
           sb.emitOp(node, 'SWAP');
           // [argsarr, callable]

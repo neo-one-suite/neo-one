@@ -60,10 +60,8 @@ export class CreateGlobalObjectHelper extends Helper {
     sb.emitOp(node, 'DUP');
     // [number, map, map]
     sb.emitPushInt(node, GlobalProperty.Modules);
-    // [number, number, map, map]
-    sb.emitPushInt(node, 0);
     // [arr, number, map, map]
-    sb.emitOp(node, 'NEWARRAY');
+    sb.emitOp(node, 'NEWARRAY0');
     // [map]
     sb.emitOp(node, 'SETITEM');
     // [map, map]

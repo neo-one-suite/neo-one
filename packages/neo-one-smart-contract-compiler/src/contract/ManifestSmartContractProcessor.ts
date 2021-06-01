@@ -4,8 +4,8 @@ import {
   ContractEventDescriptorClient,
   ContractGroup,
   ContractPermission,
+  ContractPermissionDescriptor,
   SenderAddressABIDefault,
-  UInt160Hex,
   WildcardContainer,
 } from '@neo-one/client-common';
 import { NEO_ONE_METHOD_RESERVED_PARAM } from '@neo-one/client-core';
@@ -69,7 +69,7 @@ export class ManifestSmartContractProcessor {
     return this.properties.permissions;
   }
 
-  private processTrusts(): WildcardContainer<UInt160Hex> {
+  private processTrusts(): WildcardContainer<ContractPermissionDescriptor> {
     return this.properties.trusts;
   }
 
@@ -145,100 +145,96 @@ export class ManifestSmartContractProcessor {
       .concat([deployInfo].filter(utils.notNull));
 
     return _.flatten<SmartContractInfoMethodDescriptor>(
-      propInfos.map(
-        (propInfo): ReadonlyArray<SmartContractInfoMethodDescriptor> => {
-          switch (propInfo.type) {
-            case 'deploy':
-              return [
-                {
-                  name: propInfo.name,
-                  parameters: propInfo.isMixinDeploy
-                    ? []
-                    : this.getParameters({ callSignature: propInfo.callSignature }),
-                  returnType: BOOLEAN_RETURN,
-                  safe: propInfo.isSafe,
-                },
-              ];
-            case 'upgrade':
-              return [
-                {
-                  name: propInfo.name,
-                  parameters: [
-                    { name: 'script', type: 'Buffer' },
-                    { name: 'manifest', type: 'Buffer' },
-                  ],
-                  returnType: VOID_RETURN,
-                  safe: propInfo.isSafe,
-                },
-              ];
-            case 'function':
-              return [
-                {
-                  name: propInfo.name,
-                  parameters: this.getParameters({
-                    callSignature: propInfo.callSignature,
-                  }),
-                  returnType: this.toABIReturn(propInfo.decl, propInfo.returnType),
-                  constant: propInfo.constant,
-                  safe: propInfo.isSafe,
-                },
-              ];
-            case 'property':
-              return [
-                {
-                  name: propInfo.name,
-                  parameters: [],
-                  returnType: this.toABIReturn(propInfo.decl, propInfo.propertyType),
-                  constant: true,
-                  safe: propInfo.isSafe,
-                },
-                propInfo.isReadonly
-                  ? undefined
-                  : {
-                      name: getSetterName(propInfo.name),
-                      parameters: [
-                        this.toABIParameter(propInfo.name, propInfo.decl, propInfo.propertyType, false, {
-                          error: false,
-                        }),
-                      ].filter(utils.notNull),
-                      returnType: VOID_RETURN,
-                      safe: propInfo.isSafe,
-                    },
-              ].filter(utils.notNull);
-            case 'accessor':
-              return [
-                propInfo.getter === undefined
-                  ? undefined
-                  : {
-                      name: propInfo.getter.name,
-                      parameters: [],
-                      constant: propInfo.getter.constant,
-                      returnType: this.toABIReturn(propInfo.getter.decl, propInfo.propertyType),
-                      safe: propInfo.getter.isSafe,
-                    },
-                propInfo.setter === undefined
-                  ? undefined
-                  : {
-                      name: propInfo.setter.name,
-                      parameters: [
-                        this.toABIParameter(
-                          propInfo.name,
-                          propInfo.getter === undefined ? propInfo.setter.decl : propInfo.getter.decl,
-                          propInfo.propertyType,
-                          false,
-                          propInfo.getter === undefined ? { error: true } : undefined,
-                        ),
-                      ].filter(utils.notNull),
-                      returnType: VOID_RETURN,
-                      safe: propInfo.setter.isSafe,
-                    },
-              ].filter(utils.notNull);
-            default:
-              utils.assertNever(propInfo);
-              throw new Error('For TS');
-          }
-        },
-      ),
+      propInfos.map((propInfo): ReadonlyArray<SmartContractInfoMethodDescriptor> => {
+        switch (propInfo.type) {
+          case 'deploy':
+            return [
+              {
+                name: propInfo.name,
+                parameters: propInfo.isMixinDeploy ? [] : this.getParameters({ callSignature: propInfo.callSignature }),
+                returnType: BOOLEAN_RETURN,
+                safe: propInfo.isSafe,
+              },
+            ];
+          case 'upgrade':
+            return [
+              {
+                name: propInfo.name,
+                parameters: [
+                  { name: 'script', type: 'Buffer' },
+                  { name: 'manifest', type: 'Buffer' },
+                ],
+                returnType: VOID_RETURN,
+                safe: propInfo.isSafe,
+              },
+            ];
+          case 'function':
+            return [
+              {
+                name: propInfo.name,
+                parameters: this.getParameters({
+                  callSignature: propInfo.callSignature,
+                }),
+                returnType: this.toABIReturn(propInfo.decl, propInfo.returnType),
+                constant: propInfo.constant,
+                safe: propInfo.isSafe,
+              },
+            ];
+          case 'property':
+            return [
+              {
+                name: propInfo.name,
+                parameters: [],
+                returnType: this.toABIReturn(propInfo.decl, propInfo.propertyType),
+                constant: true,
+                safe: propInfo.isSafe,
+              },
+              propInfo.isReadonly
+                ? undefined
+                : {
+                    name: getSetterName(propInfo.name),
+                    parameters: [
+                      this.toABIParameter(propInfo.name, propInfo.decl, propInfo.propertyType, false, {
+                        error: false,
+                      }),
+                    ].filter(utils.notNull),
+                    returnType: VOID_RETURN,
+                    safe: propInfo.isSafe,
+                  },
+            ].filter(utils.notNull);
+          case 'accessor':
+            return [
+              propInfo.getter === undefined
+                ? undefined
+                : {
+                    name: propInfo.getter.name,
+                    parameters: [],
+                    constant: propInfo.getter.constant,
+                    returnType: this.toABIReturn(propInfo.getter.decl, propInfo.propertyType),
+                    safe: propInfo.getter.isSafe,
+                  },
+              propInfo.setter === undefined
+                ? undefined
+                : {
+                    name: propInfo.setter.name,
+                    parameters: [
+                      this.toABIParameter(
+                        propInfo.name,
+                        propInfo.getter === undefined ? propInfo.setter.decl : propInfo.getter.decl,
+                        propInfo.propertyType,
+                        false,
+                        propInfo.getter === undefined ? { error: true } : undefined,
+                      ),
+                    ].filter(utils.notNull),
+                    returnType: VOID_RETURN,
+                    safe: propInfo.setter.isSafe,
+                  },
+            ].filter(utils.notNull);
+          default:
+            utils.assertNever(propInfo);
+            throw new Error('For TS');
+        }
+      }),
     );
   }
 

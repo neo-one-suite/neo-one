@@ -13,69 +13,85 @@ export class ArrEveryFuncHelper extends Helper {
     sb.emitHelper(node, options, sb.helpers.getCallable({}));
     // [arr, callable]
     sb.emitOp(node, 'SWAP');
-    // [map, callable]
-    sb.emitHelper(node, options, sb.helpers.arrToMap);
-    // [enumerator, callable]
-    sb.emitHelper(node, options, sb.helpers.createMapIterator);
-    // [idx, enumerator, callable]
+    // [idx, arr, callable]
     sb.emitPushInt(node, 0);
-    // [result, idx, enumerator, callable]
+    // [result, idx, arr, callable]
     sb.emitPushBoolean(node, true);
-    // [enumerator, result, idx, callable]
+    // [arr, result, idx, callable]
+    sb.emitOp(node, 'ROT');
+    // [arr, arr, result, idx, callable]
+    sb.emitOp(node, 'DUP');
+    // [size, arr, result, idx, callable]
+    sb.emitOp(node, 'SIZE');
+    // [result, size, arr, idx, callable]
+    sb.emitOp(node, 'ROT');
+    // [arr, result, size, idx, callable]
     sb.emitOp(node, 'ROT');
     sb.emitHelper(
       node,
       options,
       sb.helpers.forLoop({
         condition: () => {
-          // [result, enumerator, result, idx, callable]
+          // [idx, size, result, arr, callable]
+          sb.emitOp(node, 'REVERSE4');
+          // [size, idx, size, result, arr, callable]
           sb.emitOp(node, 'OVER');
-          // [enumerator, result, enumerator, result, idx, callable]
+          // [idx, size, idx, size, result, arr, callable]
           sb.emitOp(node, 'OVER');
-          // [boolean, result, enumerator, result, idx, callable]
-          sb.emitSysCall(node, 'System.Iterator.Next');
-          // [boolean, enumerator, result, idx, callable]
+          // [boolean, idx, size, result, arr, callable]
+          sb.emitOp(node, 'GT');
+          // [size, idx, boolean, result, arr, callable]
+          sb.emitOp(node, 'REVERSE3');
+          // [result, boolean, idx, size, arr, callable]
+          sb.emitOp(node, 'REVERSE4');
+          // [result, boolean, result, idx, size, arr, callable]
+          sb.emitOp(node, 'TUCK');
+          // [boolean, result, idx, size, arr, callable]
           sb.emitOp(node, 'BOOLAND');
         },
         each: (innerOptions) => {
-          // [enumerator, idx, callable]
-          sb.emitOp(node, 'NIP');
-          // [enumerator, enumerator, idx, callable]
-          sb.emitOp(node, 'DUP');
-          // [value, enumerator, idx, callable]
-          sb.emitHelper(node, options, sb.helpers.getMapIteratorValue);
-          // [2, value, enumerator, idx, callable]
+          // [idx, size, arr, callable]
+          sb.emitOp(node, 'DROP');
+          // [2, idx, size, arr, callable]
           sb.emitPushInt(node, 2);
-          // [idx, value, enumerator, idx, callable]
+          // [arr, idx, size, arr, callable]
           sb.emitOp(node, 'PICK');
-          // [idx, value, enumerator, idx, callable]
+          // [idx, arr, idx, size, arr, callable]
+          sb.emitOp(node, 'OVER');
+          // [val, idx, size, arr, callable]
+          sb.emitOp(node, 'PICKITEM');
+          // [idx, val, idx, size, arr, callable]
+          sb.emitOp(node, 'OVER');
+          // [idxVal, val, idx, size, arr, callable]
           sb.emitHelper(node, options, sb.helpers.wrapNumber);
-          // [value, idx, enumerator, idx, callable]
+          // [val, idxVal, idx, size, arr, callable]
           sb.emitOp(node, 'SWAP');
-          // [2, value, idx, enumerator, idx, callable]
+          // [2, val, idxVal, idx, size, arr, callable]
           sb.emitPushInt(node, 2);
-          // [argsarr, enumerator, idx, callable]
+          // [argsarr, idx, size, arr, callable]
           sb.emitOp(node, 'PACK');
-          // [3, argsarr, enumerator, idx, callable]
-          sb.emitPushInt(node, 3);
-          // [callable, argsarr, enumerator, idx, callable]
+          // [4, argsarr, idx, size, arr, callable]
+          sb.emitPushInt(node, 4);
+          // [callable, argsarr, idx, size, arr, callable]
           sb.emitOp(node, 'PICK');
-          // [val, enumerator, idx, callable]
+          // [val, idx, size, arr, callable]
           sb.emitHelper(node, sb.pushValueOptions(innerOptions), sb.helpers.call);
-          // [result, enumerator, idx, callable]
+          // [result, idx, size, arr, callable]
           sb.emitHelper(node, sb.pushValueOptions(innerOptions), sb.helpers.unwrapBoolean);
-          // [idx, result, enumerator, callable]
+          // [size, result, idx, arr, callable]
           sb.emitOp(node, 'ROT');
-          // [idx, result, enumerator, callable]
+          // [idx, size, result, arr, callable]
+          sb.emitOp(node, 'ROT');
+          // [idx, size, result, arr, callable]
           sb.emitOp(node, 'INC');
-          // [result, idx, enumerator, callable]
-          sb.emitOp(node, 'SWAP');
-          // [enumerator, result, idx, callable]
-          sb.emitOp(node, 'ROT');
+          // [arr, result, size, idx, callable]
+          sb.emitOp(node, 'REVERSE4');
         },
         cleanup: () => {
-          // [result, idx, callable]
-          sb.emitOp(node, 'DROP');
+          // [result, size, arr, callable]
+          sb.emitOp(node, 'NIP');
+          // [result, arr, callable]
+          sb.emitOp(node, 'NIP');
           // [result, callable]
           sb.emitOp(node, 'NIP');
           // [result]

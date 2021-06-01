@@ -115,10 +115,8 @@ export class ArrSliceHelper extends Helper {
 
     // [end, idx, arr]
     sb.emitOp(node, 'SWAP');
-    // [0, end, idx, arr]
-    sb.emitPushInt(node, 0);
     // [outputArr, end, idx, arr]
-    sb.emitOp(node, 'NEWARRAY');
+    sb.emitOp(node, 'NEWARRAY0');
     // [idx, outputArr, end, arr]
     sb.emitOp(node, 'ROT');
     // [end, idx, outputArr, arr]

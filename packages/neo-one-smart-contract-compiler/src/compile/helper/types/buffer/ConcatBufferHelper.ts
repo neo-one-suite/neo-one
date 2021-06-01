@@ -19,7 +19,7 @@ export class ConcatBufferHelper extends Helper {
     sb.emitHelper(
       node,
       options,
-      sb.helpers.arrReduce({
+      sb.helpers.arrReduceWithoutIterator({
         withIndex: false,
         each: (innerOptions) => {
           // [bufferVal, accum]

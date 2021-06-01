@@ -3,7 +3,7 @@ import {
   ContractGroup,
   ContractMethodDescriptorClient,
   ContractPermission,
-  UInt160Hex,
+  ContractPermissionDescriptor,
   WildcardContainer,
 } from '@neo-one/client-common';
 import { tsUtils } from '@neo-one/ts-utils';
@@ -134,7 +134,7 @@ export interface SmartContractInfoManifest {
   readonly supportedStandards: readonly string[];
   readonly abi: SmartContractInfoABI;
   readonly permissions: readonly ContractPermission[];
-  readonly trusts: WildcardContainer<UInt160Hex>;
+  readonly trusts: WildcardContainer<ContractPermissionDescriptor>;
 }
 
 export interface SmartContractInfo {

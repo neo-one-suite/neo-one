@@ -3,6 +3,14 @@ import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
+// These "unused" map helpers were originally created as a way to get around a change
+// made to the NeoVM which prohibited Compound type stack items from being used as keys
+// in map stack items. But every "object" in our compiled code was a struct with a type
+// as the first item and the value as the second item. We contemplated but abandoned this
+// solution below to have a two maps within a struct. One map to store type information on a key
+// and other map to store value information for a the same key. This solution was abandoned for
+// instead just binary serializing and binary deserializing keys.
+
 // Input: [keyVal, map] - Note that "map" here is actually a struct [typeMap, valueMap]
 // Output: [hasKey]
 export class UnusedMapHasKeyHelper extends Helper {

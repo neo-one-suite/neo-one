@@ -20,6 +20,8 @@ export class GetKeyStructuredStorageHelper extends KeyStructuredStorageBaseHelpe
         knownType: this.knownKeyType,
       }),
     );
+    // [valKeyMap, val]
+    sb.emitHelper(node, options, sb.helpers.arrToMap);
     // [val, valKeyArr]
     sb.emitOp(node, 'SWAP');
     // [struct, valKeyArr]
@@ -32,8 +34,10 @@ export class GetKeyStructuredStorageHelper extends KeyStructuredStorageBaseHelpe
     sb.emitHelper(
       node,
       options,
-      sb.helpers.arrReduce({
+      sb.helpers.mapReduceWithoutIterator({
         each: () => {
+          // [prefix, val]
+          sb.emitOp(node, 'NIP');
           // [val, prefix]
           sb.emitOp(node, 'SWAP');
           // [buffer, prefix]
@@ -43,7 +47,7 @@ export class GetKeyStructuredStorageHelper extends KeyStructuredStorageBaseHelpe
         },
       }),
     );
-    // [bytestring]
+    // [prefix]
     sb.emitOp(node, 'CONVERT', Buffer.from([StackItemType.ByteString]));
   }
 }

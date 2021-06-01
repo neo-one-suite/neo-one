@@ -13,6 +13,7 @@ export * from './ArrMapHelper';
 export * from './ArrRangeHelper';
 export * from './ArrReduceFuncHelper';
 export * from './ArrReduceHelper';
+export * from './ArrReduceWithoutIteratorHelper';
 export * from './ArrSomeFuncHelper';
 export * from './ArrSomeHelper';
 export * from './ArrToStringHelper';

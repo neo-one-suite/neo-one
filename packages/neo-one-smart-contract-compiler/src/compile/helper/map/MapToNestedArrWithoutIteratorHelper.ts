@@ -9,6 +9,7 @@ export class MapToNestedArrWithoutIteratorHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [accum, map]
     sb.emitOp(node, 'NEWARRAY0');
+    // [accum]
     sb.emitHelper(
       node,
       options,

@@ -20,10 +20,8 @@ export class ArrLeftHelper extends Helper {
     sb.emitOp(node, 'OVER');
     // [size, start, arr]
     sb.emitOp(node, 'SIZE');
-    // [0, size, start, arr]
-    sb.emitPushInt(node, 0);
     // [outputArr, size, start, arr]
-    sb.emitOp(node, 'NEWARRAY');
+    sb.emitOp(node, 'NEWARRAY0');
     // [start, outputArr, size, arr]
     sb.emitOp(node, 'ROT');
     // [size, idx, outputArr, arr]
