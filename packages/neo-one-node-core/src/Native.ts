@@ -51,6 +51,15 @@ export interface Candidate {
   readonly votes: BN;
 }
 
+export interface AccountState {
+  readonly balance: BN;
+}
+
+export interface NEOAccountState extends AccountState {
+  readonly balanceHeight: BN;
+  readonly voteTo?: ECPoint;
+}
+
 export interface NEOContract extends FungibleToken {
   readonly totalAmount: BN;
   readonly effectiveVoterTurnout: number;
@@ -63,6 +72,10 @@ export interface NEOContract extends FungibleToken {
   readonly getNextBlockValidators: (storage: NativeContractStorageContext) => Promise<readonly ECPoint[]>;
   readonly computeNextBlockValidators: (storage: NativeContractStorageContext) => Promise<readonly ECPoint[]>;
   readonly getRegisterPrice: (storage: NativeContractStorageContext) => Promise<BN>;
+  readonly getAccountState: (
+    storage: NativeContractStorageContext,
+    account: UInt160,
+  ) => Promise<NEOAccountState | undefined>;
 }
 
 export interface ContractManagement extends NativeContract {

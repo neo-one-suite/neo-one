@@ -126,6 +126,17 @@ export class NEOToken extends FungibleToken implements NEOContract {
     return utils.getInteroperable(item, CachedCommittee.fromStackItem);
   }
 
+  public async getAccountState(
+    { storages }: NativeContractStorageContext,
+    account: UInt160,
+  ): Promise<NEOAccountState | undefined> {
+    const item = await storages.tryGet(
+      this.createStorageKey(this.basePrefixes.account).addBuffer(account).toStorageKey(),
+    );
+
+    return item === undefined ? undefined : utils.getInteroperable(item, NEOAccountState.fromStackItem);
+  }
+
   public async computeNextBlockValidators(storage: NativeContractStorageContext): Promise<readonly ECPoint[]> {
     const committeeMembers = await this.computeCommitteeMembers(storage);
 

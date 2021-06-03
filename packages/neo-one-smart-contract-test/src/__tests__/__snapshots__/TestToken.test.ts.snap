@@ -82,7 +82,7 @@ Array [
 ]
 `;
 
-exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: contract hash 1`] = `"0xcb8f588dc44ec1361cdd5371119e7af6a0c89db8"`;
+exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: contract hash 1`] = `"0xc620803aa5dbbc3cd0c0f4ada1efa10b6eeba9e3"`;
 
 exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: contract methods 1`] = `
 Array [
