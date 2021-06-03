@@ -30,7 +30,7 @@ export const stdLibMethods: ReadonlyArray<ContractMethodJSON> = [
     safe: true,
   },
   {
-    name: 'base58Decode',
+    name: 'base58CheckDecode',
     parameters: [
       {
         name: 's',
@@ -42,7 +42,7 @@ export const stdLibMethods: ReadonlyArray<ContractMethodJSON> = [
     safe: true,
   },
   {
-    name: 'base58Encode',
+    name: 'base58CheckEncode',
     parameters: [
       {
         name: 'data',
@@ -54,7 +54,7 @@ export const stdLibMethods: ReadonlyArray<ContractMethodJSON> = [
     safe: true,
   },
   {
-    name: 'base64Decode',
+    name: 'base58Decode',
     parameters: [
       {
         name: 's',
@@ -66,7 +66,7 @@ export const stdLibMethods: ReadonlyArray<ContractMethodJSON> = [
     safe: true,
   },
   {
-    name: 'base64Encode',
+    name: 'base58Encode',
     parameters: [
       {
         name: 'data',
@@ -78,6 +78,30 @@ export const stdLibMethods: ReadonlyArray<ContractMethodJSON> = [
     safe: true,
   },
   {
+    name: 'base64Decode',
+    parameters: [
+      {
+        name: 's',
+        type: 'String',
+      },
+    ],
+    returntype: 'ByteArray',
+    offset: 42,
+    safe: true,
+  },
+  {
+    name: 'base64Encode',
+    parameters: [
+      {
+        name: 'data',
+        type: 'ByteArray',
+      },
+    ],
+    returntype: 'String',
+    offset: 49,
+    safe: true,
+  },
+  {
     name: 'deserialize',
     parameters: [
       {
@@ -86,7 +110,7 @@ export const stdLibMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Any',
-    offset: 42,
+    offset: 56,
     safe: true,
   },
   {
@@ -98,7 +122,7 @@ export const stdLibMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'String',
-    offset: 49,
+    offset: 63,
     safe: true,
   },
   {
@@ -114,7 +138,7 @@ export const stdLibMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'String',
-    offset: 56,
+    offset: 70,
     safe: true,
   },
   {
@@ -126,7 +150,7 @@ export const stdLibMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Any',
-    offset: 63,
+    offset: 77,
     safe: true,
   },
   {
@@ -138,7 +162,7 @@ export const stdLibMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'ByteArray',
-    offset: 70,
+    offset: 84,
     safe: true,
   },
   {
@@ -154,7 +178,7 @@ export const stdLibMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Integer',
-    offset: 77,
+    offset: 91,
     safe: true,
   },
   {
@@ -170,7 +194,7 @@ export const stdLibMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Integer',
-    offset: 84,
+    offset: 98,
     safe: true,
   },
   {
@@ -190,7 +214,7 @@ export const stdLibMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Integer',
-    offset: 91,
+    offset: 105,
     safe: true,
   },
   {
@@ -214,7 +238,7 @@ export const stdLibMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Integer',
-    offset: 98,
+    offset: 112,
     safe: true,
   },
   {
@@ -226,7 +250,7 @@ export const stdLibMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'ByteArray',
-    offset: 105,
+    offset: 119,
     safe: true,
   },
   {
@@ -242,7 +266,7 @@ export const stdLibMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Array',
-    offset: 112,
+    offset: 126,
     safe: true,
   },
   {
@@ -262,7 +286,7 @@ export const stdLibMethods: ReadonlyArray<ContractMethodJSON> = [
       },
     ],
     returntype: 'Array',
-    offset: 119,
+    offset: 133,
     safe: true,
   },
 ];
