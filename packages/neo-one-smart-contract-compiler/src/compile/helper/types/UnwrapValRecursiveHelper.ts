@@ -18,7 +18,7 @@ export class UnwrapValRecursiveHelper extends Helper {
   public constructor(options: UnwrapValRecursiveHelperOptions) {
     super();
     this.type = options.type;
-    this.deserializeBeforeUnwrap = options.deserializeBeforeUnwrap ?? false;
+    this.deserializeBeforeUnwrap = options.deserializeBeforeUnwrap || false;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {

@@ -28,7 +28,7 @@ export class WrapValRecursiveHelper extends Helper {
     this.checkValue = options.checkValue === undefined ? false : options.checkValue;
     this.type = options.type;
     this.optional = options.optional;
-    this.serializeFinalVal = options.serializeFinalVal ?? false;
+    this.serializeFinalVal = options.serializeFinalVal || false;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
@@ -36,22 +36,21 @@ export class WrapValRecursiveHelper extends Helper {
       return;
     }
 
-    const createHandleValue = (hasValue: boolean, body: (options: VisitOptions) => void) => (
-      innerOptions: VisitOptions,
-    ) => {
-      if (!innerOptions.pushValue) {
-        if (hasValue) {
-          sb.emitOp(node, 'DROP');
+    const createHandleValue =
+      (hasValue: boolean, body: (options: VisitOptions) => void) => (innerOptions: VisitOptions) => {
+        if (!innerOptions.pushValue) {
+          if (hasValue) {
+            sb.emitOp(node, 'DROP');
+          }
+
+          return;
         }
 
-        return;
-      }
-
-      body(innerOptions);
-      if (this.serializeFinalVal) {
-        sb.emitSysCall(node, 'Neo.Runtime.Serialize');
-      }
-    };
+        body(innerOptions);
+        if (this.serializeFinalVal) {
+          sb.emitSysCall(node, 'Neo.Runtime.Serialize');
+        }
+      };
 
     const handleUndefined = createHandleValue(false, (innerOptions) => {
       sb.emitOp(node, 'DROP');
