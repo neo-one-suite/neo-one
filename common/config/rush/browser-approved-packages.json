@@ -1023,6 +1023,10 @@
       "allowedCategories": [ "web" ]
     },
     {
+      "name": "reactjs-popup",
+      "allowedCategories": [ "web" ]
+    },
+    {
       "name": "redux",
       "allowedCategories": [ "web" ]
     },
