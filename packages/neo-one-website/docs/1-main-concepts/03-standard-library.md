@@ -23,7 +23,7 @@ The standard library includes several specialized value types which are defined 
 - `Hash256` - a `Buffer` that represents a NEO 256 bit hash, most commonly used for asset ids like `NEO` or `GAS` asset ids.
 - `PublicKey` - a `Buffer` that represents a public key.
 
-Each of the value types can be created from a string literal using the `from` [static method](https://www.typescriptlang.org/docs/handbook/classes.html#static-properties), for example, `Address.from('APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR')`. `Hash256` also contains static properties for the `NEO` and `GAS` `Hash256` values.
+Each of the value types can be created from a string literal using the `from` [static method](https://www.typescriptlang.org/docs/handbook/classes.html#static-properties), for example, `Address.from('APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR')`. `Address` also contains static properties for the `NEO` and `GAS` `Address` values.
 
 The `Address` type has a commonly used static method, `isCaller`, which is used to check that the passed `Address` directly called and approved the current method invocation.
 
@@ -53,7 +53,7 @@ The `Blockchain` value contains several properties pertaining to the current sta
 
 - `Blockchain.currentBlockTime` - the timestamp of the `Block` that this `Transaction` will be included in.
 - `Blockchain.currentHeight` - index of the last `Block` persisted to the blockchain.
-- `Blockchain.currentTransaction` - the current `InvocationTransaction`.
+- `Blockchain.currentTransaction` - the current `Transaction`.
 - `Blockchain.currentCallerContract` - the `Address` of the smart contract that directly invoked this contract. May be `undefined` if the current invocation was not from another smart contract.
 
 ---

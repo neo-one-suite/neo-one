@@ -13,6 +13,12 @@ Productionizing your smart contract for deployment to a network other than your 
 
 ---
 
+::: warning
+
+Deployment has not been thoroughly tested for N3 yet and may not work at this point in time.
+
+:::
+
 ## Deployment Specifics
 
 ### Properties
@@ -48,10 +54,6 @@ export class Contract extends SmartContract {
   };
 }
 ```
-
-#### `payable`
-
-Payable determines if your contract is allowed to receive assets (like NEO and GAS).
 
 #### `trusts`
 

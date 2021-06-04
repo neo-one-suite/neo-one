@@ -125,6 +125,12 @@ interface WithContractsOptions {
    * Defaults to `true`.
    */
   readonly autoSystemFee?: boolean;
+  /**
+   * Enable logs from various systems during testing.
+   *
+   * Defaults to `false`.
+   */
+  readonly logging?: boolean;
 }
 ```
 
@@ -146,6 +152,12 @@ describe('Token', () => {
 ---
 
 ## DeveloperClient
+
+::: warning
+
+`DeveloperClient` has not been thoroughly tested for N3 yet and may not work at this point in time.
+
+:::
 
 `DeveloperClient` is a class that is configured to point at a local development network. This class provides methods that are useful during testing:
 

@@ -55,41 +55,57 @@ Here's how to setup your local development environment:
 - Linux and Mac: We recommend using [Node Version Manager](https://github.com/creationix/nvm).
 - Windows: We recommend using [Chocolatey](https://chocolatey.org/).
 
-2. Follow the [installation instructions for Create React App](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) to make a new project.
+2. Install [C# .NET](https://docs.microsoft.com/en-us/dotnet/) version 3.1.401
+
+3. Add a `global.json` file to the root of your project repo with this JSON:
+
+```json
+{
+  "sdk": {
+    "version": "3.1.401"
+  }
+}
+```
+
+This tells your local C# .NET runtime to use version 3.1.401 in this repo, even if you have newer versions installed on your machine.
+
+4. Follow the [installation instructions for Create React App](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) to make a new project.
 
 - Be sure to invoke Create React App with the `--typescript` flag in order to enable TypeScript support: `npx create-react-app token --typescript`
 
-3. Change your current working directory into your new `token` directory created by `create-react-app` by running `cd token` or `cd <path/to/your/new/token/directory>`
+5. Change your current working directory into your new `token` directory created by `create-react-app` by running `cd token` or `cd <path/to/your/new/token/directory>`
 
-4. Install NEO•ONE using either [yarn](https://yarnpkg.com/)
-
-```bash
-yarn add @neo-one/suite
-```
-
-or [npm](https://www.npmjs.com/)
+6. Install NEO•ONE using either [yarn](https://yarnpkg.com/)
 
 ```bash
-npm install @neo-one/suite
-```
-
-alternatively, install the individual packages `@neo-one/suite` wraps for you:
-
-```bash
-yarn add @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
+yarn add @neo-one/cli@prerelease @neo-one/client@prerelease @neo-one/smart-contract@prerelease @neo-one/smart-contract-test@prerelease @neo-one/smart-contract-lib@prerelease @neo-one/smart-contract-typescript-plugin@prerelease
 ```
 
 ```bash
-npm install @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
+npm install @neo-one/cli@prerelease @neo-one/client@prerelease @neo-one/smart-contract@prerelease @neo-one/smart-contract-test@prerelease @neo-one/smart-contract-lib@prerelease @neo-one/smart-contract-typescript-plugin@prerelease
 ```
 
-5. Run `yarn neo-one init` or `npx neo-one init`
+7. Run `yarn neo-one init` or `npx neo-one init`
 
 This command initializes a NEO•ONE project with a `Hello World` smart contract under `neo-one/contracts/HelloWorld.ts`, a unit test under `src/__tests__/HelloWorld.test.ts`, and a config file,`.neo-one.config.ts`. For this tutorial, we will be building a `Token` from the ground up, so you can go ahead and delete the two `HelloWorld` files. We also recommend taking a moment to [setup your editor](/docs/environment-setup#Editor-Setup) to take advantage of inline NEO•ONE compiler diagnostics.
 
-6. Review the available [configuration options](/docs/config-options) and update your `.neo-one.config.ts` file as needed.
+8. Review the available [configuration options](/docs/config-options) and update your `.neo-one.config.ts` file as needed.
 
 - This tutorial uses the default options. To follow along, nothing needs to be changed.
+
+## Troubleshooting
+
+You may or may not run into environment problems when using the CLI, trying to test your smart contract, or other NEO•ONE functions that use the NEO•ONE node. The NEO•ONE node now uses the C# NeoVM instead of our own implementation of the NeoVM in TypeScript, which means that NEO•ONE controls C# code through some complicated mechanisms. If you run into problems with running a node (such as when running `neo-one init` or `neo-one build`) then try these steps:
+
+- Add these environment variables to your shell environment:
+  - `EDGE_USE_CORECLR=1`
+  - `EDGE_APP_ROOT=<path/to/your/project>/node_modules/@neo-one/node-vm/lib/Debug/netcoreapp3.0`
+- Install `pkgconfig` on macOS with Homebrew: `brew install pkgconfig`
+  - Then add this environment variable: `PKG_CONFIG_PATH=/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig`
+  - You then need to re-install your node modules by deleting the `node_modules` folder and then running `npm install` again
+- Try running the NEO•ONE CLI command using `sudo`, such as: `sudo npx neo-one init`
+
+To see a demonstration of environment setup go to our YouTube channel for helpful videos: https://www.youtube.com/channel/UCya5J1Tt2h-kX-I3a7LOvtw
 
 ### Help, I'm Stuck!
 
@@ -303,11 +319,9 @@ For those of you that have experience with other NEO Smart Contract languages, y
 
 The main difference for the NEO•ONE client APIs is that non-constant methods require relaying a transaction to the blockchain. This makes sense because a non-constant method by definiton mutates storage, and we need to persist those changes to the blockchain. We'll have to wait until the next section to test our `transfer` method since we don't currently have a way of creating tokens.
 
-### Native Asset Methods
+### Assets
 
-The NEO blockchain supports native assets, the two most important ones being NEO and GAS. Native assets are Unspent Transaction Output (UTXO) based and are understood natively by the blockchain. Contrast this with tokens like the one we've built so far which live entirely in custom smart contracts. As a result, they require special handling within smart contracts. Luckily, NEO•ONE smart contracts abstract most of this away and let you focus on the logic of your smart contract.
-
-In order to receive native assets, we can decorate a method with `@receive`. Methods marked with `@receive` must throw an error to indicate if the contract does not want to receive the assets. Note, however, that there are cases where the contract may still receive assets, despite throwing an error, due to limitations in how NEO handles native UTXO assets. For these cases, we automatically generate a `refundAssets` method that clients of your smart contract may call to refund assets which were not processed by the smart contract (i.e. the smart contract threw an error or was not called). Note that this method cannot refund assets if the smart contract invocation succeeded.
+All tokens, including native assets NEO and GAS, operate like the one we've built so far which live entirely in custom smart contracts. As a result, they require special handling within smart contracts. Luckily, NEO•ONE smart contracts abstract most of this away and let you focus on the logic of your smart contract.
 
 Let's add the `mintTokens` method to our `Token` smart contract to enable minting new tokens.
 
@@ -316,24 +330,19 @@ export class Token extends SmartContract {
   @receive
   public mintTokens(): void {
     // Inspect the current transaction
-    const { references, outputs } = Blockchain.currentTransaction;
-    if (references.length === 0) {
+    const { notifications } = Blockchain.currentTransaction;
+    if (notifications.length === 0) {
       throw new Error('Invalid mintTokens');
     }
 
     // Take the first sender address as the minter.
-    const sender = references[0].address;
+    const sender = notifications[0].scriptHash;
 
     // Sum up the amount of NEO sent to the contract. If anything else is sent, throw an error.
     let amount = 0;
-    for (const output of outputs) {
-      if (output.address.equals(this.address)) {
-        if (!output.asset.equals(Hash256.NEO)) {
-          throw new Error('Invalid mintTokens');
-        }
-
-        amount += output.value;
-      }
+    for (const notification of notifications) {
+      // Parse the stack items array in each notification to determine how much the sender transfered
+      // This is a WIP for our compiler and is coming soon
     }
 
     this.issue(sender, amount);
@@ -348,12 +357,12 @@ export class Token extends SmartContract {
 }
 ```
 
-Notice that we access the current transaction using `Blockchain.currentTransaction`. The transaction itself has many useful properties, but for now we are only interested in the `references` and `outputs` properties. The `outputs` defines the destination addresses and amounts for native assets. A reference is the corresponding `output` for the `input`s of the transaction.
+Notice that we access the current transaction using `Blockchain.currentTransaction`. The transaction itself has many useful properties, but for now we are only interested in the `notifications` property. The `notifications` defines the notifications produced by the transaction. Each notification will have a `scriptHash` property, an `eventName` property, and a `state` property. We can parse these properties to see what events were triggered by the transaction. In this case we want to see Transfer events that were produced by the NeoToken native contract, which will tell us how much was transfered, from what address, and to what address.
 
 Now that we can mint tokens, let's see how we can test both `transfer` and `mintTokens`. Note that any NEO•ONE types necessary in your tests should be imported from `@neo-one/client`:
 
 ```typescript
-import { Hash256 } from '@neo-one/client';
+import { Hash160 } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
 
 ...
@@ -368,7 +377,7 @@ await withContracts(async ({ token, accountIDs }) => {
     sendTo: [
       {
         amount,
-        asset: Hash256.NEO,
+        asset: Hash160.NEO,
       },
     ],
     from: accountID,
@@ -411,7 +420,7 @@ Phew, quite a bit, but we're testing a lot of functionality here. Recall that we
 
 First, invoke the smart contract method which will return a `Promise<TransactionResult>`. The `TransactionResult` object contains two properties, `transaction` which is the full transaction object that was relayed to the network, and `confirmed` which is a function we can call to wait for the transaction to be confirmed.
 
-Second, call `confirmed` which returns a `Promise<InvokeReceipt>`. This `InvokeReceipt` contains many useful properties, like the `event`s that were emitted during execution as well as the final `result` of the smart contract invocation. To learn more, take a look at the detailed [documentation](/docs/smart-contract-apis#methods) on invoking smart contract methods. Methods marked with `@receive` also take an additional argument for the native assets to send with the invocation.
+Second, call `confirmed` which returns a `Promise<InvokeReceipt>`. This `InvokeReceipt` contains many useful properties, like the `event`s that were emitted during execution as well as the final `result` of the smart contract invocation. To learn more, take a look at the detailed [documentation](/docs/smart-contract-apis#methods) on invoking smart contract methods.
 
 Putting it all together, we see both forms of invoking smart contract methods in the above snippet. When we mint tokens, we use the 2-step form, and when we transfer we use the 1-step or shortcut form.
 

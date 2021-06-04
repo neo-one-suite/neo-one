@@ -90,14 +90,14 @@ export class Contract extends SmartContract {
 The smart contract object returned by `createContractSmartContract` will contain one property:
 
 ```typescript
-transfer(from: AddressString, to: AddressString, amount: Fixed<8>): Promise<TransactionResult<InvokeReceipt<boolean, ContractEvent>, InvocationTransaction>>
+transfer(from: AddressString, to: AddressString, amount: Fixed<8>): Promise<TransactionResult>
 ```
 
 Calling this method corresponds to the first step in the process. The `Promise` will resolve once the transaction has been relayed to the blockchain. The `TransactionResult` object contains two properties:
 
 ```typescript
-interface TransactionResult<TTransactionReceipt extends TransactionReceipt, TTransaction extends Transaction> {
-  readonly transaction: TTransaction;
+interface TransactionResult<TTransactionReceipt extends TransactionReceipt> {
+  readonly transaction: Transaction;
   readonly confirmed: (options?: GetOptions) => Promise<TTransactionReceipt>;
 }
 ```
@@ -117,9 +117,25 @@ interface TransactionReceipt {
    */
   readonly blockHash: Hash256String;
   /**
+   * `Block` time of the `Transaction` for this receipt.
+   */
+  readonly blockTime: string;
+  /**
    * Transaction index of the `Transaction` within the `Block` for this receipt.
    */
   readonly transactionIndex: number;
+  /**
+   * Hash of the `Transaction` within the `Block` for this receipt.
+   */
+  readonly transactionHash: Hash256String;
+  /**
+   * Ordered globally unique index of the transaction.
+   */
+  readonly globalIndex: BigNumber;
+  /**
+   * Number of `Block`s which have confirmed this transaction.
+   */
+  readonly confirmations: number;
 }
 ```
 
@@ -149,20 +165,13 @@ interface InvokeReceipt<TReturn extends Return, TEvent extends Event<string, any
 The `result` property indicates success or failure based on the `state` property of the object - either `'HALT'` for success, or `'FAULT'` for failure. On success, the return value of the invocation is stored in the `value` property of the object. On failure, a descriptive message of the reason why the transaction failed is stored in the `message` property.
 
 ```typescript
-interface InvocationResultBase {
+interface InvocationResultSuccess<TValue> {
   /**
-   * GAS consumed by the operation. This is the total GAS consumed after the free GAS is subtracted.
+   * GAS consumed by the operation.
    */
   readonly gasConsumed: BigNumber;
   /**
-   * The total GAS cost before subtracting the free GAS.
-   */
-  readonly gasCost: BigNumber;
-}
-
-interface InvocationResultSuccess<TValue> extends InvocationResultBase {
-  /**
-   * Indicates a successful invocation
+   * Indicates a successful invocation.
    */
   readonly state: 'HALT';
   /**
@@ -171,9 +180,13 @@ interface InvocationResultSuccess<TValue> extends InvocationResultBase {
   readonly value: TValue;
 }
 
-interface InvocationResultError extends InvocationResultBase {
+interface InvocationResultError {
   /**
-   * Indicates a failed invocation
+   * GAS consumed by the operation.
+   */
+  readonly gasConsumed: BigNumber;
+  /**
+   * Indicates a failed invocation.
    */
   readonly state: 'FAULT';
   /**
@@ -247,30 +260,6 @@ interface SmartContract<TClient extends Client, TEvent extends Event<string, any
    * The underlying `Client` used by this `SmartContract`.
    */
   readonly client: TClient;
-  /**
-   * Iterate over the events emitted by the smart contract.
-   *
-   * @returns an `AsyncIterable` over the events emitted by the smart contract.
-   */
-  readonly iterEvents: (options?: SmartContractIterOptions) => AsyncIterable<TEvent>;
-  /**
-   * Iterate over the logs emitted by the smart contract.
-   *
-   * @returns an `AsyncIterable` over the logs emitted by the smart contract.
-   */
-  readonly iterLogs: (options?: SmartContractIterOptions) => AsyncIterable<Log>;
-  /**
-   * Iterate over the events and logs emitted by the smart contract.
-   *
-   * @returns an `AsyncIterable` over the events and logs emitted by the smart contract.
-   */
-  readonly iterActions: (options?: SmartContractIterOptions) => AsyncIterable<Action>;
-  /**
-   * Converts a `RawAction`, typically from the raw results found in a `Block` to a processed `Action` or `undefined` if the action is not recognized by the ABI.
-   *
-   * @returns `Action` if the `action` parameter is recognized by the `ABI` of the smart contract, `undefined` otherwise.
-   */
-  readonly convertAction: (action: RawAction) => Action | undefined;
 }
 ```
 
@@ -284,63 +273,6 @@ const tokenAddress = token.definition.networks[network].address;
 ```
 
 `client` is the `Client` that was used to create the smart contract API object, and is the underlying client used for all smart contract operations.
-
-`iterEvents` returns an `AsyncIterable` which allows for [asynchronous iteration](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-3.html#async-iteration) over all of the events emitted by the smart contract:
-
-```typescript
-for await (const event of contract.iterEvents()) {
-  // Do something with each event
-}
-```
-
-`iterLogs` is the same as `iterEvents` but for log notifications, i.e. unstructured strings. Note that NEO•ONE smart contracts intentionally do not support nor emit log events because any time you might want to emit a log event, we believe it's more future-proof to emit a structured event. However, when integrating with external contracts, you may want to iterate over the logs that it emits.
-
-`iterActions` is simply an `AsyncIterable` over both the events and logs of the smart contract in the order that they were seen.
-
-All of the `iter` methods accept a `SmartContractIterOptions` object:
-
-```typescript
-/**
- * Additional optional options for methods that read data from a smart contract.
- */
-export interface SmartContractReadOptions {
-  /**
-   * The network to read the smart contract data for. By default this is the network of the currently selected user account.
-   */
-  readonly network?: NetworkType;
-}
-
-/**
- * Filter that specifies (optionally) a block index to start at and (optionally) a block index to end at.
- */
-export interface BlockFilter {
-  /**
-   * The inclusive start index for the first block to include. Leaving `undefined` means start from the beginning of the blockchain, i.e. index 0.
-   */
-  readonly indexStart?: number;
-  /**
-   * The exclusive end index for the block to start at. Leaving `undefined` means continue indefinitely, waiting for new blocks to come in.
-   */
-  readonly indexStop?: number;
-}
-
-/**
- * Additional optional options for methods that iterate over data from a smart contract.
- */
-export interface SmartContractIterOptions extends SmartContractReadOptions, BlockFilter {}
-```
-
-The `SmartContractIterOptions` object allows specifying the `network` to iterate over and the iteration parameters, which block to start from and which block to end at.
-
-`convertAction` takes a `RawAction` and converts it using the ABI of the smart contract. This conversion includes parsing out the relevant events and automatically converting the raw parameters. See the [Raw Client APIs](/docs/raw-client-apis) documentation for more details.
-
-::: warning
-
-Tip
-
-Read more about asynchronous iteration [here](http://2ality.com/2016/10/asynchronous-iteration.html)
-
-:::
 
 ---
 

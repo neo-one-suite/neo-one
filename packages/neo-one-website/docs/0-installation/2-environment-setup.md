@@ -18,6 +18,7 @@ This page describes how to setup NEO•ONE using `yarn` or `npm`.
 - [Node](https://nodejs.org) >= 10.16.0 (We recommend the latest version)
   - Linux and Mac: We recommend using [Node Version Manager](https://github.com/creationix/nvm).
   - Windows: We recommend using [Chocolatey](https://chocolatey.org/).
+- [C# .NET](https://docs.microsoft.com/en-us/dotnet/) version 3.1.401
 
 ---
 
@@ -29,6 +30,31 @@ This page describes how to setup NEO•ONE using `yarn` or `npm`.
 - [Angular CLI](https://cli.angular.io/) - Generates an [Angular](https://angular.io/) starter app.
 - [Vue CLI](https://cli.vuejs.org/) - Generate a [Vue](https://vuejs.org/) starter app.
 
+**Make sure you add** this `global.json` file to the root of your project repo:
+
+```json
+{
+  "sdk": {
+    "version": "3.1.401"
+  }
+}
+```
+
+This tells your local C# .NET runtime to use version 3.1.401 in this repo, even if you have newer versions installed on your machine.
+
+**You may need to also add environment variables** to get the NEO•ONE node working. The NEO•ONE node now uses the C# NeoVM instead of our own implementation of the NeoVM in TypeScript, which means that NEO•ONE controls C# code through some complicated mechanisms. If you run into problems with running a node (such as when running `neo-one init` or `neo-one build`) then try these steps:
+
+- Add these environment variables to your shell environment:
+  - `EDGE_USE_CORECLR=1`
+  - `EDGE_APP_ROOT=<path/to/your/project>/node_modules/@neo-one/node-vm/lib/Debug/netcoreapp3.0`
+- Install `pkgconfig` on macOS with Homebrew: `brew install pkgconfig`
+  - Then add this environment variable: `PKG_CONFIG_PATH=/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig`
+  - You then need to re-install your node modules by deleting the `node_modules` folder and then running `npm install` again
+- Try running the NEO•ONE CLI command using `sudo`, such as: `sudo npx neo-one init`
+- If problems persist then please reach out to us on [Discord](https://discord.gg/S86PqDE)
+
+To see a demonstration of environment setup go to our YouTube channel for helpful videos: https://www.youtube.com/channel/UCya5J1Tt2h-kX-I3a7LOvtw
+
 **Once you have a project setup**, the next step is to add NEO•ONE to it. NEO•ONE is organized into multiple individual packages. Use as much or as little as you like. Each package may be installed using either [yarn](https://yarnpkg.com/) (`yarn add <package name>`) or [npm](https://www.npmjs.com/) (`npm install <package name>`). Each package has the form `@neo-one/<name>`, for example, `@neo-one/client`.
 
 Make sure to install the correct versions of these packages. If you are working on Neo3 then make sure you are installing NEO•ONE packages at version 3.0.0 or higher.
@@ -36,13 +62,13 @@ Make sure to install the correct versions of these packages. If you are working 
 Install all the neo-one packages with yarn by running:
 
 ```bash
-yarn add @neo-one/client @neo-one/cli @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
+yarn add @neo-one/cli@prerelease @neo-one/client@prerelease @neo-one/smart-contract@prerelease @neo-one/smart-contract-test@prerelease @neo-one/smart-contract-lib@prerelease @neo-one/smart-contract-typescript-plugin@prerelease
 ```
 
 Install all the neo-one packages with npm by running:
 
 ```bash
-npm install @neo-one/client @neo-one/cli @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
+npm install @neo-one/cli@prerelease @neo-one/client@prerelease @neo-one/smart-contract@prerelease @neo-one/smart-contract-test@prerelease @neo-one/smart-contract-lib@prerelease @neo-one/smart-contract-typescript-plugin@prerelease
 ```
 
 and then follow the [main guide](/docs/hello-world) or the [tutorial](/tutorial). By the end of it you'll know which features of NEO•ONE you're using and which packages to keep.
@@ -67,7 +93,7 @@ In addition to the above, if you're developing TypeScript smart contracts using 
 ### Update
 
 ```bash
-#npm update @neo-one/cli
+# npm update @neo-one/cli
 yarn upgrade @neo-one/cli
 ```
 

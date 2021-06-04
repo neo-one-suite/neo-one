@@ -156,7 +156,7 @@ export const Home = (props: {}) => (
     <FeaturesWrapper>
       <Authoring />
       <Testing />
-      <DeveloperTools />
+      {/* <DeveloperTools /> */}
     </FeaturesWrapper>
   </Wrapper>
 );
