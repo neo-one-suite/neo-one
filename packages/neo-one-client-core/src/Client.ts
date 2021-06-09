@@ -132,7 +132,7 @@ export class Client<
   // tslint:disable-next-line no-any
   TUserAccountProvider extends UserAccountProvider = any,
   // tslint:disable-next-line no-any
-  TUserAccountProviders extends UserAccountProviders<TUserAccountProvider> = any
+  TUserAccountProviders extends UserAccountProviders<TUserAccountProvider> = any,
 > {
   /**
    * Hook into the lifecycle of various requests. Can be used to automatically add logging, or parameter transformations across the application, for example.
@@ -640,9 +640,7 @@ export class Client<
       });
   }
 
-  protected getTransfersOptions(
-    argsIn: readonly any[],
-  ): {
+  protected getTransfersOptions(argsIn: readonly any[]): {
     readonly transfers: readonly Transfer[];
     readonly options: TransactionOptions;
   } {

@@ -37,10 +37,10 @@ The `Client` class also contains two methods for creating transactions.
 class Client {
   public async transfer(
     amount: BigNumber,
-    asset: Hash256String,
+    asset: AddressString,
     to: AddressString,
     options?: TransactionOptions,
-  ): Promise<TransactionResult<TransactionReceipt, InvocationTransaction>>;
+  ): Promise<TransactionResult>;
   public async transfer(transfers: readonly Transfer[], options?: TransactionOptions): Promise<TransactionResult>;
 
   public async claim(optionsIn?: TransactionOptions): Promise<TransactionResult>;
@@ -69,17 +69,29 @@ interface TransactionOptions {
    */
   attributes?: readonly Attribute[];
   /**
-   * An optional network fee to include with the transaction.
+   * A maximum network fee to include with the transaction. Note that this is a maximum, the client APIs will automatically calculate and add a system fee to the transaction up to the value specified here.
+   *
+   * Leaving `maxNetworkFee` `undefined` is equivalent to `new BigNumber(0)`, i.e. no network fee.
+   *
+   * A `maxNetworkFee` of `-1`, i.e. `new BigNumber(-1)` indicates no limit on the fee. This is typically used only during development.
+   *
+   * Network fee is a required fee that depends on the size of the transaction.
    */
-  networkFee?: BigNumber;
+  maxNetworkFee?: BigNumber;
   /**
    * A maximum system fee to include with the transaction. Note that this is a maximum, the client APIs will automatically calculate and add a system fee to the transaction up to the value specified here.
    *
-   * Leaving `systemFee` `undefined` is equivalent to `new BigNumber(0)`, i.e. no system fee.
+   * Leaving `maxSystemFee` `undefined` is equivalent to `new BigNumber(0)`, i.e. no system fee.
    *
-   * A `systemFee` of `-1`, i.e. `new BigNumber(-1)` indicates no limit on the fee. This is typically used only during development.
+   * A `maxSystemFee` of `-1`, i.e. `new BigNumber(-1)` indicates no limit on the fee. This is typically used only during development.
    */
-  systemFee?: BigNumber;
+  maxSystemFee?: BigNumber;
+  /**
+   * The maximum number of blocks from the current block this transaction should stay valid until. Defaults to the network's `maxValidBlockIncrement` minus 1.
+   *
+   * Useful for when there is high traffic on the network and automatic re-sending of transactions takes place but you want more control.
+   */
+  validBlockCount?: number;
 }
 ```
 
@@ -87,12 +99,12 @@ Putting this all together, if we wanted to transfer funds to another account, bu
 
 ```typescript
 const account = await client.getAccount(otherAccountID);
-if (account.balances[Hash256.NEO] === undefined) {
-  await client.transfer.confirmed(new BigNumber(10), Hash256.NEO, otherAccountID.address);
+if (account.balances[Hash160.NEO] === undefined) {
+  await client.transfer.confirmed(new BigNumber(10), Hash160.NEO, otherAccountID.address);
 }
 ```
 
-We'll learn more about the `confirmed` property in the next chapter. Also take note of the `Hash256.NEO` property, which works just like the `Hash256.NEO` property in smart contracts and can be imported directly from `@neo-one/client`.
+We'll learn more about the `confirmed` property in the next chapter. Also take note of the `Hash160.NEO` property, which works just like the `Hash160.NEO` property in smart contracts and can be imported directly from `@neo-one/client`.
 
 ---
 
@@ -110,8 +122,8 @@ The output directory for generated files is configurable. You can also change th
 
 For each contract, the toolchain will emit 3 files:
 
-- `src/neo-one/<ContractName>/abi.ts` - Contains the ABI that generates the client smart contract APIs at runtime that we'll discuss in the next chapter.
-- `src/neo-one/<ContractName>/contract.ts` - Contains the smart contract definition, which contains the ABI, the source maps for the contract and a mapping from network name to deployed address for the smart contract. Initially the network mapping will only contain the `local` network which represents your local development network. Once you deploy your smart contract to the TestNet or MainNet, it will also contain deployed contract addresses for those networks. The client APIs automatically choose which address to work with based on the network of the user account that is initiating the request. This file also contains a helper function for creating the smart contract APIs given a `Client`.
+- `src/neo-one/<ContractName>/manifest.ts` - Contains the Manifest that generates the client smart contract APIs at runtime that we'll discuss in the next chapter.
+- `src/neo-one/<ContractName>/contract.ts` - Contains the smart contract definition, which contains the Manifest, the source maps for the contract and a mapping from network name to deployed address for the smart contract. Initially the network mapping will only contain the `local` network which represents your local development network. Once you deploy your smart contract to the TestNet or MainNet, it will also contain deployed contract addresses for those networks. The client APIs automatically choose which address to work with based on the network of the user account that is initiating the request. This file also contains a helper function for creating the smart contract APIs given a `Client`.
 - `src/neo-one/<ContractName>/types.ts` - Contains the TypeScript type definitions for the smart contract client APIs.
 
 5 files will also be emitted that are common to all of your smart contracts:

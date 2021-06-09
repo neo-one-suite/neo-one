@@ -109,6 +109,10 @@ interface UserAccount {
    * The public key for the address.
    */
   readonly publicKey: PublicKeyString;
+  /**
+   * The signature redemption contract of the account.
+   */
+  readonly contract: AccountContract;
 }
 ```
 

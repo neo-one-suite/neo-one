@@ -38,7 +38,12 @@ Public instance methods come in several flavors but they effectively break down 
 
 1. Normal instance methods. These have no restrictions and work identically to instance methods in normal TypeScript.
 2. Constant instance methods. Designated with the `@constant` decorator, these methods may not modify smart contract properties. These methods can be called by any contract. Even if the contract's manifest specifies trusted contracts, trusted groups, and permissions, any contract will be able to call a method marked as `@constant`.
-3. Native asset instance methods. Designated with the `@receive`, `@sendUnsafe`, `@send` and `@claim` decorators. Read more about these in the [Native Assets](/docs/native-assets) advanced guide.
+
+::: warning
+
+Due to recent changes in the NeoVM the `@constant` decorator may cause errors if a method happens to use certain APIs that will cause it to actually use contract storage. We are working on removing this flaw, but in the meantime if you get an uncertain error from calling a method marked `@constant` and aren't sure what is going on try to remove the `@constant` decorator and call again.
+
+:::
 
 Public instance methods define the API of the smart contract. In the following example we have two methods. One is a constant method since it's decorated with `@constant`. The other is a normal instance method which modifies the smart contract property `mutableClosing`.
 

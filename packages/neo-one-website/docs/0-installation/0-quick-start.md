@@ -31,38 +31,58 @@ Tip
 
 ## Installations
 
-1. Install [NodeJS](https://nodejs.org) >= 10.16.0 (Latest version recommended)
+1. Install [NodeJS](https://nodejs.org) >= 10.16.0 (We recommend using v10.16.0)
 
    - Linux and Mac: [Node Version Manager](https://github.com/creationix/nvm). (`recommended`)
    - Windows: We recommend using [Chocolatey](https://chocolatey.org/). (`recommended`)
 
-2. Follow the [installation instructions for Create React App](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) to make a new project.
+2. Install [C# .NET](https://docs.microsoft.com/en-us/dotnet/) version 3.1.401
+3. Add a `global.json` file to the root of your project repo with this JSON:
+
+```json
+{
+  "sdk": {
+    "version": "3.1.401"
+  }
+}
+```
+
+This tells your local C# .NET runtime to use version 3.1.401 in this repo, even if you have newer versions installed on your machine.
+
+4. Follow the [installation instructions for Create React App](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) to make a new project.
 
    - Be sure to invoke Create React App with the `--template typescript` in order to enable TypeScript support: `npx create-react-app token --template typescript`
 
-3. Install NEO•ONE using either [yarn](https://yarnpkg.com/) or [npm](https://www.npmjs.com/)
+5. Install NEO•ONE using either [yarn](https://yarnpkg.com/) or [npm](https://www.npmjs.com/)
 
 ```bash
-yarn add @neo-one/suite
+yarn add @neo-one/cli@prerelease @neo-one/client@prerelease @neo-one/smart-contract@prerelease @neo-one/smart-contract-test@prerelease @neo-one/smart-contract-lib@prerelease @neo-one/smart-contract-typescript-plugin@prerelease
 ```
 
 ```bash
-npm install @neo-one/suite
+npm install @neo-one/cli@prerelease @neo-one/client@prerelease @neo-one/smart-contract@prerelease @neo-one/smart-contract-test@prerelease @neo-one/smart-contract-lib@prerelease @neo-one/smart-contract-typescript-plugin@prerelease
 ```
 
-Alternatively, install the individual packages `@neo-one/suite` wraps for you:
-
-```bash
-yarn add @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
-```
-
-```bash
-npm install @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
-```
-
-4. Run `yarn neo-one init` or `npx neo-one init`
+6. Run `yarn neo-one init` or `npx neo-one init`
 
 The command above generates a sample `HelloWorld.ts` smart contract, a sample test for the contract `HelloWorld.test.ts`, a config file `.neo-one.config.ts`, and a `neo-one` folder with important modules.
+
+---
+
+## Troubleshooting
+
+You may or may not run into environment problems when using the CLI, trying to test your smart contract, or other NEO•ONE functions that use the NEO•ONE node. The NEO•ONE node now uses the C# NeoVM instead of our own implementation of the NeoVM in TypeScript, which means that NEO•ONE controls C# code through some complicated mechanisms. If you run into problems with running a node (such as when running `neo-one init` or `neo-one build`) then try these steps:
+
+- Add these environment variables to your shell environment:
+  - `EDGE_USE_CORECLR=1`
+  - `EDGE_APP_ROOT=<path/to/your/project>/node_modules/@neo-one/node-vm/lib/Debug/netcoreapp3.0`
+- Install `pkgconfig` on macOS with Homebrew: `brew install pkgconfig`
+  - Then add this environment variable: `PKG_CONFIG_PATH=/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig`
+  - You then need to re-install your node modules by deleting the `node_modules` folder and then running `npm install` again
+- Try running the NEO•ONE CLI command using `sudo`, such as: `sudo npx neo-one init`
+- If problems persist then please reach out to us on [Discord](https://discord.gg/S86PqDE)
+
+To see a demonstration of environment setup go to our YouTube channel for helpful videos: https://www.youtube.com/channel/UCya5J1Tt2h-kX-I3a7LOvtw
 
 ---
 
@@ -77,7 +97,6 @@ import { SmartContract } from '@neo-one/smart-contract';
 export class Token extends SmartContract {
   public readonly mutableSupply: Fixed<8> = 0;
 
-  //
   @constant
   public get totalSupply(): Fixed<8> {
     return this.mutable;
@@ -234,15 +253,13 @@ export default ({ token, ico, escrow }: MigrationContracts, _network: string) =>
 
 Note
 
-For more details on deployment specifics and migration files, check out the [Deployment](/docs/deployment) page.
+Deployment has not been thoroughly tested yet for N3. It _should_ work, but there may be bugs, so be aware and feel free to bring up issues and ask questions in our [Discord](https://discord.gg/S86PqDE) server. For more details on deployment specifics and migration files, check out the [Deployment](/docs/deployment) page.
 
 :::
 
 ### Get Test coins
 
-You can get test coins automatically from https://neowish.ngd.network/
-
-Limited to 1000 NEO and 1000 GAS per day.
+You can get test coins automatically from https://neowish.ngd.network/neo3/#/
 
 If you need more than that. You must apply through Neo website. Please follow the instructions here: https://docs.neo.org/docs/en-us/network/testnet.html#applying-for-test-coin-from-neo-website
 
@@ -279,5 +296,4 @@ We **HIGHLY** recommend deploying to both a local private network and the Neo Te
 
 ## Explore with NEO Tracker
 
-If your deployment to the TestNet was successful you should be able to find your contract at https://testnet.neotracker.io/browse/contract/1.
-
+NEO Tracker doesn't currently support N3, so you will have to use another explorer to see your deployed contracts.

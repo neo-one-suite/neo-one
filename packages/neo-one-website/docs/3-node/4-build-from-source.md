@@ -20,6 +20,7 @@ This can be useful for local debugging and if you would like to make your own co
   - Windows: We recommend using [Chocolatey](https://chocolatey.org/).
 - [Yarn](https://yarnpkg.com/) (recommended)
 - [RushJS](https://rushjs.io/)
+- [C# .NET](https://docs.microsoft.com/en-us/dotnet/) version 3.1.401
 
 ---
 
@@ -71,3 +72,15 @@ node neo-one-node --config /path/to/config.json --environment.logger.level=trace
 ```
 
 You can also add a `.neo-onerc` configuration file anywhere in the app directory (recommended at the root of the repo directory) to apply your configuration by default. See [rc](https://github.com/dominictarr/rc#rc) for more informatio on how NEO•ONE will find and apply the node configuration with an `rc` file.
+
+## Troubleshooting
+
+You may or may not run into environment problems when trying to run the node. The NEO•ONE node now uses the C# NeoVM instead of our own implementation of the NeoVM in TypeScript, which means that NEO•ONE controls C# code through some complicated mechanisms. If you run into problems with running the node then try these steps:
+
+- Add these environment variables to your shell environment:
+  - `EDGE_USE_CORECLR=1`
+  - `EDGE_APP_ROOT=<path/to/your/project>/node_modules/@neo-one/node-vm/lib/Debug/netcoreapp3.0`
+- Install `pkgconfig` on macOS with Homebrew: `brew install pkgconfig`
+  - Then add this environment variable: `PKG_CONFIG_PATH=/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig`
+  - You then need to re-install your node modules by deleting the `node_modules` folder and then running `npm install` again
+- If problems persist then please reach out to us on [Discord](https://discord.gg/S86PqDE)

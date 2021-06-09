@@ -25,13 +25,13 @@ export default {
     // NEO•ONE will look for smart contracts in this directory.
     path: 'neo-one/contracts',
     // Set this to true if you want the compile command to output JSON.
-    // json: true,
+    json: true,
     // Set this to true if you want the compile command to output AVM.
-    // avm: false,
+    avm: false,
     // Set this to true if you want the compile command to output additional debug information.
-    // debug: false,
+    debug: false,
     // Set this to true if you want the compile command to output the AVM in a human-readable format for debugging (requires debug: true).
-    // opcodes: false,
+    opcodes: false,
   },
   artifacts: {
     // NEO•ONE will store build and deployment artifacts that should be checked in to vcs in this directory.

@@ -296,7 +296,7 @@ export interface Transaction {
    */
   readonly height: number;
   /**
-   * Code that was executed in NEO VM.
+   * Code that was executed in the NeoVM.
    */
   readonly script: Buffer;
   /**

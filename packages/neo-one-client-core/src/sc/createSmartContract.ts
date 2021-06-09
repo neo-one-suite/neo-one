@@ -398,6 +398,7 @@ export const createSmartContract = ({
       }),
     {
       client,
+      // TODO: need to add documentation back to the website for these when added back
       // iterEvents,
       // iterLogs,
       // iterActions,

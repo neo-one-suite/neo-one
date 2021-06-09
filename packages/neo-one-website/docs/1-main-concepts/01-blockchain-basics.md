@@ -81,14 +81,10 @@ Delegated Proof of Stake (dPOS) works in a similar way to PoS, however instead o
 
 ## NEO Specifics
 
-NEO's blockchain data structure is very similar to other blockchains and the general outline we gave above. Like Bitcoin, NEO uses the UTXO model for its native assets, NEO and GAS. Like Ethereum, NEO is a full smart contract platform with its own virtual machine.
+NEO's blockchain data structure is very similar to other blockchains and the general outline we gave above. NEO uses smart contract storage to keep track of native assets NEO and GAS. Like Ethereum, NEO is a full smart contract platform with its own virtual machine.
 
-One differentiating factor to be aware of is that NEO has several different types of transactions that can be included in a block; we'll list the most important ones below:
+NEO's transactions all contains scripts which are used to invoke smart contracts, including "native" contracts which control voting, native assets NEO and GAS, and other blockchain APIs.
 
-1. `ContractTransaction` - Used for transferring native assets. May only contain inputs and outputs.
-2. `InvocationTransaction` - Used for invoking smart contracts. May contain inputs and outputs.
-3. `ClaimTransaction` - Used for claiming accrued GAS
-
-Take a look at the [@neo-one/client](/reference/@neo-one/client) reference for more details on the specific properties stored on each transaction type. Note the final transaction in that list, the `ClaimTransaction`, refers to claiming GAS. GAS is produced every block and allocated to every NEO holder in proportion to their holdings. NEO holders claim their GAS by submitting a `ClaimTransaction` to the network. GAS is used to "fuel" the network; it's used primarily for transaction fees and is also meant as the primary currency. NEO, on the other hand, is meant to represent ownership of the network and is used only for voting and generating GAS.
+GAS is produced every block and allocated to every NEO holder in proportion to their holdings. GAS is used to "fuel" the network; it's used primarily for transaction fees and is also meant as the primary currency. NEO, on the other hand, is meant to represent ownership of the network and is used for voting and generating GAS.
 
 NEO uses a form of dPOS called Delegated Byzantine Fault Tolerance (dBFT). While we won't go into detail on the algorithm, the key differentiator of dBFT is that it results in one block finality. Once a block has been propagated on the network it cannot be reversed. Contrast this with most blockchain consensus algorithms which can have anywhere from 6 blocks to 40 or more block finality. NEO holders vote in consensus nodes which participate in producing new blocks via dBFT.
