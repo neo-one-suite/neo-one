@@ -106,6 +106,18 @@ namespace NEOONE
       }
     }
 
+    public class BufferReturn
+    {
+      public byte[] value;
+      public StackItemType Type => StackItemType.Buffer;
+      public readonly bool IsNull;
+      public BufferReturn(Neo.VM.Types.Buffer item)
+      {
+        this.value = item.InnerBuffer;
+        this.IsNull = item.IsNull;
+      }
+    }
+
     public class InteropInterfaceReturn
     {
       public dynamic value;
@@ -135,7 +147,7 @@ namespace NEOONE
       return item.Type switch
       {
         StackItemType.Any => item,
-        StackItemType.Buffer => item,
+        StackItemType.Buffer => new BufferReturn((Neo.VM.Types.Buffer)item),
         StackItemType.Pointer => new PointerReturn((Neo.VM.Types.Pointer)item),
         StackItemType.Array => new ArrayReturn((Neo.VM.Types.Array)item),
         StackItemType.Struct => new StructReturn((Struct)item),
