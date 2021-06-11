@@ -315,9 +315,7 @@ export class MessageTransform extends Transform {
     }
   }
 
-  private processBuffer(
-    reader: BinaryReader,
-  ): {
+  private processBuffer(reader: BinaryReader): {
     readonly remainingBuffer: Buffer;
     readonly mutableMessages: Message[];
   } {
