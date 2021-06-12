@@ -11,5 +11,5 @@ export const writePidFile = async (
 ) => {
   const pidFile = getProcessIDFile(config, name);
   await fs.ensureDir(nodePath.dirname(pidFile));
-  await fs.writeFile(pidFile, proc.pid);
+  await fs.writeFile(pidFile, `${proc.pid}`);
 };
