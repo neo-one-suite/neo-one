@@ -2,6 +2,26 @@
   "name": "@neo-one/smart-contract-compiler-node",
   "entries": [
     {
+      "version": "2.7.3",
+      "tag": "@neo-one/smart-contract-compiler-node_v2.7.3",
+      "date": "Tue, 15 Jun 2021 01:21:56 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Minor fixes"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/smart-contract\" from `^2.7.2` to `^2.7.3`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/smart-contract-lib\" from `^2.7.2` to `^2.7.3`"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.7.2",
       "tag": "@neo-one/smart-contract-compiler-node_v2.7.2",
       "date": "Fri, 30 Apr 2021 01:53:33 GMT",

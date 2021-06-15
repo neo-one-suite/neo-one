@@ -2,6 +2,29 @@
   "name": "@neo-one/smart-contract-codegen",
   "entries": [
     {
+      "version": "2.7.3",
+      "tag": "@neo-one/smart-contract-codegen_v2.7.3",
+      "date": "Tue, 15 Jun 2021 01:21:56 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Minor fixes"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/cli-common\" from `^2.7.2` to `^2.7.3`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-common\" from `^2.7.2` to `^2.7.3`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-core\" from `^2.7.2` to `^2.7.3`"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.7.2",
       "tag": "@neo-one/smart-contract-codegen_v2.7.2",
       "date": "Tue, 23 Feb 2021 23:29:30 GMT",

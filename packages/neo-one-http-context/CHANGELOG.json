@@ -2,6 +2,26 @@
   "name": "@neo-one/http-context",
   "entries": [
     {
+      "version": "2.7.3",
+      "tag": "@neo-one/http-context_v2.7.3",
+      "date": "Tue, 15 Jun 2021 01:21:56 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Minor fixes"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-switch\" from `^2.7.2` to `^2.7.3`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/logger\" from `^2.6.1` to `^2.6.2`"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.7.2",
       "tag": "@neo-one/http-context_v2.7.2",
       "date": "Fri, 30 Apr 2021 01:53:33 GMT",

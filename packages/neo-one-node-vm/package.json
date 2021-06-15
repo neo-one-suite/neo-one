@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-vm",
-  "version": "2.7.2",
+  "version": "2.7.3",
   "description": "NEO•ONE NEO VM.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -13,9 +13,9 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-common": "^2.7.2",
-    "@neo-one/client-full-common": "^2.7.2",
-    "@neo-one/node-core": "^2.7.2",
+    "@neo-one/client-common": "^2.7.3",
+    "@neo-one/client-full-common": "^2.7.3",
+    "@neo-one/node-core": "^2.7.3",
     "@neo-one/utils": "^2.6.1",
     "@reactivex/ix-es2015-cjs": "^2.5.3",
     "@reactivex/ix-esnext-esm": "^2.5.3",
