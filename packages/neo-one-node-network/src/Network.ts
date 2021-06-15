@@ -87,6 +87,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
   private readonly unconnectedPeers: Set<Endpoint>;
   private readonly endpointBlacklist: Set<Endpoint>;
   private mutableBadEndpoints: Set<Endpoint>;
+  private readonly mutableBadEndpointsPrelist: Set<Endpoint>;
   private readonly permanentBlacklist: Set<Endpoint>;
   private mutableSeeds: Set<Endpoint>;
   private mutablePeerSeeds: Set<Endpoint>;
@@ -120,6 +121,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
     this.unconnectedPeers = new Set();
     this.endpointBlacklist = new Set();
     this.mutableReverseBlacklist = {};
+    this.mutableBadEndpointsPrelist = new Set();
     this.mutableBadEndpoints = new Set();
     this.permanentBlacklist = new Set();
     this.mutablePreviousHealth = {};
@@ -413,7 +415,11 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
     } catch (err) {
       logger.trace({ err, ...logData }, `Failed to connect to peer at ${endpoint}.`);
       if (this.mutableConnectErrorCodes.has(err.code)) {
-        this.mutableBadEndpoints.add(endpoint);
+        if (this.mutableBadEndpointsPrelist.has(endpoint)) {
+          this.mutableBadEndpoints.add(endpoint);
+        } else {
+          this.mutableBadEndpointsPrelist.add(endpoint);
+        }
       }
     } finally {
       const { [endpoint]: _unused, ...rest } = this.mutableConnectingPeers;
