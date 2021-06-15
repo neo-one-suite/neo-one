@@ -1,5 +1,6 @@
 // tslint:disable no-any
 import { CodegenFramework, CodegenLanguage, Configuration } from '@neo-one/cli-common';
+import { normalizePath } from '@neo-one/utils';
 import { cosmiconfig } from 'cosmiconfig';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
@@ -153,28 +154,28 @@ const relativizePaths = (config: Configuration) => ({
   ...config,
   artifacts: {
     ...config.artifacts,
-    path: nodePath.relative(process.cwd(), config.artifacts.path),
+    path: normalizePath(nodePath.relative(process.cwd(), config.artifacts.path)),
   },
   migration: {
     ...config.migration,
-    path: nodePath.relative(process.cwd(), config.migration.path),
+    path: normalizePath(nodePath.relative(process.cwd(), config.migration.path)),
   },
   contracts: {
     ...config.contracts,
-    outDir: nodePath.relative(process.cwd(), config.contracts.outDir),
-    path: nodePath.relative(process.cwd(), config.contracts.path),
+    outDir: normalizePath(nodePath.relative(process.cwd(), config.contracts.outDir)),
+    path: normalizePath(nodePath.relative(process.cwd(), config.contracts.path)),
   },
   codegen: {
     ...config.codegen,
-    path: nodePath.relative(process.cwd(), config.codegen.path),
+    path: normalizePath(nodePath.relative(process.cwd(), config.codegen.path)),
   },
   network: {
     ...config.network,
-    path: nodePath.relative(process.cwd(), config.network.path),
+    path: normalizePath(nodePath.relative(process.cwd(), config.network.path)),
   },
   neotracker: {
     ...config.neotracker,
-    path: nodePath.relative(process.cwd(), config.neotracker.path),
+    path: normalizePath(nodePath.relative(process.cwd(), config.neotracker.path)),
   },
 });
 
