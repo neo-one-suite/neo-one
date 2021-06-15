@@ -1,6 +1,13 @@
 # Change Log - @neo-one/smart-contract-codegen
 
-This log was last generated on Tue, 23 Feb 2021 23:29:30 GMT and should not be manually modified.
+This log was last generated on Tue, 15 Jun 2021 01:21:56 GMT and should not be manually modified.
+
+## 2.7.3
+Tue, 15 Jun 2021 01:21:56 GMT
+
+### Patches
+
+- Minor fixes
 
 ## 2.7.2
 Tue, 23 Feb 2021 23:29:30 GMT

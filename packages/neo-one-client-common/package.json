@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client-common",
-  "version": "2.7.2",
+  "version": "2.7.3",
   "description": "NEO•ONE client common code.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",

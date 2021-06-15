@@ -1,6 +1,13 @@
 # Change Log - @neo-one/cli-common-node
 
-This log was last generated on Fri, 30 Apr 2021 01:53:33 GMT and should not be manually modified.
+This log was last generated on Tue, 15 Jun 2021 01:21:56 GMT and should not be manually modified.
+
+## 2.7.3
+Tue, 15 Jun 2021 01:21:56 GMT
+
+### Patches
+
+- Minor fixes
 
 ## 2.7.2
 Fri, 30 Apr 2021 01:53:33 GMT
