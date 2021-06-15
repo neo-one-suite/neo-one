@@ -51,7 +51,7 @@ This tells your local C# .NET runtime to use version 3.1.401 in this repo, even 
 
 4. Follow the [installation instructions for Create React App](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) to make a new project.
 
-   - Be sure to invoke Create React App with the `--template typescript` in order to enable TypeScript support: `npx create-react-app token --template typescript`
+   - Be sure to invoke Create React App with `--template typescript` in order to enable TypeScript support: `npx create-react-app token --template typescript`
 
 5. Install NEO•ONE using either [yarn](https://yarnpkg.com/) or [npm](https://www.npmjs.com/)
 
