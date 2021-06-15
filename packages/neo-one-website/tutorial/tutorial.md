@@ -57,7 +57,7 @@ Here's how to setup your local development environment:
 
 2. Follow the [installation instructions for Create React App](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) to make a new project.
 
-- Be sure to invoke Create React App with the `--typescript` flag in order to enable TypeScript support: `npx create-react-app token --typescript`
+- Be sure to invoke Create React App with `--template typescript` in order to enable TypeScript support: `npx create-react-app token --typescript`
 
 3. Change your current working directory into your new `token` directory created by `create-react-app` by running `cd token` or `cd <path/to/your/new/token/directory>`
 
