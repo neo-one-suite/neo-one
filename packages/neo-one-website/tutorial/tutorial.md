@@ -8,7 +8,7 @@ This tutorial serves as an introduction to NEO•ONE and does not assume any pri
 
 ## Before We Get Started
 
-This tutorial roughly follows the same material as the first course of the NEO•ONE Courses: Tokens, ICOs and DApps, oh my! We'll focus on creating a token, but even if you have no plans to build a token, give this tutorial (or the course) a chance. The techniques you’ll learn in the tutorial are fundamental to building decentralized apps with NEO•ONE, and mastering it will give you a deep understanding of NEO•ONE.
+This tutorial focuses on creating a token, but even if you have no plans to build a token, give this tutorial (or the course) a chance. The techniques you’ll learn in the tutorial are fundamental to building decentralized apps with NEO•ONE, and mastering it will give you a deep understanding of NEO•ONE.
 
 ::: warning
 
@@ -46,7 +46,7 @@ Finally, we'll use [Jest](https://jestjs.io/) for testing our smart contracts, h
 
 ### Setup for the Tutorial
 
-This tutorial assumes you'll be working with a local development environment. **If you'd prefer to work entirely within the browser, head on over to [NEO•ONE Courses](/course)** and take the first course, which covers the same material as this tutorial.
+This tutorial assumes you'll be working with a local development environment.
 
 Here's how to setup your local development environment:
 
@@ -426,7 +426,7 @@ Putting it all together, we see both forms of invoking smart contract methods in
 
 ### Wrapping Up
 
-At this point we have a fully functioning, although simplistic, token contract. If you'd like to go into more details on some aspects or work on some of the parts we skipped, like event notifications or advanced topics like invoking other smart contracts, check out [NEO•ONE Courses](/course). Otherwise, head to the next section to learn about integrating a dapp with the NEO•ONE client and smart contract APIs. Once you have it integrated, try it out with the React boilerplate that was generated with create-react-app!
+At this point we have a fully functioning, although simplistic, token contract. Head to the next section to learn about integrating a dapp with the NEO•ONE client and smart contract APIs. Once you have it integrated, try it out with the React boilerplate that was generated with create-react-app!
 
 ---
 
