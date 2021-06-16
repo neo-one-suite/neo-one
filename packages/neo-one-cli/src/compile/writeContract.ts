@@ -153,6 +153,7 @@ export const writeContract = async (
       entrypoint: '0',
       documents: debugInfo.documents,
       methods: [jmpMethod, dispatcherMethod, ...methods],
+      'static-variables': ['scope,Array,0'],
       events: manifest.abi.events.map((event, index) => ({
         id: `${lastID + index}`,
         name: `${contract.manifest.name}-${event.name}`,
