@@ -207,4 +207,4 @@ export {
   nep17,
 } from '@neo-one/client-core';
 
-// export { DeveloperTools } from '@neo-one/developer-tools'; // TODO: add back
+export { DeveloperTools } from '@neo-one/developer-tools';
