@@ -91,51 +91,53 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
       isOptionalChain ? processUndefined(innerOptions) : throwTypeError(innerOptions);
     };
 
-    const createHandleProp = (
-      handleString: (options: VisitOptions) => void,
-      handleNumber: (options: VisitOptions) => void,
-      handleSymbol: (options: VisitOptions) => void,
-    ) => (innerOptions: VisitOptions) => {
-      // [propVal, objectVal]
-      sb.visit(prop, innerOptions);
-      sb.emitHelper(
-        prop,
-        innerOptions,
-        sb.helpers.forBuiltinType({
-          type: propType,
-          array: throwInnerTypeError,
-          arrayStorage: throwInnerTypeError,
-          boolean: throwInnerTypeError,
-          buffer: throwInnerTypeError,
-          null: throwInnerTypeError,
-          number: handleNumber,
-          object: throwInnerTypeError,
-          string: handleString,
-          symbol: handleSymbol,
-          undefined: throwInnerTypeError,
-          map: throwInnerTypeError,
-          mapStorage: throwInnerTypeError,
-          set: throwInnerTypeError,
-          setStorage: throwInnerTypeError,
-          error: throwInnerTypeError,
-          forwardValue: throwInnerTypeError,
-          iteratorResult: throwInnerTypeError,
-          iterable: throwInnerTypeError,
-          iterableIterator: throwInnerTypeError,
-          transaction: throwInnerTypeError,
-          attribute: throwInnerTypeError,
-          contract: throwInnerTypeError,
-          block: throwInnerTypeError,
-          contractManifest: throwInnerTypeError,
-          contractABI: throwInnerTypeError,
-          contractMethod: throwInnerTypeError,
-          contractEvent: throwInnerTypeError,
-          contractParameter: throwInnerTypeError,
-          contractGroup: throwInnerTypeError,
-          contractPermission: throwInnerTypeError,
-        }),
-      );
-    };
+    const createHandleProp =
+      (
+        handleString: (options: VisitOptions) => void,
+        handleNumber: (options: VisitOptions) => void,
+        handleSymbol: (options: VisitOptions) => void,
+      ) =>
+      (innerOptions: VisitOptions) => {
+        // [propVal, objectVal]
+        sb.visit(prop, innerOptions);
+        sb.emitHelper(
+          prop,
+          innerOptions,
+          sb.helpers.forBuiltinType({
+            type: propType,
+            array: throwInnerTypeError,
+            arrayStorage: throwInnerTypeError,
+            boolean: throwInnerTypeError,
+            buffer: throwInnerTypeError,
+            null: throwInnerTypeError,
+            number: handleNumber,
+            object: throwInnerTypeError,
+            string: handleString,
+            symbol: handleSymbol,
+            undefined: throwInnerTypeError,
+            map: throwInnerTypeError,
+            mapStorage: throwInnerTypeError,
+            set: throwInnerTypeError,
+            setStorage: throwInnerTypeError,
+            error: throwInnerTypeError,
+            forwardValue: throwInnerTypeError,
+            iteratorResult: throwInnerTypeError,
+            iterable: throwInnerTypeError,
+            iterableIterator: throwInnerTypeError,
+            transaction: throwInnerTypeError,
+            attribute: throwInnerTypeError,
+            contract: throwInnerTypeError,
+            block: throwInnerTypeError,
+            contractManifest: throwInnerTypeError,
+            contractABI: throwInnerTypeError,
+            contractMethod: throwInnerTypeError,
+            contractEvent: throwInnerTypeError,
+            contractParameter: throwInnerTypeError,
+            contractGroup: throwInnerTypeError,
+            contractPermission: throwInnerTypeError,
+          }),
+        );
+      };
 
     const createProcessBuiltin = (name: string) => {
       const handleStringBase = (innerInnerOptions: VisitOptions) => {

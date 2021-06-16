@@ -13,6 +13,7 @@ export const builder = (yargsBuilder: typeof yargs) =>
   yargsBuilder.boolean('reset').describe('reset', 'Reset the NEO Tracker database.').default('reset', false);
 export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
   start(async (_cmd, config) => {
+    throw new Error('This feature is not yet implemented');
     const running = await isRunning(config.neotracker.port);
     if (running) {
       if (argv.reset) {
