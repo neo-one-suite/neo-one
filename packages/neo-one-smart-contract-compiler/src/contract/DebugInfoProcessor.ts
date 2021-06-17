@@ -12,6 +12,7 @@ export interface DebugInfo {
   readonly methods: readonly DebugMethod[];
   readonly events: readonly DebugEvent[];
   readonly documents: readonly string[];
+  readonly 'static-variables': readonly string[];
 }
 
 export interface DebugMethod {
@@ -43,6 +44,7 @@ export class DebugInfoProcessor {
       documents: [this.sourceFile.fileName],
       methods: this.processMethods(),
       events: [],
+      'static-variables': ['scope,Array,0'],
     };
   }
 
@@ -50,74 +52,72 @@ export class DebugInfoProcessor {
     const propInfos = this.contractInfo.propInfos.filter((propInfo) => propInfo.isPublic).filter(utils.notNull);
 
     return _.flatten<DebugMethod>(
-      propInfos.map(
-        (propInfo): ReadonlyArray<DebugMethod> => {
-          switch (propInfo.type) {
-            case 'deploy':
-              return [
-                {
-                  id: '',
-                  name: propInfo.name,
-                  params: propInfo.isMixinDeploy ? [] : this.getParameters({ callSignature: propInfo.callSignature }),
-                  range: [0, 0],
-                  returnType: 'Boolean',
-                },
-              ];
+      propInfos.map((propInfo): ReadonlyArray<DebugMethod> => {
+        switch (propInfo.type) {
+          case 'deploy':
+            return [
+              {
+                id: '',
+                name: propInfo.name,
+                params: propInfo.isMixinDeploy ? [] : this.getParameters({ callSignature: propInfo.callSignature }),
+                range: [0, 0],
+                returnType: 'Boolean',
+              },
+            ];
 
-            case 'upgrade':
-              return [
-                {
-                  id: '',
-                  name: propInfo.name,
-                  params: ['script,Buffer', 'manifest,Buffer'],
-                  range: [0, 0],
-                  returnType: 'Void',
-                },
-              ];
+          case 'upgrade':
+            return [
+              {
+                id: '',
+                name: propInfo.name,
+                params: ['script,Buffer', 'manifest,Buffer'],
+                range: [0, 0],
+                returnType: 'Void',
+              },
+            ];
 
-            case 'function':
-              const funcRange = this.getSourceRange(propInfo.decl);
-              if (funcRange === undefined) {
-                return [];
-              }
+          case 'function':
+            const funcRange = this.getSourceRange(propInfo.decl);
+            if (funcRange === undefined) {
+              return [];
+            }
 
-              return [
-                {
-                  id: '',
-                  name: propInfo.name,
-                  params: this.getParameters({
-                    callSignature: propInfo.callSignature,
-                  }),
-                  range: funcRange,
-                  returnType: this.toDebugReturn(propInfo.decl, propInfo.returnType),
-                },
-              ];
+            return [
+              {
+                id: '',
+                name: propInfo.name,
+                params: this.getParameters({
+                  callSignature: propInfo.callSignature,
+                }),
+                range: funcRange,
+                returnType: this.toDebugReturn(propInfo.decl, propInfo.returnType),
+              },
+            ];
 
-            case 'property':
-              const propRange = this.getSourceRange(propInfo.decl);
-              if (propRange === undefined) {
-                return [];
-              }
+          case 'property':
+            const propRange = this.getSourceRange(propInfo.decl);
+            if (propRange === undefined) {
+              return [];
+            }
 
-              return [
-                {
-                  id: '',
-                  name: propInfo.name,
-                  params: [],
-                  range: propRange,
-                  returnType: this.toDebugReturn(propInfo.decl, propInfo.propertyType),
-                },
-              ];
+            return [
+              {
+                id: '',
+                name: propInfo.name,
+                params: [],
+                range: propRange,
+                returnType: this.toDebugReturn(propInfo.decl, propInfo.propertyType),
+              },
+            ];
 
-            case 'accessor':
-              return [this.getGetterInfo(propInfo), this.getSetterInfo(propInfo)].filter(utils.notNull);
+          case 'accessor':
+            return [this.getGetterInfo(propInfo), this.getSetterInfo(propInfo)].filter(utils.notNull);
 
-            default:
-              utils.assertNever(propInfo);
-              throw new Error('For TS');
-          }
-        },
-      ),
+          default:
+            utils.assertNever(propInfo);
+            throw new Error('For TS');
+        }
+      }),
     );
   }
 
