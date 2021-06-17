@@ -177,6 +177,7 @@ export const getSmartContractInfo = (context: Context, sourceFile: ts.SourceFile
     debugInfo: {
       entrypoint: '',
       documents: [],
+      'static-variables': [],
       methods: [],
       events: [],
     },
