@@ -535,8 +535,8 @@ export class Node implements INode {
         })
       : undefined;
 
-    const verackMessage = Message.create({ command: Command.Verack });
-    this.sendMessage(peer, verackMessage);
+    this.sendMessage(peer, Message.create({ command: Command.Verack }));
+
     const nextMessage = await peer.receiveMessage(30000);
     if (nextMessage.value.command !== Command.Verack) {
       throw new NegotiationError(nextMessage, 'Expected Verack');

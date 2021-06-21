@@ -311,6 +311,8 @@ export class MessageTransform extends Transform {
       mutableMessages.forEach((message) => this.push(message));
       callback(undefined);
     } catch (error) {
+      // tslint:disable-next-line: no-console
+      console.log(error);
       callback(error);
     }
   }

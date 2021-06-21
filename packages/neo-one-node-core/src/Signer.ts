@@ -19,8 +19,10 @@ export class Signer extends SignerModel implements SerializableJSON<SignerJSON> 
     if (witnessScopeHasFlag(scopes, WitnessScopeModel.Global) && scopes !== WitnessScopeModel.Global) {
       throw new InvalidFormatError('Only the global scope should have the global flag');
     }
-    const allowedContracts = hasCustomContracts(scopes) ? reader.readArray(reader.readUInt160, this.maxSubItems) : [];
-    const allowedGroups = hasCustomGroups(scopes) ? reader.readArray(reader.readECPoint, this.maxSubItems) : [];
+    const allowedContracts = hasCustomContracts(scopes)
+      ? reader.readArray(() => reader.readUInt160(), this.maxSubItems)
+      : [];
+    const allowedGroups = hasCustomGroups(scopes) ? reader.readArray(() => reader.readECPoint(), this.maxSubItems) : [];
 
     return new Signer({
       account,
