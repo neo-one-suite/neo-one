@@ -77,6 +77,30 @@ export interface AddressConstructor {
    * `Address` of the Policy `Contract`.
    */
   readonly Policy: Address;
+  /**
+   * `Address` of the ContractManagement `Contract`.
+   */
+  readonly ContractManagement: Address;
+  /**
+   * `Address` of the StdLib `Contract`.
+   */
+  readonly StdLib: Address;
+  /**
+   * `Address` of the CryptoLib `Contract`.
+   */
+  readonly CryptoLib: Address;
+  /**
+   * `Address` of the Ledger `Contract`.
+   */
+  readonly Ledger: Address;
+  /**
+   * `Address` of the RoleManagement `Contract`.
+   */
+  readonly RoleManagement: Address;
+  /**
+   * `Address` of the Oracle `Contract`.
+   */
+  readonly Oracle: Address;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 
@@ -1328,7 +1352,7 @@ export interface LinkedSmartContractConstructor {
 export const LinkedSmartContract: LinkedSmartContractConstructor;
 
 /**
- * Types that can be hashed the various `crypto` functions.
+ * Types that can be hashed by the various `crypto` functions.
  *
  * @see crypto
  */

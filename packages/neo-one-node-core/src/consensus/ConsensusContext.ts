@@ -13,6 +13,7 @@ export interface ConsensusContextAdd {
   readonly viewNumber: number;
   readonly myIndex: number;
   readonly validators: readonly ECPoint[];
+  readonly maxValidUntilBlockIncrement: number;
   readonly blockReceivedTimeMS: number;
   readonly verificationContext: TransactionVerificationContext;
   readonly blockOptions: BlockPartial;
@@ -111,6 +112,7 @@ export class ConsensusContext {
   public readonly viewNumber: number;
   public readonly myIndex: number;
   public readonly validators: readonly ECPoint[];
+  public readonly maxValidUntilBlockIncrement: number;
   public readonly blockReceivedTimeMS: number;
   public readonly verificationContext: TransactionVerificationContext;
   public readonly preparationPayloads: ReadonlyArray<ExtensiblePayload | undefined>;
@@ -141,6 +143,7 @@ export class ConsensusContext {
     transactions = {},
     transactionHashes,
     witnessSize = 0,
+    maxValidUntilBlockIncrement,
   }: ConsensusContextAdd) {
     this.viewNumber = viewNumber;
     this.myIndex = myIndex;
@@ -157,6 +160,7 @@ export class ConsensusContext {
     this.transactionHashes = transactionHashes;
     this.transactionHashesSet = new Set(transactionHashes?.map(common.uInt256ToHex));
     this.witnessSize = witnessSize;
+    this.maxValidUntilBlockIncrement = maxValidUntilBlockIncrement;
   }
 
   public getMessage<T extends ConsensusMessage>(payload: ExtensiblePayload): T {
@@ -167,7 +171,11 @@ export class ConsensusContext {
 
     const message = deserializeConsensusMessageWire({
       buffer: payload.data,
-      context: { network: payload.network, validatorsCount: this.validators.length },
+      context: {
+        network: payload.network,
+        validatorsCount: this.validators.length,
+        maxValidUntilBlockIncrement: this.maxValidUntilBlockIncrement,
+      },
     });
     // tslint:disable-next-line: no-object-mutation
     this.mutableCachedMessages[common.uInt256ToString(payload.hash)] = message;
@@ -217,6 +225,7 @@ export class ConsensusContext {
       transactions: this.transactions,
       transactionHashes: this.transactionHashes,
       lastSeenMessage: this.lastSeenMessage,
+      maxValidUntilBlockIncrement: this.maxValidUntilBlockIncrement,
       ...rest,
     });
   }
