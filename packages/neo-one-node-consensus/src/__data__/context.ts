@@ -24,6 +24,7 @@ const getBackupContext = (getGasBalance: (storage: NativeContractStorageContext,
     validators,
     blockReceivedTimeMS,
     verificationContext: new TransactionVerificationContext({ getGasBalance }),
+    maxValidUntilBlockIncrement: 5760,
   });
 
 const backupPrivateKey = keys[backupIndex].privateKey;
@@ -40,6 +41,7 @@ const getPrimaryContext = (getGasBalance: (storage: NativeContractStorageContext
     validators,
     blockReceivedTimeMS,
     verificationContext: new TransactionVerificationContext({ getGasBalance }),
+    maxValidUntilBlockIncrement: 5760,
   });
 
 const primaryPrivateKey = keys[primaryIndex].privateKey;

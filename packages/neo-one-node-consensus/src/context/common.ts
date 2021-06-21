@@ -385,5 +385,6 @@ export const getInitialContext = ({
     validators,
     witnessSize: 0,
     blockReceivedTimeMS: Date.now(),
+    maxValidUntilBlockIncrement: blockchain.settings.maxValidUntilBlockIncrement,
   });
 };

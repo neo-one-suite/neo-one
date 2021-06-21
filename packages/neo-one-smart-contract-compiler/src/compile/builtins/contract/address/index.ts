@@ -36,4 +36,34 @@ export const add = (builtins: Builtins): void => {
     'Policy',
     new BuiltinConstantBufferMemberValue(common.nativeHashes.Policy),
   );
+  builtins.addContractMember(
+    'AddressConstructor',
+    'ContractManagement',
+    new BuiltinConstantBufferMemberValue(common.nativeHashes.ContractManagement),
+  );
+  builtins.addContractMember(
+    'AddressConstructor',
+    'StdLib',
+    new BuiltinConstantBufferMemberValue(common.nativeHashes.StdLib),
+  );
+  builtins.addContractMember(
+    'AddressConstructor',
+    'CryptoLib',
+    new BuiltinConstantBufferMemberValue(common.nativeHashes.CryptoLib),
+  );
+  builtins.addContractMember(
+    'AddressConstructor',
+    'Ledger',
+    new BuiltinConstantBufferMemberValue(common.nativeHashes.Ledger),
+  );
+  builtins.addContractMember(
+    'AddressConstructor',
+    'RoleManagement',
+    new BuiltinConstantBufferMemberValue(common.nativeHashes.RoleManagement),
+  );
+  builtins.addContractMember(
+    'AddressConstructor',
+    'Oracle',
+    new BuiltinConstantBufferMemberValue(common.nativeHashes.Oracle),
+  );
 };
