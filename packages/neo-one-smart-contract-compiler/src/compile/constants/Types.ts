@@ -28,8 +28,9 @@ export enum Types {
   ContractParameter = 27,
   ContractGroup = 28,
   ContractPermission = 29,
+  Transfer = 30,
   // Fake type, never appears
-  Iterable = 30,
+  Iterable = 31,
 }
 
 export type WrappableType =
@@ -59,7 +60,8 @@ export type WrappableType =
   | Types.ContractEvent
   | Types.ContractParameter
   | Types.ContractGroup
-  | Types.ContractPermission;
+  | Types.ContractPermission
+  | Types.Transfer;
 
 export type IterableTypes =
   | Types.Array

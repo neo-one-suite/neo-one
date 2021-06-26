@@ -59,6 +59,7 @@ export class IsNullOrUndefinedHelper extends TypedHelper {
         contractParameter: pushFalse,
         contractGroup: pushFalse,
         contractPermission: pushFalse,
+        transfer: pushFalse,
       }),
     );
   }

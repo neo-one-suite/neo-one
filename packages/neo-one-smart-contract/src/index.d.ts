@@ -323,10 +323,6 @@ export interface Transaction {
    * Code that was executed in the NeoVM.
    */
   readonly script: Buffer;
-  /**
-   * `Notification`s emitted by the `Transaction`.
-   */
-  // readonly notifications: Notification[];
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface TransactionConstructor {
@@ -581,48 +577,6 @@ export enum ContractParameterType {
   InteropInterface = 0x30,
   Void = 0xff,
 }
-
-// export enum StackItemType {
-//   Any = 0x00,
-//   Pointer = 0x10,
-//   Boolean = 0x20,
-//   Integer = 0x21,
-//   ByteString = 0x28,
-//   Buffer = 0x30,
-//   Array = 0x40,
-//   Struct = 0x41,
-//   Map = 0x48,
-//   InteropInterface = 0x60,
-// }
-
-// export interface StackItemBase {
-//   readonly type: StackItemType;
-// }
-
-// export interface BufferStackItem extends StackItemBase {
-//   readonly type: StackItemType.Buffer;
-//   readonly value: Buffer;
-// }
-
-// export type StackItem = BufferStackItem;
-
-// /**
-//  *
-//  */
-// export interface Notification {
-//   /**
-//    *
-//    */
-//   readonly scriptHash: Address;
-//   /**
-//    * The name of the notification event. \"Transfer\" in the event of a transfer.
-//    */
-//   readonly eventName: string;
-//   /**
-//    *
-//    */
-//   readonly state: StackItem[];
-// }
 
 /**
  * Attributes of a `Block` persisted to the blockchain.
@@ -968,6 +922,14 @@ export interface BlockchainConstructor {
    * Will be `undefined` if the smart contract method was not invoked by another smart contract, but instead was invoked by a user directly.
    */
   readonly currentCallerContract: Address | undefined;
+  /**
+   * An array of recent NEO `Transfer`s.
+   */
+  readonly currentNEOTransfers: readonly Transfer[];
+  /**
+   * An array of recent GAS `Transfer`s.
+   */
+  readonly currentGASTransfers: readonly Transfer[];
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 /**
@@ -1384,21 +1346,30 @@ export interface CryptoConstructor {
 export const crypto: CryptoConstructor;
 
 /**
- * Represents a native `Asset` transfer.
+ * Represents an asset transfer.
  */
+export const Transfer: TransferConstructor;
 export interface Transfer {
   /**
    * The amount transferred.
    */
   readonly amount: Fixed<8>;
   /**
-   * The `Hash256` of the `Asset` transferred.
+   * The `UInt160` hash of the contract.
    */
-  readonly asset: Hash256;
+  readonly asset: Address;
   /**
    * The desination `Address` of the transfer.
    */
-  readonly to: Address;
+  readonly to?: Address;
+  /**
+   * The `Address` of the source of the transfer.
+   */
+  readonly from?: Address;
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+export interface TransferConstructor {
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 
 /**

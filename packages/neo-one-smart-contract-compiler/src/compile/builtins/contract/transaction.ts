@@ -76,14 +76,6 @@ export const add = (builtins: Builtins): void => {
     'script',
     new BuiltinInstanceIndexValue(7, Types.Transaction, Types.Buffer),
   );
-  // TODO: notification is an array stack item which needs to be split up by index
-  // Need to input a Hash160 to get the notification
-  // Hash160 is script hash? SHA160 the script?
-  // builtins.addContractMember(
-  //   'Transaction',
-  //   'notifications',
-  //   new SysCallInstanceMemberArray('System.Runtime.GetNotifications', Types.Transaction, Types.Notification),
-  // );
   builtins.addContractMember(
     'TransactionConstructor',
     'for',

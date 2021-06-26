@@ -149,6 +149,7 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
         contractParameter: createProcessBuiltin('ContractParameterDefinition'),
         contractGroup: createProcessBuiltin('ContractGroup'),
         contractPermission: createProcessBuiltin('ContractPermission'),
+        transfer: createProcessBuiltin('Transfer'),
       }),
     );
   }

@@ -9,6 +9,7 @@ export class BuiltinInstanceIndexValue extends BuiltinInstanceMemberValue {
     private readonly index: number,
     private readonly valueType: WrappableType,
     private readonly type: WrappableType,
+    private readonly shouldWrap: boolean = true,
   ) {
     super();
   }
@@ -20,7 +21,9 @@ export class BuiltinInstanceIndexValue extends BuiltinInstanceMemberValue {
     sb.emitPushInt(node, this.index);
     // [property]
     sb.emitOp(node, 'PICKITEM');
-    // [val]
-    sb.emitHelper(node, options, sb.helpers.wrapVal({ type: this.type }));
+    if (this.shouldWrap) {
+      // [val]
+      sb.emitHelper(node, options, sb.helpers.wrapVal({ type: this.type }));
+    }
   }
 }

@@ -99,30 +99,29 @@ const makeContext = (
   return createContext(sourceFiles, program, typeChecker, languageService, host);
 };
 
-const createModifyHostFiles = (files: { readonly [fileName: string]: string | undefined }) => (
-  host: ts.LanguageServiceHost,
-) => {
-  const originalFileExists = host.fileExists === undefined ? undefined : host.fileExists.bind(host);
-  // tslint:disable-next-line no-object-mutation no-any
-  host.fileExists = (file) => {
-    if (files[file] !== undefined) {
-      return true;
-    }
+const createModifyHostFiles =
+  (files: { readonly [fileName: string]: string | undefined }) => (host: ts.LanguageServiceHost) => {
+    const originalFileExists = host.fileExists === undefined ? undefined : host.fileExists.bind(host);
+    // tslint:disable-next-line no-object-mutation no-any
+    host.fileExists = (file) => {
+      if (files[file] !== undefined) {
+        return true;
+      }
 
-    return originalFileExists === undefined ? false : originalFileExists(file);
+      return originalFileExists === undefined ? false : originalFileExists(file);
+    };
+
+    const originalReadFile = host.readFile === undefined ? undefined : host.readFile.bind(host);
+    // tslint:disable-next-line no-object-mutation no-any
+    host.readFile = (file, ...args: any[]) => {
+      const foundFile = files[file];
+      if (foundFile !== undefined) {
+        return foundFile;
+      }
+
+      return originalReadFile === undefined ? undefined : originalReadFile(file, ...args);
+    };
   };
-
-  const originalReadFile = host.readFile === undefined ? undefined : host.readFile.bind(host);
-  // tslint:disable-next-line no-object-mutation no-any
-  host.readFile = (file, ...args: any[]) => {
-    const foundFile = files[file];
-    if (foundFile !== undefined) {
-      return foundFile;
-    }
-
-    return originalReadFile === undefined ? undefined : originalReadFile(file, ...args);
-  };
-};
 
 const createProgram = (
   rootNames: ReadonlyArray<string>,

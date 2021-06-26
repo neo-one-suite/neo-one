@@ -99,6 +99,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
             contractParameter: throwTypeError,
             contractGroup: throwTypeError,
             contractPermission: throwTypeError,
+            transfer: throwTypeError,
           }),
         );
       } else {

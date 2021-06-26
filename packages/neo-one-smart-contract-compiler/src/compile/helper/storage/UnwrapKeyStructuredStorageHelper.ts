@@ -58,6 +58,7 @@ export class UnwrapKeyStructuredStorageHelper extends TypedHelper {
         contractParameter: wrapArray,
         contractGroup: wrapArray,
         contractPermission: wrapArray,
+        transfer: wrapArray,
       }),
     );
   }

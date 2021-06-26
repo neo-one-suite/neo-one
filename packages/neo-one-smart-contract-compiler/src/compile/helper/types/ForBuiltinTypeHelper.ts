@@ -36,6 +36,7 @@ import { hasSetStorage } from './setStorage';
 import { hasString } from './string';
 import { hasSymbol } from './symbol';
 import { hasTransaction } from './transaction';
+import { hasTransfer } from './transfer';
 import { hasUndefined } from './undefined';
 
 type ProcessType = (options: VisitOptions) => void;
@@ -77,6 +78,7 @@ export interface ForBuiltinTypeHelperOptions {
   readonly contractParameter: ProcessType;
   readonly contractGroup: ProcessType;
   readonly contractPermission: ProcessType;
+  readonly transfer: ProcessType;
 }
 
 // Input: [val]
@@ -118,6 +120,7 @@ export class ForBuiltinTypeHelper extends Helper {
   private readonly contractParameter: ProcessType;
   private readonly contractGroup: ProcessType;
   private readonly contractPermission: ProcessType;
+  private readonly transfer: ProcessType;
 
   public constructor({
     type,
@@ -156,6 +159,7 @@ export class ForBuiltinTypeHelper extends Helper {
     contractParameter,
     contractGroup,
     contractPermission,
+    transfer,
   }: ForBuiltinTypeHelperOptions) {
     super();
     this.type = type;
@@ -194,6 +198,7 @@ export class ForBuiltinTypeHelper extends Helper {
     this.contractParameter = contractParameter;
     this.contractGroup = contractGroup;
     this.contractPermission = contractPermission;
+    this.transfer = transfer;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
@@ -428,6 +433,13 @@ export class ForBuiltinTypeHelper extends Helper {
             },
             process: this.contractPermission,
           },
+          {
+            hasType: (type) => hasTransfer(sb.context, node, type),
+            isRuntimeType: (innerOptions) => {
+              sb.emitHelper(node, innerOptions, sb.helpers.isTransfer);
+            },
+            process: this.transfer,
+          },
         ],
       }),
     );
@@ -525,6 +537,9 @@ export class ForBuiltinTypeHelper extends Helper {
         break;
       case Types.ContractPermission:
         this.contractPermission(options);
+        break;
+      case Types.Transfer:
+        this.transfer(options);
         break;
       default:
         /* istanbul ignore next */

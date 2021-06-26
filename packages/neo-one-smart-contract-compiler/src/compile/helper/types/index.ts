@@ -18,6 +18,7 @@ export * from './object';
 export * from './string';
 export * from './symbol';
 export * from './transaction';
+export * from './transfer';
 export * from './undefined';
 
 export * from './ForBuiltinTypeHelper';

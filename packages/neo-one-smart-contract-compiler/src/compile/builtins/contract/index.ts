@@ -19,6 +19,7 @@ import { add as addPublicKey } from './publicKey';
 import { add as addSetStorage } from './setStorage';
 import { add as addSmartContract } from './smartContract';
 import { add as addTransaction } from './transaction';
+import { add as addTransfer } from './transfer';
 
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {
@@ -40,6 +41,7 @@ export const add = (builtins: Builtins): void => {
   addSetStorage(builtins);
   addSmartContract(builtins);
   addTransaction(builtins);
+  addTransfer(builtins);
   addAttribute(builtins);
   addAttributeUsage(builtins);
 };

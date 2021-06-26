@@ -207,6 +207,7 @@ export class ToStringHelper extends TypedHelper {
           contractParameter: convertEmptyString,
           contractGroup: convertEmptyString,
           contractPermission: convertEmptyString,
+          transfer: convertEmptyString,
         }),
       );
     };

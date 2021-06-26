@@ -64,6 +64,7 @@ export class ToObjectHelper extends TypedHelper {
         contractParameter: emptyObject,
         contractGroup: emptyObject,
         contractPermission: emptyObject,
+        transfer: emptyObject,
       }),
     );
   }

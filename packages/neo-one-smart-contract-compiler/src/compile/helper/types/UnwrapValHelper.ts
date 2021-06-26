@@ -101,6 +101,9 @@ export class UnwrapValHelper extends Helper {
       case Types.ContractPermission:
         sb.emitHelper(node, options, sb.helpers.unwrapContractPermission);
         break;
+      case Types.Transfer:
+        sb.emitHelper(node, options, sb.helpers.unwrapTransfer);
+        break;
       default:
         /* istanbul ignore next */
         utils.assertNever(this.type);

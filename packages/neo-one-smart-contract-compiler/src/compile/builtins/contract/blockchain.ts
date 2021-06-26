@@ -7,6 +7,7 @@ import { BuiltinMemberValue } from '../BuiltinMemberValue';
 import { Builtins } from '../Builtins';
 import { BuiltinValueObject } from '../BuiltinValueObject';
 import { MemberLikeExpression } from '../types';
+import { BlockchainCurrentTransfers } from './BlockchainCurrentTransfers';
 import { NativeContractCallValue } from './NativeContractCallValue';
 import { SysCallMemberValue } from './SysCallMemberValue';
 
@@ -78,4 +79,14 @@ export const add = (builtins: Builtins): void => {
     new SysCallMemberValue('System.Runtime.GetScriptContainer', Types.Transaction),
   );
   builtins.addContractMember('BlockchainConstructor', 'currentCallerContract', new BlockchainCurrentCallerContract());
+  builtins.addContractMember(
+    'BlockchainConstructor',
+    'currentNEOTransfers',
+    new BlockchainCurrentTransfers(common.nativeHashes.NEO),
+  );
+  builtins.addContractMember(
+    'BlockchainConstructor',
+    'currentGASTransfers',
+    new BlockchainCurrentTransfers(common.nativeHashes.GAS),
+  );
 };

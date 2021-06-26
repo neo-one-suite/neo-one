@@ -268,6 +268,7 @@ export class ObjectBindingHelper extends TypedHelper<ts.ObjectBindingPattern> {
               contractParameter: throwInnerTypeError,
               contractGroup: throwInnerTypeError,
               contractPermission: throwInnerTypeError,
+              transfer: throwInnerTypeError,
             }),
           );
         } else {
@@ -401,6 +402,7 @@ export class ObjectBindingHelper extends TypedHelper<ts.ObjectBindingPattern> {
         contractParameter: createProcessBuiltin('ContractParameterDefinition'),
         contractGroup: createProcessBuiltin('ContractGroup'),
         contractPermission: createProcessBuiltin('ContractPermission'),
+        transfer: createProcessBuiltin('Transfer'),
       }),
     );
   }

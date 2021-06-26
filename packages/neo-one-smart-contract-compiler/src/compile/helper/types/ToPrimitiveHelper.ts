@@ -132,6 +132,7 @@ export class ToPrimitiveHelper extends Helper {
               contractParameter: throwTypeError,
               contractGroup: throwTypeError,
               contractPermission: throwTypeError,
+              transfer: throwTypeError,
             }),
           );
         };
@@ -181,6 +182,7 @@ export class ToPrimitiveHelper extends Helper {
             contractParameter: throwInnerTypeError,
             contractGroup: throwInnerTypeError,
             contractPermission: throwInnerTypeError,
+            transfer: throwInnerTypeError,
           }),
         );
       };
@@ -269,6 +271,7 @@ export class ToPrimitiveHelper extends Helper {
         contractParameter: toString(Types.ContractParameter),
         contractGroup: toString(Types.ContractGroup),
         contractPermission: toString(Types.ContractPermission),
+        transfer: toString(Types.Transfer),
       }),
     );
   }

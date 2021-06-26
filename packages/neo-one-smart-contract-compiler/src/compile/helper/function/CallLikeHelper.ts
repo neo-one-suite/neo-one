@@ -358,6 +358,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
           contractParameter: createProcessBuiltin('ContractParameterDefinition'),
           contractGroup: createProcessBuiltin('ContractGroup'),
           contractPermission: createProcessBuiltin('ContractPermission'),
+          transfer: createProcessBuiltin('Transfer'),
         }),
       );
     } else if (ts.isElementAccessExpression(expr)) {
@@ -459,6 +460,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
               contractParameter: throwInnerTypeError,
               contractGroup: throwInnerTypeError,
               contractPermission: throwInnerTypeError,
+              transfer: throwInnerTypeError,
             }),
           );
         };
@@ -641,6 +643,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
             contractParameter: throwInnerTypeError,
             contractGroup: throwInnerTypeError,
             contractPermission: throwInnerTypeError,
+            transfer: throwInnerTypeError,
           }),
         );
       };
@@ -683,6 +686,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
           contractParameter: createProcessBuiltin('ContractParameterDefinition'),
           contractGroup: createProcessBuiltin('ContractGroup'),
           contractPermission: createProcessBuiltin('ContractPermission'),
+          transfer: createProcessBuiltin('Transfer'),
         }),
       );
     } else if (ts.isCallExpression(expression)) {
@@ -733,6 +737,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
           contractParameter: throwTypeError,
           contractGroup: throwTypeError,
           contractPermission: throwTypeError,
+          transfer: throwTypeError,
         }),
       );
     } else {

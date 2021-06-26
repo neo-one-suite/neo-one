@@ -1,4 +1,4 @@
-import { helpers, keys } from '../../../../__data__';
+import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('ObjectBindingHelper', () => {
@@ -82,27 +82,6 @@ describe('ObjectBindingHelper', () => {
       `,
         { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
       );
-    });
-
-    // TODO: come back to this when notifications are implemented
-    test('builtin instance value', async () => {
-      await helpers.executeString(`
-        import { Blockchain } from '@neo-one/smart-contract';
-        const { currentTransaction: { notifications } } = Blockchain;
-
-        assertEqual(references !== undefined, true);
-        assertEqual(references.length, 0);
-      `);
-    });
-
-    // TODO: come back to this when notifications are implemented
-    test('builtin value string property', async () => {
-      await helpers.executeString(`
-        import { Blockchain } from '@neo-one/smart-contract';
-        const { 'currentTransaction': { 'notifications': [value] } } = Blockchain;
-
-        assertEqual(value !== undefined, true);
-      `);
     });
 
     test('builtin value instance computed property', async () => {

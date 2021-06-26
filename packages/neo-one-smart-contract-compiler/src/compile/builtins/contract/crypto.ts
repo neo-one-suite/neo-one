@@ -81,6 +81,7 @@ class HashSysCall extends BuiltinMemberCall {
         contractParameter: throwTypeError,
         contractGroup: throwTypeError,
         contractPermission: throwTypeError,
+        transfer: throwTypeError,
       }),
     );
     // [buffer]

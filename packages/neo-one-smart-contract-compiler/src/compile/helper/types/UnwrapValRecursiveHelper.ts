@@ -213,6 +213,9 @@ export class UnwrapValRecursiveHelper extends Helper {
         contractPermission: (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.unwrapContractPermission);
         },
+        transfer: (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.unwrapTransfer);
+        },
       }),
     );
   }

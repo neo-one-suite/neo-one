@@ -36,22 +36,21 @@ export class WrapValRecursiveHelper extends Helper {
       return;
     }
 
-    const createHandleValue = (hasValue: boolean, body: (options: VisitOptions) => void) => (
-      innerOptions: VisitOptions,
-    ) => {
-      if (!innerOptions.pushValue) {
-        if (hasValue) {
-          sb.emitOp(node, 'DROP');
+    const createHandleValue =
+      (hasValue: boolean, body: (options: VisitOptions) => void) => (innerOptions: VisitOptions) => {
+        if (!innerOptions.pushValue) {
+          if (hasValue) {
+            sb.emitOp(node, 'DROP');
+          }
+
+          return;
         }
 
-        return;
-      }
-
-      body(innerOptions);
-      if (this.serializeFinalVal) {
-        sb.emitHelper(node, options, sb.helpers.binarySerialize);
-      }
-    };
+        body(innerOptions);
+        if (this.serializeFinalVal) {
+          sb.emitHelper(node, options, sb.helpers.binarySerialize);
+        }
+      };
 
     const handleUndefined = createHandleValue(false, (innerOptions) => {
       sb.emitOp(node, 'DROP');
@@ -325,6 +324,9 @@ export class WrapValRecursiveHelper extends Helper {
         }),
         contractPermission: createHandleValue(true, (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.wrapContractPermission);
+        }),
+        transfer: createHandleValue(true, (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.wrapTransfer);
         }),
       }),
     );
