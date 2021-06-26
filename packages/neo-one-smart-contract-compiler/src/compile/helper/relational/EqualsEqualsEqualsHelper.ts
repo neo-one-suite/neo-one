@@ -133,6 +133,7 @@ export class EqualsEqualsEqualsHelper extends Helper {
             contractParameter: pushFalse,
             contractGroup: pushFalse,
             contractPermission: pushFalse,
+            transfer: pushFalse,
             [value]: compareValue,
           }),
         );
@@ -176,6 +177,7 @@ export class EqualsEqualsEqualsHelper extends Helper {
           contractParameter: pushFalse,
           contractGroup: pushFalse,
           contractPermission: pushFalse,
+          transfer: pushFalse,
           [value]: compareStorageValue,
         }),
       );
@@ -219,6 +221,7 @@ export class EqualsEqualsEqualsHelper extends Helper {
           contractParameter: pushFalse,
           contractGroup: pushFalse,
           contractPermission: pushFalse,
+          transfer: pushFalse,
           [value]: pushTrue,
         }),
       );
@@ -264,6 +267,7 @@ export class EqualsEqualsEqualsHelper extends Helper {
         contractParameter: createProcess('contractParameter', Types.ContractParameter),
         contractGroup: createProcess('contractGroup', Types.ContractGroup),
         contractPermission: createProcess('contractPermission', Types.ContractPermission),
+        transfer: createProcess('transfer', Types.Transfer),
       }),
     );
   }

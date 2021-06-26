@@ -193,6 +193,7 @@ export class GenericLogSerializeHelper extends Helper {
               contractParameter: throwTypeError,
               contractGroup: throwTypeError,
               contractPermission: throwTypeError,
+              transfer: throwTypeError,
             }),
           );
           // []

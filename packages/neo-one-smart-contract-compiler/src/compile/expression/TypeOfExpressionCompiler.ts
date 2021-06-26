@@ -55,6 +55,7 @@ export class TypeOfExpressionCompiler extends NodeCompiler<ts.TypeOfExpression> 
         contractParameter: pushObject,
         contractGroup: pushObject,
         contractPermission: pushObject,
+        transfer: pushObject,
       }),
     );
     // [val]

@@ -5,6 +5,8 @@ import {
   Attribute,
   AttributeModel,
   Block,
+  CallFlags,
+  common,
   Contract,
   ForwardValue,
   GetOptions,
@@ -18,6 +20,7 @@ import {
   RawApplicationLogData,
   RawCallReceipt,
   RawInvokeReceipt,
+  ScriptBuilder,
   ScriptBuilderParam,
   SourceMaps,
   Transaction,
@@ -490,7 +493,22 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
 
     // TODO: need to pass transfers into here to they are include in the script. must be in front of the actual method call?
     // Or are they included as "witnesses" which used to be called scripts?
-    const { script, invokeMethodOptions } = this.getScriptAndInvokeMethodOptions(invokeMethodOptionsOrScript);
+    const { script: scriptIn, invokeMethodOptions } = this.getScriptAndInvokeMethodOptions(invokeMethodOptionsOrScript);
+
+    const sb = new ScriptBuilder();
+    transfers.forEach((transfer) => {
+      sb.emitDynamicAppCall(
+        common.stringToUInt160(transfer.asset),
+        'transfer',
+        CallFlags.All,
+        common.stringToUInt160(addressToScriptHash(transfer.from.address)),
+        common.stringToUInt160(addressToScriptHash(transfer.to)),
+        transfer.amount.toNumber(),
+        {},
+      );
+    });
+    // TODO: does the script ordering matter here?
+    const script = Buffer.concat([sb.build(), scriptIn]);
 
     return this.capture(
       async () =>

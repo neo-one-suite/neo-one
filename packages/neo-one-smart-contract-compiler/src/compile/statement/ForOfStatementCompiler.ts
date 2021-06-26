@@ -238,6 +238,7 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
         contractParameter: handleOther,
         contractGroup: handleOther,
         contractPermission: handleOther,
+        transfer: handleOther,
       }),
     );
   }

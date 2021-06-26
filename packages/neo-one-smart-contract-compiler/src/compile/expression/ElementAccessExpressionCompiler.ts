@@ -135,6 +135,7 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
             contractParameter: throwInnerTypeError,
             contractGroup: throwInnerTypeError,
             contractPermission: throwInnerTypeError,
+            transfer: throwInnerTypeError,
           }),
         );
       };
@@ -473,6 +474,7 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
           contractParameter: throwInnerTypeError,
           contractGroup: throwInnerTypeError,
           contractPermission: throwInnerTypeError,
+          transfer: throwInnerTypeError,
         }),
       );
     };
@@ -515,6 +517,7 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
         contractParameter: createProcessBuiltin('ContractParameterDefinition'),
         contractGroup: createProcessBuiltin('ContractGroup'),
         contractPermission: createProcessBuiltin('ContractPermission'),
+        transfer: createProcessBuiltin('Transfer'),
       }),
     );
   }

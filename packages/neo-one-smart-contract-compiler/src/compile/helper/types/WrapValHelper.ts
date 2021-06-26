@@ -101,6 +101,9 @@ export class WrapValHelper extends Helper {
       case Types.ContractPermission:
         sb.emitHelper(node, options, sb.helpers.wrapContractPermission);
         break;
+      case Types.Transfer:
+        sb.emitHelper(node, options, sb.helpers.wrapTransfer);
+        break;
       default:
         /* istanbul ignore next */
         utils.assertNever(this.type);

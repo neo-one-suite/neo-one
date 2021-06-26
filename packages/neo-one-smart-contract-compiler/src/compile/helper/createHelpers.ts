@@ -439,6 +439,7 @@ import {
   WrapContractParameterHelper,
   WrapContractPermissionHelper,
 } from './types/manifest';
+import { IsTransferHelper, UnwrapTransferHelper, WrapTransferHelper } from './types/transfer';
 
 export interface Helpers {
   readonly mutableCache: { [K in string]?: Helper };
@@ -873,6 +874,11 @@ export interface Helpers {
   readonly wrapTransaction: WrapTransactionHelper;
   readonly unwrapTransaction: UnwrapTransactionHelper;
   readonly isTransaction: IsTransactionHelper;
+
+  // types/transfer
+  readonly wrapTransfer: WrapTransferHelper;
+  readonly unwrapTransfer: UnwrapTransferHelper;
+  readonly isTransfer: IsTransferHelper;
 
   readonly export: (options: ExportHelperOptions) => ExportHelper;
   readonly exportSingle: (options: ExportHelperOptions) => ExportSingleHelper;
@@ -1310,6 +1316,11 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     wrapTransaction: new WrapTransactionHelper(),
     unwrapTransaction: new UnwrapTransactionHelper(),
     isTransaction: new IsTransactionHelper(),
+
+    // types/transfer
+    wrapTransfer: new WrapTransferHelper(),
+    unwrapTransfer: new UnwrapTransferHelper(),
+    isTransfer: new IsTransferHelper(),
 
     export: (options) => new ExportHelper(options),
     exportSingle: (options) => new ExportSingleHelper(options),

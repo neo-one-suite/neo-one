@@ -61,6 +61,7 @@ export class ToNullishBooleanHelper extends TypedHelper {
         contractParameter: convertOther,
         contractGroup: convertOther,
         contractPermission: convertOther,
+        transfer: convertOther,
       }),
     );
   }

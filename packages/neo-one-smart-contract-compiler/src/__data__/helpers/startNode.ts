@@ -214,7 +214,13 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
         context,
       } = await getCompiledScript(script);
 
-      throwOnDiagnosticErrorOrWarning(context.diagnostics, outerOptions.ignoreWarnings);
+      try {
+        throwOnDiagnosticErrorOrWarning(context.diagnostics, outerOptions.ignoreWarnings);
+      } catch (e) {
+        // tslint:disable-next-line: no-console
+        console.log(e);
+        throw e;
+      }
 
       const contractAddress = scriptHashToAddress(
         common.uInt160ToString(crypto.toScriptHash(Buffer.from(outputScript, 'hex'))),

@@ -83,6 +83,7 @@ export class ArrayConcat extends BuiltinInstanceMemberCall {
           contractParameter: handleOther,
           contractGroup: handleOther,
           contractPermission: handleOther,
+          transfer: handleOther,
         }),
       );
       // [arr]

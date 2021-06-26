@@ -257,6 +257,7 @@ export class ToNumberHelper extends TypedHelper {
           contractParameter: throwTypeError,
           contractGroup: throwTypeError,
           contractPermission: throwTypeError,
+          transfer: throwTypeError,
         }),
       );
     };

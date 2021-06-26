@@ -1,17 +1,11 @@
-import { ABI, ContractParameterType } from '@neo-one/client-common';
+import { ContractGroup, ContractManifestClient, ContractPermission, WildcardContainer } from '@neo-one/client-common';
 import { RawSourceMap } from 'source-map';
 
 export interface Contract {
-  readonly parameters: ReadonlyArray<ContractParameterType>;
-  readonly returnType: ContractParameterType;
   readonly name: string;
-  readonly codeVersion: string;
-  readonly author: string;
-  readonly email: string;
-  readonly description: string;
-  readonly storage: boolean;
-  readonly dynamicInvoke: boolean;
-  readonly payable: boolean;
+  readonly trusts: WildcardContainer<string>;
+  readonly permissions: readonly ContractPermission[];
+  readonly groups: readonly ContractGroup[];
 }
 
 export interface TranspileResult {
@@ -21,6 +15,6 @@ export interface TranspileResult {
       readonly sourceMap: RawSourceMap;
     };
   };
-  readonly abi: ABI;
+  readonly manifest: ContractManifestClient;
   readonly contract: Contract;
 }
