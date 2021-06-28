@@ -5,15 +5,15 @@ import path from 'path';
 
 interface CLICompileOptions {
   readonly json: boolean;
-  readonly avm: boolean;
+  readonly nef: boolean;
   readonly debug: boolean;
   readonly opcodes: boolean;
 }
 
 // this is just a helper to replicate the coercing we do for the CLI command
 const createOptions = (options: Partial<CLICompileOptions> = {}): CLICompileOptions => ({
-  avm: options.avm ? options.avm : false,
-  json: options.json ? options.json : !options.avm,
+  nef: options.nef ? options.nef : false,
+  json: options.json ? options.json : !options.nef,
   debug: options.debug ? options.debug : false,
   opcodes: options.opcodes ? options.opcodes : false,
 });
@@ -65,16 +65,16 @@ const testCompileProject = async (project: string, options: CLICompileOptions) =
   );
   const neooneABIFiles = outFiles.filter((filename) => filename.endsWith('.neoone.abi.json'));
   const debugFiles = outFiles.filter((filename) => filename.endsWith('.debug.json'));
-  const avmFiles = outFiles.filter((filename) => filename.endsWith('.avm'));
-  const avmDebugFiles = outFiles.filter((filename) => filename.endsWith('.avmdbgnfo'));
-  const opcodeFiles = outFiles.filter((filename) => filename.endsWith('.avm.txt'));
+  const avmFiles = outFiles.filter((filename) => filename.endsWith('.nef'));
+  const avmDebugFiles = outFiles.filter((filename) => filename.endsWith('.nefdbgnfo'));
+  const opcodeFiles = outFiles.filter((filename) => filename.endsWith('.nef.txt'));
 
   if (!options.json) {
     expect(contractFiles.length).toEqual(0);
     expect(neooneABIFiles.length).toEqual(0);
   }
 
-  if (!options.avm) {
+  if (!options.nef) {
     expect(avmFiles.length).toEqual(0);
     expect(avmABIFiles.length).toEqual(0);
   }
@@ -99,9 +99,9 @@ const testCompileProject = async (project: string, options: CLICompileOptions) =
         expect(contents.returnType).toBeDefined();
         expect(contents.name).toBeDefined();
 
-        // we won't always check the avm buffer (it won't always check but will be enough)
-        if (options.avm) {
-          const avmFile = filename.replace('.contract.json', '.avm');
+        // we won't always check the nef buffer (it won't always check but will be enough)
+        if (options.nef) {
+          const avmFile = filename.replace('.contract.json', '.nef');
           const avmScript = await fs.readFile(getTmpPath(avmFile));
           expect(Buffer.from(contents.script, 'hex')).toEqual(avmScript);
         }
@@ -111,7 +111,7 @@ const testCompileProject = async (project: string, options: CLICompileOptions) =
     await Promise.all(
       neooneABIFiles.map(async (filename) => {
         const contents = await fs.readJSON(getTmpPath(filename));
-        expect(() => args.assertABI(filename, contents)).not.toThrow();
+        expect(() => args.assertContractManifestClient(filename, contents)).not.toThrow();
       }),
     );
   }
@@ -131,14 +131,14 @@ const testCompileProject = async (project: string, options: CLICompileOptions) =
       );
     }
 
-    if (options.avm) {
+    if (options.nef) {
       expect(avmDebugFiles.length).toEqual(3);
       expect(avmFiles.length).toEqual(3);
       await Promise.all(
         avmDebugFiles.map(async (filename) => {
           const rawFile = await fs.readFile(getTmpPath(filename));
           const zipped = await JSZip.loadAsync(rawFile);
-          const zipContents = await zipped.file(filename.replace('.avmdbgnfo', '.debug.json'))?.async('text');
+          const zipContents = await zipped.file(filename.replace('.nefdbgnfo', '.debug.json'))?.async('text');
           if (zipContents === undefined) {
             throw new Error('contents should be defined here');
           }
@@ -156,26 +156,26 @@ describe('Compile ICO', () => {
   });
 
   test('compile -- avm flag', async () => {
-    await testCompileProject('ico', createOptions({ avm: true }));
+    await testCompileProject('ico', createOptions({ nef: true }));
   });
 
-  test('compile -- json & avm flag', async () => {
-    await testCompileProject('ico', createOptions({ avm: true, json: true }));
+  test('compile -- json & nef flag', async () => {
+    await testCompileProject('ico', createOptions({ nef: true, json: true }));
   });
 
   test('compile -- debug flag', async () => {
     await testCompileProject('ico', createOptions({ debug: true }));
   });
 
-  test('compile -- avm & debug flag', async () => {
-    await testCompileProject('ico', createOptions({ avm: true, debug: true }));
+  test('compile -- nef & debug flag', async () => {
+    await testCompileProject('ico', createOptions({ nef: true, debug: true }));
   });
 
-  test('compile -- avm && debug && opcodes flag', async () => {
-    await testCompileProject('ico', createOptions({ avm: true, debug: true, opcodes: true }));
+  test('compile -- nef && debug && opcodes flag', async () => {
+    await testCompileProject('ico', createOptions({ nef: true, debug: true, opcodes: true }));
   });
 
-  test('compile -- json & avm & debug', async () => {
-    await testCompileProject('ico', createOptions({ json: true, avm: true, debug: true }));
+  test('compile -- json & nef & debug', async () => {
+    await testCompileProject('ico', createOptions({ json: true, nef: true, debug: true }));
   });
 });

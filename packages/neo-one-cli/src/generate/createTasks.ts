@@ -71,8 +71,6 @@ export const createTasks = (_cmd: Command, config: Configuration) =>
     {
       title: 'Generate common code',
       task: async (ctx) => {
-        // TODO: add more network definition here for non-local dev purposes?
-        // should these new definitions be in build createTasks
         const networks = [
           {
             name: 'local',
@@ -87,6 +85,11 @@ export const createTasks = (_cmd: Command, config: Configuration) =>
           {
             name: 'main',
             rpcURL: rpcURL.main,
+            dev: false,
+          },
+          {
+            name: 'staging',
+            rpcURL: rpcURL.staging,
             dev: false,
           },
         ];

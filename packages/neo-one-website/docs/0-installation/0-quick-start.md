@@ -82,7 +82,7 @@ You may or may not run into environment problems when using the CLI, trying to t
 - Try running the NEO•ONE CLI command using `sudo`, such as: `sudo npx neo-one init`
 - If problems persist then please reach out to us on [Discord](https://discord.gg/S86PqDE)
 
-To see a demonstration of environment setup go to our YouTube channel for helpful videos: https://www.youtube.com/channel/UCya5J1Tt2h-kX-I3a7LOvtw
+To see a demonstration of environment setup go to our [YouTube channel](https://www.youtube.com/channel/UCya5J1Tt2h-kX-I3a7LOvtw) for helpful videos.
 
 ---
 

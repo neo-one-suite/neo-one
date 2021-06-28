@@ -105,7 +105,7 @@ You may or may not run into environment problems when using the CLI, trying to t
   - You then need to re-install your node modules by deleting the `node_modules` folder and then running `npm install` again
 - Try running the NEO•ONE CLI command using `sudo`, such as: `sudo npx neo-one init`
 
-To see a demonstration of environment setup go to our YouTube channel for helpful videos: https://www.youtube.com/channel/UCya5J1Tt2h-kX-I3a7LOvtw
+To see a demonstration of environment setup go to our [YouTube channel](https://www.youtube.com/channel/UCya5J1Tt2h-kX-I3a7LOvtw) for helpful videos.
 
 ### Help, I'm Stuck!
 
