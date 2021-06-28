@@ -1,4 +1,4 @@
-import { common, ContractParameterTypeModel, ECPoint, UInt160 } from '@neo-one/client-common';
+import { common, ContractParameterTypeModel, ECPoint, UInt160, WildcardContainer } from '@neo-one/client-common';
 import { constants } from '@neo-one/utils';
 import {
   ContractABIModel,
@@ -110,12 +110,13 @@ export const contractPermissionModel = (
 ) => new ContractPermissionModel({ contract: contractPermissionDescriptorModel(hashOrGroupType), methods });
 
 export const contractManifestModel = (
+  name: string = 'name1',
   groups: readonly ContractGroupModel[] = [contractGroupModel()],
   abi: ContractABIModel = contractAbiModel(),
   permissions: readonly ContractPermissionModel[] = [contractPermissionModel('uint160', ['method1'])],
-  trusts: readonly UInt160[] = [common.bufferToUInt160(Buffer.alloc(20, 1))],
+  trusts: WildcardContainer<ContractPermissionDescriptorModel> = [contractPermissionDescriptorModel('uint160')],
   supportedStandards: readonly string[] = [],
-) => new ContractManifestModel({ groups, supportedStandards, abi, permissions, trusts });
+) => new ContractManifestModel({ name, groups, supportedStandards, abi, permissions, trusts });
 
 // TODO: fixup
 export const contractModel = (
