@@ -25,9 +25,9 @@ export const defaultNetworks = {
     userAccountProvider: createUserAccountProviderFunc('main', commonRpcURL.main),
   },
   test: {
-    userAccountProvider: createUserAccountProviderFunc('test', commonRpcURL.test),
+    userAccountProvider: createUserAccountProviderFunc('test', commonRpcURL.staging),
   },
   local: {
-    userAccountProvider: createUserAccountProviderFunc('neo-one', 'localhost:9040'), // TODO: should this end with /rpc ? abstrac this if not
+    userAccountProvider: createUserAccountProviderFunc('neo-one', 'localhost:9040/rpc'),
   },
 };

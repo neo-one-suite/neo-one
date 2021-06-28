@@ -53,7 +53,7 @@ This tells your local C# .NET runtime to use version 3.1.401 in this repo, even 
 - Try running the NEO•ONE CLI command using `sudo`, such as: `sudo npx neo-one init`
 - If problems persist then please reach out to us on [Discord](https://discord.gg/S86PqDE)
 
-To see a demonstration of environment setup go to our YouTube channel for helpful videos: https://www.youtube.com/channel/UCya5J1Tt2h-kX-I3a7LOvtw
+To see a demonstration of environment setup go to our [YouTube channel](https://www.youtube.com/channel/UCya5J1Tt2h-kX-I3a7LOvtw) for helpful videos.
 
 **Once you have a project setup**, the next step is to add NEO•ONE to it. NEO•ONE is organized into multiple individual packages. Use as much or as little as you like. Each package may be installed using either [yarn](https://yarnpkg.com/) (`yarn add <package name>`) or [npm](https://www.npmjs.com/) (`npm install <package name>`). Each package has the form `@neo-one/<name>`, for example, `@neo-one/client`.
 

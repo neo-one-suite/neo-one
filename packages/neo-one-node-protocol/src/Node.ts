@@ -899,7 +899,7 @@ export class Node implements INode {
                 }),
               );
             }
-            logger.debug({
+            logger.info({
               name: 'neo_relay_block',
               [Labels.NEO_BLOCK_INDEX]: block.index,
               ['neo.block.transactions']: block.transactions.length,
