@@ -1,4 +1,4 @@
-import { BinaryWriter } from '@neo-one/client-common';
+import { BinaryWriter, common, crypto } from '@neo-one/client-common';
 import { disassembleByteCode } from '@neo-one/node-core';
 import { CompileContractResult } from '@neo-one/smart-contract-compiler';
 import { utils } from '@neo-one/utils';
@@ -7,7 +7,7 @@ import JSZip from 'jszip';
 import _ from 'lodash';
 import path from 'path';
 import { SourceMapConsumer } from 'source-map';
-import { convertABI, getDispatcherMethodDefinition, getJmpMethodDefinition, NEOONEContractMetadata } from './interop';
+import { convertManifest, getDispatcherMethodDefinition, getJmpLMethodDefinition } from './interop';
 
 export interface CompileWriteOptions {
   readonly json: boolean;
@@ -39,18 +39,6 @@ export const writeContract = async (
 
   const manifest = contract.manifest;
 
-  // TODO: get this from compiler? Or change properties expected
-  const metadata: NEOONEContractMetadata = {
-    name: contract.manifest.name,
-    description: 'A NEO•ONE Smart Contract',
-    codeVersion: '1.0',
-    author: 'NEO•ONE',
-    email: 'contact@neo-one.io',
-    storage: true,
-    dynamicInvoke: true,
-    payable: true,
-  };
-
   const sourceMap = await sourceMapPromise;
 
   if (jsonFlag) {
@@ -74,8 +62,9 @@ export const writeContract = async (
     await Promise.all([
       fs.writeFile(outputPath.replace('.contract.json', '.nef'), byteCode),
       fs.writeFile(
-        outputPath.replace('.contract.json', '.abi.json'),
-        JSON.stringify(convertABI(manifest.abi, metadata, byteCode), undefined, 2),
+        outputPath.replace('.contract.json', '.manifest.json'),
+        // TODO: add "extra" here
+        JSON.stringify(convertManifest(manifest, {}), undefined, 2),
       ),
     ]);
   }
@@ -89,7 +78,7 @@ export const writeContract = async (
     const jmpAddress = getJumpLength(disassembled[3].value); // TODO: abstract this index from compiler package. FIRST_JMP_IDX = 3;
     const endAddress = disassembled[disassembled.length - 1].pc;
 
-    const jmpMethod = getJmpMethodDefinition(contract.manifest.name);
+    const jmpMethod = getJmpLMethodDefinition(contract.manifest.name);
     const dispatcherMethod = getDispatcherMethodDefinition(contract.manifest.name, jmpAddress, endAddress);
 
     const getMethodRanges = (consumer: SourceMapConsumer, line: number) =>
@@ -150,7 +139,7 @@ export const writeContract = async (
 
     const lastID = methods.length < 1 ? 2 : Number(methods[methods.length - 1].id) + 1;
     const debugJSON = {
-      entrypoint: '0',
+      hash: common.uInt160ToHex(crypto.toScriptHash(byteCode)),
       documents: debugInfo.documents,
       methods: [jmpMethod, dispatcherMethod, ...methods],
       'static-variables': ['scope,Array,0'],

@@ -253,6 +253,10 @@ function wrapNullable<Result>(
         return undefined;
       }
 
+      if (contractParameter.type === 'Any') {
+        return undefined;
+      }
+
       return func(contractParameter);
       /* istanbul ignore next */
     } catch (error) {

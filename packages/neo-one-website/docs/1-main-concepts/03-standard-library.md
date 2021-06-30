@@ -55,6 +55,7 @@ The `Blockchain` value contains several properties pertaining to the current sta
 - `Blockchain.currentHeight` - index of the last `Block` persisted to the blockchain.
 - `Blockchain.currentTransaction` - the current `Transaction`.
 - `Blockchain.currentCallerContract` - the `Address` of the smart contract that directly invoked this contract. May be `undefined` if the current invocation was not from another smart contract.
+- `Blockchain.currentNEOTranfers` and `Blockchain.currentGASTransfers` - the `Transfer` notifications that have been emitted by the NEOToken and GASToken Native Contracts respectively. It has `from`, `to`, `amount`, `asset` properties which can be used in a smart contract to determine what assets were sent to the contract.
 
 ---
 

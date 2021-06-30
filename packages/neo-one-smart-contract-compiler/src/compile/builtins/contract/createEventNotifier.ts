@@ -57,16 +57,6 @@ class CreateEventNotifier extends BuiltinCall {
               },
             }),
           );
-          // [length, ...params]
-          sb.emitOp(node, 'UNPACK');
-          // [eventName, length, ...params]
-          sb.emitPushString(node, eventName);
-          // [length, eventName, ...params]
-          sb.emitOp(node, 'SWAP');
-          // [length, eventName, ...params]
-          sb.emitOp(node, 'INC');
-          // [arr]
-          sb.emitOp(node, 'PACK');
           // [eventName, arr]
           sb.emitPushString(node, eventName);
           // []

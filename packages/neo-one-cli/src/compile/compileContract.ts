@@ -14,11 +14,17 @@ export const compileContract = async (
     throw new Error('Compilation error.');
   }
 
-  const address = scriptHashToAddress(
-    common.uInt160ToString(crypto.toScriptHash(Buffer.from(contract.contract.script, 'hex'))),
-  );
-
+  // Change address to be script hash or just script or something like that
+  // Here it's only being used as an identifier
+  const scriptHash = common.uInt160ToString(crypto.toScriptHash(Buffer.from(contract.contract.script, 'hex')));
   // TODO: this will be wrong now since contract script hash need sender for script completion
+  // Used as a unique identifier in compiler file outputs
+  // But also used in createSmartContract(), which is important to be correct
+  // Change SmartContractNetworksDefinition
+  // const contractHash = crypto.getContractHash(signer.account, nefFile.checkSum, contractIn.manifest.name);
+  // const contractAddress = scriptHashToAddress(common.uInt160ToString(contractHash));
+  const address = scriptHashToAddress(scriptHash);
+
   const sourceMap = await contract.sourceMap;
   const nextSourceMaps = {
     ...sourceMaps,
@@ -27,7 +33,7 @@ export const compileContract = async (
 
   return {
     contract,
-    address, // TODO: this should be a "pre-address script" or something that will be used with the sender
+    address,
     sourceMap,
     sourceMaps: nextSourceMaps,
     linked: {

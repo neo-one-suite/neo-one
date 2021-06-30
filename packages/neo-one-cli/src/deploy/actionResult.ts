@@ -89,7 +89,6 @@ const deserializeInvocationResult = <TValue>(
   const commonObj = {
     ...result,
     gasConsumed: new BigNumber(result.gasConsumed),
-    gasCost: new BigNumber(result.gasCost),
   };
 
   if (result.state === 'HALT') {
@@ -145,7 +144,6 @@ const serializeRawInvokeReceipt = (result: RawInvokeReceipt) => ({
 const deserializeRawInvocationResult = (result: any): RawInvocationResult => ({
   ...result,
   gasConsumed: new BigNumber(result.gasConsumed),
-  gasCost: new BigNumber(result.gasCost),
   stack: result.stack.map(deserializeContractParameter),
 });
 
