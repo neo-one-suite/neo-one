@@ -12,6 +12,16 @@ export interface ContractPermissionDescriptorModelAdd {
 }
 
 export class ContractPermissionDescriptorModel implements SerializableJSON<ContractPermissionDescriptorJSON> {
+  public static hashOrGroupFromString(stringIn: string): UInt160 | ECPoint | Wildcard {
+    if (common.stringIsValidUInt160(stringIn)) {
+      return common.stringToUInt160(stringIn);
+    }
+    if (common.stringIsValidECPoint(stringIn)) {
+      return common.stringToECPoint(stringIn);
+    }
+
+    return '*';
+  }
   public readonly hashOrGroup: UInt160 | ECPoint | Wildcard;
 
   public constructor({ hashOrGroup }: ContractPermissionDescriptorModelAdd = {}) {

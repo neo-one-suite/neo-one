@@ -144,7 +144,6 @@ export interface SmartContractInfo {
   readonly manifest: SmartContractInfoManifest;
 }
 
-// TODO: should name be in SmartContractInfoManifest?
 export const getSmartContractInfo = (context: Context, sourceFile: ts.SourceFile): SmartContractInfo => {
   const smartContract = getSmartContract(context, sourceFile);
   const contractInfo = smartContract === undefined ? undefined : getContractInfo(context, smartContract);
