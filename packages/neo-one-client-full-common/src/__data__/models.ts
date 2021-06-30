@@ -110,7 +110,7 @@ export const contractPermissionModel = (
 ) => new ContractPermissionModel({ contract: contractPermissionDescriptorModel(hashOrGroupType), methods });
 
 export const contractManifestModel = (
-  name: string = 'name1',
+  name = 'name1',
   groups: readonly ContractGroupModel[] = [contractGroupModel()],
   abi: ContractABIModel = contractAbiModel(),
   permissions: readonly ContractPermissionModel[] = [contractPermissionModel('uint160', ['method1'])],

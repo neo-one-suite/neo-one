@@ -155,7 +155,7 @@ export const getContractProperties = (context: Context, smartContract: ts.ClassD
         }
 
         // tslint:disable-next-line: no-array-mutation
-        finalGroupsArray.push((newObjToPush as unknown) as ContractGroup);
+        finalGroupsArray.push(newObjToPush as unknown as ContractGroup);
       });
 
       // tslint:disable-next-line: no-object-mutation
@@ -360,7 +360,7 @@ export const getContractProperties = (context: Context, smartContract: ts.ClassD
         }
 
         // tslint:disable-next-line: no-array-mutation
-        finalPermissionsArray.push((permissionObject as unknown) as ContractPermission);
+        finalPermissionsArray.push(permissionObject as unknown as ContractPermission);
       });
 
       // tslint:disable-next-line: no-object-mutation
@@ -413,11 +413,10 @@ export const getContractProperties = (context: Context, smartContract: ts.ClassD
 
         const literalString = tsUtils.literal.getLiteralValue(elem);
 
-        try {
-          common.stringToUInt160(literalString);
+        if (common.stringIsValidUInt160(literalString) || common.stringIsValidECPoint(literalString)) {
           // tslint:disable-next-line: no-array-mutation
           finalTrustsArray.push(literalString);
-        } catch {
+        } else {
           context.reportError(
             elem,
             DiagnosticCode.InvalidContractProperties,

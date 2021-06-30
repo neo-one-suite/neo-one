@@ -29,6 +29,16 @@ const UINT160_BUFFER_BYTES = 20;
 
 const isUInt160 = (value: {}): value is UInt160 => value instanceof Buffer && value.length === UINT160_BUFFER_BYTES;
 
+const stringIsValidUInt160 = (value: string): boolean => {
+  try {
+    stringToUInt160(value);
+  } catch {
+    return false;
+  }
+
+  return true;
+};
+
 const asUInt160 = (value: {}): UInt160 => {
   if (isUInt160(value)) {
     return value;
@@ -64,6 +74,16 @@ const ZERO_UINT256 = Buffer.alloc(UINT256_BUFFER_BYTES, 0) as UInt256;
 const MAX_UINT256 = Buffer.alloc(UINT256_BUFFER_BYTES, 0xff) as UInt256;
 
 const isUInt256 = (value: {}): value is UInt256 => value instanceof Buffer && value.length === UINT256_BUFFER_BYTES;
+
+const stringIsValidUInt256 = (value: string): boolean => {
+  try {
+    stringToUInt256(value);
+  } catch {
+    return false;
+  }
+
+  return true;
+};
 
 const asUInt256 = (value: {}): UInt256 => {
   if (isUInt256(value)) {
@@ -104,6 +124,16 @@ const ECPOINT_INFINITY = Buffer.from([ECPOINT_INFINITY_BYTE]) as ECPointInfinity
 
 const isECPoint = (value: {}): value is ECPoint =>
   value instanceof Buffer && (value.length === ECPOINT_BUFFER_BYTES || value.equals(ECPOINT_INFINITY));
+
+const stringIsValidECPoint = (value: string): boolean => {
+  try {
+    stringToECPoint(value);
+  } catch {
+    return false;
+  }
+
+  return true;
+};
 
 const asECPoint = (value: {}): ECPoint => {
   if (isECPoint(value)) {
@@ -290,10 +320,13 @@ export const common = {
   stringToUInt160,
   uInt160Equal,
   isUInt160,
+  stringIsValidUInt160,
   bufferToUInt160,
   isUInt256,
+  stringIsValidUInt256,
   asUInt256,
   isECPoint,
+  stringIsValidECPoint,
   asECPoint,
   uInt256ToBuffer,
   bufferToUInt256,

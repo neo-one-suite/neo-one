@@ -1,6 +1,7 @@
 import {
   ABIParameter,
   ABIReturn,
+  common,
   ContractEventDescriptorClient,
   ContractGroup,
   ContractPermission,
@@ -9,6 +10,7 @@ import {
   WildcardContainer,
 } from '@neo-one/client-common';
 import { NEO_ONE_METHOD_RESERVED_PARAM } from '@neo-one/client-core';
+import { ContractPermissionDescriptorModel } from '@neo-one/client-full-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
@@ -70,7 +72,13 @@ export class ManifestSmartContractProcessor {
   }
 
   private processTrusts(): WildcardContainer<ContractPermissionDescriptor> {
-    return this.properties.trusts;
+    return common.isWildcard(this.properties.trusts)
+      ? '*'
+      : this.properties.trusts.map((trust) =>
+          new ContractPermissionDescriptorModel({
+            hashOrGroup: ContractPermissionDescriptorModel.hashOrGroupFromString(trust),
+          }).serializeJSON(),
+        );
   }
 
   private processSupportedStandards(): readonly string[] {
