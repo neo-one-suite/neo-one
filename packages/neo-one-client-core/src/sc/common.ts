@@ -259,7 +259,7 @@ export const convertAction = ({
     name: event,
     parameters: getParametersObject({
       abiParameters: eventSpec.parameters,
-      parameters: state.slice(1),
+      parameters: state,
     }),
   };
 };

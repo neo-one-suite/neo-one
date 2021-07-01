@@ -15,7 +15,7 @@ Productionizing your smart contract for deployment to a network other than your 
 
 ::: warning
 
-Deployment has not been thoroughly tested for N3 yet and may not work at this point in time.
+Deployment has not been thoroughly tested for N3 yet.
 
 :::
 

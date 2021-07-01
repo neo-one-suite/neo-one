@@ -53,7 +53,6 @@ const mintTokens = async (ico: any, accountID: UserAccountID, developerClient?: 
 
   expect(mintReceipt.result.state).toEqual('HALT');
   expect(mintReceipt.result.value).toBeUndefined();
-  expect(mintReceipt.result.gasCost).toMatchSnapshot('mint cost');
   expect(mintReceipt.result.gasConsumed).toMatchSnapshot('mint consumed');
   expect(mintReceipt.events).toHaveLength(1);
   const event = mintReceipt.events[0];
@@ -314,17 +313,13 @@ const verifySmartContractAfterMint = async (
   expect(escrowClaimReceipt.result.value).toEqual(true);
   expect(escrowClaimReceipt.events).toHaveLength(2);
 
-  const [
-    escrowBalanceAfterClaim,
-    balanceAfterClaim,
-    toBalanceAfterClaim,
-    escrowPairBalanceAfterClaim,
-  ] = await Promise.all([
-    token.balanceOf(escrowAddress),
-    token.balanceOf(accountID.address),
-    token.balanceOf(toAccountID.address),
-    escrow.balanceOf(accountID.address, toAccountID.address, tokenAddress),
-  ]);
+  const [escrowBalanceAfterClaim, balanceAfterClaim, toBalanceAfterClaim, escrowPairBalanceAfterClaim] =
+    await Promise.all([
+      token.balanceOf(escrowAddress),
+      token.balanceOf(accountID.address),
+      token.balanceOf(toAccountID.address),
+      escrow.balanceOf(accountID.address, toAccountID.address, tokenAddress),
+    ]);
   expect(escrowBalanceAfterClaim.toString()).toEqual('15');
   expect(balanceAfterClaim.toString()).toEqual('50');
   expect(toBalanceAfterClaim.toString()).toEqual('35');

@@ -128,8 +128,8 @@ const extractLog = (action: RawAction): ConsoleLog | undefined => {
       return { address, line: -1, message: args };
     }
 
-    const line = converters.toInteger(args[1], { type: 'Integer', decimals: 0 }).toNumber();
-    const message = extractMessage(Buffer.from(converters.toBuffer(args[2]), 'hex'));
+    const line = converters.toInteger(args[0], { type: 'Integer', decimals: 0 }).toNumber();
+    const message = extractMessage(Buffer.from(converters.toBuffer(args[1]), 'hex'));
 
     return { address, line, message };
   } catch {

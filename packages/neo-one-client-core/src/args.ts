@@ -614,12 +614,9 @@ const assertContractMethodDescriptorClient = (name: string, value?: unknown): Co
 
   return {
     name: assertProperty(value, 'ContractMethodDescriptorClient', 'name', assertString),
-    parameters: assertProperty(
-      value,
-      'ContractMethodDescriptorClient',
-      'parameters',
-      assertNullableArray,
-    ).map((parameter) => assertABIParameter('ContractMethodDescriptorClient.parameters', parameter)),
+    parameters: assertProperty(value, 'ContractMethodDescriptorClient', 'parameters', assertNullableArray).map(
+      (parameter) => assertABIParameter('ContractMethodDescriptorClient.parameters', parameter),
+    ),
     returnType: assertProperty(value, 'ContractMethodDescriptorClient', 'returnType', assertABIReturn),
     constant: assertProperty(value, 'ContractMethodDescriptorClient', 'constant', assertNullableBoolean),
     safe: assertProperty(value, 'ContractMethodDescriptorClient', 'safe', assertBoolean),
@@ -649,12 +646,9 @@ const assertContractEventDescriptorClient = (name: string, value?: unknown): Con
 
   return {
     name: assertProperty(value, 'ContractEventDescriptorClient', 'name', assertString),
-    parameters: assertProperty(
-      value,
-      'ContractEventDescriptorClient',
-      'parameters',
-      assertNullableArray,
-    ).map((parameter) => assertABIParameter('ContractEventDescriptorClient.parameters', parameter)),
+    parameters: assertProperty(value, 'ContractEventDescriptorClient', 'parameters', assertNullableArray).map(
+      (parameter) => assertABIParameter('ContractEventDescriptorClient.parameters', parameter),
+    ),
   };
 };
 
@@ -836,7 +830,7 @@ export const assertContractManifestClient = (name: string, value?: unknown): Con
     permissions: assertProperty(value, 'ContractManifest', 'permissions', assertArray).map((permission) =>
       assertContractPermission('ContractManifest.permissions', permission),
     ),
-    trusts: assertWildcardContainerProperty(value, 'ContractManifest', 'trusts', assertUInt160Hex),
+    trusts: assertWildcardContainerProperty(value, 'ContractManifest', 'trusts', assertContractPermissionDescriptor),
     extra: assertProperty(value, 'ContractManifest', 'extra', assertNullableJSON),
   };
 };
@@ -858,7 +852,7 @@ export const assertContractManifest = (name: string, value?: unknown): ContractM
     permissions: assertProperty(value, 'ContractManifest', 'permissions', assertArray).map((permission) =>
       assertContractPermission('ContractManifest.permissions', permission),
     ),
-    trusts: assertWildcardContainerProperty(value, 'ContractManifest', 'trusts', assertUInt160Hex),
+    trusts: assertWildcardContainerProperty(value, 'ContractManifest', 'trusts', assertContractPermissionDescriptor),
     extra: assertProperty(value, 'ContractManifest', 'extra', assertNullableJSON),
   };
 };
@@ -1059,8 +1053,8 @@ export const assertTransactionOptions = (name: string, options?: unknown): Trans
     attributes: assertProperty(options, 'TransactionOptions', 'attributes', assertNullableArray).map((value) =>
       assertAttribute('TransactionOption.attributes', value),
     ),
-    maxNetworkFee: assertProperty(options, 'TransactionOptions', 'maxNetworkFee', assertBigNumber),
-    maxSystemFee: assertProperty(options, 'TransactionOptions', 'maxSystemFee', assertBigNumber),
+    maxNetworkFee: assertProperty(options, 'TransactionOptions', 'maxNetworkFee', assertNullableBigNumber),
+    maxSystemFee: assertProperty(options, 'TransactionOptions', 'maxSystemFee', assertNullableBigNumber),
   };
 };
 
@@ -1108,7 +1102,7 @@ const assertNullableSendTo = (name: string, value?: unknown): ReadonlyArray<Omit
 
   return assertNullableArray(name, value).map((transfer) => ({
     amount: assertProperty(transfer, 'transfer', 'amount', assertBigNumber),
-    asset: assertProperty(transfer, 'transfer', 'asset', assertHash256),
+    asset: assertProperty(transfer, 'transfer', 'asset', assertUInt160Hex),
   }));
 };
 

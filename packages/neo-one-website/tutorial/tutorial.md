@@ -329,20 +329,25 @@ Let's add the `mintTokens` method to our `Token` smart contract to enable mintin
 export class Token extends SmartContract {
   @receive
   public mintTokens(): void {
-    // Inspect the current transaction
-    const { notifications } = Blockchain.currentTransaction;
-    if (notifications.length === 0) {
+    // Get the latest NEO transfers to this contract
+    const transfers = Blockchain.currentNEOTransfers.filter(
+      (transfer) => transfer.to !== undefined && transfer.to.equals(this.address),
+    );
+    if (transfers.length === 0) {
       throw new Error('Invalid mintTokens');
     }
 
-    // Take the first sender address as the minter.
-    const sender = notifications[0].scriptHash;
+    // Get the minter address from the current transaction sender
+    const sender = Blockchain.currentTransaction.sender;
 
-    // Sum up the amount of NEO sent to the contract. If anything else is sent, throw an error.
+    // Sum up the amount of NEO sent to the contract from the sender.
+    // Note that the minter will have to make these transfers before calling `mintTokens`
     let amount = 0;
-    for (const notification of notifications) {
-      // Parse the stack items array in each notification to determine how much the sender transfered
-      // This is a WIP for our compiler and is coming soon
+    // tslint:disable-next-line: no-loop-statement
+    for (const transfer of transfers) {
+      if (transfer.from !== undefined && transfer.from.equals(sender)) {
+        amount += transfer.amount * this.amounterPerNEO;
+      }
     }
 
     this.issue(sender, amount);

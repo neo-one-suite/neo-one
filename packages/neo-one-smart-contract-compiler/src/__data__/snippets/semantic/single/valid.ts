@@ -7,7 +7,6 @@ import {
   Deploy,
   Fixed,
   ForwardValue,
-  Hash256,
   Integer,
   MapStorage,
   receive,
@@ -189,30 +188,33 @@ export class One extends SmartContract {
       throw new Error('Invalid mintTokens');
     }
 
-    // Outputs represent the destination addresses and amounts for native assets
-    // A reference is a corresponding output for the inputs of the transaction
-    // Now we want to use notifications to check if transfers were sent to this contract
-    // const { notifications, sender } = Blockchain.currentTransaction;
+    // Get the valid transfers of NEO that have been sent to this contract
+    const transfers = Blockchain.currentNEOTransfers.filter(
+      (transfer) => transfer.to !== undefined && transfer.to.equals(this.address),
+    );
 
-    // // Here we're getting the amount of NEO sent to the contract
-    // let amount = 0;
-    // // tslint:disable-next-line no-loop-statement
-    // for (const notification of notifications) {
-    //   // Every notification we check that the transferTo address is to this contract
-    //   if (notification.state[1].equals(this.address)) {
-    //     // Only distribute for NEO received
-    //     if (notification.scriptHash.equals(Hash256.NEO)) {
-    //       amount += notification[2] * this.amountPerNEO;
-    //     }
-    //   }
-    // }
+    // If there are no valid NEO transfers to this contract then throw.
+    if (transfers.length === 0) {
+      throw new Error('Invalid mintTokens');
+    }
 
-    // if (amount > this.remaining) {
-    //   throw new Error('Invalid mintTokens');
-    // }
+    // Get the current caller of the contract from the current transaction.
+    const caller = Blockchain.currentTransaction.sender;
+    let amount = 0;
+    // tslint:disable-next-line: no-loop-statement
+    for (const transfer of transfers) {
+      // Add up all the transfers that have come from the contract caller.
+      if (transfer.from !== undefined && transfer.from.equals(caller)) {
+        amount += transfer.amount * this.amountPerNEO;
+      }
+    }
 
-    // this.mutableRemaining -= amount;
-    // this.issue(sender, amount);
+    if (amount > this.remaining) {
+      throw new Error('Invalid mintTokens');
+    }
+
+    this.mutableRemaining -= amount;
+    this.issue(caller, amount);
   }
 
   private issue(addr: Address, amount: Fixed<8>): void {

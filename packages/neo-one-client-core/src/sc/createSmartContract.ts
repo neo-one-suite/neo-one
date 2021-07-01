@@ -170,9 +170,10 @@ export const getParamsAndOptions = ({
   if (contractNetwork === undefined) {
     throw new NoContractDeployedError(network);
   }
-  if (options.sendTo !== undefined && !receive) {
-    throw new CannotSendToContractError(contractNetwork.address);
-  }
+  // TODO: may need to add another check here depending on if we keep @receive decorator
+  // if (options.sendTo !== undefined && !receive) {
+  //   throw new CannotSendToContractError(contractNetwork.address);
+  // }
 
   const { converted, zipped } = common.convertParams({
     params: requiredArgs,
@@ -201,8 +202,8 @@ const createCall =
     readonly definition: SmartContractDefinition;
     readonly client: Client;
     readonly func: ContractMethodDescriptorClient;
-    // tslint:disable-next-line no-any
   }) =>
+  // tslint:disable-next-line no-any
   async (...args: any[]): Promise<Return | undefined> => {
     const { params, network, address } = getParamsAndOptions({
       definition,

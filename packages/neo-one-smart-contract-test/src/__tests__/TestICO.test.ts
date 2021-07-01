@@ -1,5 +1,5 @@
 import { common, crypto, privateKeyToAddress } from '@neo-one/client-common';
-import { SmartContractAny } from '@neo-one/client-core';
+import { Hash160, SmartContractAny } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import * as path from 'path';
 import { withContracts } from '../withContracts';
@@ -22,7 +22,7 @@ describe('TestICO', () => {
         crypto.addPublicKey(common.stringToPrivateKey(MINTER.PRIVATE_KEY), common.stringToECPoint(MINTER.PUBLIC_KEY));
         const deployResult = await smartContract.deploy(
           masterAccountID.address,
-          new BigNumber(Math.round(Date.now() / 1000)),
+          new BigNumber(Math.round(Date.now() / 1)), // TODO: this was 1000 but that didn't work for the ICO. Check this out
         );
         const deployReceipt = await deployResult.confirmed({ timeoutMS: 2500 });
         if (deployReceipt.result.state !== 'HALT') {
@@ -52,12 +52,12 @@ describe('TestICO', () => {
             [
               {
                 amount: new BigNumber(10000),
-                asset: Hash256.NEO,
+                asset: Hash160.NEO,
                 to: privateKeyToAddress(MINTER.PRIVATE_KEY),
               },
               {
-                amount: new BigNumber(10000),
-                asset: Hash256.GAS,
+                amount: new BigNumber(154460781), // TODO: why is the GAS required so large?
+                asset: Hash160.GAS,
                 to: privateKeyToAddress(MINTER.PRIVATE_KEY),
               },
             ],
@@ -76,18 +76,18 @@ describe('TestICO', () => {
           sendTo: [
             {
               amount: firstMint,
-              asset: Hash256.NEO,
+              asset: common.nativeScriptHashes.NEO,
             },
           ],
         });
 
         const mintReceipt = await mintResult.confirmed({ timeoutMS: 2500 });
         expect(mintReceipt.result.gasConsumed.toString()).toMatchSnapshot('mint consumed');
-        expect(mintReceipt.result.gasCost.toString()).toMatchSnapshot('mint cost');
         expect(mintReceipt.result.value).toBeUndefined();
-        expect(mintReceipt.events).toHaveLength(1);
-        const event = mintReceipt.events[0];
-        expect(event.name).toEqual('transfer');
+        expect(mintReceipt.events).toHaveLength(3);
+        const event = mintReceipt.events[2]; // TODO: not totally sure it's the 3rd item
+        // TODO: also check the first two events
+        expect(event.name).toEqual('Transfer');
         expect(event.parameters.from).toBeUndefined();
         expect(event.parameters.to).toEqual(minter.userAccount.id.address);
         if (event.parameters.amount === undefined) {
@@ -95,15 +95,15 @@ describe('TestICO', () => {
           throw new Error('For TS');
         }
         const firstBalance = firstMint.times(10).toString();
-        expect(event.parameters.amount.toString()).toEqual(firstBalance);
+        expect(event.parameters.amount.toString()).toEqual(firstBalance); // TODO: value returned is 8 decimal places off
 
         const [minterBalance, mintTotalSupply] = await Promise.all([
           smartContract.balanceOf(minter.userAccount.id.address),
           smartContract.totalSupply(),
         ]);
 
-        expect(minterBalance.toString(10)).toEqual(firstBalance);
-        expect(mintTotalSupply.toString(10)).toEqual(firstBalance);
+        expect(minterBalance.toString(10)).toEqual(firstBalance); // TODO: value returned is 8 decimal places off
+        expect(mintTotalSupply.toString(10)).toEqual(firstBalance); // TODO: value returned is 8 decimal places off
       },
       { deploy: false },
     );
