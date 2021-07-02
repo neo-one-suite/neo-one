@@ -157,7 +157,7 @@ export const testToken = async ({
       expect(contract.updateCounter).toEqual(0);
       expect(contract.hash).toMatchSnapshot('contract hash');
       expect(contract.nef.tokens).toMatchSnapshot('nef tokens');
-      expect(contract.nef.compiler).toEqual('neo-one 3.0.0-rc1');
+      expect(contract.nef.compiler).toEqual('neo-one 3.0.0-rc3');
       expect(contract.nef.magic).toEqual(NefFileModel.magic);
       expect(contract.manifest.abi.events).toMatchSnapshot('contract events');
       expect(contract.manifest.abi.methods).toMatchSnapshot('contract methods');
