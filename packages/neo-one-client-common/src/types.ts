@@ -797,6 +797,14 @@ export interface TransactionOptions {
    * Useful for when there is high traffic on the network and automatic re-sending of transactions takes place but you want more control.
    */
   validBlockCount?: number;
+  /**
+   * `Transfer`s that specify native assets to send to the contract.
+   */
+  sendTo?: ReadonlyArray<OmitStrict<Transfer, 'to'>>;
+  /**
+   * `Transfer`s that specify native assets to send from the contract.
+   */
+  sendFrom?: readonly Transfer[];
   // tslint:enable readonly-keyword
 }
 
