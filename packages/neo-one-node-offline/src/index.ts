@@ -64,9 +64,7 @@ class BlockTransform extends Transform {
     }
   }
 
-  private processBuffer(
-    reader: BinaryReader,
-  ): {
+  private processBuffer(reader: BinaryReader): {
     readonly remainingBuffer: Buffer;
     readonly mutableBlocks: Block[];
   } {
@@ -108,23 +106,28 @@ const getStream = (chain: Chain): Readable => {
   return stream;
 };
 
-const getCount = async (stream: Readable): Promise<number> => {
-  let count = stream.read(4);
+const getCount = async (stream: Readable, readStart?: boolean): Promise<number> => {
+  let startBlock = readStart ? stream.read(4) : undefined;
   // tslint:disable-next-line no-loop-statement
-  while (count == undefined) {
+  while (startBlock == undefined) {
     await new Promise<void>((resolve) => setTimeout(resolve, 250));
-    count = stream.read(4);
+    startBlock = readStart ? stream.read(4) : Buffer.from([0, 0, 0, 0]);
   }
+  const endBlock = stream.read(4);
+  const startBlockIndex = startBlock.readUInt32LE(0);
+  const endBlockIndex = endBlock.readUInt32LE(0);
 
-  return count.readUInt32LE(0);
+  return readStart ? endBlockIndex - startBlockIndex : endBlockIndex;
 };
 
 export const loadChain = async ({
   blockchain,
   chain,
+  readStart,
 }: {
   readonly blockchain: Blockchain;
   readonly chain: Chain;
+  readonly readStart?: boolean;
 }): Promise<void> =>
   new Promise<void>((resolve, reject) => {
     logger.info({
@@ -144,6 +147,7 @@ export const loadChain = async ({
     const onError = (error: Error) => {
       if (!resolved && !rejected) {
         rejected = true;
+        logger.info({ title: 'chain_file_load_error', error });
         cleanup();
         reject(error);
       }
@@ -153,6 +157,7 @@ export const loadChain = async ({
       if (!resolved && !rejected) {
         resolved = true;
         cleanup();
+        logger.info({ title: 'chain_file_load_end' });
         resolve();
       }
     };
@@ -212,8 +217,9 @@ export const loadChain = async ({
       }
     });
 
-    getCount(stream)
+    getCount(stream, readStart)
       .then((count) => {
+        logger.info({ title: 'chain_file_count', count, currentIndex: blockchain.currentBlockIndex });
         if (count > blockchain.currentBlockIndex) {
           stream.pipe(transform);
         } else {
@@ -232,11 +238,11 @@ const writeOut = async (blockchain: Blockchain, out: Writable, height: number): 
   // tslint:disable-next-line no-loop-statement
   for (const chunk of _.chunk(_.range(0, height), 1000)) {
     // eslint-disable-next-line
-    const trimmedBlocks = await Promise.all(chunk.map(async (index) => blockchain.getBlock(index)));
+    const blocks = await Promise.all(chunk.map(async (index) => blockchain.getBlock(index)));
+    const definedBlocks = blocks.filter((b): b is Block => b !== undefined);
 
     // tslint:disable-next-line no-loop-statement
-    for (const trimmed of trimmedBlocks) {
-      const block = await trimmed.getBlock(blockchain.transactions);
+    for (const block of definedBlocks) {
       const buffer = block.serializeWire();
       const length = Buffer.alloc(4, 0);
       length.writeInt32LE(buffer.length, 0);
@@ -262,14 +268,21 @@ const writeOut = async (blockchain: Blockchain, out: Writable, height: number): 
 export const dumpChain = async ({
   blockchain,
   path,
+  writeStart,
 }: {
   readonly blockchain: Blockchain;
   readonly path: string;
+  readonly writeStart?: boolean;
 }): Promise<void> => {
   const height = blockchain.currentBlockIndex;
   await new Promise<void>((resolve, reject) => {
     const out = fs.createWriteStream(path);
     out.once('open', () => {
+      if (writeStart) {
+        const start = Buffer.alloc(4, 0);
+        start.writeUInt32LE(0, 0);
+        out.write(start);
+      }
       const count = Buffer.alloc(4, 0);
       count.writeUInt32LE(height, 0);
       out.write(count);
