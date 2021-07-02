@@ -8,14 +8,17 @@ const start = createStart(nodeLogger);
 
 export const command = 'neo-one-node';
 export const describe = 'Start a NEO•ONE node.';
-export const builder = (yargsBuilder: typeof yargs) => yargsBuilder.string('chain-file').string('dump-chain-file');
+export const builder = (yargsBuilder: typeof yargs) =>
+  yargsBuilder.string('chain-file').boolean('readStart').string('dump-chain-file').boolean('writeStart');
 export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
   start(async () => {
     const options = getOptions();
     const fullNode = new FullNode({
       options,
+      readStart: argv.readStart,
       chainFile: argv['chain-file'],
       dumpChainFile: argv['dump-chain-file'],
+      writeStart: argv.writeStart,
     });
     await fullNode.start();
 

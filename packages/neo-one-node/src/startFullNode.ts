@@ -36,6 +36,8 @@ export interface Options {
 export interface FullNodeOptions {
   readonly options: Options;
   readonly chainFile?: string;
+  readonly readStart?: boolean;
+  readonly writeStart?: boolean;
   readonly dumpChainFile?: string;
   readonly leveldown?: AbstractLevelDOWN;
 }
@@ -61,6 +63,8 @@ export const startFullNode = async ({
     rpc: rpcOptions = {},
   },
   chainFile,
+  readStart,
+  writeStart,
   dumpChainFile,
   leveldown: customLeveldown,
 }: FullNodeOptions): Promise<Disposable> => {
@@ -124,6 +128,7 @@ export const startFullNode = async ({
       await loadChain({
         chain: { format: 'raw', path: chainFile },
         blockchain,
+        readStart,
       });
     }
 
@@ -131,6 +136,7 @@ export const startFullNode = async ({
       await dumpChain({
         path: dumpChainFile,
         blockchain,
+        writeStart,
       });
     }
 
