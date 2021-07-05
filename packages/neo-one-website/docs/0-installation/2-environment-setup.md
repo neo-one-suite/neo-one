@@ -46,7 +46,7 @@ This tells your local C# .NET runtime to use version 3.1.401 in this repo, even 
 
 - Add these environment variables to your shell environment:
   - `EDGE_USE_CORECLR=1`
-  - `EDGE_APP_ROOT=<path/to/your/project>/node_modules/@neo-one/node-vm/lib/Debug/netcoreapp3.0`
+  - `EDGE_APP_ROOT=<path/to/your/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/netcoreapp3.0`
 - Install `pkgconfig` on macOS with Homebrew: `brew install pkgconfig`
   - Then add this environment variable: `PKG_CONFIG_PATH=/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig`
   - You then need to re-install your node modules by deleting the `node_modules` folder and then running `npm install` again
