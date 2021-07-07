@@ -1,7 +1,7 @@
-import { Op, Byte, assertByteCode } from './models';
-import { Instruction } from './Instruction';
-import { isStackItemType, StackItemType } from './StackItemType';
 import { InvalidScriptError } from './errors';
+import { Instruction } from './Instruction';
+import { assertByteCode, Byte, Op } from './models';
+import { isStackItemType, StackItemType } from './StackItemType';
 
 export class Script {
   private readonly script: Buffer;
@@ -13,8 +13,11 @@ export class Script {
     this.instructions = new Map<number, Instruction>();
 
     if (strictMode) {
+      // tslint:disable-next-line: no-empty no-loop-statement
       for (let ip = 0; ip < this.script.length; ip += this.getInstruction(ip).size) {}
-      for (let [ip, instruction] of this.instructions) {
+      // tslint:disable-next-line: no-loop-statement
+      for (const [ip, instruction] of this.instructions) {
+        // tslint:disable-next-line: switch-default
         switch (instruction.opCode) {
           case Op.JMP:
           case Op.JMPIF:
@@ -73,12 +76,15 @@ export class Script {
             if (instruction.opCode !== Op.NEWARRAY_T && type === StackItemType.Any) {
               throw new InvalidScriptError(Byte[instruction.opCode], ip);
             }
-            break;
         }
       }
     }
 
     this.strictMode = strictMode;
+  }
+
+  public get buffer(): Buffer {
+    return this.script;
   }
 
   public get length(): number {
