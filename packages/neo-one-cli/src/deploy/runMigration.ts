@@ -127,7 +127,7 @@ export const runMigration = async (
             {
               ...(action.options === undefined ? {} : action.options),
               maxSystemFee: new BigNumber(1000),
-              maxNetworkFee: new BigNumber(1),
+              maxNetworkFee: new BigNumber(-1),
             },
             sourceMaps,
           );
