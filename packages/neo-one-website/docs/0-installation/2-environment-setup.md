@@ -40,7 +40,7 @@ This page describes how to setup NEO•ONE using `yarn` or `npm`.
 }
 ```
 
-This tells your local C# .NET runtime to use version 3.1.404 in this repo. Make sure you are using versions 3.1.4xx. You can find out the current installed version by typing `dotnet --version` on the console. This is required because NEO•ONE node uses the official C# NeoVM under the hood.
+This tells your local C# .NET runtime to use version 3.1.404 in this repo. Make sure you are using versions 3.1.4xx. You can view the installed SDKs by typing `dotnet --list-sdks` on the console.  To confirm you are using a compatible version, type `dotnet --version` inside the project folder.  NEO•ONE will use the latest version unless it sees the `global.json`. This is required because NEO•ONE node uses the official C# NeoVM under the hood.
 
 **You need to add environment variables to get the NEO•ONE node working.**
 
@@ -49,7 +49,7 @@ On **Windows**:
   - `EDGE_USE_CORECLR=1`
   - `EDGE_APP_ROOT=<path/to/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/netcoreapp3.0`
 
-On **MacOS**:
+On **macOS**:
 - Install `pkgconfig` on macOS with Homebrew: `brew install pkgconfig`
   - Then add this environment variable: `PKG_CONFIG_PATH=/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig`
   - You then need to re-install your node modules by deleting the `node_modules` folder and then running `npm install` again
