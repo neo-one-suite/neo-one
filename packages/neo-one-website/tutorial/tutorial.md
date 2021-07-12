@@ -85,11 +85,26 @@ yarn add @neo-one/cli@prerelease @neo-one/client@prerelease @neo-one/smart-contr
 npm install @neo-one/cli@prerelease @neo-one/client@prerelease @neo-one/smart-contract@prerelease @neo-one/smart-contract-test@prerelease @neo-one/smart-contract-lib@prerelease @neo-one/smart-contract-typescript-plugin@prerelease
 ```
 
-7. Run `yarn neo-one init` or `npx neo-one init`
+7. Add environment variables to get the NEO•ONE node working:
+
+- On **Windows**:
+  - Add these environment variables to your shell environment:
+    - `EDGE_USE_CORECLR=1`
+    - `EDGE_APP_ROOT=<path/to/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/netcoreapp3.0`
+
+- On **macOS**:
+  - Install `pkgconfig` on macOS with Homebrew: `brew install pkgconfig`
+    - Then add this environment variable: `PKG_CONFIG_PATH=/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig`
+    - You then need to re-install your node modules by deleting the `node_modules` folder and then running `npm install` again 
+
+8. Run `yarn neo-one init` or `npx neo-one init`
 
 This command initializes a NEO•ONE project with a `Hello World` smart contract under `neo-one/contracts/HelloWorld.ts`, a unit test under `src/__tests__/HelloWorld.test.ts`, and a config file,`.neo-one.config.ts`. For this tutorial, we will be building a `Token` from the ground up, so you can go ahead and delete the two `HelloWorld` files. We also recommend taking a moment to [setup your editor](/docs/environment-setup#Editor-Setup) to take advantage of inline NEO•ONE compiler diagnostics.
 
-8. Review the available [configuration options](/docs/config-options) and update your `.neo-one.config.ts` file as needed.
+9. Review the available [configuration options](/docs/config-options) and update your `.neo-one.config.ts` file as needed.
+
+10. Test your setup using `npx neo-one start network`. The output should be something like `{"level":30,"time":1625855073745,"service":"node","service":"blockchain","name":"neo_blockchain_start","msg":"Neo blockchain started.","v":1}`. You may need to use `sudo` depending on your project configuration.
+    - If you run into problems, then please reach out to us on [Discord](https://discord.gg/S86PqDE)
 
 - This tutorial uses the default options. To follow along, nothing needs to be changed.
 

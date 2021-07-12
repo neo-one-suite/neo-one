@@ -75,12 +75,19 @@ You can also add a `.neo-onerc` configuration file anywhere in the app directory
 
 ## Troubleshooting
 
-You may or may not run into environment problems when trying to run the node. The NEO•ONE node now uses the C# NeoVM instead of our own implementation of the NeoVM in TypeScript, which means that NEO•ONE controls C# code through some complicated mechanisms. If you run into problems with running the node then try these steps:
+Make sure you add these environment variables to get the NEO•ONE node working:
 
+On **Windows**:
 - Add these environment variables to your shell environment:
   - `EDGE_USE_CORECLR=1`
   - `EDGE_APP_ROOT=<path/to/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/netcoreapp3.0`
+
+On **macOS**:
 - Install `pkgconfig` on macOS with Homebrew: `brew install pkgconfig`
   - Then add this environment variable: `PKG_CONFIG_PATH=/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig`
   - You then need to re-install your node modules by deleting the `node_modules` folder and then running `npm install` again
-- If problems persist then please reach out to us on [Discord](https://discord.gg/S86PqDE)
+
+**Testing your setup:**
+- Use `npx neo-one start network`. The output should be something like `{"level":30,"time":1625855073745,"service":"node","service":"blockchain","name":"neo_blockchain_start","msg":"Neo blockchain started.","v":1}`. You may need to use `sudo` depending on your project configuration.
+- If you run into problems, then please reach out to us on [Discord](https://discord.gg/S86PqDE)
+

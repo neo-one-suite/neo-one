@@ -36,18 +36,18 @@ Tip
    - Linux and Mac: [Node Version Manager](https://github.com/creationix/nvm). (`recommended`)
    - Windows: We recommend using [Chocolatey](https://chocolatey.org/). (`recommended`)
 
-2. Install [C# .NET](https://docs.microsoft.com/en-us/dotnet/) version 3.1.401
+2. Install [C# .NET](https://docs.microsoft.com/en-us/dotnet/) version 3.1.404
 3. Add a `global.json` file to the root of your project repo with this JSON:
 
 ```json
 {
   "sdk": {
-    "version": "3.1.401"
+    "version": "3.1.404"
   }
 }
 ```
 
-This tells your local C# .NET runtime to use version 3.1.401 in this repo, even if you have newer versions installed on your machine.
+This tells your local C# .NET runtime to use version 3.1.404 in this repo. Make sure you are using versions 3.1.4xx. You can view the installed SDKs by typing `dotnet --list-sdks` on the console.  To confirm you are using a compatible version, type `dotnet --version` inside the project folder.  NEO•ONE will use the latest version unless it sees the `global.json`. This is required because NEO•ONE node uses the official C# NeoVM under the hood.
 
 4. Follow the [installation instructions for Create React App](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) to make a new project.
 
@@ -63,10 +63,24 @@ yarn add @neo-one/cli@prerelease @neo-one/client@prerelease @neo-one/smart-contr
 npm install @neo-one/cli@prerelease @neo-one/client@prerelease @neo-one/smart-contract@prerelease @neo-one/smart-contract-test@prerelease @neo-one/smart-contract-lib@prerelease @neo-one/smart-contract-typescript-plugin@prerelease
 ```
 
-6. Run `yarn neo-one init` or `npx neo-one init`
+6. Add environment variables to get the NEO•ONE node working:
 
-The command above generates a sample `HelloWorld.ts` smart contract, a sample test for the contract `HelloWorld.test.ts`, a config file `.neo-one.config.ts`, and a `neo-one` folder with important modules.
+- On **Windows**:
+  - Add these environment variables to your shell environment:
+    - `EDGE_USE_CORECLR=1`
+    - `EDGE_APP_ROOT=<path/to/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/netcoreapp3.0`
 
+- On **macOS**:
+  - Install `pkgconfig` on macOS with Homebrew: `brew install pkgconfig`
+    - Then add this environment variable: `PKG_CONFIG_PATH=/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig`
+    - You then need to re-install your node modules by deleting the `node_modules` folder and then running `npm install` again 
+
+7. Run `yarn neo-one init` or `npx neo-one init`
+
+    - The command above generates a sample `HelloWorld.ts` smart contract, a sample test for the contract `HelloWorld.test.ts`, a config file `.neo-one.config.ts`, and a `neo-one` folder with important modules.
+
+8. Test your setup using `npx neo-one start network`. The output should be something like `{"level":30,"time":1625855073745,"service":"node","service":"blockchain","name":"neo_blockchain_start","msg":"Neo blockchain started.","v":1}`. You may need to use `sudo` depending on your project configuration.
+    - If you run into problems, then please reach out to us on [Discord](https://discord.gg/S86PqDE)
 ---
 
 ## Troubleshooting
