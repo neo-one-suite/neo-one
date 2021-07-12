@@ -31,7 +31,7 @@ If you haven't already, prepare your project by following the instructions in th
 The NEO•ONE toolchain expects all smart contracts in your project to be contained within one parent folder. By default, that folder is `one/contracts`, though this location is [configurable](/docs/config-options). The main command you'll use from the NEO•ONE toolchain is:
 
 ```bash
-neo-one build
+npx neo-one build
 ```
 
 This command compiles your smart contracts, sets up a local private network, deploys your smart contracts to that network and generates testing utilities and client APIs for interacting with your smart contract. Appending the command with `--watch` will watch for changes in your smart contracts and automatically run the build command.
