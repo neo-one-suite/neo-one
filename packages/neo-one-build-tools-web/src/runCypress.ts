@@ -114,9 +114,9 @@ const run = async () => {
   //   startProc.stderr.pipe(process.stderr);
   // }
 
-  const FIFTEEN_MINUTES = 15 * 60 * 1000;
+  const TWENTY_MINUTES = 20 * 60 * 1000;
   const EIGHT_MINUTES = 8 * 60 * 1000;
-  await timer(argv.local ? EIGHT_MINUTES : FIFTEEN_MINUTES).toPromise();
+  await timer(argv.local ? EIGHT_MINUTES : TWENTY_MINUTES).toPromise();
   await runCypress();
 };
 

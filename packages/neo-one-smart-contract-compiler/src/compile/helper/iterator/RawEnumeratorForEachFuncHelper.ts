@@ -14,7 +14,7 @@ export class RawEnumeratorForEachFuncHelper extends Helper {
 
   public constructor(options: RawEnumeratorForEachFuncHelperOptions) {
     super();
-    this.deserializeKey = options.deserializeKey ?? false;
+    this.deserializeKey = options.deserializeKey || false;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {

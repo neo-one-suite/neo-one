@@ -5,11 +5,13 @@ on:
       - master
       - staging
       - trying
+      - master-2.x
   pull_request:
     branches:
       - master
       - staging
       - trying
+      - master-2.x
 jobs:
   cypress12:
     name: cypress12
@@ -18,9 +20,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@94d077c24971944d312dd9197c1bdfba62b39878
       - name: Install Node
-        run: brew update-reset && brew update && brew unlink node@12 && brew install node@10 && brew link node@10 --force
+        run: brew update-reset && brew update && brew install node@10 && brew link node@10 --force
       - name: Install Chrome
-        run: brew cask install google-chrome
+        run: brew install --cask google-chrome
       - name: Install Rush
         run: npm i -g @microsoft/rush@latest
       - name: Rush Install

@@ -21,7 +21,7 @@ export class CreateEnumeratorIterableIteratorHelper extends Helper {
   public constructor(options: CreateEnumeratorIterableIteratorHelperOptions) {
     super();
     this.mapValue = options.mapValue === undefined ? doNothing : options.mapValue;
-    this.deserializeKey = options.deserializeKey ?? false;
+    this.deserializeKey = options.deserializeKey || false;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
