@@ -18,7 +18,7 @@ This page describes how to setup NEO•ONE using `yarn` or `npm`.
 - [Node](https://nodejs.org) >= 10.16.0 (We recommend the latest version)
   - Linux and Mac: We recommend using [Node Version Manager](https://github.com/creationix/nvm).
   - Windows: We recommend using [Chocolatey](https://chocolatey.org/).
-- [C# .NET](https://docs.microsoft.com/en-us/dotnet/) version 3.1.401
+- [C# .NET](https://docs.microsoft.com/en-us/dotnet/) version 3.1.404
 
 ---
 
@@ -35,23 +35,28 @@ This page describes how to setup NEO•ONE using `yarn` or `npm`.
 ```json
 {
   "sdk": {
-    "version": "3.1.401"
+    "version": "3.1.404"
   }
 }
 ```
 
-This tells your local C# .NET runtime to use version 3.1.401 in this repo, even if you have newer versions installed on your machine.
+This tells your local C# .NET runtime to use version 3.1.404 in this repo. Make sure you are using versions 3.1.4xx. You can view the installed SDKs by typing `dotnet --list-sdks` on the console.  To confirm you are using a compatible version, type `dotnet --version` inside the project folder.  NEO•ONE will use the latest version unless it sees the `global.json`. This is required because NEO•ONE node uses the official C# NeoVM under the hood.
 
-**You may need to also add environment variables** to get the NEO•ONE node working. The NEO•ONE node now uses the C# NeoVM instead of our own implementation of the NeoVM in TypeScript, which means that NEO•ONE controls C# code through some complicated mechanisms. If you run into problems with running a node (such as when running `neo-one init` or `neo-one build`) then try these steps:
+**You need to add environment variables to get the NEO•ONE node working.**
 
+On **Windows**:
 - Add these environment variables to your shell environment:
   - `EDGE_USE_CORECLR=1`
   - `EDGE_APP_ROOT=<path/to/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/netcoreapp3.0`
+
+On **macOS**:
 - Install `pkgconfig` on macOS with Homebrew: `brew install pkgconfig`
   - Then add this environment variable: `PKG_CONFIG_PATH=/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig`
   - You then need to re-install your node modules by deleting the `node_modules` folder and then running `npm install` again
-- Try running the NEO•ONE CLI command using `sudo`, such as: `sudo npx neo-one init`
-- If problems persist then please reach out to us on [Discord](https://discord.gg/S86PqDE)
+
+**Testing your setup:**
+- Use `npx neo-one start network`. The output should be something like `{"level":30,"time":1625855073745,"service":"node","service":"blockchain","name":"neo_blockchain_start","msg":"Neo blockchain started.","v":1}`. You may need to use `sudo` depending on your project configuration.
+- If you run into problems, then please reach out to us on [Discord](https://discord.gg/S86PqDE)
 
 To see a demonstration of environment setup go to our [YouTube channel](https://www.youtube.com/channel/UCya5J1Tt2h-kX-I3a7LOvtw) for helpful videos.
 
