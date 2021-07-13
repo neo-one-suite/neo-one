@@ -13,7 +13,7 @@ export const deployContract = async (
   sourceMaps: SourceMaps,
   masterPrivateKey: string = constants.PRIVATE_NET_PRIVATE_KEY,
 ): Promise<AddressString> => {
-  const { client, developerClient, masterWallet } = await getClients(provider, masterPrivateKey);
+  const { client, developerClient } = await getClients(provider, masterPrivateKey);
 
   try {
     const existing = await client.read(provider.network).getContract(common.uInt160ToString(contractHash));
@@ -26,7 +26,7 @@ export const deployContract = async (
   const result = await client.publishAndDeploy(
     contract,
     manifest,
-    [masterWallet.userAccount.id.address],
+    [],
     { maxSystemFee: new BigNumber(-1), maxNetworkFee: new BigNumber(-1) },
     sourceMaps,
   );
