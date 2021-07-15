@@ -18,6 +18,7 @@
     "docker-compose*": "yaml",
     "*.d.ts.map": "json"
   },
+  "search.followSymlinks": false,
   "search.exclude": {
     "packages/*/dist/**": true
   },
