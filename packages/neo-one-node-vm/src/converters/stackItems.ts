@@ -1,4 +1,4 @@
-import { StackItemType } from '@neo-one/client-common';
+import { Script, StackItemType } from '@neo-one/client-common';
 import {
   ArrayStackItem,
   BooleanStackItem,
@@ -120,7 +120,7 @@ export const parseStackItem = (item: StackItemReturn): StackItem => {
 
     case 'Pointer':
       return new PointerStackItem({
-        script: item.value,
+        script: new Script(item.value),
         position: item.Position,
       });
 
