@@ -63,7 +63,7 @@
       "summary": "Compile & serve editor server (only in dev mode)",
       "description": "Build and run the NEO•ONE editor server",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "mkdir \"./dist/server\" && touch ./dist/server/index.js && cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --watch --bundle server"
+      "shellCommand": "mkdir \"./dist\" && mkdir \"./dist/server\" && touch ./dist/server/index.js && cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --watch --bundle server"
     },
     {
       "commandKind": "global",
