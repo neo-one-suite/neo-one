@@ -13,13 +13,13 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/smart-contract": "^3.1.0",
-    "@neo-one/smart-contract-lib": "^3.1.0",
-    "@neo-one/utils": "^3.1.0",
+    "@neo-one/smart-contract": "^3.5.3-rc3",
+    "@neo-one/smart-contract-lib": "^3.5.4-rc3",
+    "@neo-one/utils": "^3.5.0-rc1",
     "app-root-dir": "^1.0.2",
     "glob": "^7.1.4",
-    "tslib": "^1.10.0",
-    "typescript": "3.9.5"
+    "tslib": "^2.0.0",
+    "typescript": "4.3.5"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",

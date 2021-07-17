@@ -13,9 +13,9 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-core": "^3.1.0",
+    "@neo-one/client-core": "^3.5.4-rc3",
     "resize-observer-polyfill": "^1.5.0",
-    "tslib": "^1.10.0"
+    "tslib": "^2.0.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",

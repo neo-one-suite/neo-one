@@ -16,7 +16,7 @@ jobs:
     runs-on: macOS-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@94d077c24971944d312dd9197c1bdfba62b39878
+        uses: actions/checkout@25a956c84d5dd820d28caab9f86b8d183aeeff3d
       - name: Install Node
         run: brew update-reset && brew update && brew unlink node@12 && brew install node@10 && brew link node@10 --force
       - name: Install Chrome
@@ -36,7 +36,7 @@ jobs:
       - name: Store Cypress Screenshots
         if: failure()
         continue-on-error: true
-        uses: actions/upload-artifact@e20a7983ecacb840d6004bbaa6dd6f75eaff8af7
+        uses: actions/upload-artifact@11e311c8b504ea40cbed20583a64d75b4735cff3
         with:
           name: cypress-screenshots
           path: cypress/screenshots

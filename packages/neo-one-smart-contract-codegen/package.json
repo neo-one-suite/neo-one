@@ -13,21 +13,21 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/cli-common": "^3.1.0",
-    "@neo-one/client-common": "^3.1.0",
-    "@neo-one/client-core": "^3.1.0",
-    "@neo-one/utils": "^3.1.0",
+    "@neo-one/cli-common": "^3.5.4-rc3",
+    "@neo-one/client-common": "^3.5.4-rc3",
+    "@neo-one/client-core": "^3.5.4-rc3",
+    "@neo-one/utils": "^3.5.0-rc1",
     "lodash": "^4.17.15",
     "prettier": "^2.0.1",
     "safe-stable-stringify": "^1.1.0",
     "source-map": "^0.7.3",
-    "tslib": "^1.10.0"
+    "tslib": "^2.0.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
-    "@types/jest": "^24.0.18",
+    "@types/jest": "^26.0.0",
     "@types/lodash": "^4.14.138",
-    "@types/prettier": "^1.18.2",
+    "@types/prettier": "^2.0.0",
     "gulp": "~4.0.2"
   }
 }

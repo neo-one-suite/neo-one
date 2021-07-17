@@ -13,12 +13,12 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-switch": "^3.1.0",
+    "@neo-one/client-switch": "^3.5.4-rc3",
     "@neo-one/logger": "^2.6.1",
-    "@neo-one/utils": "^3.1.0",
+    "@neo-one/utils": "^3.5.0-rc1",
     "@types/koa": "^2.0.49",
     "koa": "^2.7.0",
-    "tslib": "^1.10.0"
+    "tslib": "^2.0.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",

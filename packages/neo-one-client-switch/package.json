@@ -15,14 +15,14 @@
   "sideEffects": false,
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
-    "@ledgerhq/hw-transport-u2f": "^4.68.2",
-    "@neo-one/client-common": "^3.1.0",
-    "@neo-one/node-core": "^3.1.0",
-    "@neo-one/utils": "^3.1.0",
+    "@ledgerhq/hw-transport-u2f": "^5.0.0",
+    "@neo-one/client-common": "^3.5.4-rc3",
+    "@neo-one/node-core": "^3.5.4-rc3",
+    "@neo-one/utils": "^3.5.0-rc1",
     "lodash": "^4.17.15",
     "regenerator-runtime": "^0.13.3",
     "source-map": "^0.7.3",
-    "tslib": "^1.10.0"
+    "tslib": "^2.0.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
@@ -34,6 +34,6 @@
     "gulp": "~4.0.2"
   },
   "optionalDependencies": {
-    "@ledgerhq/hw-transport-node-hid": "^4.68.2"
+    "@ledgerhq/hw-transport-node-hid": "^6.0.0"
   }
 }
