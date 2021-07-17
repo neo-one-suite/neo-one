@@ -11,15 +11,15 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-core": "^3.1.0",
+    "@neo-one/client-core": "^3.5.4-rc3",
     "@neo-one/local-browser": "^2.3.1",
     "@neo-one/local-singleton": "^2.3.1",
     "@neo-one/node-browser": "^2.3.0",
-    "@neo-one/smart-contract-test-common": "^3.1.0",
-    "@neo-one/utils": "^3.1.0",
+    "@neo-one/smart-contract-test-common": "^3.5.4-rc3",
+    "@neo-one/utils": "^3.5.0-rc1",
     "@neo-one/worker": "^2.3.0",
     "core-js": "^3.2.1",
-    "tslib": "^1.10.0"
+    "tslib": "^2.0.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0"

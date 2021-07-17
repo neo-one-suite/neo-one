@@ -13,25 +13,25 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-common": "^3.1.0",
-    "@neo-one/node-core": "^3.1.0",
-    "@neo-one/node-storage-common": "^3.1.0",
-    "@neo-one/utils": "^3.1.0",
-    "@types/levelup": "^3.1.1",
+    "@neo-one/client-common": "^3.5.4-rc3",
+    "@neo-one/node-core": "^3.5.4-rc3",
+    "@neo-one/node-storage-common": "^3.5.4-rc3",
+    "@neo-one/utils": "^3.5.0-rc1",
+    "@types/levelup": "^4.0.0",
     "@types/abstract-leveldown": "^5.0.1",
-    "abstract-leveldown": "^6.0.3",
-    "levelup": "4.1.0",
-    "rocksdb": "^4.1.0",
-    "rxjs": "^6.5.3",
-    "tslib": "^1.10.0"
+    "abstract-leveldown": "^7.0.0",
+    "levelup": "5.0.1",
+    "rocksdb": "^5.0.0",
+    "rxjs": "^7.0.0",
+    "tslib": "^2.0.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
-    "@types/jest": "^24.0.18",
+    "@types/jest": "^26.0.0",
     "@types/memdown": "^3.0.0",
-    "@types/rocksdb": "3.0.0",
+    "@types/rocksdb": "3.0.1",
     "bn.js": "^5.0.0",
     "gulp": "~4.0.2",
-    "memdown": "^5.0.0"
+    "memdown": "^6.0.0"
   }
 }

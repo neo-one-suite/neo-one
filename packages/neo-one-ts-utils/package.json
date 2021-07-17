@@ -15,8 +15,8 @@
   "dependencies": {
     "lodash": "^4.17.15",
     "source-map": "^0.7.3",
-    "tslib": "^1.10.0",
-    "typescript": "3.9.5"
+    "tslib": "^2.0.0",
+    "typescript": "4.3.5"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",

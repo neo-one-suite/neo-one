@@ -13,21 +13,21 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-common": "^3.1.0",
+    "@neo-one/client-common": "^3.5.4-rc3",
     "@neo-one/logger": "^2.6.1",
-    "@neo-one/node-core": "^3.1.0",
-    "@neo-one/utils": "^3.1.0",
-    "@reactivex/ix-es2015-cjs": "^2.5.3",
-    "@reactivex/ix-esnext-esm": "^2.5.3",
-    "@types/bn.js": "^4.11.5",
+    "@neo-one/node-core": "^3.5.4-rc3",
+    "@neo-one/utils": "^3.5.0-rc1",
+    "@reactivex/ix-es2015-cjs": "^4.0.0",
+    "@reactivex/ix-esnext-esm": "^4.0.0",
+    "@types/bn.js": "^5.0.0",
     "bignumber.js": "^9.0.0",
     "bn.js": "^5.0.0",
     "lodash": "^4.17.15",
-    "tslib": "^1.10.0"
+    "tslib": "^2.0.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
-    "@types/jest": "^24.0.18",
+    "@types/jest": "^26.0.0",
     "@types/lodash": "^4.14.138",
     "gulp": "~4.0.2"
   }

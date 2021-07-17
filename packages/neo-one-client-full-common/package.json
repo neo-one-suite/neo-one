@@ -13,13 +13,13 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-common": "^3.1.0",
-    "@neo-one/utils": "^3.1.0",
-    "tslib": "^1.10.0"
+    "@neo-one/client-common": "^3.5.4-rc3",
+    "@neo-one/utils": "^3.5.0-rc1",
+    "tslib": "^2.0.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
-    "@types/jest": "^24.0.18",
+    "@types/jest": "^26.0.0",
     "gulp": "~4.0.2"
   }
 }
