@@ -36,6 +36,7 @@ export const getExpectedBlockSizeWithoutTransactions = (context: ConsensusContex
   IOHelper.sizeOfUInt256 +
   IOHelper.sizeOfUInt256 +
   IOHelper.sizeOfUInt64LE +
+  IOHelper.sizeOfUInt64LE +
   IOHelper.sizeOfUInt32LE +
   IOHelper.sizeOfUInt8 +
   IOHelper.sizeOfUInt160 +
@@ -330,6 +331,7 @@ export const reset = async ({
     primaryIndex,
     merkleRoot: undefined,
     timestamp: new BN(0),
+    nonce: new BN(0),
     transactions: undefined,
   };
 

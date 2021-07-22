@@ -206,6 +206,14 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
+  test('(123 ** 0) == 1 [AsteriskAsteriskToken]', async () => {
+    await helpers.executeString(`
+      if ((123 ** 0) != 1) {
+        throw 'Failure';
+      }
+    `);
+  });
+
   test('(10 ** -2) == 0.01 [AsteriskAsteriskToken]', async () => {
     await helpers.executeString(`
       if ((10 ** -2) != 0) {

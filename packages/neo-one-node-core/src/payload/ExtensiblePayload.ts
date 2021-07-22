@@ -110,7 +110,7 @@ export class ExtensiblePayload extends UnsignedExtensiblePayload implements Seri
       storage: options.storage,
       native: options.native,
       headerCache: options.headerCache,
-      gas: common.fixed8FromDecimal('0.02'),
+      gas: common.fixed8FromDecimal('0.06'),
       settings: options.settings,
     });
   }

@@ -66,5 +66,6 @@ export const createTest = ({
     nativeUpdateHistory: commonSettings.nativeUpdateHistory,
     maxTransactionsPerBlock: commonSettings.maxTransactionsPerBlock,
     maxTraceableBlocks: commonSettings.maxTraceableBlocks,
+    initialGasDistribution: commonSettings.initialGasDistribution,
   };
 };

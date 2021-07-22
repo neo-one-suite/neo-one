@@ -11,6 +11,48 @@ const properties = `
 `;
 
 describe('Blockchain', () => {
+  test('networkNumber', async () => {
+    const node = await helpers.startNode();
+
+    await node.executeString(`
+      import { Blockchain } from '@neo-one/smart-contract';
+
+      assertEqual(Blockchain.networkNumber, ${7630401}); // This comes from createPriv.ts network number
+    `);
+  });
+
+  test('set networkNumber', async () => {
+    await helpers.compileString(
+      `
+      import { Blockchain } from '@neo-one/smart-contract';
+
+      Blockchain.networkNumber = 10;
+    `,
+      { type: 'error' },
+    );
+  });
+
+  test('randomNumber', async () => {
+    const node = await helpers.startNode();
+
+    await node.executeString(`
+      import { Blockchain } from '@neo-one/smart-contract';
+
+      assertEqual(typeof Blockchain.randomNumber, 'number');
+    `);
+  });
+
+  test('set randomNumber', async () => {
+    await helpers.compileString(
+      `
+      import { Blockchain } from '@neo-one/smart-contract';
+
+      Blockchain.randomNumber = 10;
+    `,
+      { type: 'error' },
+    );
+  });
+
   test('currentHeight', async () => {
     const node = await helpers.startNode();
 

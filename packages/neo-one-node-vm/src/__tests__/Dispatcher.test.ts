@@ -75,7 +75,7 @@ describe('Dispatcher Tests', () => {
       '03cdcea66032b82f5c30450e381e5295cae85c5e6943af716cc6b646352a6067dc',
       '02cd5a5547119e24feaa7c2a0f37b8c9366216bab7054de0065c9be42084003c8a',
     ];
-    const standbyCommittee = standbyValidators.concat(standbyMembers).concat('random hash');
+    const standbyCommittee = standbyValidators.concat(standbyMembers);
     const input = {
       network: 5195086 + 1,
       addressVersion: 0x35 + 1,
@@ -85,6 +85,7 @@ describe('Dispatcher Tests', () => {
       millisecondsPerBlock: 15000 + 1,
       memoryPoolMaxTransactions: 50000 + 1,
       maxTraceableBlocks: 1,
+      initialGasDistribution: new BN(10000).toString(),
       maxTransactionsPerBlock: 10000,
       nativeUpdateHistory: {
         StdLib: [1, 2, 3],
@@ -108,6 +109,7 @@ describe('Dispatcher Tests', () => {
     ]);
     expect(result.millisecondsPerBlock).toEqual(input.millisecondsPerBlock);
     expect(result.memoryPoolMaxTransactions).toEqual(input.memoryPoolMaxTransactions);
+    expect(result.initialGasDistribution).toEqual(input.initialGasDistribution);
   });
 
   test('Dispatcher returns config without initializing config', () => {

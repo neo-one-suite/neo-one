@@ -234,6 +234,10 @@ export interface Header {
    */
   readonly time: BigNumber;
   /**
+   * `Block` nonce.
+   */
+  readonly nonce: BigNumber;
+  /**
    * `Block` index.
    */
   readonly index: number;

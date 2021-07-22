@@ -251,6 +251,11 @@ namespace NEOONE
           }
         }
       }
+      if (input.initialGasDistribution != null)
+      {
+        string InitialGasDistribution = (string)input.initialGasDistribution;
+        config.Add("ProtocolConfiguration:InitialGasDistribution", InitialGasDistribution);
+      }
 
       return new ConfigurationBuilder().AddInMemoryCollection(config).Build().GetSection("ProtocolConfiguration");
     }

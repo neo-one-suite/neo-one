@@ -7,6 +7,7 @@ import { ConsensusMessageType } from './ConsensusMessageType';
 
 export interface PrepareRequestConsensusMessageAdd extends ConsensusMessageBaseAdd {
   readonly timestamp: BN;
+  readonly nonce: BN;
   readonly transactionHashes: readonly UInt256[];
   readonly version: number;
   readonly prevHash: UInt256;
@@ -19,11 +20,13 @@ export class PrepareRequestConsensusMessage extends ConsensusMessageBase {
     const version = reader.readUInt32LE();
     const prevHash = reader.readUInt256();
     const timestamp = reader.readUInt64LE();
+    const nonce = reader.readUInt64LE();
     const transactionHashes = reader.readArray(reader.readUInt256.bind(reader), utils.USHORT_MAX_NUMBER);
 
     return new PrepareRequestConsensusMessage({
       viewNumber,
       timestamp,
+      nonce,
       transactionHashes,
       validatorIndex,
       blockIndex,
@@ -33,6 +36,7 @@ export class PrepareRequestConsensusMessage extends ConsensusMessageBase {
   }
 
   public readonly timestamp: BN;
+  public readonly nonce: BN;
   public readonly transactionHashes: readonly UInt256[];
   public readonly version: number;
   public readonly prevHash: UInt256;
@@ -40,6 +44,7 @@ export class PrepareRequestConsensusMessage extends ConsensusMessageBase {
   public constructor({
     viewNumber,
     timestamp,
+    nonce,
     transactionHashes,
     version,
     prevHash,
@@ -54,6 +59,7 @@ export class PrepareRequestConsensusMessage extends ConsensusMessageBase {
     };
     super(options);
     this.timestamp = timestamp;
+    this.nonce = nonce;
     this.transactionHashes = transactionHashes;
     this.version = version;
     this.prevHash = prevHash;
@@ -70,6 +76,7 @@ export class PrepareRequestConsensusMessage extends ConsensusMessageBase {
   public serializeWireBase(writer: BinaryWriter) {
     super.serializeWireBase(writer);
     writer.writeUInt64LE(this.timestamp);
+    writer.writeUInt64LE(this.nonce);
     writer.writeArray(this.transactionHashes, writer.writeUInt256.bind(writer));
   }
 }

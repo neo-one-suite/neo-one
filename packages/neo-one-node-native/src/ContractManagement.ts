@@ -22,6 +22,35 @@ export class ContractManagement extends NativeContract implements ContractManage
       name: 'ContractManagement',
       id: -1,
       methods: contractManagementMethods,
+      events: [
+        {
+          name: 'Deploy',
+          parameters: [
+            {
+              name: 'Hash',
+              type: 'Hash160',
+            },
+          ],
+        },
+        {
+          name: 'Update',
+          parameters: [
+            {
+              name: 'Hash',
+              type: 'Hash160',
+            },
+          ],
+        },
+        {
+          name: 'Destroy',
+          parameters: [
+            {
+              name: 'Hash',
+              type: 'Hash160',
+            },
+          ],
+        },
+      ],
       settings,
     });
   }

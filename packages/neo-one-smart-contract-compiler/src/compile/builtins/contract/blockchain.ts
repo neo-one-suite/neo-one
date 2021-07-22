@@ -89,4 +89,14 @@ export const add = (builtins: Builtins): void => {
     'currentGASTransfers',
     new BlockchainCurrentTransfers(common.nativeHashes.GAS),
   );
+  builtins.addContractMember(
+    'BlockchainConstructor',
+    'networkNumber',
+    new SysCallMemberValue('System.Runtime.GetNetwork', Types.Number),
+  );
+  builtins.addContractMember(
+    'BlockchainConstructor',
+    'randomNumber',
+    new SysCallMemberValue('System.Runtime.GetRandom', Types.Number),
+  );
 };

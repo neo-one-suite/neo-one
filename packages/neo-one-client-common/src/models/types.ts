@@ -458,6 +458,7 @@ export interface HeaderJSON {
   readonly previousblockhash: string;
   readonly merkleroot: string;
   readonly time: number;
+  readonly nonce: string;
   readonly index: number;
   readonly primary: number;
   readonly nextconsensus: string;
@@ -485,6 +486,7 @@ export interface NetworkSettingsJSON {
   readonly millisecondsperblock: number;
   readonly memorypoolmaxtransactions: number;
   readonly maxtraceableblocks: number;
+  readonly initialgasdistribution: number;
   readonly maxblocksize: number;
   readonly maxblocksystemfee: number;
   readonly maxtransactionsperblock: number;

@@ -22,6 +22,7 @@ export interface ProtocolSettings {
   readonly maxValidUntilBlockIncrement: number;
   readonly memoryPoolMaxTransactions: number;
   readonly maxTraceableBlocks: number;
+  readonly initialGasDistribution: BN;
   readonly maxBlockSize: number;
   readonly maxBlockSystemFee: BN;
   readonly maxTransactionsPerBlock: number;
@@ -39,6 +40,7 @@ export interface VMProtocolSettingsIn {
   readonly millisecondsPerBlock?: number;
   readonly memoryPoolMaxTransactions?: number;
   readonly maxTraceableBlocks?: number;
+  readonly initialGasDistribution?: string;
   readonly maxTransactionsPerBlock?: number;
   readonly nativeUpdateHistory?: { readonly [key: string]: readonly number[] };
 }
@@ -53,6 +55,7 @@ export interface VMProtocolSettingsReturn {
   readonly millisecondsPerBlock: number;
   readonly memoryPoolMaxTransactions: number;
   readonly maxTraceableBlocks: number;
+  readonly initialGasDistribution: string;
   readonly maxTransactionsPerBlock: number;
   readonly nativeUpdateHistory: { readonly [key: string]: readonly number[] };
 }

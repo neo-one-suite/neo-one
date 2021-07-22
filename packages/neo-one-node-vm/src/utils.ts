@@ -44,6 +44,7 @@ export const blockchainSettingsToProtocolSettings = (settingsIn: Settings): VMPr
   millisecondsPerBlock: settingsIn.millisecondsPerBlock,
   memoryPoolMaxTransactions: settingsIn.memoryPoolMaxTransactions,
   maxTraceableBlocks: settingsIn.maxTraceableBlocks,
+  initialGasDistribution: settingsIn.initialGasDistribution.toString(),
   maxTransactionsPerBlock: settingsIn.maxTransactionsPerBlock,
   nativeUpdateHistory: settingsIn.nativeUpdateHistory,
 });
@@ -88,5 +89,5 @@ export const validateProtocolSettings = (settings: VMProtocolSettingsIn) => {
     throw new InvalidUIntError(maxTransactionsPerBlock);
   }
 
-  return settings;
+  return { ...settings, initialGasDistribution: settings.initialGasDistribution?.toString() };
 };

@@ -129,6 +129,7 @@ export class Blockchain {
       memoryPoolMaxTransactions,
       maxTransactionsPerBlock,
       maxTraceableBlocks,
+      initialGasDistribution,
       nativeUpdateHistory,
     } = this.settings;
 
@@ -142,6 +143,7 @@ export class Blockchain {
       memoryPoolMaxTransactions,
       maxTransactionsPerBlock,
       maxTraceableBlocks,
+      initialGasDistribution,
       nativeUpdateHistory,
     };
   }
@@ -830,6 +832,7 @@ export class Blockchain {
         version: 0,
         previousHash: this.currentBlock.hash,
         timestamp: this.currentBlock.timestamp.addn(this.settings.millisecondsPerBlock),
+        nonce: this.currentBlock.nonce,
         index: this.currentBlockIndex + 0,
         primaryIndex: 0,
         merkleRoot: common.ZERO_UINT256,
