@@ -25,42 +25,40 @@ export class ArrRangeHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
 
-    // [arr]
-    sb.emitOp(node, 'NEWARRAY');
-    // [enumerator]
-    sb.emitHelper(node, options, sb.helpers.createMapIterator);
-    // [arr, enumerator]
+    // [arr, end]
     sb.emitOp(node, 'NEWARRAY0');
-    // [enumerator, arr]
+    // [end, arr]
     sb.emitOp(node, 'SWAP');
-    // [number, enumerator, arr]
+    // [idx, end, arr]
     sb.emitPushInt(node, 0);
     sb.emitHelper(
       node,
       options,
       sb.helpers.forLoop({
         condition: () => {
-          // [enumerator, number, enumerator, arr]
+          // [end, idx, end, arr]
           sb.emitOp(node, 'OVER');
-          // [boolean, number, enumerator, arr]
-          sb.emitSysCall(node, 'System.Iterator.Next');
+          // [idx, end, idx, end, arr]
+          sb.emitOp(node, 'OVER');
+          // [end > idx, idx, end, arr]
+          sb.emitOp(node, 'GT');
         },
         each: (innerOptions) => {
-          // [2, number, enumerator, arr]
+          // [2, idx, end, arr]
           sb.emitPushInt(node, 2);
-          // [arr, number, enumerator, arr]
+          // [arr, idx, end, arr]
           sb.emitOp(node, 'PICK');
-          // [number, arr, number, enumerator, arr]
+          // [idx, arr, idx, end, arr]
           sb.emitOp(node, 'OVER');
           // tslint:disable-next-line no-map-without-usage
           this.map(innerOptions);
-          // [number, enumerator, arr]
+          // [idx, end, arr]
           sb.emitOp(node, 'APPEND');
-          // [number, enumerator, arr]
+          // [idx, end, arr]
           sb.emitOp(node, 'INC');
         },
         cleanup: () => {
-          // [enumerator, arr]
+          // [end, arr]
           sb.emitOp(node, 'DROP');
           // [arr]
           sb.emitOp(node, 'DROP');
