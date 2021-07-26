@@ -15,10 +15,10 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
     <PackageReference Include="RocksDbNative" Version="6.2.2" />
     <PackageReference Include="RocksDbSharp" Version="6.2.2" />
-    <!-- <PackageReference Include="Neo-VM-N1-Fork" Version="3.0.0-rc3" /> -->
-    <!-- <PackageReference Include="Neo-NEO-ONE-Fork" Version="3.0.0-rc3" /> -->
-    <ProjectReference Include="/Users/spencercorwin/neo/src/neo/neo.csproj" />
-    <ProjectReference Include="/Users/spencercorwin/neo-vm/src/neo-vm/neo-vm.csproj" />
+    <PackageReference Include="Neo-VM-N1-Fork" Version="3.0.0-rc4" />
+    <PackageReference Include="Neo-NEO-ONE-Fork" Version="3.0.0-rc4" />
+    <!-- <ProjectReference Include="/Users/spencercorwin/neo/src/neo/neo.csproj" /> -->
+    <!-- <ProjectReference Include="/Users/spencercorwin/neo-vm/src/neo-vm/neo-vm.csproj" /> -->
   </ItemGroup>
 
   <ItemGroup>
