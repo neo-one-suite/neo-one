@@ -1,4 +1,4 @@
-import { common, crypto, PrivateKey, UInt256 } from '@neo-one/client-common';
+import { BinaryReader, common, crypto, PrivateKey, UInt256 } from '@neo-one/client-common';
 import {
   ChangeViewConsensusMessage,
   ChangeViewPayloadCompact,
@@ -157,6 +157,7 @@ export const makeRecovery = async ({
           blockIndex: utils.nullthrows(context.blockBuilder.index),
           viewNumber: context.viewNumber,
           timestamp: utils.nullthrows(context.blockBuilder.timestamp),
+          nonce: utils.nullthrows(context.blockBuilder.nonce),
           transactionHashes: context.transactionHashes,
         })
       : undefined;
@@ -227,7 +228,7 @@ export const makePrepareRequest = async ({
   }
 
   const timestamp = BN.max(new BN(Date.now()), previousHeader.timestamp.addn(1));
-  context = context.clone({ blockOptions: { timestamp } });
+  context = context.clone({ blockOptions: { timestamp, nonce: getNonce() } });
 
   const preparationPayload = await makeSignedPayload({
     node,
@@ -240,6 +241,7 @@ export const makePrepareRequest = async ({
       blockIndex: utils.nullthrows(context.blockBuilder.index),
       viewNumber: context.viewNumber,
       timestamp,
+      nonce: utils.nullthrows(context.blockBuilder.nonce),
       transactionHashes: context.transactionHashes ?? [],
     }),
   });
@@ -334,3 +336,10 @@ export const getPreparationPayloadCompact = (context: ConsensusContext, payload:
     validatorIndex: context.getMessage(payload).validatorIndex,
     invocationScript: payload.witness.invocation,
   });
+
+export const getNonce = () => {
+  const getRandom = () => Math.floor(Math.random() * (2 ** 8 - 1));
+  const buf = new BinaryReader(Buffer.from(_.range(0, 8).map(getRandom)));
+
+  return new BN(buf.readUInt64LE());
+};

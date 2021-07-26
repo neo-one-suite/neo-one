@@ -316,26 +316,41 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
       return;
     }
     if (data.length <= 4) {
-      this.emitOp(node, 'PUSHINT32', value.toArrayLike(Buffer, 'le', 4));
+      this.emitOp(node, 'PUSHINT32', this.padRight(value, 4));
 
       return;
     }
     if (data.length <= 8) {
-      this.emitOp(node, 'PUSHINT64', value.toArrayLike(Buffer, 'le', 8));
+      this.emitOp(node, 'PUSHINT64', this.padRight(value, 8));
 
       return;
     }
     if (data.length <= 16) {
-      this.emitOp(node, 'PUSHINT128', value.toArrayLike(Buffer, 'le', 16));
+      this.emitOp(node, 'PUSHINT128', this.padRight(value, 16));
 
       return;
     }
     if (data.length <= 32) {
-      this.emitOp(node, 'PUSHINT256', value.toArrayLike(Buffer, 'le', 32));
+      this.emitOp(node, 'PUSHINT256', this.padRight(value, 32));
 
       return;
     }
     throw new Error('Invalid buffer length');
+  }
+
+  public padRight(value: BN, length: number): Buffer {
+    const isNeg = value.isNeg();
+    if (!isNeg) {
+      return value.toArrayLike(Buffer, 'le', length);
+    }
+
+    const byteLength = value.byteLength();
+    const fillBytes = length - byteLength;
+
+    return Buffer.concat([
+      value.toTwos(byteLength * 8).toArrayLike(Buffer, 'le'),
+      Buffer.alloc(fillBytes, Buffer.from([255])),
+    ]);
   }
 
   public emitPushBoolean(node: ts.Node, value: boolean): void {

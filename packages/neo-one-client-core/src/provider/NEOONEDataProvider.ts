@@ -306,6 +306,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
         previousBlockHash: block.previousblockhash,
         merkleRoot: block.merkleroot,
         time: new BigNumber(block.time),
+        nonce: new BigNumber(block.nonce, 16),
         primaryIndex: block.primary,
         index: block.index,
         nextConsensus: block.nextconsensus,

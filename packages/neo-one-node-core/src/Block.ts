@@ -131,6 +131,10 @@ export class Block implements SerializableContainer, SerializableJSON<BlockJSON>
     return this.header.timestamp;
   }
 
+  public get nonce(): BN {
+    return this.header.nonce;
+  }
+
   public get index(): number {
     return this.header.index;
   }

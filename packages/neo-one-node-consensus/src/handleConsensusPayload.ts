@@ -169,6 +169,7 @@ const handlePrepareRequest = async ({
 
   const tempContextOptions = {
     timestamp: message.timestamp,
+    nonce: message.nonce,
     transactionHashes: message.transactionHashes,
     transactions: {},
     verificationContext: node.getNewVerificationContext(),

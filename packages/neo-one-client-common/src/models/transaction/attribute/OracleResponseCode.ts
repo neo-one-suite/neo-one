@@ -10,6 +10,7 @@ export enum OracleResponseCode {
   Forbidden = 0x18,
   ResponseTooLarge = 0x1a,
   InsufficientFunds = 0x1c,
+  ContentTypeNotSupported = 0x1f,
 
   Error = 0xff,
 }

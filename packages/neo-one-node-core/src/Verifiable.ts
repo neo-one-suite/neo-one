@@ -9,7 +9,7 @@ import { BlockchainStorage } from './Storage';
 import { SnapshotName, VM } from './vm';
 import { Witness } from './Witness';
 
-export const maxVerificationGas = common.fixed8FromDecimal('0.5');
+export const maxVerificationGas = common.fixed8FromDecimal('1.5');
 
 export interface GetScriptHashesContext {
   readonly storage: BlockchainStorage;

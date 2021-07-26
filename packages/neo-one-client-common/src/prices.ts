@@ -156,7 +156,7 @@ const opCodePrices: Record<Op, BigNumber | undefined> = {
   [Op.DIV]: new BigNumber(1 << 3),
   [Op.MOD]: new BigNumber(1 << 3),
   [Op.POW]: new BigNumber(1 << 6),
-  [Op.SQRT]: new BigNumber(1 << 11),
+  [Op.SQRT]: new BigNumber(1 << 6),
   [Op.SHL]: new BigNumber(1 << 3),
   [Op.SHR]: new BigNumber(1 << 3),
   [Op.NOT]: new BigNumber(1 << 2),
@@ -194,6 +194,7 @@ const opCodePrices: Record<Op, BigNumber | undefined> = {
   [Op.ISNULL]: new BigNumber(1 << 1),
   [Op.ISTYPE]: new BigNumber(1 << 1),
   [Op.CONVERT]: new BigNumber(1 << 13),
+  [Op.PRINT]: new BigNumber(0),
 };
 // tslint:enable: no-bitwise
 

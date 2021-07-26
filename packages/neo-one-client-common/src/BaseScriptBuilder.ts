@@ -92,18 +92,33 @@ export class BaseScriptBuilder {
       return this.emitOp('PUSHINT16', data);
     }
     if (data.length <= 4) {
-      return this.emitOp('PUSHINT32', value.toArrayLike(Buffer, 'le', 4));
+      return this.emitOp('PUSHINT32', this.padRight(value, 4));
     }
     if (data.length <= 8) {
-      return this.emitOp('PUSHINT64', value.toArrayLike(Buffer, 'le', 8));
+      return this.emitOp('PUSHINT64', this.padRight(value, 8));
     }
     if (data.length <= 16) {
-      return this.emitOp('PUSHINT128', value.toArrayLike(Buffer, 'le', 16));
+      return this.emitOp('PUSHINT128', this.padRight(value, 16));
     }
     if (data.length <= 32) {
-      return this.emitOp('PUSHINT256', value.toArrayLike(Buffer, 'le', 32));
+      return this.emitOp('PUSHINT256', this.padRight(value, 32));
     }
     throw new Error('Invalid buffer length');
+  }
+
+  public padRight(value: BN, length: number): Buffer {
+    const isNeg = value.isNeg();
+    if (!isNeg) {
+      return value.toArrayLike(Buffer, 'le', length);
+    }
+
+    const byteLength = value.byteLength();
+    const fillBytes = length - byteLength;
+
+    return Buffer.concat([
+      value.toTwos(byteLength * 8).toArrayLike(Buffer, 'le'),
+      Buffer.alloc(fillBytes, Buffer.from([255])),
+    ]);
   }
 
   public emitPushBoolean(value: boolean): this {

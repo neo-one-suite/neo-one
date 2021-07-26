@@ -202,7 +202,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
         }
 
         // it may seem odd to throw here and continue logic, but it helps keep our other checks type safe when it IS defined.
-        if (witnessScript === undefined) {
+        if (witnessScript === undefined || witnessScript.length === 0) {
           throw new Error('Witness still not defined so we try to look it up as a contract with a "verify" method');
         }
 

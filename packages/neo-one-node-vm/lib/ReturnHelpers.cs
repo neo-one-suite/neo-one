@@ -179,7 +179,7 @@ namespace NEOONE
     }
     public class ProtocolSettingsReturn
     {
-      public int magic;
+      public int network;
       public int addressVersion;
       public string[] standbyCommittee;
       public int committeeMembersCount;
@@ -190,10 +190,11 @@ namespace NEOONE
       public int maxTraceableBlocks;
       public int maxTransactionsPerBlock;
       public dynamic nativeUpdateHistory;
+      public string initialGasDistribution;
 
       public ProtocolSettingsReturn(ProtocolSettings value)
       {
-        this.magic = Convert.ToInt32(value.Network);
+        this.network = Convert.ToInt32(value.Network);
         this.addressVersion = Convert.ToInt32(value.AddressVersion);
         this.standbyCommittee = value.StandbyCommittee.Select(p => p.ToString()).ToArray();
         this.committeeMembersCount = value.CommitteeMembersCount;
@@ -202,6 +203,7 @@ namespace NEOONE
         this.millisecondsPerBlock = Convert.ToInt32(value.MillisecondsPerBlock);
         this.memoryPoolMaxTransactions = value.MemoryPoolMaxTransactions;
         this.maxTraceableBlocks = Convert.ToInt32(value.MaxTraceableBlocks);
+        this.initialGasDistribution = value.InitialGasDistribution.ToString();
         this.maxTransactionsPerBlock = Convert.ToInt32(value.MaxTransactionsPerBlock);
 
         Dictionary<string, int[]> UpdateHistory = new Dictionary<string, int[]>();

@@ -622,6 +622,10 @@ export interface Block {
    */
   readonly time: Integer;
   /**
+   * The nonce of the `Block`.
+   */
+  readonly nonce: Integer;
+  /**
    * Next consensus address.
    */
   readonly nextConsensus: Address;
@@ -930,6 +934,14 @@ export interface BlockchainConstructor {
    * An array of recent GAS `Transfer`s.
    */
   readonly currentGASTransfers: readonly Transfer[];
+  /**
+   * The current number of the network.
+   */
+  readonly networkNumber: number;
+  /**
+   * Returns a cryptographically secure random number.
+   */
+  readonly randomNumber: number;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 /**

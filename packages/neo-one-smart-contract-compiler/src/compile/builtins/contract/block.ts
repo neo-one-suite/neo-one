@@ -18,13 +18,14 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractMember('Block', 'previousHash', new BuiltinInstanceIndexValue(2, Types.Block, Types.Buffer));
   builtins.addContractMember('Block', 'merkleRoot', new BuiltinInstanceIndexValue(3, Types.Block, Types.Buffer));
   builtins.addContractMember('Block', 'time', new BuiltinInstanceIndexValue(4, Types.Block, Types.Number));
-  builtins.addContractMember('Block', 'index', new BuiltinInstanceIndexValue(5, Types.Block, Types.Number));
-  builtins.addContractMember('Block', 'primaryIndex', new BuiltinInstanceIndexValue(6, Types.Block, Types.Number));
-  builtins.addContractMember('Block', 'nextConsensus', new BuiltinInstanceIndexValue(7, Types.Block, Types.Buffer));
+  builtins.addContractMember('Block', 'nonce', new BuiltinInstanceIndexValue(5, Types.Block, Types.Number));
+  builtins.addContractMember('Block', 'index', new BuiltinInstanceIndexValue(6, Types.Block, Types.Number));
+  builtins.addContractMember('Block', 'primaryIndex', new BuiltinInstanceIndexValue(7, Types.Block, Types.Number));
+  builtins.addContractMember('Block', 'nextConsensus', new BuiltinInstanceIndexValue(8, Types.Block, Types.Buffer));
   builtins.addContractMember(
     'Block',
     'transactionsLength',
-    new BuiltinInstanceIndexValue(8, Types.Block, Types.Number),
+    new BuiltinInstanceIndexValue(9, Types.Block, Types.Number),
   );
 
   builtins.addContractInterface('BlockConstructor', new BlockConstructorInterface());

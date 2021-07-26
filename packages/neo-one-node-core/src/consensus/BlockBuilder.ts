@@ -1,4 +1,4 @@
-import { BlockJSON, JSONHelper, UInt160, UInt256 } from '@neo-one/client-common';
+import { BlockJSON, JSONHelper, UInt160, UInt256, utils } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { Block, BlockAdd } from '../Block';
 import { Header, HeaderAdd } from '../Header';
@@ -13,6 +13,7 @@ export class BlockBuilder {
   public readonly version?: number;
   public readonly previousHash?: UInt256;
   public readonly timestamp?: BN;
+  public readonly nonce?: BN;
   public readonly index?: number;
   public readonly primaryIndex?: number;
   public readonly nextConsensus?: UInt160;
@@ -26,6 +27,7 @@ export class BlockBuilder {
     this.version = options.version;
     this.previousHash = options.previousHash;
     this.timestamp = options.timestamp;
+    this.nonce = options.nonce;
     this.primaryIndex = options.primaryIndex;
     this.index = options.index;
     this.nextConsensus = options.nextConsensus;
@@ -40,6 +42,7 @@ export class BlockBuilder {
     version,
     previousHash,
     timestamp,
+    nonce,
     primaryIndex,
     index,
     nextConsensus,
@@ -52,6 +55,7 @@ export class BlockBuilder {
       version: version ?? this.version,
       previousHash: previousHash ?? this.previousHash,
       timestamp: timestamp ?? this.timestamp,
+      nonce: nonce ?? this.nonce,
       primaryIndex: primaryIndex ?? this.primaryIndex,
       index: index ?? this.index,
       nextConsensus: nextConsensus ?? this.nextConsensus,
@@ -69,6 +73,7 @@ export class BlockBuilder {
         previousHash: this.previousHash,
         merkleRoot: this.merkleRoot,
         timestamp: this.timestamp,
+        nonce: this.nonce,
         index: this.index,
         primaryIndex: this.primaryIndex,
         nextConsensus: this.nextConsensus,
@@ -86,6 +91,7 @@ export class BlockBuilder {
       version: this.version,
       previousblockhash: this.previousHash ? JSONHelper.writeUInt256(this.previousHash) : undefined,
       time: this.timestamp?.toNumber(),
+      nonce: this.nonce === undefined ? undefined : utils.toPaddedHexString(this.nonce, 16),
       index: this.index,
       primary: this.primaryIndex,
       nextconsensus: this.nextConsensus ? JSONHelper.writeUInt160(this.nextConsensus) : undefined,

@@ -10,6 +10,8 @@ export const DECREMENT_INTERVAL = 2000000;
 export const MILLISECONDS_PER_BLOCK = 15000;
 export const MEMORY_POOL_MAX_TRANSACTIONS = 50000;
 export const MAX_TRACEABLE_BLOCKS = 2102400;
+export const INITIAL_GAS_DISTRIBUTION = new BN(5200000000000000);
+export const NONCE = new BN(2083236893);
 export const MAX_TRANSACTION_PER_BLOCK = 512;
 export const MAX_BLOCK_SIZE = 262144;
 export const MAX_BLOCK_SYSTEM_FEE = new BN(900000000000);
@@ -52,6 +54,7 @@ const getGenesisBlock = ({ consensusAddress, network }: GetGenesisBlockOptions) 
       previousHash: clientCommon.ZERO_UINT256,
       merkleRoot: clientCommon.ZERO_UINT256,
       timestamp: new BN(Date.UTC(2016, 6, 15, 15, 8, 21)),
+      nonce: NONCE,
       index: 0,
       primaryIndex: 0,
       nextConsensus: consensusAddress,
@@ -75,5 +78,6 @@ export const common = ({ privateNet, consensusAddress, network }: Options) => ({
   maxBlockSystemFee: MAX_BLOCK_SYSTEM_FEE,
   nativeUpdateHistory: NATIVE_UPDATE_HISTORY,
   maxTraceableBlocks: MAX_TRACEABLE_BLOCKS,
+  initialGasDistribution: INITIAL_GAS_DISTRIBUTION,
   maxIteratorResultItems: 100,
 });

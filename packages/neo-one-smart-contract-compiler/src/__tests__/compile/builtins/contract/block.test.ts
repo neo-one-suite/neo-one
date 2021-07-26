@@ -29,10 +29,11 @@ describe('Block', () => {
         assertEqual(block.index, ${block.header.index});
         assertEqual(block.primaryIndex, ${block.header.primaryIndex});
         assertEqual(block.merkleRoot, Hash256.from('${block.header.merkleRoot}'));
-        assertEqual(block.time, ${block.header.time});
+        assertEqual(block.time, ${block.header.time.toString()});
         assertEqual(block.nextConsensus, Address.from('${block.header.nextConsensus}'));
         assertEqual(block.transactionsLength, 0);
         assertEqual(block instanceof Block, true);
+        assertEqual(block.nonce, ${block.header.nonce.toString()});
       }
 
       export class BlockContract extends SmartContract {

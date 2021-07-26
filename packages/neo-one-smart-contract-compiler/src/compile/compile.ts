@@ -96,7 +96,7 @@ export const compile = async ({
     })
   ).concat(addDummyMethod ? [DUMMY_METHOD] : []);
 
-  const compiler = 'neo-one 3.0.0-rc3';
+  const compiler = 'neo-one 3.0.0-rc4';
 
   return {
     contract: {

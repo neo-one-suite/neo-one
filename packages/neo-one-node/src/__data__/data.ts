@@ -8,6 +8,7 @@ const convertBlock = (json: BlockJSON, network: number, maxValidUntilBlockIncrem
     header: new Header({
       previousHash: JSONHelper.readUInt256(json.previousblockhash),
       timestamp: new BN(json.time),
+      nonce: new BN(json.nonce),
       index: json.index,
       primaryIndex: json.primary,
       nextConsensus: crypto.addressToScriptHash({

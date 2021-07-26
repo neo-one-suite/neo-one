@@ -648,6 +648,30 @@ const isSignatureContract = (script: Buffer) =>
 const isStandardContract = (script: Buffer) =>
   isSignatureContract(script) || isMultiSigContractWithResult(script).result;
 
+const getMultiSignatures = (script: Buffer) => {
+  let i = 0;
+  const signatures = [];
+  // tslint:disable-next-line: no-loop-statement
+  while (i < script.length) {
+    // tslint:disable-next-line: increment-decrement
+    if (script[i++] !== Op.PUSHDATA1) {
+      return undefined;
+    }
+    if (i + 65 > script.length) {
+      return undefined;
+    }
+    // tslint:disable-next-line: increment-decrement
+    if (script[i++] !== 64) {
+      return undefined;
+    }
+    // tslint:disable-next-line: no-array-mutation
+    signatures.push(script.slice(i, i + 64));
+    i += 64;
+  }
+
+  return signatures;
+};
+
 // https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
 const HARDENED_KEY_OFFSET = 0x80000000;
 const EXTENDED_KEY_BYTES = 78;
@@ -872,6 +896,7 @@ export const crypto = {
   isMultiSigContractWithResult,
   isSignatureContract,
   isStandardContract,
+  getMultiSignatures,
   parseExtendedKey,
   parseMasterSeed,
   deriveChildKey,

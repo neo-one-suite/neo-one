@@ -35,6 +35,9 @@ const toSignedBuffer = (value: BN): Buffer => {
   return normalValue.eq(paddedValue) ? buff : paddedBuff;
 };
 
+const toPaddedHexString = (value: BN, padding: number): string =>
+  value.toArrayLike(Buffer, 'be', padding).toString('hex');
+
 const bigNumberToBN = (value: BigNumber, decimals: number): BN => {
   const dBigNumber = new BigNumber(10 ** decimals);
 
@@ -95,6 +98,7 @@ export const utils = {
   TEN_BIG_NUMBER: new BigNumber(10),
   toSignedBuffer,
   fromSignedBuffer,
+  toPaddedHexString,
   bigNumberToBN,
   lazy,
   lazyInput,

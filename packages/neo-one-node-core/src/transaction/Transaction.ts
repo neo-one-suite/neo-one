@@ -3,6 +3,7 @@ import {
   BinaryReader,
   common,
   crypto,
+  getSignData,
   InvalidFormatError,
   IOHelper,
   JSONHelper,
@@ -250,7 +251,7 @@ export class Transaction
   }
 
   public async verifyStateIndependent(verifyOptions: VerifyOptions) {
-    const { storage, native, verifyWitness, vm, headerCache } = verifyOptions;
+    const network = verifyOptions.settings?.network ?? this.network;
     if (this.size > MAX_TRANSACTION_SIZE) {
       return VerifyResultModel.Invalid;
     }
@@ -265,29 +266,46 @@ export class Transaction
       return VerifyResultModel.Invalid;
     }
 
-    let netFee = this.networkFee.gt(maxVerificationGas) ? this.networkFee : maxVerificationGas;
-
     // tslint:disable-next-line: no-loop-statement
     for (let i = 0; i < hashes.length; i += 1) {
-      if (crypto.isStandardContract(this.witnesses[i].verification)) {
-        const { result, gas } = await verifyWitness({
-          vm,
-          verifiable: this,
-          storage,
-          native,
-          hash: hashes[i],
-          witness: this.witnesses[i],
-          gas: netFee,
-          headerCache,
-          settings: verifyOptions.settings,
-        });
-        if (!result) {
+      const multiSigResult = crypto.isMultiSigContractWithResult(this.witnesses[i].verification);
+      if (crypto.isSignatureContract(this.witnesses[i].verification)) {
+        const pubkey = common.bufferToECPoint(this.witnesses[i].verification.slice(2, 35));
+        try {
+          const signature = this.witnesses[i].invocation.slice(2);
+          const signData = getSignData(this.hash, network);
+          if (!crypto.verify({ publicKey: pubkey, message: signData, signature })) {
+            return VerifyResultModel.Invalid;
+          }
+        } catch {
           return VerifyResultModel.Invalid;
         }
-
-        netFee = netFee.sub(gas);
-        if (netFee.ltn(0)) {
-          return VerifyResultModel.InsufficientFunds;
+      } else if (multiSigResult.result) {
+        const { points, m } = multiSigResult;
+        const signatures = crypto.getMultiSignatures(this.witnesses[i].invocation);
+        if (signatures === undefined) {
+          // TODO: This check is not in there code but it's possible that their code
+          // could throw a null reference exception without this sort of check
+          return VerifyResultModel.Invalid;
+        }
+        if (signatures.length !== m) {
+          return VerifyResultModel.Invalid;
+        }
+        const n = points.length;
+        const message = getSignData(this.hash, network);
+        try {
+          // tslint:disable-next-line: no-loop-statement
+          for (let x = 0, y = 0; x < m && y < n; ) {
+            if (crypto.verify({ message, signature: signatures[x], publicKey: points[y] })) {
+              x += 1;
+            }
+            y += 1;
+            if (m - x > n - y) {
+              return VerifyResultModel.Invalid;
+            }
+          }
+        } catch {
+          return VerifyResultModel.Invalid;
         }
       }
     }

@@ -34,6 +34,7 @@ export interface HeaderAdd {
   readonly previousHash: UInt256;
   readonly merkleRoot: UInt256;
   readonly timestamp: BN;
+  readonly nonce: BN;
   readonly index: number;
   readonly nextConsensus: UInt160;
   readonly network: number;
@@ -98,6 +99,7 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
     const previousHash = reader.readUInt256();
     const merkleRoot = reader.readUInt256();
     const timestamp = reader.readUInt64LE();
+    const nonce = reader.readUInt64LE();
     const index = reader.readUInt32LE();
     const primaryIndex = reader.readUInt8();
     const nextConsensus = reader.readUInt160();
@@ -108,6 +110,7 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
       previousHash,
       merkleRoot,
       timestamp,
+      nonce,
       index,
       primaryIndex,
       nextConsensus,
@@ -115,7 +118,7 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
     });
   }
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Header {
-    const { version, previousHash, merkleRoot, timestamp, index, nextConsensus, network, primaryIndex } =
+    const { version, previousHash, merkleRoot, timestamp, nonce, index, nextConsensus, network, primaryIndex } =
       this.deserializeUnsignedHeaderWireBase(options);
     const witnesses = options.reader.readArray(() => Witness.deserializeWireBase(options), 1);
     if (witnesses.length !== 1) {
@@ -127,6 +130,7 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
       previousHash,
       merkleRoot,
       timestamp,
+      nonce,
       index,
       nextConsensus,
       witness: witnesses[0],
@@ -149,6 +153,7 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
   public readonly previousHash: UInt256;
   public readonly merkleRoot: UInt256;
   public readonly timestamp: BN;
+  public readonly nonce: BN;
   public readonly index: number;
   public readonly nextConsensus: UInt160;
   public readonly network: number;
@@ -181,6 +186,7 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
     previousHash,
     merkleRoot,
     timestamp,
+    nonce,
     index,
     nextConsensus,
     witness,
@@ -192,6 +198,7 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
     this.previousHash = previousHash;
     this.merkleRoot = merkleRoot;
     this.timestamp = timestamp;
+    this.nonce = nonce;
     this.index = index;
     this.nextConsensus = nextConsensus;
     this.witnessInternal = witness;
@@ -212,13 +219,14 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
     writer.writeUInt256(this.previousHash);
     writer.writeUInt256(this.merkleRoot);
     writer.writeUInt64LE(this.timestamp);
+    writer.writeUInt64LE(this.nonce);
     writer.writeUInt32LE(this.index);
     writer.writeUInt8(this.primaryIndex);
     writer.writeUInt160(this.nextConsensus);
   }
 
   public async verify({ vm, storage, verifyWitnesses, native, settings, headerCache }: VerifyOptions) {
-    if (this.primaryIndex >= settings.validatorsCount) {
+    if (this.primaryIndex >= (settings.validatorsCount === undefined ? this.network : settings.validatorsCount)) {
       return false;
     }
 
@@ -240,7 +248,7 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
       storage,
       native,
       headerCache,
-      gas: utils.ONE,
+      gas: utils.ONE.muln(3),
       verifiable: this,
       settings,
     });
@@ -259,7 +267,7 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
       return this.verify(options);
     }
 
-    if (this.primaryIndex >= settings.validatorsCount) {
+    if (this.primaryIndex >= (settings.validatorsCount === undefined ? this.network : settings.validatorsCount)) {
       return false;
     }
 
@@ -283,7 +291,7 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
       native,
       hash: prev.nextConsensus,
       headerCache,
-      gas: utils.ONE,
+      gas: utils.ONE.muln(3),
       settings,
     });
   }
@@ -296,6 +304,7 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
       previousblockhash: JSONHelper.writeUInt256(this.previousHash),
       merkleroot: JSONHelper.writeUInt256(this.merkleRoot),
       time: this.timestamp.toNumber(),
+      nonce: utils.toPaddedHexString(this.nonce, 16),
       index: this.index,
       primary: this.primaryIndex,
       nextconsensus: JSONHelper.writeUInt160(this.nextConsensus),

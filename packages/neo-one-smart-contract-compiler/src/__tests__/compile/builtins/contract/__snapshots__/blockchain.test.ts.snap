@@ -43,3 +43,25 @@ exports[`Blockchain set currentTransaction 1`] = `
       5 |     
 "
 `;
+
+exports[`Blockchain set networkNumber 1`] = `
+"snippetCode.ts (4,18): Cannot assign to 'networkNumber' because it is a read-only property.
+
+      2 |       import { Blockchain } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       Blockchain.networkNumber = 10;
+        |                  ^
+      5 |     
+"
+`;
+
+exports[`Blockchain set randomNumber 1`] = `
+"snippetCode.ts (4,18): Cannot assign to 'randomNumber' because it is a read-only property.
+
+      2 |       import { Blockchain } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       Blockchain.randomNumber = 10;
+        |                  ^
+      5 |     
+"
+`;
