@@ -4,8 +4,8 @@ import '../polyfill';
 import React from 'react';
 import { useRouteData } from 'react-static';
 import { Helmet, Reference, ReferenceProps } from '../components';
-import { N3Popup } from '../components/common';
 import { ContentLayout, DocsLoading } from '../layout';
+import ModalAlertVersion from '../components/modals/ModalAlertVersion';
 
 const { Suspense } = React;
 
@@ -18,7 +18,7 @@ export default () => {
       <Helmet title="NEO•ONE Reference" />
       <Suspense fallback={<DocsLoading />}>
         <ContentLayout path="reference">
-          <N3Popup />
+          <ModalAlertVersion />
           <Reference {...props} />
         </ContentLayout>
       </Suspense>

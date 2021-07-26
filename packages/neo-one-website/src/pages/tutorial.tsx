@@ -4,8 +4,8 @@ import '../polyfill';
 import React from 'react';
 import { useRouteData } from 'react-static';
 import { Helmet, Tutorial, TutorialProps } from '../components';
-import { N3Popup } from '../components/common';
 import { ContentLayout, TutorialLoading } from '../layout';
+import ModalAlertVersion from '../components/modals/ModalAlertVersion';
 
 const { Suspense } = React;
 
@@ -18,7 +18,7 @@ export default () => {
       <Helmet title="Tutorial: Intro to NEO•ONE - NEO•ONE" />
       <Suspense fallback={<TutorialLoading />}>
         <ContentLayout path="tutorial">
-          <N3Popup />
+          <ModalAlertVersion />
           <Tutorial {...props} />
         </ContentLayout>
       </Suspense>
