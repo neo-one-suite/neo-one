@@ -804,7 +804,7 @@ export class Blockchain {
     await this.onPersist();
 
     const firstHeader = this.headerCache.tryRemoveFirst();
-    if (firstHeader !== undefined && firstHeader.index !== block.index) {
+    if (firstHeader !== undefined && firstHeader.index !== block.index - 1) {
       logger.trace({
         name: 'neo_blockchain',
         message: `Header cache index does not match block index when persisting new block. Block index: ${block.index}. Headercache index: ${firstHeader.index}`,

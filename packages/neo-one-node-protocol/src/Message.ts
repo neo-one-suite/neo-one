@@ -312,7 +312,7 @@ export class MessageTransform extends Transform {
       callback(undefined);
     } catch (error) {
       // tslint:disable-next-line: no-console
-      console.log(error);
+      // console.log(error);
       callback(error);
     }
   }

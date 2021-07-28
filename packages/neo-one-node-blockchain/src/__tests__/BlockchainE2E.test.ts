@@ -15,7 +15,11 @@ describe('blockchain persist genesis block test', () => {
     const db = LevelUp(LevelDOWN(levelDBPath));
     const storage = levelupStorage({
       db,
-      context: { network: blockchainSettings.network, validatorsCount: blockchainSettings.validatorsCount },
+      context: {
+        network: blockchainSettings.network,
+        validatorsCount: blockchainSettings.validatorsCount,
+        maxValidUntilBlockIncrement: 86400000 / 1500,
+      },
     });
 
     const dispatcher = new Dispatcher({ levelDBPath });
