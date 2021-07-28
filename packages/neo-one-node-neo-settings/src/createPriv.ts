@@ -8,22 +8,17 @@ const DEFAULT_VALIDATORS_COUNT = 1;
 
 export const createPriv = ({
   standbyValidators: standbyValidatorsIn = DEFAULT_VALIDATORS,
-  extraCommitteeMembers: extraCommitteeMembersIn = [],
   network = 7630401,
   millisecondsPerBlock,
   validatorsCount = DEFAULT_VALIDATORS_COUNT,
 }: {
   readonly standbyValidators?: readonly string[];
-  readonly extraCommitteeMembers?: readonly string[];
   readonly millisecondsPerBlock?: number;
   readonly network?: number;
   readonly validatorsCount?: number;
 } = {}): Settings => {
-  const standbyValidators = standbyValidatorsIn
-    .map((value) => clientCommon.stringToECPoint(value))
-    .slice(0, validatorsCount);
-  const standbyMembers = extraCommitteeMembersIn.map((value) => clientCommon.stringToECPoint(value));
-  const standbyCommittee = standbyValidators.concat(standbyMembers);
+  const standbyCommittee = standbyValidatorsIn.map((value) => clientCommon.stringToECPoint(value));
+  const standbyValidators = standbyCommittee.slice(0, validatorsCount);
 
   const consensusAddress = crypto.getBFTAddress(standbyValidators);
 

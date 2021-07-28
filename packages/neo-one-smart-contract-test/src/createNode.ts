@@ -16,7 +16,6 @@ export const createNode = async () => {
     options: {
       blockchain: createPriv({
         standbyValidators: [constants.PRIVATE_NET_PUBLIC_KEY],
-        extraCommitteeMembers: [],
       }),
       path: '/tmp/fakePath/',
       rpc: {

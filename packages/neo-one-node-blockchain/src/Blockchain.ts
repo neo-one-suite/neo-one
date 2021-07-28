@@ -143,7 +143,7 @@ export class Blockchain {
       memoryPoolMaxTransactions,
       maxTransactionsPerBlock,
       maxTraceableBlocks,
-      initialGasDistribution,
+      initialGasDistribution: initialGasDistribution.toString(),
       nativeUpdateHistory,
     };
   }
