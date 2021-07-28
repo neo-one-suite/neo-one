@@ -49,9 +49,10 @@ export const blockchainSettingsToProtocolSettings = (settingsIn: Settings): VMPr
   nativeUpdateHistory: settingsIn.nativeUpdateHistory,
 });
 
-const numIsUint = (num: number) => num >= 0 && num < 2 ** 32 - 1;
-const numIsInt = (num: number) => num >= -(2 ** 32 / 2) && num <= 2 ** 32 / 2 - 1;
-const numIsByte = (num: number) => num >= 0 && num <= 2 ** 8 - 1;
+const isInt = (num: number) => num === parseInt(`${num}`, 10);
+const numIsUint = (num: number) => num >= 0 && num < 2 ** 32 - 1 && isInt(num);
+const numIsInt = (num: number) => num >= -(2 ** 32 / 2) && num <= 2 ** 32 / 2 - 1 && isInt(num);
+const numIsByte = (num: number) => num >= 0 && num <= 2 ** 8 - 1 && isInt(num);
 
 export const validateProtocolSettings = (settings: VMProtocolSettingsIn) => {
   const {

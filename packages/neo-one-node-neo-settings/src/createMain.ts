@@ -5,16 +5,6 @@ import { common, getMaxValidUntilBlockIncrement } from './common';
 const mainNetNetwork = 5195086;
 
 const DEFAULT_VALIDATORS_COUNT = 7;
-const DEFAULT_VALIDATORS: readonly string[] = [
-  '03b209fd4f53a7170ea4444e0cb0a6bb6a53c2bd016926989cf85f9b0fba17a70c',
-  '02df48f60e8f3e01c48ff40b9b7f1310d7a8b2a193188befe1c2e3df740e895093',
-  '03b8d9d5771d8f513aa0869b9cc8d50986403b78c6da36890638c3d46a5adce04a',
-  '02ca0e27697b9c248f6f16e085fd0061e26f44da85b58ee835c110caa5ec3ba554',
-  '024c7b7fb6c310fccf1ba33b082519d82964ea93868d676662d4a59ad548df0e7d',
-  '02aaec38470f6aad0042c6e877cfd8087d2676b0f516fddd362801b9bd3936399e',
-  '02486fd15702c4490a26703112a5cc1d0923fd697a33406bd5a1c00e0013b09a70',
-];
-
 const DEFAULT_EXTRA_MEMBERS: readonly string[] = [
   '023a36c72844610b4d34d1968662424011bf783ca9d984efa19a20babf5582f3fe',
   '03708b860c1de5d87f5b151a12c2a99feebd2e8b315ee8e7cf8aa19692a9e18379',
@@ -31,11 +21,19 @@ const DEFAULT_EXTRA_MEMBERS: readonly string[] = [
   '03cdcea66032b82f5c30450e381e5295cae85c5e6943af716cc6b646352a6067dc',
   '02cd5a5547119e24feaa7c2a0f37b8c9366216bab7054de0065c9be42084003c8a',
 ];
+const DEFAULT_VALIDATORS: readonly string[] = [
+  '03b209fd4f53a7170ea4444e0cb0a6bb6a53c2bd016926989cf85f9b0fba17a70c',
+  '02df48f60e8f3e01c48ff40b9b7f1310d7a8b2a193188befe1c2e3df740e895093',
+  '03b8d9d5771d8f513aa0869b9cc8d50986403b78c6da36890638c3d46a5adce04a',
+  '02ca0e27697b9c248f6f16e085fd0061e26f44da85b58ee835c110caa5ec3ba554',
+  '024c7b7fb6c310fccf1ba33b082519d82964ea93868d676662d4a59ad548df0e7d',
+  '02aaec38470f6aad0042c6e877cfd8087d2676b0f516fddd362801b9bd3936399e',
+  '02486fd15702c4490a26703112a5cc1d0923fd697a33406bd5a1c00e0013b09a70',
+].concat(DEFAULT_EXTRA_MEMBERS);
 
 export const createMain = ({
   privateNet = false,
   standbyValidators: standbyValidatorsIn = DEFAULT_VALIDATORS,
-  extraCommitteeMembers: extraCommitteeMembersIn = DEFAULT_EXTRA_MEMBERS,
   millisecondsPerBlock,
   validatorsCount = DEFAULT_VALIDATORS_COUNT,
 }: {
@@ -45,11 +43,8 @@ export const createMain = ({
   readonly millisecondsPerBlock?: number;
   readonly validatorsCount?: number;
 } = {}): Settings => {
-  const standbyValidators = standbyValidatorsIn
-    .map((value) => clientCommon.stringToECPoint(value))
-    .slice(0, validatorsCount);
-  const standbyMembers = extraCommitteeMembersIn.map((value) => clientCommon.stringToECPoint(value));
-  const standbyCommittee = standbyValidators.concat(standbyMembers);
+  const standbyCommittee = standbyValidatorsIn.map((value) => clientCommon.stringToECPoint(value));
+  const standbyValidators = standbyCommittee.slice(0, validatorsCount);
 
   const consensusAddress = crypto.getBFTAddress(standbyValidators);
 
