@@ -5,6 +5,7 @@ import {
   SerializableWire,
   SerializeWire,
 } from '@neo-one/client-common';
+import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   BinaryReader,
   Block,
@@ -31,6 +32,8 @@ import {
   PingPayload,
   VersionPayload,
 } from './payload';
+
+const logger = createChild(nodeLogger, { component: 'node-protocol' });
 
 const tryCompression = ({ command }: MessageValue) =>
   command === Command.Block ||
@@ -272,7 +275,7 @@ const deserializeMessageHeader = (data: Buffer) => {
   const header = data.slice(0, 3);
   const flags = assertMessageFlags(header[0]);
   const command = assertCommand(header[1]);
-  const length = header[2];
+  const length = new BinaryReader(data, 2).readVarUIntLE(PAYLOAD_MAX_SIZE).toNumber();
 
   return { length, flags, command };
 };
@@ -312,7 +315,7 @@ export class MessageTransform extends Transform {
       callback(undefined);
     } catch (error) {
       // tslint:disable-next-line: no-console
-      console.log(error);
+      logger.error({ name: 'neo_message_transform', error });
       callback(error);
     }
   }

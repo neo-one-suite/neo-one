@@ -137,10 +137,9 @@ export function createFind$<Key, Value>({
   readonly deserializeValue: (value: Buffer) => Value;
 }): (lookup: Buffer, secondaryLookup?: Buffer) => Observable<StorageReturn<Key, Value>> {
   return (lookup: Buffer, secondaryLookup?: Buffer) =>
-    streamToObservable<StorageReturn<Buffer, Buffer>>(
-      () => db.createReadStream(getSearchRange(lookup, secondaryLookup)),
-      // TODO: might need to remove this slice here?
-    ).pipe(map(({ key, value }) => ({ key: deserializeKey(key.slice(1)), value: deserializeValue(value) })));
+    streamToObservable<StorageReturn<Buffer, Buffer>>(() =>
+      db.createReadStream(getSearchRange(lookup, secondaryLookup)),
+    ).pipe(map(({ key, value }) => ({ key: deserializeKey(key), value: deserializeValue(value) })));
 }
 
 export function createReadFindStorage<Key, Value>({

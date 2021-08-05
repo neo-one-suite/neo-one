@@ -44,10 +44,10 @@ namespace NEOONE.Storage.RocksDB
       using var it = db.NewIterator(defaultFamily, Options.ReadDefault);
       if (direction == SeekDirection.Forward)
         for (it.Seek(fullKey); it.Valid(); it.Next())
-          yield return (it.Key()[1..], it.Value());
+          yield return (it.Key(), it.Value());
       else
         for (it.SeekForPrev(fullKey); it.Valid(); it.Prev())
-          yield return (it.Key()[1..], it.Value());
+          yield return (it.Key(), it.Value());
     }
 
     public bool Contains(byte[] key)

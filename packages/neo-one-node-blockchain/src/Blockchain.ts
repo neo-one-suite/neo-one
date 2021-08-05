@@ -598,7 +598,10 @@ export class Blockchain {
     this.mutableInQueue = new Set();
     this.mutableDoneRunningResolve = undefined;
     this.mutableRunning = true;
-    logger.info({ name: 'neo_blockchain_start' }, 'Neo blockchain started.');
+    logger.info(
+      { name: 'neo_blockchain_start', [Labels.NEO_BLOCK_INDEX]: this.currentBlockIndex },
+      'Neo blockchain started.',
+    );
   }
 
   private updateBlockMetadata(block: Block): void {
@@ -804,7 +807,7 @@ export class Blockchain {
     await this.onPersist();
 
     const firstHeader = this.headerCache.tryRemoveFirst();
-    if (firstHeader !== undefined && firstHeader.index !== block.index) {
+    if (firstHeader !== undefined && firstHeader.index !== block.index - 1) {
       logger.trace({
         name: 'neo_blockchain',
         message: `Header cache index does not match block index when persisting new block. Block index: ${block.index}. Headercache index: ${firstHeader.index}`,
