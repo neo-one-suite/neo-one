@@ -598,7 +598,10 @@ export class Blockchain {
     this.mutableInQueue = new Set();
     this.mutableDoneRunningResolve = undefined;
     this.mutableRunning = true;
-    logger.info({ name: 'neo_blockchain_start' }, 'Neo blockchain started.');
+    logger.info(
+      { name: 'neo_blockchain_start', [Labels.NEO_BLOCK_INDEX]: this.currentBlockIndex },
+      'Neo blockchain started.',
+    );
   }
 
   private updateBlockMetadata(block: Block): void {
