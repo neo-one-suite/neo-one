@@ -1,6 +1,6 @@
-import ModalComponent from './ModalComponent'
-import {ModalWrapper} from './ModalWrapper'
+import { ModalWrapper } from './ModalWrapper';
+export * from './ModalComponent';
 
-const Modal = new ModalWrapper()
+const Modal = new ModalWrapper();
 
-export {Modal, ModalComponent, ModalWrapper}
+export { Modal };

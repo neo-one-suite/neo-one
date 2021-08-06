@@ -2,9 +2,8 @@
 import '../polyfill';
 
 import * as React from 'react';
-import { CourseEntry, Helmet } from '../components';
+import { CourseEntry, Helmet, ModalAlertVersion } from '../components';
 import { CourseLayout } from '../layout';
-import ModalAlertVersion from '../components/modals/ModalAlertVersion';
 
 // tslint:disable-next-line export-name no-default-export
 export default () => (

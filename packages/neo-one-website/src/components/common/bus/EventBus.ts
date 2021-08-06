@@ -1,25 +1,29 @@
-export type BusMap = Record<string, BusCallback[] | undefined>
-export type BusCallback = (...params: any[]) => void
+export type BusMap = Record<string, ReadonlyArray<BusCallback> | undefined>;
+// tslint:disable-next-line no-any
+export type BusCallback = (...params: ReadonlyArray<any>) => void;
 
 export class EventBus {
-  readonly bus: BusMap
+  public readonly bus: BusMap;
 
-  constructor() {
-    this.bus = {}
+  public constructor() {
+    this.bus = {};
   }
 
-  on(key: string, callback: BusCallback) {
-    this.bus[key] = [...(this.bus[key] ?? []), callback]
+  public on(key: string, callback: BusCallback) {
+    // tslint:disable-next-line no-object-mutation
+    this.bus[key] = [...(this.bus[key] ?? []), callback];
   }
 
-  off(key: string, callback: BusCallback) {
-    this.bus[key] = this.bus[key]?.filter((it: BusCallback) => it !== callback)
+  public off(key: string, callback: BusCallback) {
+    // tslint:disable-next-line no-object-mutation
+    this.bus[key] = this.bus[key]?.filter((it: BusCallback) => it !== callback);
   }
 
-  emit(key: string, ...params: any[]) {
+  // tslint:disable-next-line no-any
+  public emit(key: string, ...params: ReadonlyArray<any>) {
+    // tslint:disable-next-line no-loop-statement
     for (const callback of this.bus[key] ?? []) {
-      // eslint-disable-next-line standard/no-callback-literal
-      callback(...params)
+      callback(...params);
     }
   }
 }

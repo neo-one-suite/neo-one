@@ -9,3 +9,4 @@ export * from './home';
 export * from './tutorial';
 export * from './content';
 export * from './reference';
+export * from './modals';

@@ -3,9 +3,8 @@ import '../polyfill';
 
 import React from 'react';
 import { useRouteData } from 'react-static';
-import { Helmet, Tutorial, TutorialProps } from '../components';
+import { Helmet, ModalAlertVersion, Tutorial, TutorialProps } from '../components';
 import { ContentLayout, TutorialLoading } from '../layout';
-import ModalAlertVersion from '../components/modals/ModalAlertVersion';
 
 const { Suspense } = React;
 

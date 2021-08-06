@@ -36,21 +36,22 @@ export class WrapValRecursiveHelper extends Helper {
       return;
     }
 
-    const createHandleValue =
-      (hasValue: boolean, body: (options: VisitOptions) => void) => (innerOptions: VisitOptions) => {
-        if (!innerOptions.pushValue) {
-          if (hasValue) {
-            sb.emitOp(node, 'DROP');
-          }
-
-          return;
+    const createHandleValue = (hasValue: boolean, body: (options: VisitOptions) => void) => (
+      innerOptions: VisitOptions,
+    ) => {
+      if (!innerOptions.pushValue) {
+        if (hasValue) {
+          sb.emitOp(node, 'DROP');
         }
 
-        body(innerOptions);
-        if (this.serializeFinalVal) {
-          sb.emitSysCall(node, 'Neo.Runtime.Serialize');
-        }
-      };
+        return;
+      }
+
+      body(innerOptions);
+      if (this.serializeFinalVal) {
+        sb.emitSysCall(node, 'Neo.Runtime.Serialize');
+      }
+    };
 
     const handleUndefined = createHandleValue(false, (innerOptions) => {
       sb.emitOp(node, 'DROP');

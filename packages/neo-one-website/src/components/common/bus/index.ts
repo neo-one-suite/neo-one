@@ -1,1 +1,1 @@
-export { EventBus } from './EventBus'
+export * from './EventBus';
