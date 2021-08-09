@@ -2,7 +2,7 @@ import { common as clientCommon, crypto } from '@neo-one/client-common';
 import { Settings } from '@neo-one/node-core';
 import { common, getMaxValidUntilBlockIncrement } from './common';
 
-const mainNetNetwork = 5195086;
+const mainNetNetwork = 860833102;
 
 const DEFAULT_VALIDATORS_COUNT = 7;
 const DEFAULT_EXTRA_MEMBERS: readonly string[] = [
