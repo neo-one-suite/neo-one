@@ -283,6 +283,9 @@ export class Transaction
       } else if (multiSigResult.result) {
         const { points, m } = multiSigResult;
         const signatures = crypto.getMultiSignatures(this.witnesses[i].invocation);
+        if (!hashes[i].equals(this.witnesses[i].scriptHash)) {
+          return VerifyResultModel.Invalid;
+        }
         if (signatures === undefined) {
           // TODO: This check is not in there code but it's possible that their code
           // could throw a null reference exception without this sort of check

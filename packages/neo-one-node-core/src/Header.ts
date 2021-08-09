@@ -94,7 +94,7 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
     const { reader } = options;
     const version = reader.readUInt32LE();
     if (version > 0) {
-      throw new InvalidFormatError(`Expected version to be less than 0. Got: ${version}`);
+      throw new InvalidFormatError(`Expected version to be greater than 0. Got: ${version}`);
     }
     const previousHash = reader.readUInt256();
     const merkleRoot = reader.readUInt256();
