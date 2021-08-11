@@ -20,5 +20,6 @@ export class SHA256Helper extends Helper {
     sb.emitPushBuffer(node, common.nativeHashes.CryptoLib);
     // [argsHash]
     sb.emitSysCall(node, 'System.Contract.Call');
+    sb.addMethodToken(common.nativeHashes.CryptoLib, 'sha256', 1, true, CallFlags.None);
   }
 }

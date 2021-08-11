@@ -49,6 +49,10 @@ export class DiagnosticScriptBuilder extends BaseScriptBuilder<DiagnosticScope> 
     // do nothing
   }
 
+  public addMethodToken(): void {
+    // do nothing
+  }
+
   public emitSysCall(): void {
     // do nothing
   }

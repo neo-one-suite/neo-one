@@ -1,5 +1,5 @@
 // tslint:disable ban-types
-import { OpCode, SysCallName, UInt160 } from '@neo-one/client-common';
+import { CallFlags, OpCode, SysCallName, UInt160 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import ts from 'typescript';
 import { Context } from '../../Context';
@@ -26,6 +26,13 @@ export interface ScriptBuilder {
   readonly helpers: Helpers;
   readonly jumpTable: JumpTable;
   readonly process: () => void;
+  readonly addMethodToken: (
+    hash: UInt160,
+    method: string,
+    paramCount: number,
+    hasReturnValue: boolean,
+    callFlags: CallFlags,
+  ) => void;
   readonly visit: (node: ts.Node, options: VisitOptions) => void;
   readonly withScope: (node: ts.Node, options: VisitOptions, func: (options: VisitOptions) => void) => void;
   readonly withProgramCounter: (func: (pc: ProgramCounterHelper) => void) => void;

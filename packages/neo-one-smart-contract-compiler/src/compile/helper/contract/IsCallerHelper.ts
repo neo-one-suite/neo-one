@@ -45,6 +45,7 @@ export class IsCallerHelper extends Helper {
           sb.emitPushBuffer(node, common.nativeHashes.ContractManagement);
           // [maybeContract, addressBuffer]
           sb.emitSysCall(node, 'System.Contract.Call');
+          sb.addMethodToken(common.nativeHashes.ContractManagement, 'getContract', 1, true, CallFlags.ReadStates);
           sb.emitHelper(
             node,
             options,

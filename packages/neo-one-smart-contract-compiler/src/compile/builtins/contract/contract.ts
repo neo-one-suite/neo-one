@@ -44,6 +44,7 @@ export const add = (builtins: Builtins): void => {
         sb.emitPushBuffer(node, common.nativeHashes.ContractManagement);
         // [contract]
         sb.emitSysCall(node, 'System.Contract.Call');
+        sb.addMethodToken(common.nativeHashes.ContractManagement, 'getContract', 1, true, CallFlags.ReadStates);
       },
       (sb, node, options) => {
         sb.emitHelper(

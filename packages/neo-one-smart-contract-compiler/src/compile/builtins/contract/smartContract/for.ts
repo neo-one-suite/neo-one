@@ -34,6 +34,9 @@ export class SmartContractFor extends SmartContractForBase {
     node: ts.CallExpression,
     prop: ts.Declaration,
     addressName: Name,
+    method: string,
+    paramCount: number,
+    hasReturnValue: boolean,
     options: VisitOptions,
   ): void {
     if (tsUtils.argumented.getArguments(node).length < 1) {
@@ -86,6 +89,7 @@ export class SmartContractFor extends SmartContractForBase {
       sb.emitOp(node, 'SWAP');
       // [result]
       sb.emitSysCall(node, 'System.Contract.Call');
+      sb.addMethodToken(scriptHash, method, paramCount, hasReturnValue, CallFlags.All);
     }
   }
 }

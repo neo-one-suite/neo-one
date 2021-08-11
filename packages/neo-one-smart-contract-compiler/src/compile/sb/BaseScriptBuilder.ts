@@ -2,9 +2,11 @@ import {
   assertSysCall,
   ByteBuffer,
   ByteCode,
+  CallFlags,
   common,
   crypto,
   getSysCallHash,
+  MethodToken,
   Op,
   OpCode,
   ScriptBuilder as ClientScriptBuilder,
@@ -41,6 +43,8 @@ type Compilers = { [K in number]?: NodeCompiler };
 
 export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptBuilder {
   public readonly jumpTable: JumpTable = new JumpTable();
+  private readonly mutableMethodTokens: MethodToken[] = [];
+  private readonly methodTokenSet = new Set();
   private mutableCurrentScope: TScope | undefined;
   private readonly compilers: Compilers;
   private readonly mutableBytecode: SingleBytecode[] = [];
@@ -253,6 +257,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
 
     return {
       code: Buffer.concat(buffers),
+      tokens: this.mutableMethodTokens,
       sourceMap,
     };
   }
@@ -402,15 +407,28 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   }
 
   public emitSysCall(node: ts.Node, name: SysCallName): void {
-    // TODO: check. commented out was Dan's change
-    // const sysCallBuffer = Buffer.allocUnsafe(4);
-    // sysCallBuffer.writeUInt32LE(toSysCallHash(assertSysCall(name)), 0);
-    // const writer = new BinaryWriter();
-    // writer.writeVarBytesLE(sysCallBuffer);
-    // this.emitOp(node, 'SYSCALL', writer.toBuffer());
+    this.emitOp(node, 'SYSCALL', getSysCallHash(assertSysCall(name)));
+  }
 
-    const hash = getSysCallHash(assertSysCall(name));
-    this.emitOp(node, 'SYSCALL', hash);
+  public addMethodToken(
+    hashIn: UInt160,
+    method: string,
+    paramCount: number,
+    hasReturnValue: boolean,
+    callFlags: CallFlags,
+  ) {
+    const hash = common.uInt160ToString(hashIn);
+    const key = `${hash}:${method}`;
+    if (!this.methodTokenSet.has(key)) {
+      this.methodTokenSet.add(key);
+      this.mutableMethodTokens.push({
+        hash,
+        method,
+        paramCount,
+        hasReturnValue,
+        callFlags,
+      });
+    }
   }
 
   public emitLine(node: ts.Node): void {

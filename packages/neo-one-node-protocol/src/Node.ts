@@ -279,7 +279,7 @@ export class Node implements INode {
     const { externalPort = 0 } = options;
     this.externalPort = externalPort;
     this.nonce = Math.floor(Math.random() * utils.UINT_MAX_NUMBER);
-    this.userAgent = `NEO:neo-one-js:3.0.0-rc4`;
+    this.userAgent = `NEO:neo-one-js:3.0.0`;
 
     this.mutableMemPool = {};
     this.getNewVerificationContext = () =>
