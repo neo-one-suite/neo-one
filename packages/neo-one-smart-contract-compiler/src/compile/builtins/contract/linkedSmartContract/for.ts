@@ -38,6 +38,9 @@ export class LinkedSmartContractFor extends SmartContractForBase {
     node: ts.CallExpression,
     prop: ts.Declaration,
     _addressName: Name,
+    method: string,
+    paramCount: number,
+    hasReturnValue: boolean,
     _options: VisitOptions,
   ): void {
     const scriptHash = this.getScriptHash(sb, node);
@@ -69,6 +72,7 @@ export class LinkedSmartContractFor extends SmartContractForBase {
       sb.emitPushBuffer(prop, scriptHash);
       // [result]
       sb.emitSysCall(prop, 'System.Contract.Call');
+      sb.addMethodToken(scriptHash, method, paramCount, hasReturnValue, CallFlags.All);
     }
   }
 

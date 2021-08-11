@@ -20,5 +20,6 @@ export class RIPEMD160Helper extends Helper {
     sb.emitPushBuffer(node, common.nativeHashes.CryptoLib);
     // [argsHash]
     sb.emitSysCall(node, 'System.Contract.Call');
+    sb.addMethodToken(common.nativeHashes.CryptoLib, 'ripemd160', 1, true, CallFlags.None);
   }
 }

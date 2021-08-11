@@ -96,14 +96,14 @@ export const compile = async ({
     })
   ).concat(addDummyMethod ? [DUMMY_METHOD] : []);
 
-  const compiler = 'neo-one 3.0.0-rc4';
+  const compiler = 'neo-one 3.0.0';
 
   return {
     contract: {
       nefFile: {
         compiler,
         script,
-        tokens: [], // TODO: need to implement this
+        tokens: finalResult.tokens,
       },
       script,
       manifest: {

@@ -51,10 +51,10 @@ export class UpgradeHelper extends Helper {
           sb.emitPushString(node, 'update');
           // [buffer, 'update', number, arg]
           sb.emitPushBuffer(node, common.nativeHashes.ContractManagement);
-          // [conract]
-          sb.emitSysCall(node, 'System.Contract.Call');
           // []
-          sb.emitOp(node, 'DROP');
+          sb.emitSysCall(node, 'System.Contract.Call');
+          // TODO: could be three parameters if we add the last "data" method somehow
+          sb.addMethodToken(common.nativeHashes.ContractManagement, 'update', 2, false, CallFlags.All);
           // [boolean]
           sb.emitPushBoolean(node, true);
         },

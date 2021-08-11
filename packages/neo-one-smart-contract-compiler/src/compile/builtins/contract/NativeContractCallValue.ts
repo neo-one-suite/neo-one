@@ -29,6 +29,7 @@ export class NativeContractCallValue extends BuiltinMemberValue {
     sb.emitPushBuffer(node, this.hash);
     // [val]
     sb.emitSysCall(node, 'System.Contract.Call');
+    sb.addMethodToken(this.hash, this.method, 0, true, this.callFlags);
     // [val]
     sb.emitHelper(node, options, sb.helpers.wrapVal({ type: this.type }));
   }

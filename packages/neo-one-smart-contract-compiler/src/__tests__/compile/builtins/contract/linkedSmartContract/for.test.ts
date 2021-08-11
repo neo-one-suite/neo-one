@@ -22,7 +22,7 @@ describe('LinkedSmartContract.for', () => {
 
     const barContract = await node.addContractFromSnippet(normalizePath(path.join('linked', 'Bar.ts')), {
       [fooFullPath]: {
-        Foo: scriptHashToAddress(fooContract.manifest.abi.hash),
+        Foo: scriptHashToAddress(fooContract.hash),
       },
     });
 
@@ -32,10 +32,8 @@ describe('LinkedSmartContract.for', () => {
       interface Contract {
         getFoo(address: Address): string;
       }
-      const expected = Address.from('${scriptHashToAddress(fooContract.manifest.abi.hash)}');
-      const contract = SmartContract.for<Contract>(Address.from('${scriptHashToAddress(
-        barContract.manifest.abi.hash,
-      )}'));
+      const expected = Address.from('${scriptHashToAddress(fooContract.hash)}');
+      const contract = SmartContract.for<Contract>(Address.from('${scriptHashToAddress(barContract.hash)}'));
       assertEqual(contract.getFoo(expected), 'foo');
     `);
   });

@@ -1,3 +1,4 @@
+import { MethodToken } from '@neo-one/client-common';
 import { ContractRegister } from '@neo-one/client-full-core';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
@@ -34,6 +35,7 @@ export interface VisitOptions {
 export interface ScriptBuilderResult {
   readonly code: Buffer;
   readonly sourceMap: Promise<RawSourceMap>;
+  readonly tokens: ReadonlyArray<MethodToken>;
 }
 export interface CompileResult {
   readonly contract: ContractRegister;

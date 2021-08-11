@@ -46,6 +46,7 @@ export const add = (builtins: Builtins): void => {
         sb.emitPushBuffer(node, common.nativeHashes.Ledger);
         // [conract]
         sb.emitSysCall(node, 'System.Contract.Call');
+        sb.addMethodToken(common.nativeHashes.Ledger, 'getBlock', 1, true, CallFlags.ReadStates);
       },
       (sb, node, options) => {
         sb.emitHelper(node, options, sb.helpers.wrapBlock);

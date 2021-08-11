@@ -53,9 +53,9 @@ export class NefFileModel implements SerializableJSON<NefFileJSON>, Serializable
   public serializeForChecksumBase(writer: BinaryWriter): void {
     this.serializeHeader(writer);
     writer.writeUInt16LE(0);
-    writer.writeArray(this.tokens, (token) => token.serializeWire());
+    writer.writeArray(this.tokens, (token) => token.serializeWireBase(writer));
     writer.writeUInt16LE(0);
-    writer.writeVarBytesLE(this.script ?? Buffer.from([])); // TODO: script can be null?
+    writer.writeVarBytesLE(this.script);
   }
 
   public serializeWireBase(writer: BinaryWriter): void {

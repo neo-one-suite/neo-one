@@ -39,6 +39,7 @@ export const add = (builtins: Builtins): void => {
         sb.emitPushBuffer(node, common.nativeHashes.Ledger);
         // [height]
         sb.emitSysCall(node, 'System.Contract.Call');
+        sb.addMethodToken(common.nativeHashes.Ledger, 'getTransactionHeight', 1, true, CallFlags.ReadStates);
       },
       Types.Transaction,
       Types.Number,
@@ -91,8 +92,9 @@ export const add = (builtins: Builtins): void => {
         sb.emitPushString(node, 'getTransaction');
         // [buffer, 'getTransaction', number, [buffer]]
         sb.emitPushBuffer(node, common.nativeHashes.Ledger);
-        // [conract]
+        // [contract]
         sb.emitSysCall(node, 'System.Contract.Call');
+        sb.addMethodToken(common.nativeHashes.Ledger, 'getTransaction', 1, true, CallFlags.ReadStates);
       },
       (sb, node, options) => {
         sb.emitHelper(node, options, sb.helpers.wrapTransaction);

@@ -20,5 +20,6 @@ export class BinaryDeserializeHelper extends Helper {
     sb.emitPushBuffer(node, common.nativeHashes.StdLib);
     // [val]
     sb.emitSysCall(node, 'System.Contract.Call');
+    sb.addMethodToken(common.nativeHashes.StdLib, 'deserialize', 1, true, CallFlags.None);
   }
 }
