@@ -16,7 +16,17 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractMember(
     'Transfer',
     'amount',
-    new BuiltinInstanceIndexValue(1, Types.Transfer, Types.Number, false),
+    // Here we are just converting the amount to a Fixed8 number
+    new BuiltinInstanceIndexValue(1, Types.Transfer, Types.Number, false, (sb, node, options) => {
+      // [amount]
+      sb.emitHelper(node, options, sb.helpers.unwrapNumber);
+      // [10^8, amount]
+      sb.emitPushInt(node, 10 ** 8);
+      // [amount]
+      sb.emitOp(node, 'MUL');
+      // [amount]
+      sb.emitHelper(node, options, sb.helpers.wrapNumber);
+    }),
   );
   builtins.addContractMember('Transfer', 'from', new BuiltinInstanceIndexValue(2, Types.Transfer, Types.Buffer, false));
   builtins.addContractMember(

@@ -60,13 +60,29 @@ class BlockchainCurrentCallerContract extends BuiltinMemberValue {
   }
 }
 
+class BlockchainCurrentBlockTime extends BuiltinMemberValue {
+  protected emit(sb: ScriptBuilder, node: MemberLikeExpression, options: VisitOptions): void {
+    if (options.pushValue) {
+      // [time]
+      sb.emitSysCall(node, 'System.Runtime.GetTime');
+      // [1000, time]
+      sb.emitPushInt(node, 1000);
+      // [time]
+      sb.emitOp(node, 'DIV');
+      // [val]
+      sb.emitHelper(node, options, sb.helpers.wrapNumber);
+    }
+  }
+}
+
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {
   builtins.addContractValue('Blockchain', new BlockchainValue());
   builtins.addContractInterface('BlockchainConstructor', new BlockchainConstructorInterface());
+  builtins.addContractMember('BlockchainConstructor', 'currentBlockTime', new BlockchainCurrentBlockTime());
   builtins.addContractMember(
     'BlockchainConstructor',
-    'currentBlockTime',
+    'currentBlockTimeMilliseconds',
     new SysCallMemberValue('System.Runtime.GetTime', Types.Number),
   );
   builtins.addContractMember(

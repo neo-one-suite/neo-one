@@ -22,7 +22,7 @@ describe('TestICO', () => {
         crypto.addPublicKey(common.stringToPrivateKey(MINTER.PRIVATE_KEY), common.stringToECPoint(MINTER.PUBLIC_KEY));
         const deployResult = await smartContract.deploy(
           masterAccountID.address,
-          new BigNumber(Math.round(Date.now() / 1)), // TODO: this was 1000 but that didn't work for the ICO. Check this out
+          new BigNumber(Math.round(Date.now() / 1000)),
         );
         const deployReceipt = await deployResult.confirmed({ timeoutMS: 2500 });
         if (deployReceipt.result.state !== 'HALT') {
@@ -56,7 +56,7 @@ describe('TestICO', () => {
                 to: privateKeyToAddress(MINTER.PRIVATE_KEY),
               },
               {
-                amount: new BigNumber(154460781), // TODO: why is the GAS required so large?
+                amount: new BigNumber(164460781), // TODO: why is the GAS required so large? Because of https://github.com/neo-one-suite/neo-one/issues/2448
                 asset: Hash160.GAS,
                 to: privateKeyToAddress(MINTER.PRIVATE_KEY),
               },
@@ -85,8 +85,7 @@ describe('TestICO', () => {
         expect(mintReceipt.result.gasConsumed.toString()).toMatchSnapshot('mint consumed');
         expect(mintReceipt.result.value).toBeUndefined();
         expect(mintReceipt.events).toHaveLength(3);
-        const event = mintReceipt.events[2]; // TODO: not totally sure it's the 3rd item
-        // TODO: also check the first two events
+        const event = mintReceipt.events[2];
         expect(event.name).toEqual('Transfer');
         expect(event.parameters.from).toBeUndefined();
         expect(event.parameters.to).toEqual(minter.userAccount.id.address);
@@ -95,15 +94,15 @@ describe('TestICO', () => {
           throw new Error('For TS');
         }
         const firstBalance = firstMint.times(10).toString();
-        expect(event.parameters.amount.toString()).toEqual(firstBalance); // TODO: value returned is 8 decimal places off
+        expect(event.parameters.amount.toString()).toEqual(firstBalance);
 
         const [minterBalance, mintTotalSupply] = await Promise.all([
           smartContract.balanceOf(minter.userAccount.id.address),
           smartContract.totalSupply(),
         ]);
 
-        expect(minterBalance.toString(10)).toEqual(firstBalance); // TODO: value returned is 8 decimal places off
-        expect(mintTotalSupply.toString(10)).toEqual(firstBalance); // TODO: value returned is 8 decimal places off
+        expect(minterBalance.toString(10)).toEqual(firstBalance);
+        expect(mintTotalSupply.toString(10)).toEqual(firstBalance);
       },
       { deploy: false },
     );
