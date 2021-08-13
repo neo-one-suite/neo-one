@@ -10,6 +10,7 @@ export class BuiltinInstanceIndexValue extends BuiltinInstanceMemberValue {
     private readonly valueType: WrappableType,
     private readonly type: WrappableType,
     private readonly shouldWrap: boolean = true,
+    private readonly modifier?: (sb: ScriptBuilder, node: MemberLikeExpression, options: VisitOptions) => void,
   ) {
     super();
   }
@@ -21,6 +22,9 @@ export class BuiltinInstanceIndexValue extends BuiltinInstanceMemberValue {
     sb.emitPushInt(node, this.index);
     // [property]
     sb.emitOp(node, 'PICKITEM');
+    if (this.modifier !== undefined) {
+      this.modifier(sb, node, options);
+    }
     if (this.shouldWrap) {
       // [val]
       sb.emitHelper(node, options, sb.helpers.wrapVal({ type: this.type }));

@@ -906,12 +906,16 @@ export interface SetStorageConstructor {
  */
 export interface BlockchainConstructor {
   /**
-   * Time of the current `Block`.
+   * Time of the current `Block` in seconds.
    *
    * During execution, this is the timestamp of the `Block` that this `Transaction` will be included in.
    * During verification, this is the timestamp of the latest `Block` + 15 seconds which represents the earliest possible timestamp of the `Block` that this `Transaction` will be included in.
    */
   readonly currentBlockTime: number;
+  /**
+   * Time of the current `Block` in milliseconds.
+   */
+  readonly currentBlockTimeMilliseconds: number;
   /**
    * Index of the latest `Block` persisted to the blockchain.
    */
@@ -1365,7 +1369,7 @@ export interface Transfer {
   /**
    * The amount transferred.
    */
-  readonly amount: Fixed<8>;
+  readonly amount: Fixed8;
   /**
    * The `UInt160` hash of the contract.
    */

@@ -97,6 +97,28 @@ describe('Blockchain', () => {
     );
   });
 
+  test('currentBlockTimeMilliseconds', async () => {
+    const node = await helpers.startNode();
+
+    await node.executeString(`
+      import { Blockchain } from '@neo-one/smart-contract';
+
+      Blockchain.currentBlockTimeMilliseconds;
+      assertEqual(Blockchain.currentBlockTimeMilliseconds > 0, true);
+    `);
+  });
+
+  test('set currentBlockTimeMilliseconds', async () => {
+    await helpers.compileString(
+      `
+      import { Blockchain } from '@neo-one/smart-contract';
+
+      Blockchain.currentBlockTimeMilliseconds = 10;
+    `,
+      { type: 'error' },
+    );
+  });
+
   test('currentTransaction', async () => {
     const node = await helpers.startNode();
 

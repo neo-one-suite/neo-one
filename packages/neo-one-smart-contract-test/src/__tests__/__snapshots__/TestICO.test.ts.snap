@@ -1,5 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`TestICO smart contract: deploy consumed 1`] = `"54151230"`;
+exports[`TestICO smart contract: deploy consumed 1`] = `"53951230"`;
 
-exports[`TestICO smart contract: mint consumed 1`] = `"135654250"`;
+exports[`TestICO smart contract: mint consumed 1`] = `"136864310"`;
