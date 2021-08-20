@@ -2,6 +2,7 @@ import {
   AttributeTypeModel,
   BinaryReader,
   common,
+  ConfirmedTransactionJSON,
   crypto,
   getSignData,
   InvalidFormatError,
@@ -16,9 +17,10 @@ import {
   TransactionModel,
   TransactionModelAdd,
   UInt160,
-  VerboseTransactionJSON,
+  utils as clientCommonUtils,
   VerifyResultModel,
 } from '@neo-one/client-common';
+import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import {
@@ -37,10 +39,10 @@ import { Attribute, deserializeAttribute } from './attributes';
 export type TransactionAdd = TransactionModelAdd<Attribute, Witness, Signer>;
 export type TransactionAddUnsigned = Omit<TransactionModelAdd<Attribute, Witness, Signer>, 'witnesses'>;
 
-export interface VerboseData {
-  readonly blockhash: string;
-  readonly confirmations: number;
-  readonly blocktime: number;
+export interface TransactionData {
+  readonly blockHash: string;
+  readonly blockIndex: number;
+  readonly transactionIndex: number;
 }
 
 export class Transaction
@@ -287,7 +289,7 @@ export class Transaction
           return VerifyResultModel.Invalid;
         }
         if (signatures === undefined) {
-          // TODO: This check is not in there code but it's possible that their code
+          // This check is not in there code but it's possible that their code
           // could throw a null reference exception without this sort of check
           return VerifyResultModel.Invalid;
         }
@@ -345,14 +347,20 @@ export class Transaction
     };
   }
 
-  public serializeJSONWithVerboseData(data: VerboseData): VerboseTransactionJSON {
+  public serializeJSONWithReceipt(data: TransactionData): ConfirmedTransactionJSON {
     const base = this.serializeJSON();
 
     return {
       ...base,
-      blockhash: data.blockhash,
-      confirmations: data.confirmations,
-      blocktime: data.blocktime,
+      receipt: {
+        blockIndex: data.blockIndex,
+        transactionIndex: data.transactionIndex,
+        blockHash: data.blockHash,
+        globalIndex: new BigNumber(clientCommonUtils.USHORT_MAX_NUMBER)
+          .times(data.blockIndex)
+          .plus(data.transactionIndex)
+          .toString(),
+      },
     };
   }
 }

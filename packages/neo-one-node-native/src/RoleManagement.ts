@@ -3,6 +3,7 @@ import {
   assertArrayStackItem,
   BlockchainSettings,
   DesignationRole as Role,
+  LedgerContract,
   NativeContractStorageContext,
   RoleManagement as RoleManagementNode,
   StackItem,
@@ -37,19 +38,14 @@ export class RoleManagement extends NativeContract implements RoleManagementNode
     });
   }
 
-  /**
-   * passing in height and index is a pretty HMMM way to do this but in the vein of being
-   * consistent with C# code as much as possible we will do it like this. The reasoning
-   * being that our snapshot equivalent 'storage' doesn't have knowledge of the current height,
-   * that is a blockchain abstraction. In almost no situation should this first error actually throw.
-   */
   public async getDesignatedByRole(
-    { storages }: NativeContractStorageContext,
+    storage: NativeContractStorageContext,
     role: Role,
-    height: number,
+    ledger: LedgerContract,
     index: number,
   ): Promise<readonly ECPoint[]> {
-    if (height + 1 < index) {
+    const { storages } = storage;
+    if ((await ledger.currentIndex(storage)) + 1 < index) {
       throw new Error(`Index out of range for getDesignatedByRole: ${index}.`);
     }
 

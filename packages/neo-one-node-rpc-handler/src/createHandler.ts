@@ -4,6 +4,7 @@ import {
   BlockJSON,
   CallReceiptJSON,
   common,
+  ConfirmedTransactionJSON,
   crypto,
   JSONHelper,
   LogJSON,
@@ -16,7 +17,6 @@ import {
   TransactionReceiptJSON,
   TriggerTypeJSON,
   UInt256,
-  VerboseTransactionJSON,
   VerifyResultModel,
 } from '@neo-one/client-common';
 import { createChild, nodeLogger } from '@neo-one/logger';
@@ -130,7 +130,7 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   getnep17transfers: 'getnep17transfers',
   getnep17balances: 'getnep17balances',
 
-  // TODO: I want to say both of these can be removed since you can make changes to policy contract storage
+  // Settings
   updatesettings: 'updatesettings',
   getsettings: 'getsettings',
 
@@ -141,7 +141,6 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   relaytransaction: 'relaytransaction',
   getallstorage: 'getallstorage',
   gettransactionreceipt: 'gettransactionreceipt',
-  getinvocationdata: 'getinvocationdata',
   getnetworksettings: 'getnetworksettings',
   runconsensusnow: 'runconsensusnow',
   fastforwardoffset: 'fastforwardoffset',
@@ -329,7 +328,7 @@ export const createHandler = ({
     containerhash: log.containerHash ? common.uInt256ToString(log.containerHash) : undefined,
     callingscripthash: common.uInt160ToString(log.callingScriptHash),
     message: log.message,
-    // position: log.position,
+    position: log.position,
   });
 
   // TODO: probably some bugs in here. See RpcServer.SmartContract.cs
@@ -342,7 +341,7 @@ export const createHandler = ({
       const interopInterface = item.getInterface((_): _ is any => true);
       if (interopInterface !== undefined && isIterable(interopInterface)) {
         const iterator = [...interopInterface][Symbol.iterator]();
-        const finalArr = [];
+        const finalArr: StackItem[] = [];
         let truncated = false;
         let max = maxIn;
         // tslint:disable-next-line: no-loop-statement
@@ -352,7 +351,7 @@ export const createHandler = ({
             break;
           }
           // tslint:disable-next-line: no-array-mutation
-          finalArr.push((val as StackItem).toContractParameter().serializeJSON());
+          finalArr.push(val.toContractParameter().serializeJSON());
           max -= 1;
         }
 
@@ -381,7 +380,7 @@ export const createHandler = ({
 
     return {
       script: script.toString('base64'),
-      state: toVMStateJSON(state),
+      state: toVMStateJSON(state) as 'HALT' | 'FAULT',
       stack,
       exception: receipt.exception,
       gasconsumed: gasConsumed.toString(),
@@ -393,11 +392,8 @@ export const createHandler = ({
   const getTransactionReceiptJSON = (block: Block, value: TransactionState): TransactionReceiptJSON => ({
     blockIndex: value.blockIndex,
     blockHash: JSONHelper.writeUInt256(block.hash),
-    blockTime: JSONHelper.writeUInt64(block.timestamp),
     globalIndex: JSONHelper.writeUInt64(new BN(-1)),
     transactionIndex: block.transactions.findIndex((tx) => value.transaction.hash.equals(tx.hash)),
-    transactionHash: JSONHelper.writeUInt256(value.transaction.hash),
-    confirmations: blockchain.currentBlockIndex - block.index + 1,
   });
 
   const handlers: Handlers = {
@@ -494,12 +490,9 @@ export const createHandler = ({
 
       return contract.serializeJSON();
     },
-    [RPC_METHODS.getrawmempool]: async () => ({
-      // TODO: add shouldGetUnverified parameter/ability? add to client as well?
-      height: await blockchain.getCurrentIndex(),
-      verified: Object.values(node.memPool).map((transaction) => JSONHelper.writeUInt256(transaction.hash)),
-    }),
-    [RPC_METHODS.getrawtransaction]: async (args): Promise<TransactionJSON | VerboseTransactionJSON | string> => {
+    [RPC_METHODS.getrawmempool]: async () =>
+      Object.values(node.memPool).map((transaction) => JSONHelper.writeUInt256(transaction.hash)),
+    [RPC_METHODS.getrawtransaction]: async (args): Promise<TransactionJSON | ConfirmedTransactionJSON | string> => {
       const hash = JSONHelper.readUInt256(args[0]);
       const verbose = args.length >= 2 && !!args[1];
 
@@ -524,15 +517,15 @@ export const createHandler = ({
         if (index === undefined) {
           return tx.serializeJSON();
         }
-        const block = await blockchain.getTrimmedBlock(index);
+        const block = await blockchain.getBlock(index);
         if (block === undefined) {
           return tx.serializeJSON();
         }
 
-        return tx.serializeJSONWithVerboseData({
-          blockhash: JSONHelper.writeUInt256(block.hash),
-          confirmations: (await blockchain.getCurrentIndex()) - block.index + 1,
-          blocktime: block.header.timestamp.toNumber(),
+        return tx.serializeJSONWithReceipt({
+          blockHash: JSONHelper.writeUInt256(block.hash),
+          blockIndex: block.index,
+          transactionIndex: block.transactions.findIndex((txIn) => state.transaction.hash.equals(txIn.hash)),
         });
       }
 
@@ -769,7 +762,7 @@ export const createHandler = ({
       throw new JSONRPCError(-101, 'Not implemented');
     },
 
-    // Nep17
+    // NEP17
     [RPC_METHODS.getnep17transfers]: async (args) => {
       const addressVersion = blockchain.settings.addressVersion;
       const { address, scriptHash } = getScriptHashAndAddress(args[0], addressVersion);
@@ -835,17 +828,16 @@ export const createHandler = ({
     },
 
     // Settings
-    [RPC_METHODS.updatesettings]: async (_args) => {
-      throw new JSONRPCError(-101, 'Not implemented');
-      // const { settings } = blockchain;
-      // const newSettings = {
-      //   ...settings,
-      //   secondsPerBlock: args[0].secondsPerBlock,
-      // };
+    [RPC_METHODS.updatesettings]: async (args) => {
+      const { settings } = blockchain;
+      const newSettings = {
+        ...settings,
+        millisecondsPerBlock: args[0].millisecondsPerBlock,
+      };
 
-      // blockchain.updateSettings(newSettings);
+      blockchain.updateSettings(newSettings);
 
-      // return true;
+      return true;
     },
     [RPC_METHODS.getsettings]: async () => ({ millisecondsPerBlock: blockchain.settings.millisecondsPerBlock }),
 
@@ -862,23 +854,6 @@ export const createHandler = ({
 
         const resultJSON = result.verifyResult !== undefined ? toVerifyResultJSON(result.verifyResult) : undefined;
 
-        // const resultJSON =
-        //   result.verifyResult === undefined
-        //     ? {}
-        //     : {
-        //         verifyResult: {
-        //           verifications: result.verifyResult.verifications.map((verification) => ({
-        //             hash: JSONHelper.writeUInt160(verification.hash),
-        //             witness: verification.witness.serializeJSON(blockchain.serializeJSONContext),
-        //             actions: verification.actions.map((action) =>
-        //               action.serializeJSON(blockchain.serializeJSONContext),
-        //             ),
-        //             failureMessage: verification.failureMessage,
-        //           })),
-        //         },
-        //       };
-
-        // TODO: client expects more information than this
         return {
           transaction: transactionJSON,
           verifyResult: resultJSON,
@@ -952,17 +927,6 @@ export const createHandler = ({
       return result;
     },
 
-    [RPC_METHODS.getinvocationdata]: async (_args) => {
-      throw new JSONRPCError(-101, 'Not implemented');
-      // const transactionState = await blockchain.transactions.get(JSONHelper.readUInt256(args[0]));
-      // const result = transactionState.transaction.serializeJSONWithInvocationData();
-
-      // if (result.data === undefined) {
-      //   throw new JSONRPCError(-103, 'Invalid Transaction');
-      // }
-
-      // return result.data;
-    },
     [RPC_METHODS.getnetworksettings]: async (): Promise<NetworkSettingsJSON> => {
       const {
         decrementInterval,

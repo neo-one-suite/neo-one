@@ -1,25 +1,12 @@
-import { common, InvalidFormatError, UInt160, UInt256 } from '@neo-one/client-common';
-import { BlockKey, Nep17BalanceKey, Nep17TransferKey, StorageKey, StreamOptions } from '@neo-one/node-core';
+import { InvalidFormatError, UInt256 } from '@neo-one/client-common';
+import { Nep17BalanceKey, Nep17TransferKey, StorageKey, StreamOptions } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 
-// TODO: these are deleted in Neo3
 export enum Prefix {
-  Block = 0x01, // Removed
-  Transaction = 0x02, // Removed
-  Contract = 0x50, // Removed?
-  Storage = 0x70, // Removed
-  HeaderHashList = 0x80, // Removed
-  CurrentBlock = 0xc0, // Removed?
-  CurrentHeader = 0xc1, // Removed?
-  ContractID = 0xc2, // Removed?
-  ConsensusState = 0xf4,
   Nep17Balance = 0xf8,
   Nep17TransferSent = 0xf9,
   Nep17TransferReceived = 0xfa,
-  ApplicationLog = 0xfb, // Custom internal prefix. Can be changed.
-
-  // NEO•ONE prefix, watch out for future collisions with https://github.com/neo-project/neo/blob/master/src/neo/Persistence/Prefixes.cs
-  Settings = 0xdd,
+  ApplicationLog = 0xfb, // Custom internal prefix. Can be changed
 }
 
 const getCreateKey = <Key>({
@@ -34,21 +21,12 @@ const getCreateKey = <Key>({
   return (key: Key) => Buffer.concat([prefixKey, serializeKey(key)]);
 };
 
-const getMetadataKey = ({ prefix }: { readonly prefix: Prefix }) => Buffer.from([prefix]);
-
-const serializeHeaderHashListKey = (key: number) => {
-  const buffer = Buffer.alloc(4);
-  buffer.writeUInt32LE(key);
-
-  return buffer;
-};
-
 /* crude method but it does what we want it to do */
 const generateSearchRange = (lookupKey: Buffer): Required<StreamOptions> => {
   const asBN = new BN(lookupKey);
   const lte = asBN.addn(1).toBuffer();
   if (lte.length !== lookupKey.length) {
-    throw new InvalidFormatError('not sure how this happened');
+    throw new InvalidFormatError('Error generating storage lookup search range');
   }
 
   return {
@@ -76,44 +54,22 @@ const createGetSearchRange = (prefix: Prefix) => {
   };
 };
 
-const createGetSearchRangeWithoutPrefix = () => (
-  lookupKey: Buffer,
-  secondaryLookupKey?: Buffer,
-): Required<StreamOptions> => {
-  if (secondaryLookupKey) {
-    return {
-      gte: lookupKey,
-      lte: secondaryLookupKey,
-    };
-  }
-  const { gte: initGte, lte: initLte } = generateSearchRange(lookupKey);
-
-  return {
-    gte: initGte,
-    lte: initLte,
-  };
-};
-
-const createBlockKey = getCreateKey<BlockKey>({
-  serializeKey: ({ hashOrIndex }) => {
-    if (typeof hashOrIndex === 'number') {
-      throw new Error();
+const createGetSearchRangeWithoutPrefix =
+  () =>
+  (lookupKey: Buffer, secondaryLookupKey?: Buffer): Required<StreamOptions> => {
+    if (secondaryLookupKey) {
+      return {
+        gte: lookupKey,
+        lte: secondaryLookupKey,
+      };
     }
+    const { gte: initGte, lte: initLte } = generateSearchRange(lookupKey);
 
-    return hashOrIndex;
-  },
-  prefix: Prefix.Block,
-});
-
-const createTransactionKey = getCreateKey<UInt256>({
-  serializeKey: (key) => key,
-  prefix: Prefix.Transaction,
-});
-
-const createContractKey = getCreateKey<UInt160>({
-  serializeKey: (key) => key,
-  prefix: Prefix.Contract,
-});
+    return {
+      gte: initGte,
+      lte: initLte,
+    };
+  };
 
 const createStorageKey = (key: StorageKey) => key.serializeWire();
 
@@ -132,30 +88,6 @@ const createNep17TransferReceivedKey = getCreateKey<Nep17TransferKey>({
   prefix: Prefix.Nep17TransferReceived,
 });
 
-const createHeaderHashListKey = getCreateKey<number>({
-  serializeKey: serializeHeaderHashListKey,
-  prefix: Prefix.HeaderHashList,
-});
-
-const blockHashIndexKey = getMetadataKey({
-  prefix: Prefix.CurrentBlock,
-});
-
-const headerHashIndexKey = getMetadataKey({
-  prefix: Prefix.CurrentHeader,
-});
-
-const contractIDKey = getMetadataKey({
-  prefix: Prefix.ContractID,
-});
-
-const consensusStateKey = getMetadataKey({
-  prefix: Prefix.ConsensusState,
-});
-
-const minBlockKey = createBlockKey({ hashOrIndex: common.ZERO_UINT256 });
-const maxBlockKey = createBlockKey({ hashOrIndex: common.MAX_UINT256 });
-
 const getStorageSearchRange = createGetSearchRangeWithoutPrefix();
 
 const getAllNep17BalanceSearchRange = {
@@ -173,24 +105,14 @@ const createApplicationLogKey = getCreateKey<UInt256>({
 });
 
 export const keys = {
-  createBlockKey,
   createNep17BalanceKey,
   createNep17TransferSentKey,
   createNep17TransferReceivedKey,
   createApplicationLogKey,
-  createTransactionKey,
-  createContractKey,
   createStorageKey,
   getStorageSearchRange,
   getNep17BalanceSearchRange,
   getAllNep17BalanceSearchRange,
   getNep17TransferReceivedSearchRange,
   getNep17TransferSentSearchRange,
-  createHeaderHashListKey,
-  blockHashIndexKey,
-  headerHashIndexKey,
-  contractIDKey,
-  consensusStateKey,
-  minBlockKey,
-  maxBlockKey,
 };

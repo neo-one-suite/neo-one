@@ -42,7 +42,7 @@ import {
 import { Labels, utils as neoOneUtils } from '@neo-one/utils';
 import { BN } from 'bn.js';
 import PriorityQueue from 'js-priority-queue';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { BlockVerifyError, ConsensusPayloadVerifyError, GenesisBlockNotRegisteredError } from './errors';
 import { getNep17UpdateOptions } from './getNep17UpdateOptions';
 import { HeaderCache } from './HeaderCache';
@@ -91,10 +91,6 @@ export class Blockchain {
   public get currentBlockIndex(): number {
     return this.mutableCurrentBlock === undefined ? -1 : this.currentBlock.index;
   }
-
-  // public get currentHeaderIndex(): number {
-  //   return this.headerCache.last.index;
-  // }
 
   public get block$(): Observable<Block> {
     return this.mutableBlock$;
@@ -150,7 +146,7 @@ export class Blockchain {
 
   public get settings(): BlockchainSettings {
     return {
-      ...this.settingsInternal,
+      ...this.settingsInternal$.getValue(),
       standbyCommittee: this.mutableStandbyCommittee,
       committeeMembersCount: this.mutableStandbyCommittee.length,
     };
@@ -182,6 +178,7 @@ export class Blockchain {
       network: this.settings.network,
     };
   }
+
   public static async create({
     settings,
     storage,
@@ -220,7 +217,7 @@ export class Blockchain {
   public readonly postPersistNativeContractScript: Buffer;
   public readonly headerCache = new HeaderCache();
 
-  private readonly settingsInternal: BlockchainSettings;
+  private readonly settingsInternal$: BehaviorSubject<BlockchainSettings>;
   private readonly storage: Storage;
   private readonly native: NativeContainer;
   private readonly vm: VM;
@@ -232,7 +229,6 @@ export class Blockchain {
   });
   private mutableCurrentBlock: Block | undefined;
   private mutablePreviousBlock: Block | undefined;
-  private mutableCurrentHeader: Header | undefined;
   private mutableExtensibleWitnessWhiteList: ImmutableHashSet<UInt160>;
   private mutablePersistingBlocks = false;
   private mutableInQueue: Set<string> = new Set();
@@ -241,8 +237,8 @@ export class Blockchain {
   private mutableBlock$: Subject<Block> = new Subject();
 
   public constructor(options: BlockchainOptions) {
-    this.settingsInternal = options.settings;
-    this.mutableStandbyCommittee = this.settingsInternal.standbyCommittee;
+    this.settingsInternal$ = new BehaviorSubject(options.settings);
+    this.mutableStandbyCommittee = options.settings.standbyCommittee;
     this.storage = options.storage;
     this.native = options.native;
     this.vm = options.vm;
@@ -286,7 +282,6 @@ export class Blockchain {
   public async reset(): Promise<void> {
     await this.stop();
     await this.storage.reset();
-    this.mutableCurrentHeader = undefined;
     this.mutableCurrentBlock = undefined;
     this.mutablePreviousBlock = undefined;
     this.start();
@@ -461,6 +456,10 @@ export class Blockchain {
     });
   }
 
+  public updateSettings(settings: BlockchainSettings): void {
+    this.settingsInternal$.next(settings);
+  }
+
   private async updateExtensibleWitnessWhiteList(storage: Storage) {
     const currentHeight = await this.native.Ledger.currentIndex(storage);
     const builder = new ImmutableHashSetBuilder<UInt160>();
@@ -471,7 +470,7 @@ export class Blockchain {
     const stateValidators = await this.native.RoleManagement.getDesignatedByRole(
       storage,
       DesignationRole.StateValidator,
-      currentHeight, // TODO: check this
+      this.native.Ledger,
       currentHeight,
     );
     if (stateValidators.length > 0) {
@@ -607,7 +606,6 @@ export class Blockchain {
   private updateBlockMetadata(block: Block): void {
     this.mutablePreviousBlock = this.mutableCurrentBlock;
     this.mutableCurrentBlock = block;
-    this.mutableCurrentHeader = block.header;
   }
 
   private updateNep17Balances({

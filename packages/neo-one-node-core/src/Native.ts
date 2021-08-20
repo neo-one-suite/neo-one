@@ -87,7 +87,7 @@ export interface RoleManagement extends NativeContract {
   readonly getDesignatedByRole: (
     storage: NativeContractStorageContext,
     role: DesignationRole,
-    height: number,
+    ledger: LedgerContract,
     index: number,
   ) => Promise<readonly ECPoint[]>;
 }

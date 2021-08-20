@@ -169,7 +169,7 @@ namespace NEOONE
         containerHash = log.ScriptContainer != null ? Crypto.Hash256(log.ScriptContainer.GetSignData(ProtocolSettings.Default.Network)) : null;
         callingScriptHash = log.ScriptHash != null ? log.ScriptHash.ToArray() : null;
         message = log.Message;
-        position = -1; // log.Position
+        position = log.Position;
       }
     }
 

@@ -86,7 +86,7 @@ export const executeScript = async (
   return {
     receipt: {
       script: compiledCode,
-      state: toVMStateJSON(receipt.state),
+      state: toVMStateJSON(receipt.state) as 'HALT' | 'FAULT',
       gasconsumed: receipt.gasConsumed.toString(),
       stack: receipt.stack.map((stackItem) => stackItem.toContractParameter().serializeJSON()),
       notifications: receipt.notifications.map((n) => n.serializeJSON()),
@@ -94,6 +94,7 @@ export const executeScript = async (
         message: log.message,
         containerhash: log.containerHash ? common.uInt256ToString(log.containerHash) : undefined,
         callingscripthash: common.uInt160ToString(log.callingScriptHash),
+        position: log.position,
       })),
     },
     sourceMaps: {

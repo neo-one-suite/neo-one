@@ -4,12 +4,6 @@ import { utils } from '@neo-one/utils';
 import type { AbstractBatch, DelBatch, PutBatch } from 'abstract-leveldown';
 import { UnknownChangeTypeError, UnknownTypeError } from './errors';
 
-/**
- * TODO: previously we had extra storage for things like `latestBlock`, etc
- * If we decide we need those back we'll need to add the logic back to here
- * like we did in 2.x, revisit this.
- */
-
 const convertAddChange = (change: AddChange): readonly PutBatch[] => {
   switch (change.type) {
     case 'nep17Balance':
@@ -48,33 +42,6 @@ const convertAddChange = (change: AddChange): readonly PutBatch[] => {
         },
       ];
 
-    // case 'block':
-    //   return [
-    //     {
-    //       type: 'put',
-    //       key: keys.createBlockKey(change.key),
-    //       value: change.value.serializeWire(),
-    //     },
-    //   ];
-
-    // case 'transaction':
-    //   return [
-    //     {
-    //       type: 'put',
-    //       key: keys.createTransactionKey(change.key),
-    //       value: change.value.serializeWire(),
-    //     },
-    //   ];
-
-    // case 'contract':
-    //   return [
-    //     {
-    //       type: 'put',
-    //       key: keys.createContractKey(change.key),
-    //       value: change.value._serializeWire(),
-    //     },
-    //   ];
-
     case 'storage':
       return [
         {
@@ -84,42 +51,6 @@ const convertAddChange = (change: AddChange): readonly PutBatch[] => {
         },
       ];
 
-    // case 'headerHashList':
-    //   return [
-    //     {
-    //       type: 'put',
-    //       key: keys.createHeaderHashListKey(change.key),
-    //       value: change.value.serializeWire(),
-    //     },
-    //   ];
-
-    // case 'blockHashIndex':
-    //   return [
-    //     {
-    //       type: 'put',
-    //       key: keys.blockHashIndexKey,
-    //       value: change.value.serializeWire(),
-    //     },
-    //   ];
-
-    // case 'headerHashIndex':
-    //   return [
-    //     {
-    //       type: 'put',
-    //       key: keys.headerHashIndexKey,
-    //       value: change.value.serializeWire(),
-    //     },
-    //   ];
-
-    // case 'contractID':
-    //   return [
-    //     {
-    //       type: 'put',
-    //       key: keys.contractIDKey,
-    //       value: change.value.serializeWire(),
-    //     },
-    //   ];
-
     default:
       utils.assertNever(change);
       throw new UnknownTypeError();
@@ -128,12 +59,6 @@ const convertAddChange = (change: AddChange): readonly PutBatch[] => {
 
 const convertDeleteChange = (change: DeleteChange): DelBatch => {
   switch (change.type) {
-    // case 'contract':
-    //   return {
-    //     type: 'del',
-    //     key: keys.createContractKey(change.key),
-    //   };
-
     case 'storage':
       return {
         type: 'del',

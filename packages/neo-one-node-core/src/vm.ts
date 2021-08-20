@@ -19,8 +19,7 @@ export interface VMLog {
   readonly containerHash?: UInt256;
   readonly callingScriptHash: UInt160;
   readonly message: string;
-  // TODO: add this here and downstream. Make sure it's implemented in VM fork
-  // readonly position: number;
+  readonly position: number;
 }
 
 export interface CallReceipt {
@@ -101,7 +100,7 @@ export type Batch = PutBatch | DeleteBatch;
 
 export interface SnapshotHandler {
   readonly commit: () => boolean;
-  // readonly reset: () => boolean;
+  readonly reset: () => boolean;
   // tslint:disable-next-line: readonly-array
   readonly getChangeSet: () => Batch[];
   readonly clone: () => void;

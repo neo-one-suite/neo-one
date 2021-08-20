@@ -10,6 +10,7 @@ import {
   Block,
   BlockJSON,
   ConfirmedTransaction,
+  ConfirmedTransactionJSON,
   Contract,
   ContractABI,
   ContractABIJSON,
@@ -74,7 +75,7 @@ import BigNumber from 'bignumber.js';
 import debug from 'debug';
 import { AsyncBlockIterator } from '../AsyncBlockIterator';
 import { clientUtils } from '../clientUtils';
-import { convertCallReceipt, convertLog, convertNotification, convertStackItem } from './convert';
+import { convertCallReceipt, convertContractParameters, convertLog, convertNotification } from './convert';
 import { JSONRPCClient } from './JSONRPCClient';
 import { JSONRPCHTTPProvider } from './JSONRPCHTTPProvider';
 import { JSONRPCProvider, JSONRPCProviderManager } from './JSONRPCProvider';
@@ -202,7 +203,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return this.convertContract(contract);
   }
 
-  public async getMemPool(): Promise<{ readonly height: number; readonly verified: readonly Hash256String[] }> {
+  public async getMemPool(): Promise<readonly Hash256String[]> {
     return this.mutableClient.getMemPool();
   }
 
@@ -300,20 +301,18 @@ export class NEOONEDataProvider implements DeveloperProvider {
 
   private convertBlock(block: BlockJSON): Block {
     return {
-      header: {
-        version: block.version,
-        hash: block.hash,
-        previousBlockHash: block.previousblockhash,
-        merkleRoot: block.merkleroot,
-        time: new BigNumber(block.time),
-        nonce: new BigNumber(block.nonce, 16),
-        primaryIndex: block.primary,
-        index: block.index,
-        nextConsensus: block.nextconsensus,
-        witness: block.witnesses[0],
-        witnesses: block.witnesses,
-        size: block.size,
-      },
+      version: block.version,
+      hash: block.hash,
+      previousBlockHash: block.previousblockhash,
+      merkleRoot: block.merkleroot,
+      time: new BigNumber(block.time),
+      nonce: new BigNumber(block.nonce, 16),
+      primaryIndex: block.primary,
+      index: block.index,
+      nextConsensus: block.nextconsensus,
+      witness: block.witnesses[0],
+      witnesses: block.witnesses,
+      size: block.size,
       transactions: block.tx.map((transaction) => this.convertConfirmedTransaction(transaction)),
     };
   }
@@ -339,10 +338,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return {
       blockIndex: receipt.blockIndex,
       blockHash: receipt.blockHash,
-      blockTime: receipt.blockTime,
-      transactionHash: receipt.transactionHash,
       globalIndex: JSONHelper.readUInt64(receipt.globalIndex),
-      confirmations: receipt.confirmations,
       transactionIndex: receipt.transactionIndex,
     };
   }
@@ -356,10 +352,10 @@ export class NEOONEDataProvider implements DeveloperProvider {
     };
   }
 
-  private convertConfirmedTransaction(transaction: TransactionJSON): ConfirmedTransaction {
+  private convertConfirmedTransaction(transaction: ConfirmedTransactionJSON): ConfirmedTransaction {
     return {
       ...this.convertTransaction(transaction),
-      receipt: transaction.receipt ? this.convertTransactionReceipt(transaction.receipt) : undefined,
+      receipt: this.convertTransactionReceipt(transaction.receipt),
     };
   }
 
@@ -516,7 +512,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
       trigger: data.trigger,
       vmState: data.vmstate,
       gasConsumed: new BigNumber(data.gasconsumed),
-      stack: typeof data.stack === 'string' ? data.stack : data.stack.map(convertStackItem),
+      stack: typeof data.stack === 'string' ? data.stack : convertContractParameters(data.stack),
       notifications: data.notifications.map(convertNotification),
       logs: data.logs.map(convertLog),
     };

@@ -12,8 +12,6 @@ import {
   OracleResponseCode,
   TriggerTypeJSON,
   VerifyResultModel,
-  VMState,
-  VMStateJSON,
   Wildcard,
 } from './models';
 
@@ -210,7 +208,7 @@ export interface ConfirmedTransaction extends Transaction {
   /**
    * 'Receipt' of the confirmed transaction on the blockchain. This contains properties like the block the `Transaction` was included in.
    */
-  readonly receipt?: TransactionReceipt;
+  readonly receipt: TransactionReceipt;
 }
 
 /**
@@ -267,11 +265,7 @@ export interface Header {
   readonly size: number;
 }
 
-export interface Block {
-  /**
-   * `Block`'s `Header`.
-   */
-  readonly header: Header;
+export interface Block extends Header {
   /**
    * `Transaction`s contained in the `Block`.
    */
@@ -291,25 +285,13 @@ export interface TransactionReceipt {
    */
   readonly blockHash: Hash256String;
   /**
-   * `Block` time of the `Transaction` for this receipt.
-   */
-  readonly blockTime: string;
-  /**
    * Transaction index of the `Transaction` within the `Block` for this receipt.
    */
   readonly transactionIndex: number;
   /**
-   * Hash of the `Transaction` within the `Block` for this receipt.
-   */
-  readonly transactionHash: Hash256String;
-  /**
    * Ordered globally unique index of the transaction.
    */
   readonly globalIndex: BigNumber;
-  /**
-   * Number of `Block`s which have confirmed this transaction.
-   */
-  readonly confirmations: number;
 }
 
 /**
@@ -393,7 +375,7 @@ export interface InvokeReceipt<TReturn extends Return = Return, TEvent extends E
 }
 
 /**
- * Represents a transfer of native assets.
+ * Represents a transfer of assets.
  */
 export interface Transfer {
   /**
@@ -703,7 +685,6 @@ export interface SmartContractNetworksDefinition {
  * Used to generate the smart contract APIs.
  */
 export interface SmartContractDefinition {
-  // TODO: may have to put hash here?
   /**
    * Configuration for the smart contract by network.
    */
@@ -2170,12 +2151,9 @@ export type ContractParameter =
  */
 export type ContractParameterType = ContractParameter['type'];
 
-// TODO: fix this
-export interface RawInvocationResult {
-  /**
-   * Result of transaction execution.
-   */
-  readonly state: 'FAULT' | 'HALT';
+export type RawInvocationResult = RawInvocationResultSuccess | RawInvocationResultError;
+
+interface RawInvocationResultBase {
   /**
    * The state of the NEO VM after execution. Typically has one `ContractParameter` which is the return value of the method invoked.
    */
@@ -2184,6 +2162,20 @@ export interface RawInvocationResult {
    * Total GAS consumed by the operation.
    */
   readonly gasConsumed: BigNumber;
+}
+
+export interface RawInvocationResultSuccess extends RawInvocationResultBase {
+  /**
+   * Result of transaction execution.
+   */
+  readonly state: 'HALT';
+}
+
+export interface RawInvocationResultError extends RawInvocationResultBase {
+  /**
+   * Result of transaction execution.
+   */
+  readonly state: 'FAULT';
 }
 
 /**
@@ -2232,79 +2224,12 @@ export interface RawActionBase {
 export type RawAction = RawNotification | RawLog;
 
 /**
- * Base properties of `RawStorageChange`s.
- */
-export interface RawStorageChangeBase {
-  /**
-   * Address of the smart contract whose storage changed.
-   */
-  readonly address: AddressString;
-  /**
-   * Key of the storage change.
-   */
-  readonly key: BufferString;
-}
-
-/**
- * Common properties of `RawStorageChangeAdd` and `RawStorageChangeModify`.
- */
-export interface RawStorageChangeAddModifyBase extends RawStorageChangeBase {
-  /**
-   * Value of the storage change.
-   */
-  readonly value: BufferString;
-}
-
-/**
- * Raw storage addition during an invocation.
- *
- * Low-level API for advanced usage only.
- */
-export interface RawStorageChangeAdd extends RawStorageChangeAddModifyBase {
-  /**
-   * `type` differentiates the `RawStorageChangeAdd` object from other `RawStorageChange` objects.
-   */
-  readonly type: 'Add';
-}
-
-/**
- * Raw storage modification during an invocation.
- *
- * Low-level API for advanced usage only.
- */
-export interface RawStorageChangeModify extends RawStorageChangeAddModifyBase {
-  /**
-   * `type` differentiates the `RawStorageChangeModify` object from other `RawStorageChange` objects.
-   */
-  readonly type: 'Modify';
-}
-
-/**
- * Raw storage deletion during an invocation.
- *
- * Low-level API for advanced usage only.
- */
-export interface RawStorageChangeDelete extends RawStorageChangeBase {
-  /**
-   * `type` differentiates the `RawStorageChangeDelete` object from other `RawStorageChange` objects.
-   */
-  readonly type: 'Delete';
-}
-
-/**
- * Raw storage change which occurred an invocation.
- *
- * Low-level API for advanced usage only.
- */
-export type RawStorageChange = RawStorageChangeAdd | RawStorageChangeModify | RawStorageChangeDelete;
-
-/**
  * Raw receipt of an invocation.
  *
  * Low-level API for advanced usage only.
  */
 export interface RawCallReceipt {
-  readonly state: keyof typeof VMState;
+  readonly state: 'HALT' | 'FAULT';
   readonly script: Buffer;
   readonly gasConsumed: BigNumber;
   readonly exception?: string;
@@ -2318,73 +2243,7 @@ export interface RawCallReceipt {
  *
  * Low-level API for advanced usage only.
  */
-export interface RawInvokeReceipt extends TransactionReceipt {
-  readonly state: keyof typeof VMState;
-  readonly script: Buffer;
-  readonly gasConsumed: BigNumber;
-  readonly stack: readonly ContractParameter[] | string;
-  readonly notifications: readonly RawNotification[];
-  readonly logs: readonly RawLog[];
-}
-
-/**
- * Raw stack item.
- *
- * Low-level API for advanced usage only.
- */
-export type RawStackItem =
-  | RawAnyStackItem
-  | RawPointerStackItem
-  | RawPrimitiveStackItem
-  | RawBufferStackItem
-  | RawArrayStackItem
-  | RawMapStackItem;
-
-export type RawPrimitiveStackItem = RawBooleanStackItem | RawIntegerStackItem | RawByteStringStackItem;
-
-export interface RawStackItemBase {
-  readonly type: RawStackItem['type'];
-}
-
-export interface RawAnyStackItem extends RawStackItemBase {
-  readonly type: 'Any';
-  readonly value: undefined;
-}
-
-export interface RawPointerStackItem extends RawStackItemBase {
-  readonly type: 'Pointer';
-  readonly value: number;
-}
-
-export interface RawBooleanStackItem extends RawStackItemBase {
-  readonly type: 'Boolean';
-  readonly value: boolean;
-}
-
-export interface RawIntegerStackItem extends RawStackItemBase {
-  readonly type: 'Integer';
-  readonly value: BN;
-}
-
-export interface RawByteStringStackItem extends RawStackItemBase {
-  readonly type: 'ByteString';
-  readonly value: string;
-}
-
-export interface RawBufferStackItem extends RawStackItemBase {
-  readonly type: 'Buffer';
-  readonly value: Buffer;
-}
-
-export interface RawArrayStackItem extends RawStackItemBase {
-  readonly type: 'Array';
-  readonly value: readonly RawStackItem[];
-}
-
-export interface RawMapStackItem extends RawStackItemBase {
-  readonly type: 'Map';
-  readonly value: ReadonlyArray<readonly [RawStackItem, RawStackItem]>;
-}
+export interface RawInvokeReceipt extends RawCallReceipt, TransactionReceipt {}
 
 /**
  * Raw notification from VM execution.
@@ -2432,8 +2291,10 @@ export interface RawLog {
    * The raw message. This is unprocessed in the `message`.
    */
   readonly message: string;
-  // TODO: implement
-  // readonly position: number;
+  /**
+   * The position of the instruction pointer when the log was emitted.
+   */
+  readonly position: number;
 }
 
 /**
@@ -2508,7 +2369,7 @@ export interface RawExecutionData {
   /**
    * The `Transaction` script's resultant VM state.
    */
-  readonly vmState: VMStateJSON;
+  readonly vmState: 'HALT' | 'FAULT';
   /**
    * The GAS consumed by the `Transaction`'s script execution.
    */
@@ -2516,7 +2377,7 @@ export interface RawExecutionData {
   /**
    * The resulting stack from `Transaction`'s script execution or the error that resulted.
    */
-  readonly stack: string | readonly RawStackItem[];
+  readonly stack: readonly ContractParameter[] | string;
   /**
    * The `Notification`s that came from the `Transaction`'s script execution.
    */

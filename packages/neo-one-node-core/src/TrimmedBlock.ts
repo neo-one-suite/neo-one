@@ -18,10 +18,6 @@ export interface TrimmedBlockAdd {
   readonly hashes: readonly UInt256[];
 }
 
-export interface BlockKey {
-  readonly hashOrIndex: UInt256 | number;
-}
-
 export class TrimmedBlock implements SerializableWire {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): TrimmedBlock {
     const { reader } = options;

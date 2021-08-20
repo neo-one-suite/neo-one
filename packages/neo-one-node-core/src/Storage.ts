@@ -9,7 +9,6 @@ import { StorageItem } from './StorageItem';
 import { StorageKey } from './StorageKey';
 import { TransactionKey } from './transaction';
 
-// TODO: along with other storage definitions in node-vm `batch` definitions need to move to `node-core`.
 type AbstractBatch = any;
 
 export interface StreamOptions {
@@ -73,36 +72,11 @@ export interface AddDeleteStorage<Key, Value> extends AddStorage<Key, Value>, De
 export interface AddUpdateDeleteStorage<Key, Value, Update>
   extends AddUpdateStorage<Key, Value, Update>,
     DeleteStorage<Key> {}
-
-/* this block of types were previously used in our storage; keeping them around until we know if we'll need them again */
-interface ReadAddStorage<Key, Value> extends ReadStorage<Key, Value>, AddStorage<Key, Value> {}
-interface ReadAddDeleteStorage<Key, Value>
-  extends ReadStorage<Key, Value>,
-    AddStorage<Key, Value>,
-    DeleteStorage<Key> {}
-interface ReadAddUpdateMetadataStorage<Value, Update>
-  extends ReadMetadataStorage<Value>,
-    AddUpdateMetadataStorage<Value, Update> {}
-interface ReadAddUpdateStorage<Key, Value, Update>
-  extends ReadStorage<Key, Value>,
-    AddUpdateStorage<Key, Value, Update> {}
-interface ReadAllAddStorage<Key, Value> extends ReadAllStorage<Key, Value>, AddStorage<Key, Value> {}
-interface ReadAllAddUpdateDeleteStorage<Key, Value, Update>
-  extends ReadAllStorage<Key, Value>,
-    AddUpdateDeleteStorage<Key, Value, Update> {}
-
 export interface LatestReadStorage<Key, Value> extends ReadStorage<Key, Value> {
   readonly tryGetLatest: () => Promise<Value | undefined>;
 }
 
 export type AddChange =
-  // | { readonly type: 'block'; readonly key: BlockKey; readonly value: TrimmedBlock }
-  // | { readonly type: 'transaction'; readonly key: TransactionKey; readonly value: TransactionState }
-  // | { readonly type: 'contract'; readonly key: ContractKey; readonly value: ContractState }
-  // | { readonly type: 'headerHashList'; readonly key: HeaderKey; readonly value: HeaderHashList }
-  // | { readonly type: 'blockHashIndex'; readonly value: HashIndexState }
-  // | { readonly type: 'headerHashIndex'; readonly value: HashIndexState }
-  // | { readonly type: 'contractID'; readonly value: ContractIDState }
   | { readonly type: 'storage'; readonly key: StorageKey; readonly value: StorageItem }
   | { readonly type: 'nep17Balance'; readonly key: Nep17BalanceKey; readonly value: Nep17Balance }
   | { readonly type: 'nep17TransferSent'; readonly key: Nep17TransferKey; readonly value: Nep17Transfer }
@@ -110,7 +84,6 @@ export type AddChange =
   | { readonly type: 'applicationLog'; readonly key: TransactionKey; readonly value: ApplicationLog };
 
 export type DeleteChange =
-  // | { readonly type: 'contract'; readonly key: ContractKey }
   | { readonly type: 'storage'; readonly key: StorageKey }
   | { readonly type: 'nep17Balance'; readonly key: Nep17BalanceKey };
 
@@ -126,7 +99,6 @@ export interface BlockchainStorage {
   readonly nep17TransfersReceived: ReadFindStorage<Nep17TransferKey, Nep17Transfer>;
   readonly applicationLogs: ReadStorage<TransactionKey, ApplicationLogJSON>;
   readonly storages: ReadFindStorage<StorageKey, StorageItem>;
-  // readonly consensusState: ReadMetadataStorage<ConsensusContext>;
 }
 
 export interface Storage extends BlockchainStorage {

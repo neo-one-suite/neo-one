@@ -43,7 +43,7 @@ export class ContractManifestModel<
   public readonly trusts: WildcardContainer<ContractPermissionDescriptorModel>;
   public readonly extra: JSONObject | undefined;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
-  // TODO: fix this
+  // There seems to be a bug in the C# implementation where there is no variable in front. See open GH issue
   public readonly serializeWireForNeo: SerializeWire = createSerializeWire(this.serializeWireBaseForNeo.bind(this));
 
   public constructor({
@@ -82,7 +82,7 @@ export class ContractManifestModel<
   }
 
   public serializeWireBaseForNeo(writer: BinaryWriter): void {
-    // TODO: fix this. or bring up with Neo team
+    // There seems to be a bug in the C# implementation where there is no variable in front. See open GH issue
     writer.writeVarStringWithoutVar(JSON.stringify(this.serializeJSON()));
   }
 }
