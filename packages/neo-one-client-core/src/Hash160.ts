@@ -32,4 +32,12 @@ export const Hash160 = {
    * `AddressString` of the native Oracle conract.
    */
   Oracle: scriptHashToAddress(common.nativeScriptHashes.Oracle),
+  /**
+   * `AddressString` of the native Crypto conract.
+   */
+  Crypto: scriptHashToAddress(common.nativeScriptHashes.CryptoLib),
+  /**
+   * `AddressString` of the native StdLib conract.
+   */
+  StdLib: scriptHashToAddress(common.nativeScriptHashes.StdLib),
 };

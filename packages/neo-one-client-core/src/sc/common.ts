@@ -329,9 +329,6 @@ export const convertCallReceipt = async ({
   if (typeof receipt.stack === 'string') {
     throw new Error(receipt.stack);
   }
-  if (receipt.state === 'NONE' || receipt.state === 'BREAK') {
-    throw new Error('Should never return NONE or BREAK');
-  }
   const contractParameter = receipt.stack[0];
   const value = convertContractParameter({
     type: returnType,

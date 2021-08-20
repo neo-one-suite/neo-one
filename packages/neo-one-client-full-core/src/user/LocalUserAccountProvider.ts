@@ -224,7 +224,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
             hash,
             'deploy',
             CallFlags.All,
-            'deploy', // TODO: remove this when fixing how contracts are called
+            'deploy', // NEO•ONE contracts have to be called with the method name as first param
             ...convertParams({
               parameters: deployFunc.parameters === undefined ? [] : deployFunc.parameters,
               params,
@@ -260,12 +260,9 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         return {
           blockIndex: receipt.blockIndex,
           blockHash: receipt.blockHash,
-          blockTime: receipt.blockTime,
           transactionIndex: receipt.transactionIndex,
-          transactionHash: receipt.transactionHash,
           globalIndex: receipt.globalIndex,
-          confirmations: receipt.confirmations,
-          stack: typeof data.stack === 'string' ? [] : data.stack, // TODO: fix
+          stack: typeof data.stack === 'string' ? [] : data.stack,
           state: data.vmState,
           script: bufferScript,
           gasConsumed: data.gasConsumed,
@@ -334,11 +331,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         const execution = data.executions.length > 0 ? data.executions[0] : undefined;
         const vmState = execution?.vmState;
 
-        // tslint:disable-next-line: prefer-switch
         if (vmState === 'FAULT') {
           result = await this.getInvocationResultError(data, sourceMaps);
-        } else if (vmState === 'NONE' || vmState === 'BREAK') {
-          throw new Error(`Something went wrong. Expected VM state HALT or FAULT. Got: ${vmState}`);
         } else {
           const contractAddress = scriptHashToAddress(common.uInt160ToString(contractHash));
           const contractOut = await this.provider.getContract(from.network, contractAddress);
@@ -351,9 +345,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           blockHash: receipt.blockHash,
           transactionIndex: receipt.transactionIndex,
           globalIndex: receipt.globalIndex,
-          blockTime: receipt.blockTime,
-          transactionHash: receipt.transactionHash,
-          confirmations: receipt.confirmations,
           result,
         };
       },
@@ -375,8 +366,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       sourceMaps,
     });
 
-    // tslint:disable-next-line: prefer-switch
-    if (data.vmState === 'HALT' || data.vmState === 'BREAK' || data.vmState === 'NONE') {
+    if (data.vmState === 'HALT') {
       throw new Error(`Expected FAULT state. Got: ${data.vmState}`);
     }
 
@@ -401,8 +391,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       sourceMaps,
     });
 
-    // tslint:disable-next-line: prefer-switch
-    if (data.vmState === 'FAULT' || data.vmState === 'BREAK' || data.vmState === 'NONE') {
+    if (data.vmState === 'FAULT') {
       throw new Error(`Expected HALT state. Got: ${data.vmState}`);
     }
 

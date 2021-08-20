@@ -5,14 +5,12 @@ export interface LogReturn {
   readonly containerHash?: Buffer;
   readonly callingScriptHash: Buffer;
   readonly message: string;
-  // TODO
-  // readonly position: number;
+  readonly position: number;
 }
 
-export const convertLog = ({ containerHash, callingScriptHash, message }: LogReturn): VMLog => ({
+export const convertLog = ({ containerHash, callingScriptHash, message, position }: LogReturn): VMLog => ({
   containerHash: containerHash ? common.asUInt256(containerHash) : undefined,
   callingScriptHash: common.asUInt160(callingScriptHash),
   message,
-  // TODO
-  // position,
+  position,
 });

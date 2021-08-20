@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Neo.Persistence;
 using Neo.SmartContract;
 
-// It is worth noting this helper method shouldn't be used outside of testing purposes.
 namespace NEOONE
 {
   partial class Dispatcher

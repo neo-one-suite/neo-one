@@ -46,4 +46,10 @@ export class SnapshotHandler {
   public clone() {
     this.cloneInternal();
   }
+
+  public reset() {
+    return this.dispatch({
+      method: 'snapshot_reset',
+    });
+  }
 }

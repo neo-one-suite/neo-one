@@ -27,6 +27,7 @@ export interface NEP17TransferEventParameters {
 export interface NEP17TransferEvent extends Event<'transfer', NEP17TransferEventParameters> {}
 
 export interface NEP17SmartContract<TClient extends Client = Client> extends SmartContract<TClient, NEP17Event> {
+  readonly name: (options?: SmartContractReadOptions) => Promise<string>;
   readonly symbol: (options?: SmartContractReadOptions) => Promise<string>;
   readonly decimals: (options?: SmartContractReadOptions) => Promise<BigNumber>;
   readonly totalSupply: (options?: SmartContractReadOptions) => Promise<BigNumber>;

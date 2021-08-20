@@ -1,8 +1,5 @@
 // tslint:disable no-any
 
-// TODO: not implemented
-export type ExecutionContext = any;
-
 export interface DispatchMethodNoArgs<Return = any> {
   readonly returnType: Return;
 }

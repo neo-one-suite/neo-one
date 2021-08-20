@@ -6,11 +6,11 @@ import {
   BlockJSON,
   BufferString,
   CallReceiptJSON,
+  ConfirmedTransactionJSON,
   ContractJSON,
   GetOptions,
   Hash256String,
   HeaderJSON,
-  InvocationDataJSON,
   NativeContractJSON,
   Nep17BalancesJSON,
   Nep17TransfersJSON,
@@ -24,7 +24,6 @@ import {
   TriggerTypeJSON,
   UnclaimedGASJSON,
   ValidatorJSON,
-  VerboseTransactionJSON,
   VerificationCostJSON,
   VersionJSON,
 } from '@neo-one/client-common';
@@ -101,11 +100,11 @@ export class JSONRPCClient {
     );
   }
 
-  public async getMemPool(): Promise<{ readonly height: number; readonly verified: readonly string[] }> {
+  public async getMemPool(): Promise<readonly string[]> {
     return this.withInstance(async (provider) => provider.request({ method: 'getrawmempool' }));
   }
 
-  public async getTransaction(hash: Hash256String): Promise<VerboseTransactionJSON> {
+  public async getTransaction(hash: Hash256String): Promise<ConfirmedTransactionJSON> {
     return this.withInstance(async (provider) =>
       provider.request({
         method: 'getrawtransaction',
@@ -262,15 +261,6 @@ export class JSONRPCClient {
       provider.request({
         method: 'getapplicationlog',
         params: [hash, trigger],
-      }),
-    );
-  }
-
-  public async getInvocationData(hash: Hash256String): Promise<InvocationDataJSON> {
-    return this.withInstance(async (provider) =>
-      provider.request({
-        method: 'getinvocationdata',
-        params: [hash],
       }),
     );
   }

@@ -1,7 +1,7 @@
 import { ExecutionJSON, toTriggerTypeJSON, toVMStateJSON, TriggerType, UInt256, VMState } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { Notification } from './Notification';
-import { StackItem, stackItemToJSON } from './StackItems';
+import { StackItem } from './StackItems';
 
 export interface ExecutionAdd {
   readonly txid?: UInt256;
@@ -33,19 +33,19 @@ export class Execution {
   public serializeJSON(): ExecutionJSON {
     let stack;
     try {
-      stack = this.stack.map((item) => stackItemToJSON(item, undefined));
+      stack = this.stack.map((item) => item.toContractParameter().serializeJSON());
     } catch {
       stack = 'error: recursive reference';
     }
 
     return {
       trigger: toTriggerTypeJSON(this.trigger),
-      vmstate: toVMStateJSON(this.vmState),
+      vmstate: toVMStateJSON(this.vmState) as 'HALT' | 'FAULT',
       gasconsumed: this.gasConsumed.toString(),
       stack,
       exception: this.exception,
       notifications: this.notifications.map((n) => n.serializeJSON()),
-      logs: [], // TODO: implement this
+      logs: [],
     };
   }
 }

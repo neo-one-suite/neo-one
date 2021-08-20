@@ -1,4 +1,5 @@
-import { BlockJSON, JSONHelper, UInt160, UInt256, utils } from '@neo-one/client-common';
+import { BlockJSON, JSONHelper, TransactionJSON, UInt160, UInt256, utils } from '@neo-one/client-common';
+import { OmitStrict } from '@neo-one/utils';
 import { BN } from 'bn.js';
 import { Block, BlockAdd } from '../Block';
 import { Header, HeaderAdd } from '../Header';
@@ -84,7 +85,7 @@ export class BlockBuilder {
     });
   }
 
-  public toJSON(): Partial<BlockJSON> {
+  public toJSON(): Partial<OmitStrict<BlockJSON, 'tx'> & { readonly tx: ReadonlyArray<TransactionJSON> }> {
     return {
       merkleroot: this.merkleRoot ? JSONHelper.writeUInt256(this.merkleRoot) : undefined,
       tx: this.transactions?.map((tx) => tx.serializeJSON()),

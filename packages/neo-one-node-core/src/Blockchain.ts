@@ -76,7 +76,7 @@ export interface Blockchain extends BlockchainStorage {
     readonly size: number;
   }>;
 
-  // readonly updateSettings: (settings: BlockchainSettings) => void;
+  readonly updateSettings: (settings: BlockchainSettings) => void;
   readonly stop: () => Promise<void>;
   readonly reset: () => Promise<void>;
 }

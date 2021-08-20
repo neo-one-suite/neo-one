@@ -248,13 +248,10 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
         return {
           blockIndex: receipt.blockIndex,
           blockHash: receipt.blockHash,
-          blockTime: receipt.blockTime,
           transactionIndex: receipt.transactionIndex,
-          transactionHash: receipt.transactionHash,
           globalIndex: receipt.globalIndex,
-          confirmations: receipt.confirmations,
           state: data.vmState,
-          stack: typeof data.stack === 'string' ? [] : data.stack, // TODO: fix
+          stack: typeof data.stack === 'string' ? [] : data.stack,
           gasConsumed: data.gasConsumed,
           script: Buffer.from(transaction.script, 'hex'),
           logs: data.logs,
@@ -490,9 +487,6 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     transfers = [],
   }: InvokeRawOptions<T>) {
     const { from, attributes, maxSystemFee, maxNetworkFee, validBlockCount } = this.getTransactionOptions(options);
-
-    // TODO: need to pass transfers into here to they are include in the script. must be in front of the actual method call?
-    // Or are they included as "witnesses" which used to be called scripts?
     const { script: scriptIn, invokeMethodOptions } = this.getScriptAndInvokeMethodOptions(invokeMethodOptionsOrScript);
 
     const sb = new ScriptBuilder();
@@ -507,7 +501,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
         {},
       );
     });
-    // TODO: does the script ordering matter here?
+
     const script = Buffer.concat([sb.build(), scriptIn]);
 
     return this.capture(

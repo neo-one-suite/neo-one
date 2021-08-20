@@ -7,6 +7,7 @@ import {
   getSignData,
   InvalidFormatError,
   IOHelper,
+  JSONHelper,
   UInt160,
   UInt256,
   UInt256Hex,
@@ -175,7 +176,15 @@ export class Block implements SerializableContainer, SerializableJSON<BlockJSON>
     return {
       ...this.header.serializeJSON(context),
       size: this.size,
-      tx: this.transactions.map((tx) => tx.serializeJSON()),
+      tx: this.transactions.map((tx) => {
+        const transactionIndex = this.transactions.findIndex((txIn) => tx.hash.equals(txIn.hash));
+
+        return tx.serializeJSONWithReceipt({
+          blockHash: JSONHelper.writeUInt256(this.hash),
+          blockIndex: this.index,
+          transactionIndex,
+        });
+      }),
     };
   }
 }

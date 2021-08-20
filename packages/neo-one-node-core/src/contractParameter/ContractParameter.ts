@@ -93,10 +93,12 @@ export const deserializeWire = createDeserializeWire(deserializeContractParamete
 };
 
 // tslint:disable-next-line no-object-mutation
-(ArrayContractParameter as {
-  // tslint:disable-next-line readonly-keyword
-  deserializeWire?: DeserializeWire<ContractParameterBase>;
-}).deserializeWire = createDeserializeWire(
+(
+  ArrayContractParameter as {
+    // tslint:disable-next-line readonly-keyword
+    deserializeWire?: DeserializeWire<ContractParameterBase>;
+  }
+).deserializeWire = createDeserializeWire(
   // tslint:disable-next-line no-any
   (ArrayContractParameter as any).deserializeWireBase.bind(ArrayContractParameter),
 );
@@ -114,10 +116,12 @@ export const deserializeWire = createDeserializeWire(deserializeContractParamete
 };
 
 // tslint:disable-next-line no-object-mutation
-(MapContractParameter as {
-  // tslint:disable-next-line readonly-keyword
-  deserializeWire?: DeserializeWire<ContractParameterBase>;
-}).deserializeWire = createDeserializeWire(
+(
+  MapContractParameter as {
+    // tslint:disable-next-line readonly-keyword
+    deserializeWire?: DeserializeWire<ContractParameterBase>;
+  }
+).deserializeWire = createDeserializeWire(
   // tslint:disable-next-line no-any
   (MapContractParameter as any).deserializeWireBase.bind(MapContractParameter),
 );

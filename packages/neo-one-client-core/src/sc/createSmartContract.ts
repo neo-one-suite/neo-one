@@ -1,37 +1,26 @@
 /// <reference types="@reactivex/ix-es2015-cjs" />
 import {
   ABIParameter,
-  // Action,
   AddressString,
-  // ContractEventDescriptorClient,
   ContractMethodDescriptorClient,
-  // Event,
   ForwardOptions,
   GetOptions,
   Hash256String,
   InvokeReceipt,
   InvokeSendUnsafeReceiveTransactionOptions,
-  // Log,
   NetworkType,
   Param,
-  // RawAction,
   RawInvokeReceipt,
   Return,
   ScriptBuilderParam,
   SmartContractDefinition,
-  // SmartContractIterOptions,
   SmartContractNetworkDefinition,
   TransactionResult,
   Transfer,
 } from '@neo-one/client-common';
-// import { utils } from '@neo-one/utils';
-// import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
-// import { filter } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/filter';
-// import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
 import * as argAssertions from '../args';
 import { Client } from '../Client';
-import { CannotSendToContractError, NoContractDeployedError } from '../errors';
-// import { events as traceEvents } from '../trace';
+import { NoContractDeployedError } from '../errors';
 import { SmartContractAny } from '../types';
 import * as common from './common';
 
@@ -213,8 +202,9 @@ const createCall =
       client,
     });
 
-    // TODO: this needs to be reverted when we change how we call contracts
-    const receipt = await client.__call(network, address, name, [name, ...params]);
+    // For NEO•ONE contracts we need to add method name as the first param. This should be fixed
+    const paramsIn = [name, ...params];
+    const receipt = await client.__call(network, address, name, paramsIn);
 
     return common.convertCallResult({
       returnType,
@@ -247,8 +237,7 @@ const createInvoke = ({
     const result: TransactionResult<RawInvokeReceipt> = await client.__invoke(
       address,
       name,
-      // TODO: fix here when reverting how we call contracts
-      [name, ...params],
+      [name, ...params], // For NEO•ONE contracts we need to add method name as the first param. This should be fixed
       paramsZipped,
       receive,
       options,
@@ -266,13 +255,11 @@ const createInvoke = ({
           events: events.concat(forwardEvents),
         });
 
-        // TODO: handle this better. or request that this be changed in the VM
         const receiptStack = typeof receipt.stack === 'string' ? [] : receipt.stack;
 
-        // TODO: change how state is handled
         const receiptResult = {
           gasConsumed: receipt.gasConsumed,
-          state: receipt.state as 'HALT' | 'FAULT',
+          state: receipt.state,
           stack: receiptStack,
         };
 
@@ -287,9 +274,6 @@ const createInvoke = ({
           blockIndex: receipt.blockIndex,
           blockHash: receipt.blockHash,
           globalIndex: receipt.globalIndex,
-          blockTime: receipt.blockTime,
-          confirmations: receipt.confirmations,
-          transactionHash: receipt.transactionHash,
           transactionIndex: receipt.transactionIndex,
           result: invocationResult,
           events: common.filterEvents(actions),
@@ -328,7 +312,7 @@ export const createSmartContract = ({
       abi: { events: abiEvents = [] },
     },
   } = definition;
-  // TODO: reimplement this stuff
+
   // const events = traceEvents.concat(abiEvents).reduce<{ [key: string]: ContractEventDescriptorClient }>(
   //   (acc, event) => ({
   //     ...acc,

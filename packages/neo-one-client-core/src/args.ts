@@ -432,6 +432,17 @@ const assertContractParameter = (paramName: string, value?: unknown): ContractPa
   }
 };
 
+const assertContractParameterDefinition = (name: string, value?: unknown): ContractParameterDefinition => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('ContractParameterDefinition', name, value);
+  }
+
+  return {
+    type: assertProperty(value, 'ContractParameterDefinition', 'type', assertContractParameterType),
+    name: assertProperty(value, 'ContractParameterDefinition', 'name', assertString),
+  };
+};
+
 const assertABIDefaultType = (name: string, valueIn?: unknown): ABIDefaultType => {
   const value = assertString(name, valueIn);
   switch (value) {
@@ -632,10 +643,11 @@ const assertContractMethodDescriptor = (name: string, value?: unknown): Contract
   return {
     name: assertProperty(value, 'ContractMethodDescriptor', 'name', assertString),
     parameters: assertProperty(value, 'ContractMethodDescriptor', 'parameters', assertNullableArray).map((parameter) =>
-      assertContractParameter('ContractMethodDescriptor.parameters', parameter),
+      assertContractParameterDefinition('ContractMethodDescriptor.parameters', parameter),
     ),
     returnType: assertProperty(value, 'ContractMethodDescriptor', 'returnType', assertContractParameterType),
     offset: assertProperty(value, 'ContractMethodDescriptor', 'offset', assertNumber),
+    safe: assertProperty(value, 'ContractMethodDescriptor', 'safe', assertBoolean),
   };
 };
 
@@ -660,7 +672,7 @@ const assertContractEventDescriptor = (name: string, value?: unknown): ContractE
   return {
     name: assertProperty(value, 'ContractEventDescriptor', 'name', assertString),
     parameters: assertProperty(value, 'ContractEventDescriptor', 'parameters', assertNullableArray).map((parameter) =>
-      assertContractParameter('ContractEventDescriptor.parameters', parameter),
+      assertContractParameterDefinition('ContractEventDescriptor.parameters', parameter),
     ),
   };
 };

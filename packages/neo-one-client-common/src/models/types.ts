@@ -3,9 +3,8 @@ import { UInt256Hex } from '../common';
 import { UserAccount } from '../types';
 import { ContractParameterTypeModel } from './ContractParameterTypeModel';
 import { AttributeTypeModel } from './transaction';
-import { TriggerType, TriggerTypeJSON } from './trigger';
+import { TriggerTypeJSON } from './trigger';
 import { VerifyResultModel } from './VerifyResultModel';
-import { VMState, VMStateJSON } from './vm';
 import { WitnessScopeModel } from './WitnessScopeModel';
 
 export interface AnyContractParameterJSON {
@@ -140,24 +139,6 @@ export type StackItemJSON =
 
 export type WitnessScopeJSON = keyof typeof WitnessScopeModel;
 
-// TODO: delete
-export interface TransactionResultErrorJSON {
-  readonly state: 'FAULT';
-  readonly gas_consumed: string;
-  readonly stack: readonly ContractParameterJSON[];
-  readonly script: string;
-  readonly message: string;
-}
-
-export interface TransactionResultSuccessJSON {
-  readonly state: 'HALT';
-  readonly gas_consumed: string;
-  readonly stack: readonly ContractParameterJSON[];
-  readonly script: string;
-}
-
-export type InvocationResultJSON = TransactionResultSuccessJSON | TransactionResultErrorJSON;
-
 export interface RawInvocationResultErrorJSON {
   readonly script: string;
   readonly state: 'FAULT';
@@ -176,28 +157,6 @@ export interface RawInvocationResultSuccessJSON {
 }
 
 export type RawInvocationResultJSON = RawInvocationResultSuccessJSON | RawInvocationResultErrorJSON;
-
-export interface StorageChangeAddJSON {
-  readonly type: 'Add';
-  readonly hash: string;
-  readonly key: string;
-  readonly value: string;
-}
-
-export interface StorageChangeModifyJSON {
-  readonly type: 'Modify';
-  readonly hash: string;
-  readonly key: string;
-  readonly value: string;
-}
-
-export interface StorageChangeDeleteJSON {
-  readonly type: 'Delete';
-  readonly hash: string;
-  readonly key: string;
-}
-
-export type StorageChangeJSON = StorageChangeAddJSON | StorageChangeModifyJSON | StorageChangeDeleteJSON;
 
 export interface ActionBaseJSON {
   readonly version: number;
@@ -256,36 +215,17 @@ export type AttributeTypeJSON = keyof typeof AttributeTypeModel;
 
 export type VerifyResultJSON = keyof typeof VerifyResultModel;
 
-export interface InvocationDataJSON {
-  readonly result: InvocationResultJSON;
-  readonly contracts: readonly ContractJSON[];
-  readonly deletedContractHashes: readonly string[];
-  readonly migratedContractHashes: ReadonlyArray<readonly [string, string]>;
-  readonly voteUpdates: ReadonlyArray<readonly [string, ReadonlyArray<string>]>;
-  readonly actions: readonly ActionJSON[];
-  readonly storageChanges: readonly StorageChangeJSON[];
-}
-
 export interface UnclaimedGASJSON {
   readonly unclaimed: string;
   readonly address: string;
 }
 
-export interface ExecutionResultJSON {
-  readonly trigger: keyof typeof TriggerType;
-  readonly contract: string;
-  readonly vmstate: keyof typeof VMState;
-  readonly gas_consumed: string;
-  readonly stack: readonly StackItemJSON[];
-  readonly notifications: readonly NotificationActionJSON[];
-}
-
 export interface ExecutionJSON {
   readonly trigger: TriggerTypeJSON;
-  readonly vmstate: VMStateJSON;
+  readonly vmstate: 'HALT' | 'FAULT';
   readonly gasconsumed: string;
   readonly exception?: string;
-  readonly stack: readonly StackItemJSON[] | string;
+  readonly stack: readonly ContractParameterJSON[] | string;
   readonly notifications: readonly NotificationJSON[];
   readonly logs: readonly LogJSON[];
 }
@@ -316,28 +256,17 @@ export interface TransactionJSON {
   readonly signers: readonly SignerJSON[];
   readonly script: string;
   readonly witnesses: readonly WitnessJSON[];
-  readonly receipt?: TransactionReceiptJSON;
 }
 
-export interface VerboseTransactionJSON extends TransactionJSON {
-  readonly blockhash: UInt256Hex;
-  readonly confirmations: number;
-  readonly blocktime: number;
-}
-
-export interface TransactionWithInvocationDataJSON extends TransactionJSON {
-  readonly script: string;
-  readonly gas: string;
+export interface ConfirmedTransactionJSON extends TransactionJSON {
+  readonly receipt: TransactionReceiptJSON;
 }
 
 export interface TransactionReceiptJSON {
   readonly blockIndex: number;
-  readonly blockHash: string;
+  readonly blockHash: UInt256Hex;
   readonly globalIndex: string;
   readonly transactionIndex: number;
-  readonly blockTime: string;
-  readonly confirmations: number;
-  readonly transactionHash: string;
 }
 
 export type Wildcard = '*';
@@ -468,7 +397,7 @@ export interface HeaderJSON {
 }
 
 export interface BlockJSON extends HeaderJSON {
-  readonly tx: readonly TransactionJSON[];
+  readonly tx: readonly ConfirmedTransactionJSON[];
 }
 
 export interface NetworkSettingsJSON {
@@ -503,12 +432,12 @@ export interface LogJSON {
   readonly containerhash?: string;
   readonly callingscripthash: string;
   readonly message: string;
-  // readonly position: number;
+  readonly position: number;
 }
 
 export interface CallReceiptJSON {
   readonly script: string;
-  readonly state: keyof typeof VMState;
+  readonly state: 'HALT' | 'FAULT';
   readonly gasconsumed: string;
   readonly exception?: string;
   readonly stack: readonly ContractParameterJSON[] | string;
@@ -523,13 +452,8 @@ export interface VerifyScriptResultJSON {
   readonly actions: readonly ActionJSON[];
 }
 
-export interface VerifyTransactionResultJSON {
-  readonly verifications: readonly VerifyScriptResultJSON[];
-}
-
 export interface RelayTransactionResultJSON {
   readonly transaction: TransactionJSON;
-  // TODO: reimplement the longform verify transaction result
   readonly verifyResult?: VerifyResultJSON;
 }
 
