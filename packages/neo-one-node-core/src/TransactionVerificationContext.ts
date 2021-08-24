@@ -5,7 +5,6 @@ import { isOracleResponse, Transaction } from './transaction';
 
 const assertSender = (sender: UInt160 | undefined) => {
   if (sender === undefined) {
-    // TODO: implement error
     throw new Error('Sender must be defined');
   }
 
@@ -38,22 +37,33 @@ export class TransactionVerificationContext {
     this.mutableSenderFee[key] = maybeFee.add(tx.systemFee).add(tx.networkFee);
   }
 
-  public async checkTransaction(tx: Transaction, storage: NativeContractStorageContext): Promise<boolean> {
+  public async checkTransaction(
+    tx: Transaction,
+    storage: NativeContractStorageContext,
+  ): Promise<{ readonly result: boolean; readonly failureReason?: string }> {
     const sender = assertSender(tx.sender);
     const balance = await this.getGasBalance(storage, sender);
     const maybeFee = this.mutableSenderFee[common.uInt160ToHex(sender)] ?? new BN(0);
     const totalFee = maybeFee.add(tx.systemFee).add(tx.networkFee);
 
     if (balance.lt(totalFee)) {
-      return false;
+      return {
+        result: false,
+        failureReason: `Insufficient balance for sender ${common.uInt160ToString(
+          sender,
+        )}. Sender balance: ${balance.toString()}. Total fee needed: ${totalFee.toString()}`,
+      };
     }
 
     const oracle = tx.getAttribute(isOracleResponse);
     if (oracle !== undefined && this.mutableOracleResponses[oracle.id.toString()] !== undefined) {
-      return false;
+      return {
+        result: false,
+        failureReason: `Expected oracle response to be undefined for id ${oracle.id.toString()}`,
+      };
     }
 
-    return true;
+    return { result: true };
   }
 
   public removeTransaction(tx: Transaction) {
@@ -61,7 +71,6 @@ export class TransactionVerificationContext {
     const key = common.uInt160ToHex(sender);
     const maybeFee = this.mutableSenderFee[key];
     if (maybeFee === undefined) {
-      // TODO: implement error
       throw new Error('Transaction not present in verification context to remove');
     }
 

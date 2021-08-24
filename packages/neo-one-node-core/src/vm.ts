@@ -1,11 +1,16 @@
 import { CallFlags, TriggerType, UInt160, UInt256, VMState } from '@neo-one/client-common';
 import { BN } from 'bn.js';
+import { Action } from './action';
 import { Block } from './Block';
+import { ExecutionResult } from './executionResult';
 import { Notification } from './Notification';
 import { SerializableContainer } from './Serializable';
 import { VMProtocolSettingsIn } from './Settings';
 import { StackItem } from './StackItems';
+import { Batch } from './Storage';
 import { Transaction } from './transaction';
+
+export const StoragePrefix = 0x70;
 
 export const executionLimits = {
   maxShift: 256,
@@ -23,6 +28,11 @@ export interface VMLog {
 }
 
 export interface CallReceipt {
+  readonly result: ExecutionResult;
+  readonly actions: readonly Action[];
+}
+
+export interface RunEngineResult {
   readonly state: VMState;
   readonly gasConsumed: BN;
   readonly exception?: string;
@@ -84,19 +94,6 @@ export interface ApplicationEngine {
   readonly execute: () => VMState;
   readonly push: (item: string) => boolean;
 }
-
-export interface PutBatch {
-  readonly type: 'put';
-  readonly key: Buffer;
-  readonly value: Buffer;
-}
-
-export interface DeleteBatch {
-  readonly type: 'del';
-  readonly key: Buffer;
-}
-
-export type Batch = PutBatch | DeleteBatch;
 
 export interface SnapshotHandler {
   readonly commit: () => boolean;

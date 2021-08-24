@@ -1,4 +1,4 @@
-import { ECPoint, UInt160, UInt256, VerifyResultModel } from '@neo-one/client-common';
+import { ECPoint, UInt160, UInt256, VerifyResultModelExtended } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { Observable } from 'rxjs';
 import { Block } from './Block';
@@ -42,7 +42,7 @@ export interface Blockchain extends BlockchainStorage {
     transaction: Transaction,
     mempool: Mempool,
     context?: TransactionVerificationContext,
-  ) => Promise<VerifyResultModel>;
+  ) => Promise<VerifyResultModelExtended>;
   readonly verifyConsensusPayload: (payload: ExtensiblePayload) => Promise<void>;
 
   readonly getBlock: (hashOrIndex: UInt256 | number) => Promise<Block | undefined>;

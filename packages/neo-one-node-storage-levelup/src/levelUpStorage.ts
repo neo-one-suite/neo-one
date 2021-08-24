@@ -1,5 +1,7 @@
 import {
   ApplicationLog,
+  BlockData,
+  deserializeActionWire,
   DeserializeWireContext,
   Nep17Balance,
   Nep17BalanceKey,
@@ -8,8 +10,10 @@ import {
   Storage,
   StorageItem,
   StorageKey,
+  TransactionData,
 } from '@neo-one/node-core';
 import { keys } from '@neo-one/node-storage-common';
+import { BN } from 'bn.js';
 import { LevelUp } from 'levelup';
 import { convertChange } from './convertChange';
 import * as read from './read';
@@ -79,6 +83,39 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
           context,
           buffer,
         }),
+    }),
+
+    blockData: read.createReadStorage({
+      db,
+      serializeKey: keys.createBlockDataKey,
+      deserializeValue: (buffer) =>
+        BlockData.deserializeWire({
+          context,
+          buffer,
+        }),
+    }),
+
+    transactionData: read.createReadStorage({
+      db,
+      serializeKey: keys.createTransactionDataKey,
+      deserializeValue: (buffer) =>
+        TransactionData.deserializeWire({
+          context,
+          buffer,
+        }),
+    }),
+
+    action: read.createReadAllFindStorage({
+      db,
+      searchRange: keys.getAllActionSearchRange,
+      getSearchRange: keys.getActionSearchRange,
+      serializeKey: keys.createActionKey,
+      deserializeValue: (buffer) =>
+        deserializeActionWire({
+          context,
+          buffer,
+        }),
+      deserializeKey: (key) => ({ index: new BN(key) }),
     }),
 
     async close(): Promise<void> {

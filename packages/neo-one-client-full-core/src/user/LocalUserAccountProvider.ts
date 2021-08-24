@@ -5,6 +5,7 @@ import {
   BufferString,
   CallFlags,
   common,
+  Contract,
   ContractManifestClient,
   ContractParameterTypeModel,
   ContractPermissionDescriptor,
@@ -17,10 +18,11 @@ import {
   NetworkSettings,
   NetworkType,
   Param,
-  RawApplicationLogData,
+  RawExecutionResultError,
+  RawExecutionResultSuccess,
   RawInvokeReceipt,
+  RawTransactionData,
   ScriptBuilder,
-  scriptHashToAddress,
   SignerModel,
   SourceMaps,
   TransactionOptions,
@@ -32,6 +34,7 @@ import {
 } from '@neo-one/client-common';
 import {
   convertParams,
+  InvalidTransactionError,
   KeyStore,
   LocalUserAccountProvider as LocalUserAccountProviderLite,
   Provider as ProviderLite,
@@ -251,25 +254,14 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       invokeMethodOptionsOrScript: bufferScript,
       options,
       transfers: options.transfers === undefined ? [] : options.transfers.map((transfer) => ({ ...transfer, from })),
-      onConfirm: ({ receipt, data: dataIn }): RawInvokeReceipt => {
-        const data = dataIn.executions.length > 0 ? dataIn.executions[0] : undefined;
-        if (data === undefined) {
-          throw new Error('Expected application log for transaction to have at least one execution');
-        }
-
-        return {
-          blockIndex: receipt.blockIndex,
-          blockHash: receipt.blockHash,
-          transactionIndex: receipt.transactionIndex,
-          globalIndex: receipt.globalIndex,
-          stack: typeof data.stack === 'string' ? [] : data.stack,
-          state: data.vmState,
-          script: bufferScript,
-          gasConsumed: data.gasConsumed,
-          logs: data.logs,
-          notifications: data.notifications,
-        };
-      },
+      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
+        blockIndex: receipt.blockIndex,
+        blockHash: receipt.blockHash,
+        transactionIndex: receipt.transactionIndex,
+        globalIndex: receipt.globalIndex,
+        result: data.executionResult,
+        actions: data.actions,
+      }),
       method: 'execute',
       sourceMaps,
     });
@@ -328,16 +320,18 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       options,
       onConfirm: async ({ receipt, data }): Promise<PublishReceipt> => {
         let result;
-        const execution = data.executions.length > 0 ? data.executions[0] : undefined;
-        const vmState = execution?.vmState;
-
-        if (vmState === 'FAULT') {
-          result = await this.getInvocationResultError(data, sourceMaps);
+        if (data.executionResult.state === 'FAULT') {
+          result = await this.getInvocationResultError(data, data.executionResult, sourceMaps);
         } else {
-          const contractAddress = scriptHashToAddress(common.uInt160ToString(contractHash));
-          const contractOut = await this.provider.getContract(from.network, contractAddress);
+          const createdContract = data.deployedContracts[0] as Contract | undefined;
+          if (createdContract === undefined) {
+            /* istanbul ignore next */
+            throw new InvalidTransactionError(
+              'Something went wrong! Expected a contract to have been created, but none was found',
+            );
+          }
 
-          result = await this.getInvocationResultSuccess(data, contractOut, sourceMaps);
+          result = await this.getInvocationResultSuccess(data, data.executionResult, createdContract, sourceMaps);
         }
 
         return {
@@ -354,50 +348,37 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   }
 
   protected async getInvocationResultError(
-    dataIn: RawApplicationLogData,
+    data: RawTransactionData,
+    result: RawExecutionResultError,
     sourceMaps: SourceMaps = {},
   ): Promise<InvocationResultError> {
-    const data = dataIn.executions.length > 0 ? dataIn.executions[0] : undefined;
-    if (data === undefined) {
-      throw new Error('Expected application log for transaction to have at least one execution');
-    }
     const message = await processActionsAndMessage({
-      actions: [...data.logs, ...data.notifications],
+      actions: data.actions,
+      message: result.message,
       sourceMaps,
     });
 
-    if (data.vmState === 'HALT') {
-      throw new Error(`Expected FAULT state. Got: ${data.vmState}`);
-    }
-
     return {
-      state: data.vmState,
-      gasConsumed: data.gasConsumed,
+      state: result.state,
+      gasConsumed: result.gasConsumed,
       message,
     };
   }
 
   protected async getInvocationResultSuccess<T>(
-    dataIn: RawApplicationLogData,
+    data: RawTransactionData,
+    result: RawExecutionResultSuccess,
     value: T,
     sourceMaps: SourceMaps = {},
   ): Promise<InvocationResultSuccess<T>> {
-    const data = dataIn.executions.length > 0 ? dataIn.executions[0] : undefined;
-    if (data === undefined) {
-      throw new Error('Expected application log for transaction to have at least one execution');
-    }
     await processConsoleLogMessages({
-      actions: [...data.logs, ...data.notifications],
+      actions: data.actions,
       sourceMaps,
     });
 
-    if (data.vmState === 'FAULT') {
-      throw new Error(`Expected HALT state. Got: ${data.vmState}`);
-    }
-
     return {
-      state: data.vmState,
-      gasConsumed: data.gasConsumed,
+      state: result.state,
+      gasConsumed: result.gasConsumed,
       value,
     };
   }

@@ -13,6 +13,7 @@ import {
   ContractState,
   Header,
   Notification,
+  RunEngineResult,
   Transaction,
   utils as coreUtils,
   Verifiable,
@@ -46,7 +47,7 @@ const getApplicationExecuted = (engine: ApplicationEngine, container?: Verifiabl
   logs: engine.logs,
 });
 
-const getCallReceipt = (engine: ApplicationEngine, container?: Verifiable) => ({
+const getRunEngineResult = (engine: ApplicationEngine, container?: Verifiable): RunEngineResult => ({
   state: engine.state,
   gasConsumed: engine.gasConsumed,
   stack: engine.resultStack,
@@ -79,7 +80,7 @@ const verifyContract = async ({
         hash: contract.hash,
         flags: CallFlags.None,
         method: 'verify',
-        pcount: -1, // TODO: verify this
+        pcount: -1,
       });
 
       if (!loaded) {
@@ -118,7 +119,7 @@ export const utils = {
   ...coreUtils,
   hashListBatchSize,
   getApplicationExecuted,
-  getCallReceipt,
+  getRunEngineResult,
   getOnPersistNativeContractScript,
   getPostPersistNativeContractScript,
   verifyContract,

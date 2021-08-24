@@ -1,12 +1,26 @@
 import { InvalidFormatError, UInt256 } from '@neo-one/client-common';
-import { Nep17BalanceKey, Nep17TransferKey, StorageKey, StreamOptions } from '@neo-one/node-core';
+import {
+  ActionKey,
+  BlockDataKey,
+  Nep17BalanceKey,
+  Nep17TransferKey,
+  StorageKey,
+  StoragePrefix,
+  StreamOptions,
+  TransactionDataKey,
+} from '@neo-one/node-core';
 import { BN } from 'bn.js';
 
 export enum Prefix {
   Nep17Balance = 0xf8,
   Nep17TransferSent = 0xf9,
   Nep17TransferReceived = 0xfa,
-  ApplicationLog = 0xfb, // Custom internal prefix. Can be changed
+  // Custom internal prefixes. Can be changed
+  ApplicationLog = 0xfb,
+  BlockData = 0xfc,
+  TransactionData = 0xfd,
+  Action = 0xfe,
+  Storage = StoragePrefix, // This byte is used in C# code as well
 }
 
 const getCreateKey = <Key>({
@@ -21,7 +35,7 @@ const getCreateKey = <Key>({
   return (key: Key) => Buffer.concat([prefixKey, serializeKey(key)]);
 };
 
-/* crude method but it does what we want it to do */
+/* Daniel Byrne: This is a crude method but it does what we want it to do */
 const generateSearchRange = (lookupKey: Buffer): Required<StreamOptions> => {
   const asBN = new BN(lookupKey);
   const lte = asBN.addn(1).toBuffer();
@@ -54,24 +68,13 @@ const createGetSearchRange = (prefix: Prefix) => {
   };
 };
 
-const createGetSearchRangeWithoutPrefix =
-  () =>
-  (lookupKey: Buffer, secondaryLookupKey?: Buffer): Required<StreamOptions> => {
-    if (secondaryLookupKey) {
-      return {
-        gte: lookupKey,
-        lte: secondaryLookupKey,
-      };
-    }
-    const { gte: initGte, lte: initLte } = generateSearchRange(lookupKey);
-
-    return {
-      gte: initGte,
-      lte: initLte,
-    };
-  };
-
-const createStorageKey = (key: StorageKey) => key.serializeWire();
+// Storage is for anything that is also expected to be read from C# VM code. Basically all contract storage
+// including native contracts. This prefix keeps contract/native storage separate from all our other blockchain
+// storage
+const createStorageKey = getCreateKey<StorageKey>({
+  serializeKey: (key) => key.serializeWire(),
+  prefix: Prefix.Storage,
+});
 
 const createNep17BalanceKey = getCreateKey<Nep17BalanceKey>({
   serializeKey: (key) => key.serializeWire(),
@@ -88,7 +91,22 @@ const createNep17TransferReceivedKey = getCreateKey<Nep17TransferKey>({
   prefix: Prefix.Nep17TransferReceived,
 });
 
-const getStorageSearchRange = createGetSearchRangeWithoutPrefix();
+const createBlockDataKey = getCreateKey<BlockDataKey>({
+  serializeKey: (key) => key.hash,
+  prefix: Prefix.BlockData,
+});
+
+const createTransactionDataKey = getCreateKey<TransactionDataKey>({
+  serializeKey: (key) => key.hash,
+  prefix: Prefix.TransactionData,
+});
+
+const createActionKey = getCreateKey<ActionKey>({
+  serializeKey: (key) => key.index.toBuffer(),
+  prefix: Prefix.Action,
+});
+
+const getStorageSearchRange = createGetSearchRange(Prefix.Storage);
 
 const getAllNep17BalanceSearchRange = {
   gte: Buffer.from([Prefix.Nep17Balance]),
@@ -98,6 +116,12 @@ const getAllNep17BalanceSearchRange = {
 const getNep17BalanceSearchRange = createGetSearchRange(Prefix.Nep17Balance);
 const getNep17TransferReceivedSearchRange = createGetSearchRange(Prefix.Nep17TransferReceived);
 const getNep17TransferSentSearchRange = createGetSearchRange(Prefix.Nep17TransferSent);
+
+const getAllActionSearchRange = {
+  gte: Buffer.from([Prefix.Action]),
+  lte: Buffer.from([Prefix.Storage]),
+};
+const getActionSearchRange = createGetSearchRange(Prefix.Action);
 
 const createApplicationLogKey = getCreateKey<UInt256>({
   serializeKey: (key) => key,
@@ -110,9 +134,14 @@ export const keys = {
   createNep17TransferReceivedKey,
   createApplicationLogKey,
   createStorageKey,
+  createBlockDataKey,
+  createTransactionDataKey,
+  createActionKey,
   getStorageSearchRange,
   getNep17BalanceSearchRange,
   getAllNep17BalanceSearchRange,
   getNep17TransferReceivedSearchRange,
   getNep17TransferSentSearchRange,
+  getActionSearchRange,
+  getAllActionSearchRange,
 };

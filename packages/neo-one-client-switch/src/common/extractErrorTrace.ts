@@ -1,4 +1,4 @@
-import { common, RawAction, scriptHashToAddress, smartContractConverters as converters } from '@neo-one/client-common';
+import { RawAction, smartContractConverters as converters } from '@neo-one/client-common';
 import _ from 'lodash';
 import { ProcessErrorError, ProcessErrorTrace } from './processError';
 
@@ -7,13 +7,7 @@ const extractError = (action: RawAction): ProcessErrorError | undefined => {
     return undefined;
   }
 
-  const address = scriptHashToAddress(common.uInt160ToString(action.scriptHash));
-  const args = action.state;
-
-  if (typeof args === 'string') {
-    return { address, line: -1, message: args };
-  }
-
+  const args = action.args;
   try {
     const event = action.eventName;
     if (event !== 'error') {
@@ -21,7 +15,7 @@ const extractError = (action: RawAction): ProcessErrorError | undefined => {
     }
 
     return {
-      address,
+      address: action.address,
       line: converters.toInteger(args[2], { type: 'Integer', decimals: 0 }).toNumber(),
       message: converters.toString(args[1]),
     };
@@ -35,21 +29,15 @@ const extractTrace = (action: RawAction): ProcessErrorTrace | undefined => {
     return undefined;
   }
 
-  const address = scriptHashToAddress(common.uInt160ToString(action.scriptHash));
-  const args = action.state;
-
-  if (typeof args === 'string') {
-    return { address, line: -1 };
-  }
-
+  const args = action.args;
   try {
-    const event = converters.toString(args[0]);
+    const event = action.eventName;
     if (event !== 'trace') {
       return undefined;
     }
 
     return {
-      address,
+      address: action.address,
       line: converters.toInteger(args[1], { type: 'Integer', decimals: 0 }).toNumber(),
     };
   } catch {

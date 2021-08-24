@@ -296,7 +296,9 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
 
         if (result.verifyResult !== undefined && result.verifyResult !== VerifyResultModel.Succeed) {
           throw new InvokeError(
-            `Transaction failed to verify with result: ${toVerifyResultJSON(result.verifyResult)}.`,
+            `Transaction verification failed: ${toVerifyResultJSON(result.verifyResult)}${
+              result.failureMessage === undefined ? '.' : `: ${result.failureMessage}`
+            }`,
           );
         }
 
@@ -489,7 +491,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
         from,
         transaction,
         onConfirm: async ({ transaction: transactionIn, receipt }) => {
-          const data = await this.provider.getApplicationLogData(from.network, transactionIn.hash);
+          const data = await this.provider.getTransactionData(from.network, transactionIn.hash);
 
           return onConfirm({ transaction: transactionIn, receipt, data });
         },

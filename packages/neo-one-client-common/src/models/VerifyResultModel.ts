@@ -13,6 +13,11 @@ export enum VerifyResultModel {
   Unknown,
 }
 
+export interface VerifyResultModelExtended {
+  readonly verifyResult?: VerifyResultModel;
+  readonly failureReason?: string;
+}
+
 export const hasVerifyResult = (
   reason: VerifyResultModel,
   flag: VerifyResultModel,

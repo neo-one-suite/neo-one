@@ -77,7 +77,7 @@ export class OracleResponse extends OracleResponseModel implements AttributeBase
     const designated = await native.RoleManagement.getDesignatedByRole(
       storage,
       DesignationRole.Oracle,
-      currentHeight,
+      native.Ledger,
       currentHeight + 1,
     );
     const oracleAccount = crypto.getBFTAddress(designated);

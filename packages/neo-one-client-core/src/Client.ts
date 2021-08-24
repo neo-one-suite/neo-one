@@ -5,10 +5,10 @@ import {
   AddressString,
   Block,
   GetOptions,
-  // IterOptions,
+  IterOptions,
   NetworkType,
   Param,
-  // RawAction,
+  RawAction,
   RawCallReceipt,
   RawInvokeReceipt,
   ScriptBuilderParam,
@@ -25,8 +25,8 @@ import {
   UserAccountProvider,
   UserAccountProviders,
 } from '@neo-one/client-common';
-// import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
-// import { flatMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatmap';
+import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
+import { flatMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatmap';
 import { toObservable } from '@reactivex/ix-es2015-cjs/asynciterable/toobservable';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
@@ -468,23 +468,22 @@ export class Client<
     return this.getNetworkProvider(id.network).getAccount(id.network, id.address);
   }
 
-  // TODO: reimplement
-  // public __iterActionsRaw(network: NetworkType, optionsIn?: IterOptions): AsyncIterable<RawAction> {
-  //   args.assertString('network', network);
-  //   const options = args.assertNullableIterOptions('iterOptions', optionsIn);
-  //   const provider = this.getNetworkProvider(network);
-  //   if (provider.iterActionsRaw !== undefined) {
-  //     return provider.iterActionsRaw(network, options);
-  //   }
+  public __iterActionsRaw(network: NetworkType, optionsIn?: IterOptions): AsyncIterable<RawAction> {
+    args.assertString('network', network);
+    const options = args.assertNullableIterOptions('iterOptions', optionsIn);
+    const provider = this.getNetworkProvider(network);
+    if (provider.iterActionsRaw !== undefined) {
+      return provider.iterActionsRaw(network, options);
+    }
 
-  //   return AsyncIterableX.from(provider.iterBlocks(network, options)).pipe<RawAction>(
-  //     flatMap(async (block) => {
-  //       const actions = _.flatten(block.transactions.map((transaction) => [...transaction.invocationData.actions]));
+    return AsyncIterableX.from(provider.iterBlocks(network, options)).pipe<RawAction>(
+      flatMap(async (block) => {
+        const actions = _.flatten(block.transactions.map((transaction) => [...transaction.transactionData.actions]));
 
-  //       return AsyncIterableX.of(...actions);
-  //     }),
-  //   );
-  // }
+        return AsyncIterableX.of(...actions);
+      }),
+    );
+  }
 
   /**
    * @internal

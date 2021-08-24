@@ -1,4 +1,4 @@
-import { VerifyResultModel } from '@neo-one/client-common';
+import { VerifyResultModelExtended } from '@neo-one/client-common';
 import { Block } from './Block';
 import { Blockchain } from './Blockchain';
 import { Endpoint } from './network';
@@ -16,9 +16,8 @@ export interface Consensus {
   readonly resume: () => Promise<void>;
 }
 
-// TODO: we can make this `VerifyResultModel` into `VerifyTransactionResult` and add more info like 2.7 later.
 export interface RelayTransactionResult {
-  readonly verifyResult?: VerifyResultModel;
+  readonly verifyResult?: VerifyResultModelExtended;
 }
 
 export interface Version {
@@ -33,7 +32,7 @@ export interface Node {
   readonly blockchain: Blockchain;
   readonly relayTransaction: (
     transaction: Transaction,
-    options?: { readonly throwVerifyError?: boolean; readonly forceAdd?: boolean },
+    options?: { readonly forceAdd?: boolean },
   ) => Promise<RelayTransactionResult>;
   readonly relayConsensusPayload: (payload: ExtensiblePayload) => void;
   readonly relayBlock: (block: Block) => Promise<void>;

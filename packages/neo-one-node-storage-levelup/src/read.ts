@@ -3,7 +3,6 @@ import {
   ReadAllFindStorage,
   ReadAllStorage,
   ReadFindStorage,
-  ReadMetadataStorage,
   ReadStorage,
   StorageReturn,
   StreamOptions,
@@ -26,33 +25,6 @@ export function createTryGet<Key, Value>({
       const result = await get(key);
 
       return result;
-    } catch (error) {
-      if (error.notFound || error.code === 'KEY_NOT_FOUND') {
-        return undefined;
-      }
-      throw error;
-    }
-  };
-}
-
-// Keeping this around if we find a use for it
-export function createTryGetLatest<Key, Value>({
-  db,
-  latestKey,
-  deserializeResult,
-  get,
-}: {
-  readonly db: LevelUp;
-  readonly latestKey: string;
-  readonly deserializeResult: (latestResult: Buffer) => Key;
-  readonly get: (key: Key) => Promise<Value>;
-}): () => Promise<Value | undefined> {
-  return async (): Promise<Value | undefined> => {
-    try {
-      const result = await db.get(latestKey);
-      const value = await get(deserializeResult(result as Buffer));
-
-      return value;
     } catch (error) {
       if (error.notFound || error.code === 'KEY_NOT_FOUND') {
         return undefined;
@@ -137,9 +109,10 @@ export function createFind$<Key, Value>({
   readonly deserializeValue: (value: Buffer) => Value;
 }): (lookup: Buffer, secondaryLookup?: Buffer) => Observable<StorageReturn<Key, Value>> {
   return (lookup: Buffer, secondaryLookup?: Buffer) =>
-    streamToObservable<StorageReturn<Buffer, Buffer>>(() =>
-      db.createReadStream(getSearchRange(lookup, secondaryLookup)),
-    ).pipe(map(({ key, value }) => ({ key: deserializeKey(key), value: deserializeValue(value) })));
+    streamToObservable<StorageReturn<Buffer, Buffer>>(
+      () => db.createReadStream(getSearchRange(lookup, secondaryLookup)),
+      // Here we slice off the first byte before deserializing the key because we have to remove the Prefix byte
+    ).pipe(map(({ key, value }) => ({ key: deserializeKey(key.slice(1)), value: deserializeValue(value) })));
 }
 
 export function createReadFindStorage<Key, Value>({
@@ -207,49 +180,4 @@ export function createReadAllFindStorage<Key, Value>({
     }),
     all$,
   };
-}
-
-export function createTryGetMetadata<Value>({
-  get,
-}: {
-  readonly get: () => Promise<Value>;
-}): () => Promise<Value | undefined> {
-  return async (): Promise<Value | undefined> => {
-    try {
-      const result = await get();
-
-      return result;
-    } catch (error) {
-      if (error.notFound || error.code === 'KEY_NOT_FOUND') {
-        return undefined;
-      }
-      throw error;
-    }
-  };
-}
-
-export function createReadMetadataStorage<Value>({
-  db,
-  key,
-  deserializeValue,
-}: {
-  readonly db: LevelUp;
-  readonly key: Buffer;
-  readonly deserializeValue: (value: Buffer) => Value;
-}): ReadMetadataStorage<Value> {
-  const get = async (): Promise<Value> => {
-    try {
-      const result = await db.get(key);
-
-      return deserializeValue(result as Buffer);
-    } catch (error) {
-      if (error.notFound || error.code === 'KEY_NOT_FOUND') {
-        throw new KeyNotFoundError(key.toString('hex'));
-      }
-
-      throw error;
-    }
-  };
-
-  return { get, tryGet: createTryGet({ get }) as ReadMetadataStorage<Value>['tryGet'] };
 }

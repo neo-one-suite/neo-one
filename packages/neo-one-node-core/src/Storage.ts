@@ -1,6 +1,8 @@
 import { ApplicationLogJSON } from '@neo-one/client-common';
 import { Observable } from 'rxjs';
+import { Action, ActionKey } from './action';
 import { ApplicationLog } from './ApplicationLog';
+import { BlockData, BlockDataKey } from './BlockData';
 import { Nep17Balance } from './Nep17Balance';
 import { Nep17BalanceKey } from './Nep17BalanceKey';
 import { Nep17Transfer } from './Nep17Transfer';
@@ -8,8 +10,7 @@ import { Nep17TransferKey } from './Nep17TransferKey';
 import { StorageItem } from './StorageItem';
 import { StorageKey } from './StorageKey';
 import { TransactionKey } from './transaction';
-
-type AbstractBatch = any;
+import { TransactionData, TransactionDataKey } from './TransactionData';
 
 export interface StreamOptions {
   readonly gte?: Buffer;
@@ -81,7 +82,10 @@ export type AddChange =
   | { readonly type: 'nep17Balance'; readonly key: Nep17BalanceKey; readonly value: Nep17Balance }
   | { readonly type: 'nep17TransferSent'; readonly key: Nep17TransferKey; readonly value: Nep17Transfer }
   | { readonly type: 'nep17TransferReceived'; readonly key: Nep17TransferKey; readonly value: Nep17Transfer }
-  | { readonly type: 'applicationLog'; readonly key: TransactionKey; readonly value: ApplicationLog };
+  | { readonly type: 'applicationLog'; readonly key: TransactionKey; readonly value: ApplicationLog }
+  | { readonly type: 'blockData'; readonly key: BlockDataKey; readonly value: BlockData }
+  | { readonly type: 'transactionData'; readonly key: TransactionDataKey; readonly value: TransactionData }
+  | { readonly type: 'action'; readonly key: ActionKey; readonly value: Action };
 
 export type DeleteChange =
   | { readonly type: 'storage'; readonly key: StorageKey }
@@ -99,12 +103,28 @@ export interface BlockchainStorage {
   readonly nep17TransfersReceived: ReadFindStorage<Nep17TransferKey, Nep17Transfer>;
   readonly applicationLogs: ReadStorage<TransactionKey, ApplicationLogJSON>;
   readonly storages: ReadFindStorage<StorageKey, StorageItem>;
+  readonly blockData: ReadStorage<BlockDataKey, BlockData>;
+  readonly transactionData: ReadStorage<TransactionDataKey, TransactionData>;
+  readonly action: ReadAllFindStorage<ActionKey, Action>;
 }
+
+interface PutBatch {
+  readonly type: 'put';
+  readonly key: Buffer;
+  readonly value: Buffer;
+}
+
+interface DeleteBatch {
+  readonly type: 'del';
+  readonly key: Buffer;
+}
+
+export type Batch = PutBatch | DeleteBatch;
 
 export interface Storage extends BlockchainStorage {
   readonly commit: (changeSet: ChangeSet) => Promise<void>;
   // tslint:disable-next-line: readonly-array
-  readonly commitBatch: (batch: AbstractBatch[]) => Promise<void>;
+  readonly commitBatch: (batch: Batch[]) => Promise<void>;
   readonly close: () => Promise<void>;
   readonly reset: () => Promise<void>;
 }

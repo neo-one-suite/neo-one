@@ -1,17 +1,29 @@
 // tslint:disable no-array-mutation no-object-mutation
-import { TriggerType, VMState } from '@neo-one/client-common';
+import { common, TriggerType, UInt160, VMState } from '@neo-one/client-common';
+import { createChild, nodeLogger } from '@neo-one/logger';
 import {
+  Action,
   ApplicationExecuted,
+  assertByteStringStackItem,
   Batch,
   Block,
+  LogAction,
+  Notification,
+  NotificationAction,
   SnapshotHandler,
+  StackItem,
+  stackItemToJSON,
   Transaction,
+  TransactionData,
   VM,
   VMProtocolSettingsIn,
 } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import { PersistNativeContractsError, PostPersistError } from './errors';
+import { getExecutionResult } from './getExecutionResult';
 import { utils } from './utils';
+
+const logger = createChild(nodeLogger, { service: 'persisting-blockchain' });
 
 interface PersistingBlockchainOptions {
   readonly vm: VM;
@@ -40,8 +52,16 @@ export class PersistingBlockchain {
 
   public persistBlock(
     block: Block,
+    lastGlobalActionIndexIn: BN,
+    lastGlobalTransactionIndex: BN,
+  ): {
     // tslint:disable-next-line: readonly-array
-  ): { readonly changeBatch: Batch[]; readonly applicationsExecuted: readonly ApplicationExecuted[] } {
+    readonly changeBatch: Batch[];
+    readonly transactionData: readonly TransactionData[];
+    readonly applicationsExecuted: readonly ApplicationExecuted[];
+    readonly actions: readonly Action[];
+    readonly lastGlobalActionIndex: BN;
+  } {
     return this.vm.withSnapshots(({ main, clone }) => {
       const appsExecuted: ApplicationExecuted[] = [];
 
@@ -68,27 +88,168 @@ export class PersistingBlockchain {
 
       main.clone();
 
-      const executedTransactions = this.persistTransactions(block, main, clone);
+      const { transactionData, executedTransactions, actions, lastGlobalActionIndex } = this.persistTransactions(
+        block,
+        main,
+        clone,
+        lastGlobalActionIndexIn,
+        lastGlobalTransactionIndex,
+      );
 
       const postPersistExecuted = this.postPersist(block);
 
       return {
         changeBatch: main.getChangeSet(),
+        transactionData,
+        actions,
+        lastGlobalActionIndex,
         applicationsExecuted: appsExecuted.concat(executedTransactions).concat(postPersistExecuted),
       };
     });
+  }
+
+  private getActionsFromAppExecuted(
+    appExecuted: ApplicationExecuted,
+    lastGlobalActionIndexIn: BN,
+  ): { readonly actions: readonly Action[]; readonly lastGlobalActionIndex: BN } {
+    let lastGlobalActionIndex = lastGlobalActionIndexIn;
+    const actions: Action[] = [];
+
+    appExecuted.notifications.forEach((notification) => {
+      actions.push(
+        new NotificationAction({
+          index: lastGlobalActionIndexIn,
+          scriptHash: notification.scriptHash,
+          eventName: notification.eventName,
+          args: notification.state.map((n) => n.toContractParameter()),
+        }),
+      );
+
+      lastGlobalActionIndex = lastGlobalActionIndex.add(utils.ONE);
+    });
+    appExecuted.logs.forEach((log) => {
+      actions.push(
+        new LogAction({
+          index: lastGlobalActionIndexIn,
+          scriptHash: log.callingScriptHash,
+          message: log.message,
+          position: log.position,
+        }),
+      );
+
+      lastGlobalActionIndex = lastGlobalActionIndex.add(utils.ONE);
+    });
+
+    return { actions, lastGlobalActionIndex };
+  }
+
+  private getContractManagementInfo(
+    appExecuted: ApplicationExecuted,
+    block: Block,
+  ): {
+    readonly deletedContractHashes: readonly UInt160[];
+    readonly deployedContractHashes: readonly UInt160[];
+    readonly updatedContractHashes: readonly UInt160[];
+  } {
+    const contractManagementNotifications = appExecuted.notifications.filter((n) =>
+      n.scriptHash.equals(common.nativeHashes.ContractManagement),
+    );
+    const getUInt160 = (item: StackItem) => common.bufferToUInt160(assertByteStringStackItem(item).getBuffer());
+    const mapFilterUInt160s = (notifications: readonly Notification[], eventName: string) =>
+      notifications
+        .filter((n) => n.eventName === eventName)
+        .filter((n) => {
+          try {
+            getUInt160(n.state[0]);
+          } catch (error) {
+            logger.error({
+              name: 'contract_management_info_parse_error',
+              index: block.index,
+              event: eventName,
+              // tslint:disable-next-line: no-unnecessary-callback-wrapper
+              state: n.state.map((item) => stackItemToJSON(item)),
+              error,
+            });
+
+            return false;
+          }
+
+          return true;
+        })
+        .map((n) => {
+          const hash = getUInt160(n.state[0]);
+          logger.info({
+            name: 'new_contract_management_action',
+            index: block.index,
+            event: eventName,
+            hash: common.uInt160ToString(hash),
+          });
+
+          return hash;
+        });
+
+    const updatedContractHashes = mapFilterUInt160s(contractManagementNotifications, 'Update');
+    const deletedContractHashes = mapFilterUInt160s(contractManagementNotifications, 'Destroy');
+    const deployedContractHashes = mapFilterUInt160s(contractManagementNotifications, 'Deploy');
+
+    return { deletedContractHashes, deployedContractHashes, updatedContractHashes };
   }
 
   private persistTransactions(
     block: Block,
     main: SnapshotHandler,
     clone: Omit<SnapshotHandler, 'clone'>,
-  ): readonly ApplicationExecuted[] {
-    return block.transactions.reduce<readonly ApplicationExecuted[]>((acc, transaction) => {
-      const appExecuted = this.persistTransaction(transaction, main, clone, block);
+    lastGlobalActionIndexIn: BN,
+    lastGlobalTransactionIndex: BN,
+  ): {
+    readonly transactionData: readonly TransactionData[];
+    readonly executedTransactions: readonly ApplicationExecuted[];
+    readonly lastGlobalActionIndex: BN;
+    readonly actions: readonly Action[];
+  } {
+    return block.transactions.reduce<{
+      readonly transactionData: readonly TransactionData[];
+      readonly executedTransactions: readonly ApplicationExecuted[];
+      readonly actions: readonly Action[];
+      readonly lastGlobalActionIndex: BN;
+    }>(
+      (acc, transaction, transactionIndex) => {
+        const appExecuted = this.persistTransaction(transaction, main, clone, block);
+        const { actions: newActions, lastGlobalActionIndex } = this.getActionsFromAppExecuted(
+          appExecuted,
+          lastGlobalActionIndexIn,
+        );
 
-      return acc.concat(appExecuted);
-    }, []);
+        const executionResult = getExecutionResult(appExecuted);
+
+        const { deletedContractHashes, deployedContractHashes, updatedContractHashes } = this.getContractManagementInfo(
+          appExecuted,
+          block,
+        );
+
+        const txData = new TransactionData({
+          hash: transaction.hash,
+          blockHash: block.hash,
+          deletedContractHashes,
+          deployedContractHashes,
+          updatedContractHashes,
+          executionResult,
+          actionIndexStart: lastGlobalActionIndexIn,
+          actionIndexStop: lastGlobalActionIndex,
+          transactionIndex,
+          blockIndex: block.index,
+          globalIndex: lastGlobalTransactionIndex.add(new BN(transactionIndex + 1)),
+        });
+
+        return {
+          transactionData: acc.transactionData.concat([txData]),
+          executedTransactions: acc.executedTransactions.concat(appExecuted),
+          actions: acc.actions.concat(newActions),
+          lastGlobalActionIndex,
+        };
+      },
+      { transactionData: [], executedTransactions: [], actions: [], lastGlobalActionIndex: lastGlobalActionIndexIn },
+    );
   }
 
   private persistTransaction(

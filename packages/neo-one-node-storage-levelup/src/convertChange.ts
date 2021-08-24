@@ -51,6 +51,33 @@ const convertAddChange = (change: AddChange): readonly PutBatch[] => {
         },
       ];
 
+    case 'blockData':
+      return [
+        {
+          type: 'put',
+          key: keys.createBlockDataKey(change.key),
+          value: change.value.serializeWire(),
+        },
+      ];
+
+    case 'transactionData':
+      return [
+        {
+          type: 'put',
+          key: keys.createTransactionDataKey(change.key),
+          value: change.value.serializeWire(),
+        },
+      ];
+
+    case 'action':
+      return [
+        {
+          type: 'put',
+          key: keys.createActionKey(change.key),
+          value: change.value.serializeWire(),
+        },
+      ];
+
     default:
       utils.assertNever(change);
       throw new UnknownTypeError();
