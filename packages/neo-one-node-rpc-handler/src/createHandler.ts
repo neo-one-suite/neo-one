@@ -2,40 +2,35 @@ import {
   ApplicationLogJSON,
   assertTriggerTypeJSON,
   BlockJSON,
-  CallReceiptJSON,
   common,
   ConfirmedTransactionJSON,
   crypto,
   JSONHelper,
-  LogJSON,
   NetworkSettingsJSON,
   RelayTransactionResultJSON,
   scriptHashToAddress,
   toVerifyResultJSON,
-  toVMStateJSON,
+  TransactionDataJSON,
   TransactionJSON,
   TransactionReceiptJSON,
   TriggerTypeJSON,
   UInt256,
   VerifyResultModel,
+  VerifyResultModelExtended,
 } from '@neo-one/client-common';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   Block,
   Blockchain,
-  CallReceipt,
   getEndpointConfig,
-  isInteropInterface,
   NativeContainer,
   Nep17Transfer,
   Nep17TransferKey,
   Node,
   Signers,
-  StackItem,
   StorageKey,
   Transaction,
   TransactionState,
-  VMLog,
 } from '@neo-one/node-core';
 import { Labels, utils } from '@neo-one/utils';
 import { BN } from 'bn.js';
@@ -135,6 +130,7 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   getsettings: 'getsettings',
 
   // NEO•ONE
+  gettransactiondata: 'gettransactiondata',
   getfeeperbyte: 'getfeeperbyte',
   getexecfeefactor: 'getexecfeefactor',
   getverificationcost: 'getverificationcost',
@@ -169,6 +165,16 @@ const getScriptHashAndAddress = (param: string, addressVersion: number) => {
   const scriptHash = JSONHelper.readUInt160(param);
 
   return { scriptHash, address: crypto.scriptHashToAddress({ addressVersion, scriptHash }) };
+};
+
+const getVerifyResultErrorMessage = (extendedResult?: VerifyResultModelExtended) => {
+  if (extendedResult !== undefined && extendedResult.verifyResult !== undefined) {
+    return `Verification failed: ${extendedResult.verifyResult}${
+      extendedResult.failureReason === undefined ? '.' : `: ${extendedResult.failureReason}`
+    }`;
+  }
+
+  return 'Verification failed.';
 };
 
 const createJSONRPCHandler = (handlers: Handlers) => {
@@ -324,71 +330,6 @@ export const createHandler = ({
     return JSONHelper.readUInt160(input);
   };
 
-  const vmLogToJson = (log: VMLog): LogJSON => ({
-    containerhash: log.containerHash ? common.uInt256ToString(log.containerHash) : undefined,
-    callingscripthash: common.uInt160ToString(log.callingScriptHash),
-    message: log.message,
-    position: log.position,
-  });
-
-  // TODO: probably some bugs in here. See RpcServer.SmartContract.cs
-  const stackItemToJson = (item: StackItem, maxIn: number) => {
-    // tslint:disable-next-line: no-null-keyword triple-equals no-any
-    const isIterable = (obj: any) => obj != null && typeof obj[Symbol.iterator] === 'function';
-    const json = item.toContractParameter().serializeJSON();
-    if (isInteropInterface(item)) {
-      // tslint:disable-next-line: no-any
-      const interopInterface = item.getInterface((_): _ is any => true);
-      if (interopInterface !== undefined && isIterable(interopInterface)) {
-        const iterator = [...interopInterface][Symbol.iterator]();
-        const finalArr: StackItem[] = [];
-        let truncated = false;
-        let max = maxIn;
-        // tslint:disable-next-line: no-loop-statement
-        for (const val of iterator) {
-          if (max <= 0) {
-            truncated = true;
-            break;
-          }
-          // tslint:disable-next-line: no-array-mutation
-          finalArr.push(val.toContractParameter().serializeJSON());
-          max -= 1;
-        }
-
-        return {
-          ...json,
-          iterator: finalArr,
-          truncated,
-        };
-      }
-    }
-
-    return json;
-  };
-
-  const getInvokeResult = (script: Buffer, receipt: CallReceipt, maxIteratorResultItems: number): CallReceiptJSON => {
-    const { stack: stackIn, state, notifications, gasConsumed, logs } = receipt;
-
-    let stack;
-    try {
-      stack = stackIn.map((item: StackItem) => stackItemToJson(item, maxIteratorResultItems));
-    } catch {
-      stack = 'error: invalid operation';
-    }
-
-    // TODO: need to add ProcessInvokeWithWallet()? Probably not but check
-
-    return {
-      script: script.toString('base64'),
-      state: toVMStateJSON(state) as 'HALT' | 'FAULT',
-      stack,
-      exception: receipt.exception,
-      gasconsumed: gasConsumed.toString(),
-      notifications: notifications.map((n) => n.serializeJSON()),
-      logs: logs.map(vmLogToJson),
-    };
-  };
-
   const getTransactionReceiptJSON = (block: Block, value: TransactionState): TransactionReceiptJSON => ({
     blockIndex: value.blockIndex,
     blockHash: JSONHelper.writeUInt256(block.hash),
@@ -522,11 +463,7 @@ export const createHandler = ({
           return tx.serializeJSON();
         }
 
-        return tx.serializeJSONWithReceipt({
-          blockHash: JSONHelper.writeUInt256(block.hash),
-          blockIndex: block.index,
-          transactionIndex: block.transactions.findIndex((txIn) => state.transaction.hash.equals(txIn.hash)),
-        });
+        return tx.serializeJSONWithData(blockchain.serializeJSONContext);
       }
 
       return tx.serializeJSON();
@@ -612,12 +549,9 @@ export const createHandler = ({
       });
 
       try {
-        const { verifyResult } = await node.relayTransaction(transaction, { throwVerifyError: true, forceAdd: true });
-        if (verifyResult !== VerifyResultModel.Succeed) {
-          throw new JSONRPCError(
-            -500,
-            verifyResult === undefined ? 'Unknown verify result' : toVerifyResultJSON(verifyResult),
-          );
+        const { verifyResult: result } = await node.relayTransaction(transaction, { forceAdd: true });
+        if (result !== undefined && result.verifyResult !== VerifyResultModel.Succeed) {
+          throw new JSONRPCError(-500, getVerifyResultErrorMessage(result));
         }
 
         return { hash: transaction.hash };
@@ -642,9 +576,8 @@ export const createHandler = ({
     [RPC_METHODS.invokescript]: async (args) => {
       const script = JSONHelper.readBase64Buffer(args[0]);
       const signers = args[1] !== undefined ? Signers.fromJSON(args[1]) : undefined;
-      const result = blockchain.invokeScript({ script, signers }); // TODO: should be 20 or 20 fixed8FromDecimal?
 
-      return getInvokeResult(script, result, blockchain.settings.maxIteratorResultItems);
+      return blockchain.invokeScript({ script, signers }); // TODO: should be 20 or 20 fixed8FromDecimal?
     },
     [RPC_METHODS.testtransaction]: async (args) => {
       const transaction = Transaction.deserializeWire({
@@ -652,9 +585,7 @@ export const createHandler = ({
         buffer: JSONHelper.readBuffer(args[0]),
       });
 
-      const result = blockchain.testTransaction(transaction);
-
-      return getInvokeResult(transaction.script, result, blockchain.settings.maxIteratorResultItems);
+      return blockchain.testTransaction(transaction);
     },
     [RPC_METHODS.getunclaimedgas]: async (args) => {
       const address = args[0];
@@ -850,13 +781,17 @@ export const createHandler = ({
 
       try {
         const transactionJSON = transaction.serializeJSON();
-        const result = await node.relayTransaction(transaction, { forceAdd: true, throwVerifyError: true });
+        const { verifyResult: result } = await node.relayTransaction(transaction, { forceAdd: true });
 
-        const resultJSON = result.verifyResult !== undefined ? toVerifyResultJSON(result.verifyResult) : undefined;
+        const resultJSON =
+          result !== undefined && result.verifyResult !== undefined
+            ? toVerifyResultJSON(result.verifyResult)
+            : undefined;
 
         return {
           transaction: transactionJSON,
           verifyResult: resultJSON,
+          failureMessage: result?.failureReason,
         };
       } catch (error) {
         throw new JSONRPCError(-110, `Relay transaction failed: ${error.message}`);
@@ -925,6 +860,22 @@ export const createHandler = ({
       }
 
       return result;
+    },
+
+    [RPC_METHODS.gettransactiondata]: async (args): Promise<TransactionDataJSON> => {
+      const state = await blockchain.getTransaction(JSONHelper.readUInt256(args[0]));
+
+      if (state === undefined) {
+        throw new JSONRPCError(-100, 'Unknown transaction');
+      }
+
+      const result = await state.transaction.serializeJSONWithData(blockchain.serializeJSONContext);
+
+      if (result.transactionData === undefined) {
+        throw new JSONRPCError(-103, 'No transaction data found');
+      }
+
+      return result.transactionData;
     },
 
     [RPC_METHODS.getnetworksettings]: async (): Promise<NetworkSettingsJSON> => {

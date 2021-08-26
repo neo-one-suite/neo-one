@@ -8,6 +8,7 @@ import {
   addressToScriptHash,
   assertAttributeTypeJSON,
   assertCallFlags as clientAssertCallFlags,
+  assertOracleResponseCode as assertOracleResponseCodeIn,
   Attribute,
   AttributeTypeModel,
   BufferString,
@@ -22,7 +23,6 @@ import {
   ContractManifestClient,
   ContractMethodDescriptor,
   ContractMethodDescriptorClient,
-  ContractParameter,
   ContractParameterDefinition,
   ContractPermission,
   ContractPermissionDescriptor,
@@ -32,6 +32,7 @@ import {
   IterOptions,
   MethodToken,
   NefFile,
+  OracleResponseCode,
   Param,
   PrivateKeyString,
   privateKeyToPublicKey,
@@ -330,25 +331,6 @@ const assertContractParameterType = (name: string, valueIn?: unknown): ContractP
   return value as ContractParameterDefinition['type'];
 };
 
-const assertMapProperty = <T, Name extends string, P>(
-  value: T,
-  objectName: string,
-  name: Name,
-  assertType: (name: string, v?: unknown) => P,
-): ReadonlyArray<readonly [P, P]> => {
-  const map = assertProperty(value, objectName, name, assertMap);
-  const result: Array<[P, P]> = [];
-  map.forEach((val, key) => {
-    const keyOut = assertType(`${objectName}.${name}`, key);
-    const valOut = assertType(`${objectName}.${name}`, val);
-
-    // tslint:disable-next-line: no-array-mutation
-    result.push([keyOut, valOut]);
-  });
-
-  return result;
-};
-
 const ABI_TYPES = new Set([
   'Any',
   'Signature',
@@ -375,61 +357,6 @@ const assertABIType = (name: string, valueIn?: unknown): ABIReturn['type'] => {
   }
 
   return value as ABIReturn['type'];
-};
-
-const assertContractParameter = (paramName: string, value?: unknown): ContractParameter => {
-  if (!isObject(value)) {
-    throw new InvalidArgumentError('ContractParameter', paramName, value);
-  }
-
-  const type = assertProperty(value, 'ContractParameter', 'type', assertContractParameterType);
-
-  switch (type) {
-    case 'Any':
-      return { type, value: undefined };
-    case 'Signature':
-      return { type, value: assertProperty(value, 'ContractParameter', 'value', assertString) };
-    case 'Boolean':
-      return { type, value: assertProperty(value, 'ContractParameter', 'value', assertBoolean) };
-    case 'Address':
-      return { type, value: assertProperty(value, 'ContractParameter', 'value', assertAddress) };
-    case 'Hash160':
-      return { type, value: assertProperty(value, 'ContractParameter', 'value', assertAddress) };
-    case 'Hash256':
-      return { type, value: assertProperty(value, 'ContractParameter', 'value', assertHash256) };
-    case 'Buffer':
-      return { type, value: assertProperty(value, 'ContractParameter', 'value', assertBuffer) };
-    case 'PublicKey':
-      return { type, value: assertProperty(value, 'ContractParameter', 'value', assertPublicKey) };
-    case 'String':
-      return { type, value: assertProperty(value, 'ContractParameter', 'value', assertString) };
-    case 'Array':
-      return {
-        type,
-        value: assertProperty(value, 'ContractParameter', 'value', assertArray).map((param) =>
-          assertContractParameter('Array', param),
-        ),
-      };
-    case 'Map':
-      return {
-        type,
-        value: assertMapProperty(value, 'ContractParameter', 'value', assertContractParameter),
-      };
-    case 'Void':
-      return { type };
-    case 'Integer':
-      return {
-        type,
-        value: assertProperty(value, 'ContractParameter', 'value', assertBN),
-      };
-    case 'InteropInterface':
-      return { type };
-    default:
-      /* istanbul ignore next */
-      utils.assertNever(type);
-      /* istanbul ignore next */
-      throw new Error('For TS');
-  }
 };
 
 const assertContractParameterDefinition = (name: string, value?: unknown): ContractParameterDefinition => {
@@ -1037,16 +964,33 @@ const assertAttributeTypeArg = (name: string, valueIn?: unknown): AttributeTypeM
   }
 };
 
+const assertOracleResponseCode = (name: string, valueIn?: unknown): OracleResponseCode => {
+  const value = assertNumber(name, valueIn);
+
+  try {
+    return assertOracleResponseCodeIn(value);
+  } catch {
+    throw new InvalidArgumentError('AttributeType', name, value);
+  }
+};
+
 export const assertAttribute = (name: string, attribute?: unknown): Attribute => {
   if (!isObject(attribute)) {
     throw new InvalidArgumentError('Attribute', name, attribute);
   }
 
-  // TODO: check this works for both attributes
+  const type = assertProperty(attribute, 'Attribute', 'type', assertAttributeTypeArg);
+
+  if (type === AttributeTypeModel.HighPriority) {
+    return {
+      type,
+    };
+  }
+
   return {
-    type: assertProperty(attribute, 'Attribute', 'type', assertAttributeTypeArg),
+    type,
     id: assertProperty(attribute, 'Attribute', 'id', assertBigNumber),
-    code: assertProperty(attribute, 'Attribute', 'code', assertNumber),
+    code: assertProperty(attribute, 'Attribute', 'code', assertOracleResponseCode),
     result: assertProperty(attribute, 'Attribute', 'result', assertBuffer),
   };
 };
@@ -1067,6 +1011,8 @@ export const assertTransactionOptions = (name: string, options?: unknown): Trans
     ),
     maxNetworkFee: assertProperty(options, 'TransactionOptions', 'maxNetworkFee', assertNullableBigNumber),
     maxSystemFee: assertProperty(options, 'TransactionOptions', 'maxSystemFee', assertNullableBigNumber),
+    validBlockCount: assertProperty(options, 'TransactionOptions', 'validBlockCount', assertNullableNumber),
+    // TODO: need sendTo and sendFrom here? Yes if they are included in TransactionOptions
   };
 };
 

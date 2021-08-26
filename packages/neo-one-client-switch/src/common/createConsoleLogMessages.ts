@@ -1,4 +1,4 @@
-import { common, RawAction, scriptHashToAddress, smartContractConverters as converters } from '@neo-one/client-common';
+import { RawAction, smartContractConverters as converters } from '@neo-one/client-common';
 import { assertArrayLikeStackItem, BinaryReader, deserializeStackItem, StackItem } from '@neo-one/node-core';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
@@ -117,21 +117,17 @@ const extractLog = (action: RawAction): ConsoleLog | undefined => {
     return undefined;
   }
 
-  const address = scriptHashToAddress(common.uInt160ToString(action.scriptHash));
-  const args = action.state;
+  const args = action.args;
   try {
     const event = action.eventName;
     if (event !== 'console.log') {
       return undefined;
     }
-    if (typeof args === 'string') {
-      return { address, line: -1, message: args };
-    }
 
-    const line = converters.toInteger(args[0], { type: 'Integer', decimals: 0 }).toNumber();
-    const message = extractMessage(Buffer.from(converters.toBuffer(args[1]), 'hex'));
+    const line = converters.toInteger(args[1], { type: 'Integer', decimals: 0 }).toNumber();
+    const message = extractMessage(Buffer.from(converters.toBuffer(args[2]), 'hex'));
 
-    return { address, line, message };
+    return { address: action.address, line, message };
   } catch {
     return undefined;
   }
@@ -139,11 +135,6 @@ const extractLog = (action: RawAction): ConsoleLog | undefined => {
 
 const extractConsoleLogs = (actions: readonly RawAction[]): readonly ConsoleLog[] => {
   const mutableLogs: ConsoleLog[] = [];
-  // TODO: this should be removed when we're more confident in our types
-  // tslint:disable-next-line: strict-type-predicates
-  if (actions === undefined) {
-    return mutableLogs;
-  }
   // tslint:disable-next-line no-loop-statement
   for (const action of actions) {
     const log = extractLog(action);

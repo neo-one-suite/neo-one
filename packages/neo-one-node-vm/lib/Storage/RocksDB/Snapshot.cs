@@ -2,6 +2,7 @@ using Neo.Persistence;
 using RocksDbSharp;
 using System;
 using System.Collections.Generic;
+
 namespace NEOONE.Storage.RocksDB
 {
   internal class Snapshot : ISnapshot
@@ -22,9 +23,46 @@ namespace NEOONE.Storage.RocksDB
       options.SetSnapshot(snapshot);
     }
 
-    public void Commit()
+    public IEnumerable<(byte[] Key, byte[] Value)> Seek(byte[] keyOrPrefix, SeekDirection direction)
     {
-      throw new InvalidOperationException();
+      if (keyOrPrefix == null) keyOrPrefix = Array.Empty<byte>();
+
+      using var it = db.NewIterator(store.defaultFamily, options);
+
+      // Here we need to add the special Prefix byte for Storage
+      byte[] fullKey = keyOrPrefix.AddNEOONEPrefixByte();
+
+      if (direction == SeekDirection.Forward)
+        for (it.Seek(fullKey); it.Valid(); it.Next())
+        {
+          // Here we slice off the first Prefix byte
+          yield return (it.Key()[1..], it.Value());
+        }
+      else
+        for (it.SeekForPrev(fullKey); it.Valid(); it.Prev())
+        {
+          // Here we slice off the first Prefix byte
+          yield return (it.Key()[1..], it.Value());
+        }
+    }
+
+    public bool Contains(byte[] key)
+    {
+      byte[] fullKey = key == null ? new byte[] { } : key;
+      // Here we need atot add the special Prefix byte for Storage
+      return db.Get((fullKey ?? Array.Empty<byte>()).AddNEOONEPrefixByte(), store.defaultFamily, options) != null;
+    }
+
+    public byte[] TryGet(byte[] key)
+    {
+      byte[] fullKey = key == null ? new byte[] { } : key;
+      // Here we need to add the special Prefix byte for Storage
+      return db.Get((fullKey ?? Array.Empty<byte>()).AddNEOONEPrefixByte(), store.defaultFamily, options);
+    }
+
+    public void Dispose()
+    {
+      snapshot.Dispose();
     }
 
     public void Delete(byte[] key)
@@ -37,38 +75,9 @@ namespace NEOONE.Storage.RocksDB
       throw new InvalidOperationException();
     }
 
-    public IEnumerable<(byte[] Key, byte[] Value)> Seek(byte[] keyOrPrefix, SeekDirection direction)
+    public void Commit()
     {
-      if (keyOrPrefix == null) keyOrPrefix = Array.Empty<byte>();
-
-      using var it = db.NewIterator(store.defaultFamily, options);
-      byte[] fullKey = keyOrPrefix;
-
-      if (direction == SeekDirection.Forward)
-        for (it.Seek(fullKey); it.Valid(); it.Next())
-          yield return (it.Key(), it.Value());
-      else
-        for (it.SeekForPrev(fullKey); it.Valid(); it.Prev())
-        {
-          yield return (it.Key(), it.Value());
-        }
-    }
-
-    public bool Contains(byte[] key)
-    {
-      byte[] fullKey = key == null ? new byte[] { } : key;
-      return db.Get(fullKey ?? Array.Empty<byte>(), store.defaultFamily, options) != null;
-    }
-
-    public byte[] TryGet(byte[] key)
-    {
-      byte[] fullKey = key == null ? new byte[] { } : key;
-      return db.Get(fullKey ?? Array.Empty<byte>(), store.defaultFamily, options);
-    }
-
-    public void Dispose()
-    {
-      snapshot.Dispose();
+      throw new InvalidOperationException();
     }
   }
 }

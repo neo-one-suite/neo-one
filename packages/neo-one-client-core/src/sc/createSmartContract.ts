@@ -1,26 +1,37 @@
 /// <reference types="@reactivex/ix-es2015-cjs" />
 import {
   ABIParameter,
+  Action,
   AddressString,
+  ContractEventDescriptorClient,
   ContractMethodDescriptorClient,
+  Event,
   ForwardOptions,
   GetOptions,
   Hash256String,
   InvokeReceipt,
   InvokeSendUnsafeReceiveTransactionOptions,
+  Log,
   NetworkType,
   Param,
+  RawAction,
   RawInvokeReceipt,
   Return,
   ScriptBuilderParam,
   SmartContractDefinition,
+  SmartContractIterOptions,
   SmartContractNetworkDefinition,
   TransactionResult,
   Transfer,
 } from '@neo-one/client-common';
+import { utils } from '@neo-one/utils';
+import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
+import { filter } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/filter';
+import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
 import * as argAssertions from '../args';
 import { Client } from '../Client';
 import { NoContractDeployedError } from '../errors';
+import { events as traceEvents } from '../trace';
 import { SmartContractAny } from '../types';
 import * as common from './common';
 
@@ -208,7 +219,8 @@ const createCall =
 
     return common.convertCallResult({
       returnType,
-      receipt,
+      result: receipt.result,
+      actions: receipt.actions,
       sourceMaps: definition.sourceMaps,
     });
   };
@@ -251,22 +263,14 @@ const createInvoke = ({
         const { events = [] } = definition.manifest.abi;
         const { events: forwardEvents = [] } = forwardOptions;
         const actions = common.convertActions({
-          actions: [...receipt.logs, ...receipt.notifications],
+          actions: receipt.actions,
           events: events.concat(forwardEvents),
         });
 
-        const receiptStack = typeof receipt.stack === 'string' ? [] : receipt.stack;
-
-        const receiptResult = {
-          gasConsumed: receipt.gasConsumed,
-          state: receipt.state,
-          stack: receiptStack,
-        };
-
         const invocationResult = await common.convertInvocationResult({
           returnType,
-          result: receiptResult,
-          actions: [...receipt.logs, ...receipt.notifications],
+          result: receipt.result,
+          actions: receipt.actions,
           sourceMaps: definition.sourceMaps,
         });
 
@@ -313,56 +317,56 @@ export const createSmartContract = ({
     },
   } = definition;
 
-  // const events = traceEvents.concat(abiEvents).reduce<{ [key: string]: ContractEventDescriptorClient }>(
-  //   (acc, event) => ({
-  //     ...acc,
-  //     [event.name]: event,
-  //   }),
-  //   {},
-  // );
+  const events = traceEvents.concat(abiEvents).reduce<{ [key: string]: ContractEventDescriptorClient }>(
+    (acc, event) => ({
+      ...acc,
+      [event.name]: event,
+    }),
+    {},
+  );
 
-  // const iterActionsRaw = ({
-  //   network = client.getCurrentNetwork(),
-  //   ...iterOptions
-  // }: SmartContractIterOptions = {}): AsyncIterable<RawAction> =>
-  //   AsyncIterableX.from(client.__iterActionsRaw(network, iterOptions)).pipe<RawAction>(
-  //     filter((action) => action.address === definition.networks[network].address),
-  //   );
+  const iterActionsRaw = ({
+    network = client.getCurrentNetwork(),
+    ...iterOptions
+  }: SmartContractIterOptions = {}): AsyncIterable<RawAction> =>
+    AsyncIterableX.from(client.__iterActionsRaw(network, iterOptions)).pipe<RawAction>(
+      filter((action) => action.address === definition.networks[network].address),
+    );
 
-  // const convertAction = (action: RawAction): Action | undefined => {
-  //   const converted = common.convertAction({ action, events });
+  const convertAction = (action: RawAction): Action | undefined => {
+    const converted = common.convertAction({ action, events });
 
-  //   return typeof converted === 'string' ? undefined : converted;
-  // };
+    return typeof converted === 'string' ? undefined : converted;
+  };
 
-  // const iterActions = (options?: SmartContractIterOptions): AsyncIterable<Action> =>
-  //   AsyncIterableX.from(iterActionsRaw(options)).pipe(map(convertAction), filter(utils.notNull));
+  const iterActions = (options?: SmartContractIterOptions): AsyncIterable<Action> =>
+    AsyncIterableX.from(iterActionsRaw(options)).pipe(map(convertAction), filter(utils.notNull));
 
-  // const iterEvents = (options?: SmartContractIterOptions): AsyncIterable<Event> =>
-  //   AsyncIterableX.from(iterActions(options)).pipe(
-  //     map((action) => {
-  //       if (action.type === 'Log') {
-  //         return undefined;
-  //       }
+  const iterEvents = (options?: SmartContractIterOptions): AsyncIterable<Event> =>
+    AsyncIterableX.from(iterActions(options)).pipe(
+      map((action) => {
+        if (action.type === 'Log') {
+          return undefined;
+        }
 
-  //       return action;
-  //     }),
-  //     filter(utils.notNull),
-  //     filter<Event>(Boolean),
-  //   );
+        return action;
+      }),
+      filter(utils.notNull),
+      filter<Event>(Boolean),
+    );
 
-  // const iterLogs = (options?: SmartContractIterOptions): AsyncIterable<Log> =>
-  //   AsyncIterableX.from(iterActions(options)).pipe(
-  //     map((action) => {
-  //       if (action.type === 'Event') {
-  //         return undefined;
-  //       }
+  const iterLogs = (options?: SmartContractIterOptions): AsyncIterable<Log> =>
+    AsyncIterableX.from(iterActions(options)).pipe(
+      map((action) => {
+        if (action.type === 'Event') {
+          return undefined;
+        }
 
-  //       return action;
-  //     }),
-  //     filter(utils.notNull),
-  //     filter<Log>(Boolean),
-  //   );
+        return action;
+      }),
+      filter(utils.notNull),
+      filter<Log>(Boolean),
+    );
 
   return definition.manifest.abi.methods.reduce<SmartContractAny>(
     (acc, func) =>
@@ -383,11 +387,10 @@ export const createSmartContract = ({
       }),
     {
       client,
-      // TODO: need to add documentation back to the website for these when added back
-      // iterEvents,
-      // iterLogs,
-      // iterActions,
-      // convertAction,
+      iterEvents,
+      iterLogs,
+      iterActions,
+      convertAction,
       definition,
     },
   );

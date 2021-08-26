@@ -20,6 +20,7 @@ import {
   RelayTransactionResultJSON,
   SendRawTransactionResultJSON,
   StorageItemJSON,
+  TransactionDataJSON,
   TransactionReceiptJSON,
   TriggerTypeJSON,
   UnclaimedGASJSON,
@@ -213,6 +214,15 @@ export class JSONRPCClient {
     return this.withInstance(async (provider) =>
       provider.request({
         method: 'gettransactionheight',
+        params: [hash],
+      }),
+    );
+  }
+
+  public async getTransactionData(hash: Hash256String): Promise<TransactionDataJSON> {
+    return this.withInstance(async (provider) =>
+      provider.request({
+        method: 'gettransactiondata',
         params: [hash],
       }),
     );

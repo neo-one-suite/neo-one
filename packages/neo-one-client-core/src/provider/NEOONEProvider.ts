@@ -10,6 +10,7 @@ import {
   NetworkType,
   RawApplicationLogData,
   RawCallReceipt,
+  RawTransactionData,
   RelayTransactionResult,
   ScriptBuilderParam,
   Transaction,
@@ -71,6 +72,10 @@ export class NEOONEProvider implements Provider {
     options?: GetOptions,
   ): Promise<TransactionReceipt> {
     return this.getProvider(network).getTransactionReceipt(hash, options);
+  }
+
+  public async getTransactionData(network: NetworkType, hash: Hash256String): Promise<RawTransactionData> {
+    return this.getProvider(network).getTransactionData(hash);
   }
 
   public async getApplicationLogData(network: NetworkType, hash: Hash256String): Promise<RawApplicationLogData> {

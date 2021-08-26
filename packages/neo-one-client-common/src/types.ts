@@ -208,7 +208,7 @@ export interface ConfirmedTransaction extends Transaction {
   /**
    * 'Receipt' of the confirmed transaction on the blockchain. This contains properties like the block the `Transaction` was included in.
    */
-  readonly receipt: TransactionReceipt;
+  readonly transactionData: RawTransactionData;
 }
 
 /**
@@ -273,6 +273,32 @@ export interface Block extends Header {
 }
 
 /**
+ * Additional raw data that is typically processed by client APIs.
+ */
+export interface RawTransactionData extends TransactionReceipt {
+  /**
+   * The `AddressString`s of contracts destroyed by the transaction execution.
+   */
+  readonly deletedContractHashes: readonly UInt160Hex[];
+  /**
+   * `Contract`s created by the transaction execution.
+   */
+  readonly deployedContracts: readonly Contract[];
+  /**
+   * `Contract`s updated by the transaction execution.
+   */
+  readonly updatedContracts: readonly Contract[];
+  /**
+   * Raw result of an transaction execution.
+   */
+  readonly executionResult: RawExecutionResult;
+  /**
+   * Raw actions emitted by the transaction execution.
+   */
+  readonly actions: readonly RawAction[];
+}
+
+/**
  * Receipt of a confirmed `Transaction` which contains data about the confirmation such as the `Block` index and the index of the `Transaction` within the block.
  */
 export interface TransactionReceipt {
@@ -311,14 +337,17 @@ export interface TransactionResult<TTransactionReceipt extends TransactionReceip
   readonly confirmed: (options?: GetOptions) => Promise<TTransactionReceipt>;
 }
 
-/**
- * Result of a successful invocation.
- */
-export interface InvocationResultSuccess<TValue> {
+export interface RawInvocationResultBase {
   /**
    * GAS consumed by the operation.
    */
   readonly gasConsumed: BigNumber;
+}
+
+/**
+ * Result of a successful invocation.
+ */
+export interface InvocationResultSuccess<TValue> extends RawInvocationResultBase {
   /**
    * Indicates a successful invocation.
    */
@@ -332,11 +361,7 @@ export interface InvocationResultSuccess<TValue> {
 /**
  * Result of a failed invocation.
  */
-export interface InvocationResultError {
-  /**
-   * GAS consumed by the operation.
-   */
-  readonly gasConsumed: BigNumber;
+export interface InvocationResultError extends RawInvocationResultBase {
   /**
    * Indicates a failed invocation.
    */
@@ -622,7 +647,7 @@ export interface EventParameters {
 /**
  * Structured data emitted by a smart contract during a method invocation. Typically emitted in response to state changes within the contract and to notify contract listeners of an action happening within the contract.
  */
-export interface Event<TName extends string = string, TEventParameters = EventParameters> {
+export interface Event<TName extends string = string, TEventParameters = EventParameters> extends RawActionBase {
   /**
    * `type` differentiates the `Event` object from other `Action` objects, i.e. `Log`.
    */
@@ -645,7 +670,7 @@ export interface Event<TName extends string = string, TEventParameters = EventPa
 /**
  * Unstructured string emitted by a smart contract during a method invocation.
  */
-export interface Log {
+export interface Log extends RawActionBase {
   /**
    * `type` differentiates the `Log` object from other `Action` objects, i.e. `Event`.
    */
@@ -811,7 +836,8 @@ export interface InvokeSendUnsafeTransactionOptions extends TransactionOptions {
   /**
    * `Transfer`s that specify native assets to send from the contract.
    */
-  readonly sendFrom?: readonly Transfer[];
+  // TODO: remove or keep?
+  // readonly sendFrom?: readonly Transfer[];
 }
 
 /**
@@ -821,7 +847,8 @@ export interface InvokeReceiveTransactionOptions extends TransactionOptions {
   /**
    * `Transfer`s that specify native assets to send to the contract.
    */
-  readonly sendTo?: ReadonlyArray<OmitStrict<Transfer, 'to'>>;
+  // TODO: remove or keep?
+  // readonly sendTo?: ReadonlyArray<OmitStrict<Transfer, 'to'>>;
 }
 
 /**
@@ -2151,9 +2178,9 @@ export type ContractParameter =
  */
 export type ContractParameterType = ContractParameter['type'];
 
-export type RawInvocationResult = RawInvocationResultSuccess | RawInvocationResultError;
+export type RawExecutionResult = RawExecutionResultSuccess | RawExecutionResultError;
 
-interface RawInvocationResultBase {
+interface RawExecutionResultBase {
   /**
    * The state of the NEO VM after execution. Typically has one `ContractParameter` which is the return value of the method invoked.
    */
@@ -2164,18 +2191,22 @@ interface RawInvocationResultBase {
   readonly gasConsumed: BigNumber;
 }
 
-export interface RawInvocationResultSuccess extends RawInvocationResultBase {
+export interface RawExecutionResultSuccess extends RawExecutionResultBase {
   /**
-   * Result of transaction execution.
+   * Result of transaction execution. Indicates a successful execution.
    */
   readonly state: 'HALT';
 }
 
-export interface RawInvocationResultError extends RawInvocationResultBase {
+export interface RawExecutionResultError extends RawExecutionResultBase {
   /**
-   * Result of transaction execution.
+   * Result of transaction execution. Indicates a failed execution.
    */
   readonly state: 'FAULT';
+  /**
+   * Failure reason.
+   */
+  readonly message: string;
 }
 
 /**
@@ -2224,33 +2255,58 @@ export interface RawActionBase {
 export type RawAction = RawNotification | RawLog;
 
 /**
- * Raw receipt of an invocation.
+ * Raw notification emitted during an invocation. This is the unprocessed counterpart to an `Event`.
  *
  * Low-level API for advanced usage only.
  */
-export interface RawCallReceipt {
-  readonly state: 'HALT' | 'FAULT';
-  readonly script: Buffer;
-  readonly gasConsumed: BigNumber;
-  readonly exception?: string;
-  readonly stack: readonly ContractParameter[] | string;
-  readonly notifications: readonly RawNotification[];
-  readonly logs: readonly RawLog[];
+export interface RawNotification extends RawActionBase {
+  /**
+   * `type` differentiates the `RawNotification` object from other `RawAction` objects, i.e. `RawLog`.
+   */
+  readonly type: 'Notification';
+  /**
+   * The raw arguments of the notifications. These are processed into the `parameters` parameter of the `Event` object using the `ABI`.
+   */
+  readonly args: readonly ContractParameter[];
+  /**
+   * The name of the notification.
+   */
+  readonly eventName: string;
 }
 
 /**
- * Raw receipt of an invocation.
+ * Raw log emitted during an invocation.
  *
  * Low-level API for advanced usage only.
  */
-export interface RawInvokeReceipt extends RawCallReceipt, TransactionReceipt {}
+export interface RawLog extends RawActionBase {
+  /**
+   * `type` differentiates the `RawLog` object from other `RawAction` objects, i.e. `RawNotification`.
+   */
+  readonly type: 'Log';
+  /**
+   * The raw message. This is unprocessed in the `message`.
+   */
+  readonly message: string;
+  /**
+   * The position of the instruction pointer at the point of the log.
+   */
+  readonly position: number;
+}
+
+/**
+ * Raw action emitted during an invocation.
+ *
+ * Low-level API for advanced usage only.
+ */
+export type RawVMAction = RawVMNotification | RawVMLog;
 
 /**
  * Raw notification from VM execution.
  *
  * Low-level API for advanced usage only.
  */
-export interface RawNotification {
+export interface RawVMNotification {
   /**
    * `type` differentiates the `RawNotification` object from other `RawAction` objects, i.e. `RawLog`.
    */
@@ -2258,7 +2314,7 @@ export interface RawNotification {
   /**
    * The script hash of the contract that created the notification.
    */
-  readonly scriptHash: UInt160;
+  readonly scriptHash: UInt160Hex;
   /**
    * The event name of the notification.
    */
@@ -2274,7 +2330,7 @@ export interface RawNotification {
  *
  * Low-level API for advanced usage only.
  */
-export interface RawLog {
+export interface RawVMLog {
   /**
    * `type` differentiates the `RawLog` object from other `RawAction` objects, i.e. `RawNotification`.
    */
@@ -2282,11 +2338,11 @@ export interface RawLog {
   /**
    * The hash of the container that emitted the log.
    */
-  readonly containerHash?: UInt256;
+  readonly containerHash?: Hash256String;
   /**
    * The script hash of the transaction that called the invocation that emitted the log.
    */
-  readonly callingScriptHash: UInt160;
+  readonly callingScriptHash: UInt160Hex;
   /**
    * The raw message. This is unprocessed in the `message`.
    */
@@ -2295,6 +2351,26 @@ export interface RawLog {
    * The position of the instruction pointer when the log was emitted.
    */
   readonly position: number;
+}
+
+/**
+ * Raw receipt of an invocation.
+ *
+ * Low-level API for advanced usage only.
+ */
+export interface RawCallReceipt {
+  readonly result: RawExecutionResult;
+  readonly actions: readonly RawAction[];
+}
+
+/**
+ * Raw receipt of an invocation.
+ *
+ * Low-level API for advanced usage only.
+ */
+export interface RawInvokeReceipt extends TransactionReceipt {
+  readonly result: RawExecutionResult;
+  readonly actions: readonly RawAction[];
 }
 
 /**
@@ -2326,28 +2402,6 @@ export interface JSONRPCErrorResponse {
 }
 
 /**
- * An individual verification and the associated data.
- */
-export interface VerifyScriptResult {
-  /**
-   * `undefined` if the verification passed, otherwise a message that describes the failure.
-   */
-  readonly failureMessage?: string;
-  /**
-   * The smart contract this result is associated with.
-   */
-  readonly address: AddressString;
-  /**
-   * The specific `Witness` that was checked.
-   */
-  readonly witness: Witness;
-  /**
-   * The actions emitted during the verification.
-   */
-  readonly actions: readonly RawAction[];
-}
-
-/**
  * Raw result of relaying a `Transaction`. Further consumed and processed by `LocalUserAccountProvider` and `ContractABI`.
  */
 export interface RelayTransactionResult {
@@ -2359,6 +2413,10 @@ export interface RelayTransactionResult {
    * Verification result.
    */
   readonly verifyResult?: VerifyResultModel;
+  /**
+   * Optional additional failure message for debugging transaction relay failure.
+   */
+  readonly failureMessage?: string;
 }
 
 export interface RawExecutionData {
@@ -2381,11 +2439,11 @@ export interface RawExecutionData {
   /**
    * The `Notification`s that came from the `Transaction`'s script execution.
    */
-  readonly notifications: readonly RawNotification[];
+  readonly notifications: readonly RawVMNotification[];
   /**
    * The `Log`s that came from the `Transaction`'s script execution.
    */
-  readonly logs: readonly RawLog[];
+  readonly logs: readonly RawVMLog[];
 }
 
 /**

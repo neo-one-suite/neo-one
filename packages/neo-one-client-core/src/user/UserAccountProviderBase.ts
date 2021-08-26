@@ -20,6 +20,7 @@ import {
   RawApplicationLogData,
   RawCallReceipt,
   RawInvokeReceipt,
+  RawTransactionData,
   ScriptBuilder,
   ScriptBuilderParam,
   SourceMaps,
@@ -61,7 +62,7 @@ export interface InvokeRawOptions<T extends TransactionReceipt> {
   readonly verify?: boolean;
   readonly onConfirm: (options: {
     readonly transaction: Transaction;
-    readonly data: RawApplicationLogData;
+    readonly data: RawTransactionData;
     readonly receipt: TransactionReceipt;
   }) => Promise<T> | T;
   readonly method: string;
@@ -80,7 +81,7 @@ export interface ExecuteInvokeScriptOptions<T extends TransactionReceipt> {
   readonly witnesses: readonly WitnessModel[];
   readonly onConfirm: (options: {
     readonly transaction: Transaction;
-    readonly data: RawApplicationLogData;
+    readonly data: RawTransactionData;
     readonly receipt: TransactionReceipt;
   }) => Promise<T> | T;
   readonly sourceMaps?: SourceMaps;
@@ -100,6 +101,7 @@ export interface Provider {
     options?: GetOptions,
   ) => Promise<TransactionReceipt>;
   readonly getApplicationLogData: (network: NetworkType, hash: Hash256String) => Promise<RawApplicationLogData>;
+  readonly getTransactionData: (network: NetworkType, hash: Hash256String) => Promise<RawTransactionData>;
   readonly testInvoke: (network: NetworkType, script: Buffer) => Promise<RawCallReceipt>;
   readonly testTransaction: (network: NetworkType, transaction: TransactionModel) => Promise<RawCallReceipt>;
   readonly call: (
@@ -239,26 +241,14 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
           ),
         ),
       },
-      onConfirm: ({ receipt, data: dataIn, transaction }): RawInvokeReceipt => {
-        const data = dataIn.executions.length > 0 ? dataIn.executions[0] : undefined;
-        if (data === undefined) {
-          throw new Error('Expected application log for transaction to have at least one execution');
-        }
-
-        return {
-          blockIndex: receipt.blockIndex,
-          blockHash: receipt.blockHash,
-          transactionIndex: receipt.transactionIndex,
-          globalIndex: receipt.globalIndex,
-          state: data.vmState,
-          stack: typeof data.stack === 'string' ? [] : data.stack,
-          gasConsumed: data.gasConsumed,
-          script: Buffer.from(transaction.script, 'hex'),
-          logs: data.logs,
-          notifications: data.notifications,
-        };
-      },
-      // TODO: what to do here? Related to attaching transfers to method invocation
+      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
+        blockIndex: receipt.blockIndex,
+        blockHash: receipt.blockHash,
+        transactionIndex: receipt.transactionIndex,
+        globalIndex: receipt.globalIndex,
+        result: data.executionResult,
+        actions: data.actions,
+      }),
       witnesses: this.getInvokeScripts(
         method,
         params,
@@ -299,13 +289,13 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     });
     const callReceipt = await this.provider.testTransaction(network, tx);
 
-    await processConsoleLogMessages({ actions: [...callReceipt.logs, ...callReceipt.notifications] });
+    await processConsoleLogMessages({ actions: callReceipt.actions });
 
-    if (callReceipt.state === 'FAULT') {
-      throw new InvokeError(callReceipt.state);
+    if (callReceipt.result.state === 'FAULT') {
+      throw new InvokeError(callReceipt.result.state);
     }
 
-    const gas = callReceipt.gasConsumed.integerValue(BigNumber.ROUND_UP);
+    const gas = callReceipt.result.gasConsumed.integerValue(BigNumber.ROUND_UP);
     if (gas.gt(utils.ZERO_BIG_NUMBER) && maxFee.lt(gas) && !maxFee.eq(utils.NEGATIVE_ONE_BIG_NUMBER)) {
       throw new InsufficientSystemFeeError(maxFee, gas);
     }

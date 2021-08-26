@@ -6,6 +6,7 @@ import {
   UInt256Hex,
   utils,
   VerifyResultModel,
+  VerifyResultModelExtended,
 } from '@neo-one/client-common';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import { Consensus, ConsensusOptions } from '@neo-one/node-consensus';
@@ -372,11 +373,7 @@ export class Node implements INode {
 
   public async relayTransaction(
     transaction: Transaction,
-    {
-      throwVerifyError = false,
-      forceAdd = false,
-    }: { readonly throwVerifyError?: boolean; readonly forceAdd?: boolean } = {
-      throwVerifyError: false,
+    { forceAdd = false }: { readonly forceAdd?: boolean } = {
       forceAdd: false,
     },
   ): Promise<RelayTransactionResult> {
@@ -407,7 +404,7 @@ export class Node implements INode {
               ...logLabels,
             };
           }
-          let verifyResult: VerifyResultModel | undefined;
+          let verifyResult: VerifyResultModelExtended | undefined;
           if (foundTransaction === undefined) {
             verifyResult = await this.blockchain.verifyTransaction(
               transaction,
@@ -415,7 +412,7 @@ export class Node implements INode {
               this.transactionVerificationContext,
             );
 
-            if (verifyResult === VerifyResultModel.Succeed) {
+            if (verifyResult.verifyResult === VerifyResultModel.Succeed) {
               this.mutableMemPool[transaction.hashHex] = transaction;
               if (this.mutableConsensus !== undefined) {
                 this.mutableConsensus.onTransactionReceived(transaction);
@@ -437,12 +434,7 @@ export class Node implements INode {
 
         return finalResult;
       } catch (error) {
-        if (
-          error.code === undefined ||
-          typeof error.code !== 'string' ||
-          !error.code.includes('VERIFY') ||
-          throwVerifyError
-        ) {
+        if (error.code === undefined || typeof error.code !== 'string' || !error.code.includes('VERIFY')) {
           throw error;
         }
       } finally {

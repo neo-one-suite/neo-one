@@ -13,14 +13,14 @@ import {
   Script,
   scriptHashToAddress,
   signatureContractCost,
+  TransactionDataJSON,
   TransactionJSON,
   TransactionModel,
   TransactionModelAdd,
   UInt160,
-  utils as clientCommonUtils,
   VerifyResultModel,
+  VerifyResultModelExtended,
 } from '@neo-one/client-common';
-import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import {
@@ -28,6 +28,7 @@ import {
   DeserializeWireOptions,
   SerializableContainer,
   SerializableContainerType,
+  SerializeJSONContext,
 } from '../Serializable';
 import { Signer } from '../Signer';
 import { TransactionVerificationContext } from '../TransactionVerificationContext';
@@ -39,7 +40,7 @@ import { Attribute, deserializeAttribute } from './attributes';
 export type TransactionAdd = TransactionModelAdd<Attribute, Witness, Signer>;
 export type TransactionAddUnsigned = Omit<TransactionModelAdd<Attribute, Witness, Signer>, 'witnesses'>;
 
-export interface TransactionData {
+export interface TransactionDataAddOn {
   readonly blockHash: string;
   readonly blockIndex: number;
   readonly transactionIndex: number;
@@ -182,28 +183,70 @@ export class Transaction
   public async verifyStateDependent(
     verifyOptions: VerifyOptions,
     transactionContext?: TransactionVerificationContext,
-  ): Promise<VerifyResultModel> {
+  ): Promise<VerifyResultModelExtended> {
     const { storage, native, verifyWitness, vm, headerCache } = verifyOptions;
     const index = await native.Ledger.currentIndex(storage);
-    if (this.validUntilBlock <= index || this.validUntilBlock > index + this.maxValidUntilBlockIncrement) {
-      return VerifyResultModel.Expired;
+    if (this.validUntilBlock <= index) {
+      return {
+        verifyResult: VerifyResultModel.Expired,
+        failureReason: `Transaction is expired. Current index ${index} is greater than validUntilBlock ${this.validUntilBlock}`,
+      };
+    }
+
+    if (this.validUntilBlock > index + this.maxValidUntilBlockIncrement) {
+      return {
+        verifyResult: VerifyResultModel.Expired,
+        failureReason: `Transaction is expired. Current index ${index} plus maxValidUntilBlockIncrement ${this.maxValidUntilBlockIncrement} is less than validUntilBlock ${this.validUntilBlock}`,
+      };
     }
 
     const hashes = this.getScriptHashesForVerifying();
-    const blocked = await Promise.all(hashes.map(async (hash) => native.Policy.isBlocked(storage, hash)));
+    const blockedHashes: UInt160[] = [];
+    const blocked = await Promise.all(
+      hashes.map(async (hash) => {
+        const isBlocked = await native.Policy.isBlocked(storage, hash);
+        if (isBlocked) {
+          // tslint:disable-next-line: no-array-mutation
+          blockedHashes.push(hash);
+        }
+
+        return isBlocked;
+      }),
+    );
     if (blocked.some((bool) => bool)) {
-      return VerifyResultModel.PolicyFail;
+      return {
+        verifyResult: VerifyResultModel.PolicyFail,
+        failureReason: `The following signers are blocked: ${blockedHashes
+          .map((hash) => common.uInt160ToString(hash))
+          .join(', ')}`,
+      };
     }
 
-    const checkTxPromise = transactionContext?.checkTransaction(this, storage) ?? Promise.resolve(true);
+    const checkTxPromise = transactionContext?.checkTransaction(this, storage) ?? Promise.resolve({ result: true });
     const checkTx = await checkTxPromise;
-    if (!checkTx) {
-      return VerifyResultModel.InsufficientFunds;
+    if (!checkTx.result) {
+      return { verifyResult: VerifyResultModel.InsufficientFunds, failureReason: checkTx.failureReason };
     }
 
-    const attrVerifications = await Promise.all(this.attributes.map(async (attr) => attr.verify(verifyOptions, this)));
+    const failedAttributes: Attribute[] = [];
+    const attrVerifications = await Promise.all(
+      this.attributes.map(async (attr) => {
+        const verification = await attr.verify(verifyOptions, this);
+        if (!verification) {
+          // tslint:disable-next-line: no-array-mutation
+          failedAttributes.push(attr);
+        }
+
+        return verification;
+      }),
+    );
     if (attrVerifications.some((verification) => !verification)) {
-      return VerifyResultModel.Invalid;
+      return {
+        verifyResult: VerifyResultModel.Invalid,
+        failureReason: `The following attributes failed verification: ${failedAttributes
+          .map((attr) => JSON.stringify(attr.serializeJSON()))
+          .join(', ')}`,
+      };
     }
 
     const [feePerByte, execFeeFactor] = await Promise.all([
@@ -211,9 +254,15 @@ export class Transaction
       native.Policy.getExecFeeFactor(storage),
     ]);
 
-    let netFee = this.networkFee.sub(feePerByte.muln(this.size));
+    const feeNeeded = feePerByte.muln(this.size);
+    let netFee = this.networkFee.sub(feeNeeded);
     if (netFee.ltn(0)) {
-      return VerifyResultModel.InsufficientFunds;
+      return {
+        verifyResult: VerifyResultModel.InsufficientFunds,
+        failureReason: `Insufficient network fee. Transaction size ${
+          this.size
+        } times fee per byte of ${feePerByte.toString()} = ${feeNeeded.toString()} is greater than attached network fee ${this.networkFee.toString()}`,
+      };
     }
     if (netFee.gt(maxVerificationGas)) {
       netFee = maxVerificationGas;
@@ -228,7 +277,7 @@ export class Transaction
       } else if (crypto.isSignatureContract(witness.verification)) {
         netFee = netFee.sub(new BN(signatureContractCost.toString(), 10).muln(execFeeFactor));
       } else {
-        const { result, gas } = await verifyWitness({
+        const { result, gas, failureReason } = await verifyWitness({
           vm,
           verifiable: this,
           storage,
@@ -240,32 +289,48 @@ export class Transaction
           settings: verifyOptions.settings,
         });
         if (!result) {
-          return VerifyResultModel.InsufficientFunds;
+          return {
+            verifyResult: VerifyResultModel.InsufficientFunds,
+            failureReason: `Witness verification failed for witness ${common.uInt160ToString(
+              witness.scriptHash,
+            )}. Reason: ${failureReason}.`,
+          };
         }
         netFee = netFee.sub(gas);
       }
       if (netFee.ltn(0)) {
-        return VerifyResultModel.InsufficientFunds;
+        return {
+          verifyResult: VerifyResultModel.InsufficientFunds,
+          failureReason: `Insufficient network fee while verifying witnesses. Try adding ${netFee
+            .neg()
+            .toString()} to network fee`,
+        };
       }
     }
 
-    return VerifyResultModel.Succeed;
+    return { verifyResult: VerifyResultModel.Succeed };
   }
 
-  public async verifyStateIndependent(verifyOptions: VerifyOptions) {
+  public async verifyStateIndependent(verifyOptions: VerifyOptions): Promise<VerifyResultModelExtended> {
     const network = verifyOptions.settings?.network ?? this.network;
     if (this.size > MAX_TRANSACTION_SIZE) {
-      return VerifyResultModel.Invalid;
+      return { verifyResult: VerifyResultModel.Invalid, failureReason: '' };
     }
     try {
       // tslint:disable-next-line: no-unused-expression
       new Script(this.script, true);
-    } catch {
-      return VerifyResultModel.Invalid;
+    } catch (error) {
+      return {
+        verifyResult: VerifyResultModel.Invalid,
+        failureReason: `Transaction script is invalid: ${error.message}`,
+      };
     }
     const hashes = this.getScriptHashesForVerifying();
     if (hashes.length !== this.witnesses.length) {
-      return VerifyResultModel.Invalid;
+      return {
+        verifyResult: VerifyResultModel.Invalid,
+        failureReason: `Expected hashes length ${hashes.length} to equal witnesses length ${this.witnesses.length}`,
+      };
     }
 
     // tslint:disable-next-line: no-loop-statement
@@ -277,24 +342,38 @@ export class Transaction
           const signature = this.witnesses[i].invocation.slice(2);
           const signData = getSignData(this.hash, network);
           if (!crypto.verify({ publicKey: pubkey, message: signData, signature })) {
-            return VerifyResultModel.Invalid;
+            return { verifyResult: VerifyResultModel.Invalid, failureReason: 'Signature verification failed' };
           }
-        } catch {
-          return VerifyResultModel.Invalid;
+        } catch (error) {
+          return {
+            verifyResult: VerifyResultModel.Invalid,
+            failureReason: `Signature verification failed: ${error.message}`,
+          };
         }
       } else if (multiSigResult.result) {
         const { points, m } = multiSigResult;
         const signatures = crypto.getMultiSignatures(this.witnesses[i].invocation);
         if (!hashes[i].equals(this.witnesses[i].scriptHash)) {
-          return VerifyResultModel.Invalid;
+          return {
+            verifyResult: VerifyResultModel.Invalid,
+            failureReason: `Expected witness scripthash ${common.uInt160ToString(
+              this.witnesses[i].scriptHash,
+            )} to equal ${common.uInt160ToString(hashes[i])}`,
+          };
         }
         if (signatures === undefined) {
           // This check is not in there code but it's possible that their code
           // could throw a null reference exception without this sort of check
-          return VerifyResultModel.Invalid;
+          return {
+            verifyResult: VerifyResultModel.Invalid,
+            failureReason: 'Expected witness invocation signature to be defined',
+          };
         }
         if (signatures.length !== m) {
-          return VerifyResultModel.Invalid;
+          return {
+            verifyResult: VerifyResultModel.Invalid,
+            failureReason: `Expected signatures length ${signatures.length} to equal witness verification script result length ${m}`,
+          };
         }
         const n = points.length;
         const message = getSignData(this.hash, network);
@@ -306,24 +385,30 @@ export class Transaction
             }
             y += 1;
             if (m - x > n - y) {
-              return VerifyResultModel.Invalid;
+              return {
+                verifyResult: VerifyResultModel.Invalid,
+                failureReason: 'Error while verifying invocation signature',
+              };
             }
           }
-        } catch {
-          return VerifyResultModel.Invalid;
+        } catch (error) {
+          return {
+            verifyResult: VerifyResultModel.Invalid,
+            failureReason: `Error while verifying invocation signatures: ${error.message}`,
+          };
         }
       }
     }
 
-    return VerifyResultModel.Succeed;
+    return { verifyResult: VerifyResultModel.Succeed };
   }
 
   public async verify(
     verifyOptions: VerifyOptions,
     verifyContext?: TransactionVerificationContext,
-  ): Promise<VerifyResultModel> {
+  ): Promise<VerifyResultModelExtended> {
     const independentResult = await this.verifyStateIndependent(verifyOptions);
-    if (independentResult !== VerifyResultModel.Succeed) {
+    if (independentResult.verifyResult !== VerifyResultModel.Succeed) {
       return independentResult;
     }
 
@@ -347,20 +432,27 @@ export class Transaction
     };
   }
 
-  public serializeJSONWithReceipt(data: TransactionData): ConfirmedTransactionJSON {
+  public async serializeJSONWithData(context: SerializeJSONContext): Promise<ConfirmedTransactionJSON> {
     const base = this.serializeJSON();
+    const data = await context.tryGetTransactionData(this.hash);
+    let transactionData: TransactionDataJSON | undefined;
+    if (data !== undefined) {
+      transactionData = {
+        blockIndex: data.blockIndex,
+        blockHash: JSONHelper.writeUInt256(data.blockHash),
+        globalIndex: JSONHelper.writeUInt64(data.globalIndex),
+        transactionIndex: data.transactionIndex,
+        deletedContractHashes: data.deletedContractHashes.map((hash) => JSONHelper.writeUInt160(hash)),
+        deployedContracts: data.deployedContracts.map((c) => c.serializeJSON()),
+        updatedContracts: data.updatedContracts.map((c) => c.serializeJSON()),
+        executionResult: data.executionResult.serializeJSON(),
+        actions: data.actions.map((action) => action.serializeJSON()),
+      };
+    }
 
     return {
       ...base,
-      receipt: {
-        blockIndex: data.blockIndex,
-        transactionIndex: data.transactionIndex,
-        blockHash: data.blockHash,
-        globalIndex: new BigNumber(clientCommonUtils.USHORT_MAX_NUMBER)
-          .times(data.blockIndex)
-          .plus(data.transactionIndex)
-          .toString(),
-      },
+      transactionData,
     };
   }
 }

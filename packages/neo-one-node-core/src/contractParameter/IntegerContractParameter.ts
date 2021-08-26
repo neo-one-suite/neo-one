@@ -35,7 +35,12 @@ export class IntegerContractParameter extends ContractParameterBase<
     return !this.value.isZero();
   }
 
-  public asBuffer(): Buffer {
+  public asBuffer(useGetBuffer?: boolean): Buffer {
+    // This is from IntegerStackItem getBuffer method to ensure consistency with that method
+    if (useGetBuffer) {
+      return this.value.eqn(0) ? Buffer.from([]) : this.value.toBuffer('le');
+    }
+
     return utils.toSignedBuffer(this.value);
   }
 

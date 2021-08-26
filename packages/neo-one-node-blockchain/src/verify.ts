@@ -1,4 +1,12 @@
-import { CallFlags, ContractParameterTypeModel, Script, TriggerType, UInt160, VMState } from '@neo-one/client-common';
+import {
+  CallFlags,
+  common,
+  ContractParameterTypeModel,
+  Script,
+  TriggerType,
+  UInt160,
+  VMState,
+} from '@neo-one/client-common';
 import {
   ContractState,
   ExecuteScriptResult,
@@ -77,15 +85,15 @@ export const verifyWitness = async ({
   try {
     // tslint:disable-next-line: no-unused-expression
     new Script(invocation, true);
-  } catch {
-    return { result: false, gas: initFee };
+  } catch (error) {
+    return { result: false, gas: initFee, failureReason: `Invocation script is invalid: ${error.message}` };
   }
 
   let contract: ContractState | undefined;
   if (verification.length === 0) {
     contract = await native.ContractManagement.getContract(storage, hash);
     if (contract === undefined) {
-      return { result: false, gas: initFee };
+      return { result: false, gas: initFee, failureReason: `Contract not found: ${common.uInt160ToString(hash)}` };
     }
   }
 
@@ -108,7 +116,7 @@ export const verifyWitness = async ({
       if (contract !== undefined) {
         const methodDescriptor = contract.manifest.abi.getMethod('verify', -1);
         if (methodDescriptor?.returnType !== ContractParameterTypeModel.Boolean) {
-          return { result: false, gas: initFee };
+          return { result: false, gas: initFee, failureReason: `Contract verify method's return type is not boolean` };
         }
 
         engine.loadContract({
@@ -119,18 +127,28 @@ export const verifyWitness = async ({
         });
       } else {
         if (native.isNative(hash)) {
-          return { result: false, gas: initFee };
+          return {
+            result: false,
+            gas: initFee,
+            failureReason: `Cannot use native contract for verification: ${common.uInt160ToString(hash)}`,
+          };
         }
 
         if (!hash.equals(witness.scriptHash)) {
-          return { result: false, gas: initFee };
+          return {
+            result: false,
+            gas: initFee,
+            failureReason: `Expected contract hash ${common.uInt160ToString(
+              hash,
+            )} to equal witness script hash ${common.uInt160ToString(witness.scriptHash)}`,
+          };
         }
 
         try {
           // tslint:disable-next-line: no-unused-expression
           new Script(verification, true);
-        } catch {
-          return { result: false, gas: initFee };
+        } catch (error) {
+          return { result: false, gas: initFee, failureReason: `Verification script is invalid: ${error.message}` };
         }
 
         engine.loadScript({ script: verification, flags: CallFlags.ReadOnly, scriptHash: hash, initialPosition: 0 });
@@ -140,11 +158,11 @@ export const verifyWitness = async ({
       const result = engine.execute();
 
       if (result === VMState.FAULT) {
-        return { result: false, gas: initFee };
+        return { result: false, gas: initFee, failureReason: `Invocation script execution resulted in FAULT state` };
       }
 
       if (!engine.resultStack[0].getBoolean()) {
-        return { result: false, gas: initFee };
+        return { result: false, gas: initFee, failureReason: `Invocation script execution returned false` };
       }
 
       return { result: true, gas: engine.gasConsumed };

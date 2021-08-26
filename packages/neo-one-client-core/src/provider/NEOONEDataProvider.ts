@@ -2,72 +2,28 @@
 import {
   Account,
   AddressString,
-  ApplicationLogJSON,
-  assertCallFlags,
-  Attribute,
-  AttributeJSON,
-  AttributeTypeModel,
   Block,
-  BlockJSON,
-  ConfirmedTransaction,
-  ConfirmedTransactionJSON,
   Contract,
-  ContractABI,
-  ContractABIJSON,
-  ContractEventDescriptor,
-  ContractEventDescriptorJSON,
-  ContractGroup,
-  ContractGroupJSON,
-  ContractJSON,
-  ContractManifest,
-  ContractManifestJSON,
-  ContractMethodDescriptor,
-  ContractMethodDescriptorJSON,
-  ContractParameterDefinition,
-  ContractParameterDefinitionJSON,
-  ContractParameterDefinitionType,
-  ContractParameterTypeJSON,
-  ContractPermission,
-  ContractPermissionJSON,
   DeveloperProvider,
-  ExecutionJSON,
   GetOptions,
   Hash256String,
   IterOptions,
-  JSONHelper,
-  MethodToken,
-  MethodTokenJSON,
-  NefFile,
-  NefFileJSON,
   NetworkSettings,
-  NetworkSettingsJSON,
   NetworkType,
-  OracleResponseJSON,
   Peer,
   PrivateNetworkSettings,
   RawApplicationLogData,
   RawCallReceipt,
-  RawExecutionData,
+  RawTransactionData,
   RelayTransactionResult,
-  RelayTransactionResultJSON,
   ScriptBuilderParam,
-  scriptHashToAddress,
-  Signer,
-  SignerJSON,
   StorageItem,
   StorageItemJSON,
-  toAttributeType,
-  toVerifyResult,
   Transaction,
-  TransactionJSON,
   TransactionModel,
   TransactionReceipt,
-  TransactionReceiptJSON,
   UInt160Hex,
-  VerifyResultJSON,
-  VerifyResultModel,
 } from '@neo-one/client-common';
-import { utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { flatten } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatten';
 import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
@@ -75,7 +31,17 @@ import BigNumber from 'bignumber.js';
 import debug from 'debug';
 import { AsyncBlockIterator } from '../AsyncBlockIterator';
 import { clientUtils } from '../clientUtils';
-import { convertCallReceipt, convertContractParameters, convertLog, convertNotification } from './convert';
+import {
+  convertApplicationLogData,
+  convertBlock,
+  convertCallReceipt,
+  convertContract,
+  convertNetworkSettings,
+  convertRelayTransactionResult,
+  convertStorageItem,
+  convertTransaction,
+  convertTransactionData,
+} from './convert';
 import { JSONRPCClient } from './JSONRPCClient';
 import { JSONRPCHTTPProvider } from './JSONRPCHTTPProvider';
 import { JSONRPCProvider, JSONRPCProviderManager } from './JSONRPCProvider';
@@ -120,7 +86,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
   public async relayTransaction(transaction: TransactionModel): Promise<RelayTransactionResult> {
     const result = await this.mutableClient.relayTransaction(transaction.serializeWire().toString('hex'));
 
-    return this.convertRelayTransactionResult(result);
+    return convertRelayTransactionResult(result);
   }
 
   public async getTransactionReceipt(hash: Hash256String, options?: GetOptions): Promise<TransactionReceipt> {
@@ -132,7 +98,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
   public async getApplicationLogData(hash: Hash256String): Promise<RawApplicationLogData> {
     const applicationLogData = await this.mutableClient.getApplicationLog(hash);
 
-    return this.convertApplicationLogData(applicationLogData);
+    return convertApplicationLogData(applicationLogData);
   }
 
   public async testInvoke(script: Buffer): Promise<RawCallReceipt> {
@@ -150,7 +116,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
   public async getBlock(hashOrIndex: Hash256String | number, options?: GetOptions): Promise<Block> {
     const block = await this.mutableClient.getBlock(hashOrIndex, options);
 
-    return this.convertBlock(block);
+    return convertBlock(block);
   }
 
   public async getFeePerByte(): Promise<BigNumber> {
@@ -200,7 +166,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
   public async getContract(address: AddressString): Promise<Contract> {
     const contract = await this.mutableClient.getContract(address);
 
-    return this.convertContract(contract);
+    return convertContract(contract);
   }
 
   public async getMemPool(): Promise<readonly Hash256String[]> {
@@ -210,7 +176,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
   public async getTransaction(hash: Hash256String): Promise<Transaction> {
     const transaction = await this.mutableClient.getTransaction(hash);
 
-    return this.convertTransaction(transaction);
+    return convertTransaction(transaction);
   }
 
   public async getConnectedPeers(): Promise<readonly Peer[]> {
@@ -220,7 +186,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
   public async getNetworkSettings(): Promise<NetworkSettings> {
     const settings = await this.mutableClient.getNetworkSettings();
 
-    return this.convertNetworkSettings(settings);
+    return convertNetworkSettings(settings);
   }
 
   public async call(
@@ -273,7 +239,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return AsyncIterableX.from(this.mutableClient.getAllStorage(address).then((res) => AsyncIterableX.from(res))).pipe(
       // tslint:disable-next-line no-any
       flatten<StorageItem>() as any,
-      map<StorageItemJSON, StorageItem>((storageItem) => this.convertStorageItem(storageItem)),
+      map<StorageItemJSON, StorageItem>(convertStorageItem),
     );
   }
 
@@ -292,268 +258,10 @@ export class NEOONEDataProvider implements DeveloperProvider {
     };
   }
 
-  private convertStorageItem(storageItem: StorageItemJSON): StorageItem {
-    return {
-      key: storageItem.key,
-      value: storageItem.value,
-    };
-  }
+  public async getTransactionData(hash: Hash256String): Promise<RawTransactionData> {
+    const transactionData = await this.mutableClient.getTransactionData(hash);
 
-  private convertBlock(block: BlockJSON): Block {
-    return {
-      version: block.version,
-      hash: block.hash,
-      previousBlockHash: block.previousblockhash,
-      merkleRoot: block.merkleroot,
-      time: new BigNumber(block.time),
-      nonce: new BigNumber(block.nonce, 16),
-      primaryIndex: block.primary,
-      index: block.index,
-      nextConsensus: block.nextconsensus,
-      witness: block.witnesses[0],
-      witnesses: block.witnesses,
-      size: block.size,
-      transactions: block.tx.map((transaction) => this.convertConfirmedTransaction(transaction)),
-    };
-  }
-
-  private convertTransaction(transaction: TransactionJSON): Transaction {
-    return {
-      version: transaction.version,
-      nonce: transaction.nonce,
-      sender: transaction.sender ? transaction.sender : undefined,
-      hash: transaction.hash,
-      size: transaction.size,
-      validUntilBlock: transaction.validuntilblock,
-      attributes: this.convertAttributes(transaction.attributes),
-      systemFee: new BigNumber(transaction.sysfee),
-      networkFee: new BigNumber(transaction.netfee),
-      signers: transaction.signers.map((signer) => this.convertSigner(signer)),
-      script: transaction.script,
-      witnesses: transaction.witnesses,
-    };
-  }
-
-  private convertTransactionReceipt(receipt: TransactionReceiptJSON): TransactionReceipt {
-    return {
-      blockIndex: receipt.blockIndex,
-      blockHash: receipt.blockHash,
-      globalIndex: JSONHelper.readUInt64(receipt.globalIndex),
-      transactionIndex: receipt.transactionIndex,
-    };
-  }
-
-  private convertSigner(signer: SignerJSON): Signer {
-    return {
-      account: scriptHashToAddress(signer.account),
-      scopes: signer.scopes,
-      allowedContracts: signer.allowedcontracts?.map(scriptHashToAddress),
-      allowedGroups: signer.allowedgroups,
-    };
-  }
-
-  private convertConfirmedTransaction(transaction: ConfirmedTransactionJSON): ConfirmedTransaction {
-    return {
-      ...this.convertTransaction(transaction),
-      receipt: this.convertTransactionReceipt(transaction.receipt),
-    };
-  }
-
-  private convertAttributes(attributes: readonly AttributeJSON[]): readonly Attribute[] {
-    return attributes.map(this.convertAttribute);
-  }
-
-  private convertAttribute(attribute: AttributeJSON): Attribute {
-    const type = toAttributeType(attribute.type);
-    switch (type) {
-      case AttributeTypeModel.HighPriority:
-        return {
-          type,
-        };
-      case AttributeTypeModel.OracleResponse:
-        // tslint:disable-next-line: no-any we know this is true but TS is being mean
-        const oracleJSON = attribute as OracleResponseJSON;
-
-        return {
-          type,
-          id: new BigNumber(oracleJSON.id),
-          code: oracleJSON.code,
-          result: oracleJSON.result,
-        };
-      default:
-        throw new Error();
-    }
-  }
-
-  private convertMethodToken(token: MethodTokenJSON): MethodToken {
-    return {
-      hash: token.hash,
-      method: token.method,
-      paramCount: token.paramcount,
-      hasReturnValue: token.hasreturnvalue,
-      callFlags: assertCallFlags(token.callflags),
-    };
-  }
-
-  private convertNefFile(nef: NefFileJSON): NefFile {
-    return {
-      magic: nef.magic,
-      compiler: nef.compiler,
-      tokens: nef.tokens.map(this.convertMethodToken),
-      script: nef.script,
-      checksum: nef.checksum,
-    };
-  }
-
-  private convertContract(contract: ContractJSON): Contract {
-    return {
-      id: contract.id,
-      updateCounter: contract.updatecounter,
-      nef: this.convertNefFile(contract.nef),
-      hash: contract.hash,
-      manifest: this.convertContractManifest(contract.manifest),
-    };
-  }
-
-  private convertContractManifest(manifest: ContractManifestJSON): ContractManifest {
-    return {
-      name: manifest.name,
-      groups: manifest.groups.map(this.convertContractGroup),
-      supportedStandards: manifest.supportedstandards,
-      abi: this.convertContractABI(manifest.abi),
-      permissions: manifest.permissions.map(this.convertContractPermission),
-      trusts: manifest.trusts,
-      extra: manifest.extra,
-    };
-  }
-
-  private convertContractGroup(group: ContractGroupJSON): ContractGroup {
-    return {
-      publicKey: group.publicKey,
-      signature: group.signature,
-    };
-  }
-
-  private convertContractPermission(permission: ContractPermissionJSON): ContractPermission {
-    return {
-      contract: permission.contract,
-      methods: permission.methods,
-    };
-  }
-
-  private convertContractABI(abi: ContractABIJSON): ContractABI {
-    return {
-      methods: abi.methods.map(this.convertContractMethodDescriptor.bind(this)),
-      events: abi.events.map(this.convertContractEventDescriptor.bind(this)),
-    };
-  }
-
-  private convertContractEventDescriptor(event: ContractEventDescriptorJSON): ContractEventDescriptor {
-    return {
-      name: event.name,
-      parameters: event.parameters.map(this.convertContractParameterDefinition.bind(this)),
-    };
-  }
-
-  private convertContractMethodDescriptor(method: ContractMethodDescriptorJSON): ContractMethodDescriptor {
-    return {
-      name: method.name,
-      parameters: method.parameters.map(this.convertContractParameterDefinition.bind(this)),
-      returnType: this.convertContractParameterType(method.returntype),
-      offset: method.offset,
-      safe: method.safe,
-    };
-  }
-
-  private convertContractParameterDefinition(param: ContractParameterDefinitionJSON): ContractParameterDefinition {
-    return {
-      type: this.convertContractParameterType(param.type),
-      name: param.name,
-    };
-  }
-
-  private convertContractParameterType(param: ContractParameterTypeJSON): ContractParameterDefinitionType {
-    switch (param) {
-      case 'Any':
-        return 'Any';
-      case 'Signature':
-        return 'Signature';
-      case 'Boolean':
-        return 'Boolean';
-      case 'Integer':
-        return 'Integer';
-      case 'Hash160':
-        return 'Hash160';
-      case 'Hash256':
-        return 'Hash256';
-      case 'ByteArray':
-        return 'Buffer';
-      case 'PublicKey':
-        return 'PublicKey';
-      case 'String':
-        return 'String';
-      case 'Array':
-        return 'Array';
-      case 'Map':
-        return 'Map';
-      case 'InteropInterface':
-        return 'InteropInterface';
-      case 'Void':
-        return 'Void';
-      /* istanbul ignore next */
-      default:
-        commonUtils.assertNever(param);
-        throw new Error('For TS');
-    }
-  }
-
-  private convertExecution(data: ExecutionJSON): RawExecutionData {
-    return {
-      trigger: data.trigger,
-      vmState: data.vmstate,
-      gasConsumed: new BigNumber(data.gasconsumed),
-      stack: typeof data.stack === 'string' ? data.stack : convertContractParameters(data.stack),
-      notifications: data.notifications.map(convertNotification),
-      logs: data.logs.map(convertLog),
-    };
-  }
-
-  private convertApplicationLogData(data: ApplicationLogJSON): RawApplicationLogData {
-    return {
-      txId: data.txid,
-      blockHash: data.blockhash,
-      executions: data.executions.map(this.convertExecution),
-    };
-  }
-
-  private convertNetworkSettings(settings: NetworkSettingsJSON): NetworkSettings {
-    return {
-      blockCount: settings.blockcount,
-      decrementInterval: settings.decrementinterval,
-      generationAmount: settings.generationamount,
-      privateKeyVersion: settings.privatekeyversion,
-      standbyvalidators: settings.standbyvalidators,
-      network: settings.network,
-      maxValidUntilBlockIncrement: settings.maxvaliduntilblockincrement,
-      addressVersion: settings.addressversion,
-      standbyCommittee: settings.standbycommittee,
-      committeeMemberscount: settings.committeememberscount,
-      validatorsCount: settings.validatorscount,
-      millisecondsPerBlock: settings.millisecondsperblock,
-      memoryPoolMaxTransactions: settings.memorypoolmaxtransactions,
-    };
-  }
-
-  private convertRelayTransactionResult(result: RelayTransactionResultJSON): RelayTransactionResult {
-    const transaction = this.convertTransaction(result.transaction);
-    const verifyResult = result.verifyResult === undefined ? undefined : this.convertVerifyResult(result.verifyResult);
-
-    return { transaction, verifyResult };
-  }
-
-  /* istanbul ignore next */
-  private convertVerifyResult(result: VerifyResultJSON): VerifyResultModel {
-    return toVerifyResult(result);
+    return convertTransactionData(transactionData, hash);
   }
 
   private async capture<T>(func: () => Promise<T>, title: string): Promise<T> {

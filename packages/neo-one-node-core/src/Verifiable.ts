@@ -27,6 +27,7 @@ export interface Verifiable {
 export interface ExecuteScriptResult {
   readonly gas: BN;
   readonly result: boolean;
+  readonly failureReason?: string;
 }
 
 export interface VerifyWitnessesOptions {

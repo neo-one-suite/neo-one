@@ -167,11 +167,13 @@ export interface ActionBaseJSON {
 export interface LogActionJSON extends ActionBaseJSON {
   readonly type: 'Log';
   readonly message: string;
+  readonly position: number;
 }
 
 export interface NotificationActionJSON extends ActionBaseJSON {
   readonly type: 'Notification';
   readonly args: readonly ContractParameterJSON[];
+  readonly eventName: string;
 }
 
 export type ActionJSON = NotificationActionJSON | LogActionJSON;
@@ -259,7 +261,7 @@ export interface TransactionJSON {
 }
 
 export interface ConfirmedTransactionJSON extends TransactionJSON {
-  readonly receipt: TransactionReceiptJSON;
+  readonly transactionData?: TransactionDataJSON;
 }
 
 export interface TransactionReceiptJSON {
@@ -267,6 +269,28 @@ export interface TransactionReceiptJSON {
   readonly blockHash: UInt256Hex;
   readonly globalIndex: string;
   readonly transactionIndex: number;
+}
+
+export interface TransactionDataJSON extends TransactionReceiptJSON {
+  readonly deletedContractHashes: readonly string[];
+  readonly deployedContracts: readonly ContractJSON[];
+  readonly updatedContracts: readonly ContractJSON[];
+  readonly executionResult: ExecutionResultJSON;
+  readonly actions: readonly ActionJSON[];
+}
+
+export type ExecutionResultJSON = ExecutionResultSuccessJSON | ExecutionResultErrorJSON;
+export interface ExecutionResultBaseJSON {
+  readonly state: 'HALT' | 'FAULT';
+  readonly gas_consumed: string;
+  readonly stack: readonly ContractParameterJSON[];
+}
+export interface ExecutionResultSuccessJSON extends ExecutionResultBaseJSON {
+  readonly state: 'HALT';
+}
+export interface ExecutionResultErrorJSON extends ExecutionResultBaseJSON {
+  readonly state: 'FAULT';
+  readonly message: string;
 }
 
 export type Wildcard = '*';
@@ -436,13 +460,8 @@ export interface LogJSON {
 }
 
 export interface CallReceiptJSON {
-  readonly script: string;
-  readonly state: 'HALT' | 'FAULT';
-  readonly gasconsumed: string;
-  readonly exception?: string;
-  readonly stack: readonly ContractParameterJSON[] | string;
-  readonly notifications: readonly NotificationJSON[];
-  readonly logs: readonly LogJSON[];
+  readonly result: ExecutionResultJSON;
+  readonly actions: readonly ActionJSON[];
 }
 
 export interface VerifyScriptResultJSON {
@@ -455,6 +474,7 @@ export interface VerifyScriptResultJSON {
 export interface RelayTransactionResultJSON {
   readonly transaction: TransactionJSON;
   readonly verifyResult?: VerifyResultJSON;
+  readonly failureMessage?: string;
 }
 
 export interface SendRawTransactionResultJSON {

@@ -1,3 +1,4 @@
+export * from './action';
 export * from './Block';
 export * from './Blockchain';
 export * from './consensus';
@@ -45,6 +46,8 @@ export * from './MethodToken';
 export * from './HeaderCache';
 export * from './Execution';
 export * from './ImmutableHashSet';
+export * from './BlockData';
+export * from './executionResult';
 
 import { BinaryReader, disassembleByteCode } from '@neo-one/client-common';
 export { BinaryReader, disassembleByteCode };

@@ -10,7 +10,7 @@ import {
   InvokeReceipt,
   Log,
   RawAction,
-  RawInvocationResult,
+  RawExecutionResult,
   RawInvokeReceipt,
   serializeParam,
 } from '@neo-one/client-common';
@@ -129,7 +129,7 @@ const deserializeContractParameter = (param: ContractParameter) =>
       }
     : param;
 
-const serializeRawInvocationResult = (result: RawInvocationResult) => ({
+const serializeRawExecutionResult = (result: RawExecutionResult) => ({
   ...result,
   gasConsumed: result.gasConsumed.toString(10),
   stack: result.stack.map(serializeContractParameter),
@@ -137,11 +137,11 @@ const serializeRawInvocationResult = (result: RawInvocationResult) => ({
 
 const serializeRawInvokeReceipt = (result: RawInvokeReceipt) => ({
   ...result,
-  gasConsumed: result.gasConsumed.toString(10),
-  stack: typeof result.stack === 'string' ? [] : result.stack.map(serializeContractParameter),
+  gasConsumed: result.result.gasConsumed.toString(10),
+  stack: result.result.stack.map(serializeContractParameter),
 });
 
-const deserializeRawInvocationResult = (result: any): RawInvocationResult => ({
+const deserializeRawExecutionResult = (result: any): RawExecutionResult => ({
   ...result,
   gasConsumed: new BigNumber(result.gasConsumed),
   stack: result.stack.map(deserializeContractParameter),
@@ -151,12 +151,12 @@ const serializeRawAction = (action: RawAction) =>
   action.type === 'Notification'
     ? {
         ...action,
-        args: typeof action.state === 'string' ? [] : action.state.map(serializeContractParameter),
-        // globalIndex: action.globalIndex.toString(10),
+        args: action.args.map(serializeContractParameter),
+        globalIndex: action.globalIndex.toString(10),
       }
     : {
         ...action,
-        // globalIndex: action.globalIndex.toString(10),
+        globalIndex: action.globalIndex.toString(10),
       };
 
 const deserializeRawAction = (action: any): RawAction =>
@@ -173,7 +173,7 @@ const deserializeRawAction = (action: any): RawAction =>
 
 const serializeLog = (log: Log) => ({
   ...log,
-  // globalIndex: log.globalIndex.toString(10),
+  globalIndex: log.globalIndex.toString(10),
 });
 
 const deserializeLog = (log: any): Log => ({
@@ -183,7 +183,7 @@ const deserializeLog = (log: any): Log => ({
 
 const serializeEvent = (event: Event) => ({
   ...event,
-  // globalIndex: new BigNumber(event.globalIndex),
+  globalIndex: new BigNumber(event.globalIndex),
   parameters: _.fromPairs(Object.entries(event.parameters).map(([k, v]) => [k, serializeParam(v)])),
 });
 
@@ -202,7 +202,7 @@ const serializeInvokeReceipt = (receipt: InvokeReceipt) => ({
   raw: {
     ...receipt.raw,
     globalIndex: receipt.raw.globalIndex.toString(10),
-    actions: [...receipt.raw.logs, ...receipt.raw.notifications].map(serializeRawAction),
+    actions: receipt.raw.actions,
     result: serializeRawInvokeReceipt(receipt.raw),
   },
 });
@@ -217,7 +217,7 @@ const deserializeInvokeReceipt = (receipt: any): InvokeReceipt => ({
     ...receipt.raw,
     globalIndex: new BigNumber(receipt.raw.globalIndex),
     actions: receipt.raw.actions.map(deserializeRawAction),
-    result: deserializeRawInvocationResult(receipt.raw.result),
+    result: deserializeRawExecutionResult(receipt.raw.result),
   },
 });
 

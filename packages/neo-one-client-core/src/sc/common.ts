@@ -16,8 +16,7 @@ import {
   Log,
   Param,
   RawAction,
-  RawCallReceipt,
-  RawInvocationResult,
+  RawExecutionResult,
   Return,
   ScriptBuilderParam,
   SourceMaps,
@@ -232,34 +231,31 @@ export const convertAction = ({
     return action;
   }
 
-  const { state, eventName: event } = action;
-  if (state.length === 0) {
+  const { args, eventName: event } = action;
+  if (createForwardValueArgs.length === 0) {
     throw new InvalidEventError('Notification had no arguments');
   }
 
-  if (typeof state === 'string') {
-    throw new InvalidEventError(`Notification serialization failed: ${state}`);
-  }
-
+  // TODO: check this
   const eventSpec = events[event];
   if (eventSpec === undefined) {
     return event;
   }
 
   return {
-    // version: action.version,
-    // blockIndex: action.blockIndex,
-    // blockHash: action.blockHash,
-    // transactionIndex: action.transactionIndex,
-    // transactionHash: action.transactionHash,
-    // index: action.index,
-    // globalIndex: action.globalIndex,
-    // address: action.address,
+    version: action.version,
+    blockIndex: action.blockIndex,
+    blockHash: action.blockHash,
+    transactionIndex: action.transactionIndex,
+    transactionHash: action.transactionHash,
+    index: action.index,
+    globalIndex: action.globalIndex,
+    address: action.address,
     type: 'Event',
     name: event,
     parameters: getParametersObject({
       abiParameters: eventSpec.parameters,
-      parameters: state,
+      parameters: args,
     }),
   };
 };
@@ -271,7 +267,7 @@ export const convertInvocationResult = async ({
   sourceMaps,
 }: {
   readonly returnType: ABIReturn;
-  readonly result: RawInvocationResult;
+  readonly result: RawExecutionResult;
   readonly actions: readonly RawAction[];
   readonly sourceMaps?: SourceMaps;
 }): Promise<InvocationResult<Return | undefined>> => {
@@ -279,6 +275,7 @@ export const convertInvocationResult = async ({
   if (result.state === 'FAULT') {
     const message = await processActionsAndMessage({
       actions,
+      message: result.message,
       sourceMaps,
     });
 
@@ -300,54 +297,18 @@ export const convertInvocationResult = async ({
   return { state: result.state, gasConsumed, value };
 };
 
-export const convertCallReceipt = async ({
-  returnType,
-  receipt,
-  sourceMaps,
-}: {
-  readonly returnType: ABIReturn;
-  readonly receipt: RawCallReceipt;
-  readonly sourceMaps?: SourceMaps;
-}): Promise<InvocationResult<Return | undefined>> => {
-  const actions = [...receipt.logs, ...receipt.notifications];
-  const { gasConsumed } = receipt;
-  if (receipt.state === 'FAULT') {
-    const message = await processActionsAndMessage({
-      actions,
-      sourceMaps,
-    });
-
-    return {
-      state: receipt.state,
-      gasConsumed,
-      message,
-    };
-  }
-
-  await processConsoleLogMessages({ actions, sourceMaps });
-
-  if (typeof receipt.stack === 'string') {
-    throw new Error(receipt.stack);
-  }
-  const contractParameter = receipt.stack[0];
-  const value = convertContractParameter({
-    type: returnType,
-    parameter: contractParameter,
-  });
-
-  return { state: receipt.state, gasConsumed, value };
-};
-
 export const convertCallResult = async ({
   returnType,
-  receipt,
+  result: resultIn,
+  actions,
   sourceMaps,
 }: {
   readonly returnType: ABIReturn;
-  readonly receipt: RawCallReceipt;
+  readonly result: RawExecutionResult;
+  readonly actions: readonly RawAction[];
   readonly sourceMaps?: SourceMaps;
 }): Promise<Return | undefined> => {
-  const result = await convertCallReceipt({ returnType, receipt, sourceMaps });
+  const result = await convertInvocationResult({ returnType, result: resultIn, actions, sourceMaps });
   if (result.state === 'FAULT') {
     throw new InvocationCallError(result.message);
   }
@@ -398,8 +359,8 @@ export const convertParams = ({
       ? undefined
       : parametersIn[parametersIn.length - 1];
 
-  // TODO: this is brittle. it removes the reserved method that is used by our compiled contracts to know what method to call
-  // Remove this when fixing how we call contracts
+  // This is brittle. It removes the reserved method that is used by our compiled contracts to know what method to call
+  // This is because NEO•ONE contract methods expect the first parameter to any method call to be the name of the method
   const parameters = parametersFirst.filter((param) => param.name !== NEO_ONE_METHOD_RESERVED_PARAM);
 
   const nonOptionalParameters = parameters.filter((param) => !param.optional);

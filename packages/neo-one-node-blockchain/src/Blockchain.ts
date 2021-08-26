@@ -8,14 +8,17 @@ import {
   UInt160,
   UInt256,
   VerifyResultModel,
+  VerifyResultModelExtended,
 } from '@neo-one/client-common';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
+  Action,
   ApplicationExecuted,
   ApplicationLog,
   Block,
   Blockchain as BlockchainType,
   BlockchainSettings,
+  BlockData,
   CallReceipt,
   ChangeSet,
   DeserializeWireContext,
@@ -23,15 +26,20 @@ import {
   Execution,
   ExtensiblePayload,
   Header,
+  LogAction,
   Mempool,
   NativeContainer,
   Nep17Balance,
   Notification,
+  NotificationAction,
   RunEngineOptions,
+  RunEngineResult,
+  SerializableTransactionData,
   SerializeJSONContext,
   Signers,
   Storage,
   Transaction,
+  TransactionData,
   TransactionState,
   TransactionVerificationContext,
   VerifyOptions,
@@ -43,7 +51,9 @@ import { Labels, utils as neoOneUtils } from '@neo-one/utils';
 import { BN } from 'bn.js';
 import PriorityQueue from 'js-priority-queue';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { map, toArray } from 'rxjs/operators';
 import { BlockVerifyError, ConsensusPayloadVerifyError, GenesisBlockNotRegisteredError } from './errors';
+import { getExecutionResult } from './getExecutionResult';
 import { getNep17UpdateOptions } from './getNep17UpdateOptions';
 import { HeaderCache } from './HeaderCache';
 import { ImmutableHashSet, ImmutableHashSetBuilder } from './ImmutableHashSet';
@@ -172,10 +182,23 @@ export class Blockchain {
     return this.storage.storages;
   }
 
+  public get blockData() {
+    return this.storage.blockData;
+  }
+
+  public get transactionData() {
+    return this.storage.transactionData;
+  }
+
+  public get action() {
+    return this.storage.action;
+  }
+
   public get serializeJSONContext(): SerializeJSONContext {
     return {
       addressVersion: this.settings.addressVersion,
       network: this.settings.network,
+      tryGetTransactionData: this.tryGetTransactionData,
     };
   }
 
@@ -299,10 +322,13 @@ export class Blockchain {
     transaction: Transaction,
     mempool: Mempool,
     context?: TransactionVerificationContext,
-  ): Promise<VerifyResultModel> {
+  ): Promise<VerifyResultModelExtended> {
     const containsTransaction = await this.containsTransactionInternal(transaction.hash, mempool);
     if (containsTransaction) {
-      return VerifyResultModel.AlreadyExists;
+      return {
+        verifyResult: VerifyResultModel.AlreadyExists,
+        failureReason: `Transaction already exists in node mempool or storage.`,
+      };
     }
 
     return transaction.verify(this.verifyOptions, context);
@@ -428,12 +454,14 @@ export class Blockchain {
   }
 
   public testTransaction(transaction: Transaction): CallReceipt {
-    return this.runEngineWrapper({
-      script: transaction.script,
-      snapshot: 'clone',
-      container: transaction,
-      gas: common.ONE_HUNDRED_FIXED8,
-    });
+    return this.parseRunEngineResult(
+      this.runEngineWrapper({
+        script: transaction.script,
+        snapshot: 'clone',
+        container: transaction,
+        gas: common.ONE_HUNDRED_FIXED8,
+      }),
+    );
   }
 
   public invokeScript({
@@ -447,18 +475,100 @@ export class Blockchain {
     readonly gas?: BN;
     readonly rvcount?: number;
   }): CallReceipt {
-    return this.runEngineWrapper({
-      script,
-      snapshot: 'main',
-      container: signers,
-      gas,
-      rvcount,
-    });
+    return this.parseRunEngineResult(
+      this.runEngineWrapper({
+        script,
+        snapshot: 'main',
+        container: signers,
+        gas,
+        rvcount,
+      }),
+    );
   }
 
   public updateSettings(settings: BlockchainSettings): void {
     this.settingsInternal$.next(settings);
   }
+
+  private parseRunEngineResult(result: RunEngineResult): CallReceipt {
+    let globalActionIndex = new BN(0);
+    const actions: Action[] = [];
+
+    result.notifications.forEach((notification) => {
+      // tslint:disable-next-line: no-array-mutation
+      actions.push(
+        new NotificationAction({
+          index: globalActionIndex,
+          scriptHash: notification.scriptHash,
+          eventName: notification.eventName,
+          args: notification.state.map((n) => n.toContractParameter()),
+        }),
+      );
+
+      globalActionIndex = globalActionIndex.add(utils.ONE);
+    });
+    result.logs.forEach((log) => {
+      // tslint:disable-next-line: no-array-mutation
+      actions.push(
+        new LogAction({
+          index: globalActionIndex,
+          scriptHash: log.callingScriptHash,
+          message: log.message,
+          position: log.position,
+        }),
+      );
+
+      globalActionIndex = globalActionIndex.add(utils.ONE);
+    });
+
+    const executionResult = getExecutionResult(result);
+
+    return {
+      result: executionResult,
+      actions,
+    };
+  }
+
+  private readonly tryGetTransactionData = async (hash: UInt256): Promise<SerializableTransactionData | undefined> => {
+    const data = await this.transactionData.tryGet({ hash });
+
+    if (data === undefined) {
+      return undefined;
+    }
+
+    const tryGetContract = async (hashIn: UInt160) => {
+      const contract = await this.native.ContractManagement.getContract(this.storage, hashIn);
+      if (contract === undefined) {
+        logger.error({
+          title: 'blockchain_get_transaction_data_contract_not_found',
+          hash: common.uInt160ToString(hashIn),
+        });
+      }
+
+      return contract;
+    };
+
+    const [deployedContracts, updatedContracts, actions] = await Promise.all([
+      Promise.all(data.deployedContractHashes.map(tryGetContract)),
+      Promise.all(data.updatedContractHashes.map(tryGetContract)),
+      data.actionIndexStart.eq(data.actionIndexStop)
+        ? Promise.resolve([])
+        : this.action
+            .find$(data.actionIndexStart.toBuffer(), data.actionIndexStop.sub(utils.ONE).toBuffer())
+            .pipe(
+              map(({ value }) => value),
+              toArray(),
+            )
+            .toPromise(),
+    ]);
+
+    return {
+      ...data,
+      deployedContracts: deployedContracts.filter(neoOneUtils.notNull),
+      updatedContracts: updatedContracts.filter(neoOneUtils.notNull),
+      actions,
+    };
+  };
 
   private async updateExtensibleWitnessWhiteList(storage: Storage) {
     const currentHeight = await this.native.Ledger.currentIndex(storage);
@@ -489,7 +599,7 @@ export class Blockchain {
     rvcount,
     offset = 0,
     gas = common.TEN_FIXED8,
-  }: RunEngineOptions): CallReceipt {
+  }: RunEngineOptions): RunEngineResult {
     let persistingBlock = blockIn;
     if (persistingBlock === undefined) {
       persistingBlock = this.createDummyBlock();
@@ -508,7 +618,7 @@ export class Blockchain {
         engine.loadScript({ script, initialPosition: offset, rvcount });
         engine.execute();
 
-        return utils.getCallReceipt(engine, container);
+        return utils.getRunEngineResult(engine, container);
       },
     );
   }
@@ -614,7 +724,7 @@ export class Blockchain {
   }: {
     readonly applicationsExecuted: readonly ApplicationExecuted[];
     readonly block: Block;
-  }) {
+  }): ChangeSet {
     const { assetKeys, transfersSent, transfersReceived } = getNep17UpdateOptions({
       applicationsExecuted,
       block,
@@ -625,7 +735,7 @@ export class Blockchain {
         .emitDynamicAppCall(key.assetScriptHash, 'balanceOf', CallFlags.All, key.userScriptHash)
         .build();
       const callReceipt = this.invokeScript({ script });
-      const balanceBuffer = callReceipt.stack[0].getInteger().toBuffer();
+      const balanceBuffer = callReceipt.result.stack[0].asBuffer(true);
 
       return { key, value: new Nep17Balance({ balanceBuffer, lastUpdatedBlock: this.currentBlockIndex }) };
     });
@@ -777,15 +887,97 @@ export class Blockchain {
       );
   }
 
+  private getBlockDataUpdates({
+    block,
+    lastGlobalActionIndex,
+    prevBlockData,
+  }: {
+    readonly block: Block;
+    readonly lastGlobalActionIndex: BN;
+    readonly prevBlockData: { readonly lastGlobalActionIndex: BN; readonly lastGlobalTransactionIndex: BN };
+  }): ChangeSet {
+    return [
+      {
+        type: 'add',
+        subType: 'add',
+        change: {
+          type: 'blockData',
+          key: { hash: block.hash },
+          value: new BlockData({
+            hash: block.hash,
+            lastGlobalActionIndex,
+            lastGlobalTransactionIndex: prevBlockData.lastGlobalTransactionIndex.add(new BN(block.transactions.length)),
+          }),
+        },
+      },
+    ];
+  }
+
+  private getTransactionDataChangeSet(transactionData: readonly TransactionData[]): ChangeSet {
+    return transactionData.map((txData) => ({
+      type: 'add',
+      subType: 'add',
+      change: {
+        type: 'transactionData',
+        key: { hash: txData.hash },
+        value: txData,
+      },
+    }));
+  }
+
+  private async getPrevBlockData(block: Block) {
+    const maybePrevBlockData = await (block.index === 0
+      ? Promise.resolve(undefined)
+      : this.blockData.tryGet({ hash: block.previousHash }));
+
+    return maybePrevBlockData === undefined
+      ? {
+          lastGlobalActionIndex: utils.NEGATIVE_ONE,
+          lastGlobalTransactionIndex: utils.NEGATIVE_ONE,
+        }
+      : {
+          lastGlobalActionIndex: maybePrevBlockData.lastGlobalActionIndex,
+          lastGlobalTransactionIndex: maybePrevBlockData.lastGlobalTransactionIndex,
+        };
+  }
+
+  private getActionUpdates(actions: readonly Action[]): ChangeSet {
+    return actions.map((action) => ({
+      type: 'add',
+      subType: 'add',
+      change: {
+        type: 'action',
+        key: { index: action.index },
+        value: action,
+      },
+    }));
+  }
+
   private async persistBlockInternal(block: Block, verify?: boolean): Promise<void> {
     if (verify) {
       await this.verifyBlock(block);
     }
 
     const blockchain = this.createPersistingBlockchain();
+    const prevBlockData = await this.getPrevBlockData(block);
 
-    const { changeBatch: persistBatch, applicationsExecuted } = blockchain.persistBlock(block);
+    const {
+      changeBatch: persistBatch,
+      transactionData,
+      applicationsExecuted,
+      actions,
+      lastGlobalActionIndex,
+    } = blockchain.persistBlock(block, prevBlockData.lastGlobalActionIndex, prevBlockData.lastGlobalTransactionIndex);
     await this.storage.commitBatch(persistBatch);
+
+    const actionUpdates = this.getActionUpdates(actions);
+    await this.storage.commit(actionUpdates);
+
+    const transactionDataUpdates = this.getTransactionDataChangeSet(transactionData);
+    await this.storage.commit(transactionDataUpdates);
+
+    const blockDataUpdates = this.getBlockDataUpdates({ block, lastGlobalActionIndex, prevBlockData });
+    await this.storage.commit(blockDataUpdates);
 
     this.updateBlockMetadata(block);
 

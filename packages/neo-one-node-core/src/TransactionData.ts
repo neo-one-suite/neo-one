@@ -1,6 +1,7 @@
-import { BinaryReader, BinaryWriter, IOHelper, UInt256 } from '@neo-one/client-common';
+import { BinaryReader, BinaryWriter, IOHelper, UInt160, UInt256 } from '@neo-one/client-common';
 import { BaseState } from '@neo-one/client-full-common';
 import { BN } from 'bn.js';
+import { deserializeExecutionResultWireBase, ExecutionResult } from './executionResult';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,
@@ -14,16 +15,15 @@ export interface TransactionDataAdd {
   readonly version?: number;
   readonly hash: UInt256;
   readonly blockHash: UInt256;
-  readonly startHeight: number;
-  readonly index: number;
   readonly globalIndex: BN;
-  readonly endHeights?: { readonly [index: number]: number };
-  readonly claimed?: { readonly [index: number]: boolean };
-}
-
-export interface TransactionDataUpdate {
-  readonly endHeights?: { readonly [index: number]: number };
-  readonly claimed?: { readonly [index: number]: boolean };
+  readonly deployedContractHashes: readonly UInt160[];
+  readonly deletedContractHashes: readonly UInt160[];
+  readonly updatedContractHashes: readonly UInt160[];
+  readonly blockIndex: number;
+  readonly transactionIndex: number;
+  readonly actionIndexStart: BN;
+  readonly actionIndexStop: BN;
+  readonly executionResult: ExecutionResult;
 }
 
 export interface TransactionDataKey {
@@ -31,35 +31,34 @@ export interface TransactionDataKey {
 }
 
 export class TransactionData extends BaseState implements SerializableWire {
-  public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): TransactionData {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): TransactionData {
+    const { reader } = options;
     const version = reader.readUInt8();
     const hash = reader.readUInt256();
     const blockHash = reader.readUInt256();
-    const startHeight = reader.readUInt32LE();
-    const index = reader.readUInt32LE();
+    const blockIndex = reader.readUInt32LE();
+    const transactionIndex = reader.readUInt32LE();
     const globalIndex = reader.readUInt64LE();
-    const endHeights = reader.readObject(() => {
-      const key = reader.readUInt32LE();
-      const value = reader.readUInt32LE();
-
-      return { key, value };
-    });
-    const claimed = reader.readObject(() => {
-      const key = reader.readUInt32LE();
-      const value = reader.readBoolean();
-
-      return { key, value };
-    });
+    const deployedContractHashes = reader.readArray(() => reader.readUInt160());
+    const deletedContractHashes = reader.readArray(() => reader.readUInt160());
+    const updatedContractHashes = reader.readArray(() => reader.readUInt160());
+    const actionIndexStart = reader.readUInt64LE();
+    const actionIndexStop = reader.readUInt64LE();
+    const executionResult = deserializeExecutionResultWireBase(options);
 
     return new this({
       version,
       hash,
       blockHash,
-      startHeight,
-      index,
+      transactionIndex,
       globalIndex,
-      endHeights,
-      claimed,
+      blockIndex,
+      deployedContractHashes,
+      deletedContractHashes,
+      updatedContractHashes,
+      actionIndexStart,
+      actionIndexStop,
+      executionResult,
     });
   }
 
@@ -72,15 +71,15 @@ export class TransactionData extends BaseState implements SerializableWire {
 
   public readonly hash: UInt256;
   public readonly blockHash: UInt256;
-  public readonly startHeight: number;
-  public readonly index: number;
+  public readonly transactionIndex: number;
   public readonly globalIndex: BN;
-  public readonly endHeights: {
-    readonly [index: number]: number;
-  };
-  public readonly claimed: {
-    readonly [index: number]: boolean;
-  };
+  public readonly deletedContractHashes: readonly UInt160[];
+  public readonly deployedContractHashes: readonly UInt160[];
+  public readonly updatedContractHashes: readonly UInt160[];
+  public readonly blockIndex: number;
+  public readonly actionIndexStart: BN;
+  public readonly actionIndexStop: BN;
+  public readonly executionResult: ExecutionResult;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly sizeInternal: () => number;
 
@@ -88,27 +87,40 @@ export class TransactionData extends BaseState implements SerializableWire {
     version,
     hash,
     blockHash,
-    startHeight,
-    index,
+    transactionIndex,
     globalIndex,
-    endHeights = {},
-    claimed = {},
+    deletedContractHashes,
+    deployedContractHashes,
+    updatedContractHashes,
+    blockIndex,
+    actionIndexStart,
+    actionIndexStop,
+    executionResult,
   }: TransactionDataAdd) {
     super({ version });
     this.hash = hash;
     this.blockHash = blockHash;
-    this.startHeight = startHeight;
-    this.index = index;
+    this.transactionIndex = transactionIndex;
     this.globalIndex = globalIndex;
-    this.endHeights = endHeights;
-    this.claimed = claimed;
+    this.deletedContractHashes = deletedContractHashes;
+    this.deployedContractHashes = deployedContractHashes;
+    this.updatedContractHashes = updatedContractHashes;
+    this.blockIndex = blockIndex;
+    this.actionIndexStart = actionIndexStart;
+    this.actionIndexStop = actionIndexStop;
+    this.executionResult = executionResult;
     this.sizeInternal = utils.lazy(
       () =>
         IOHelper.sizeOfUInt8 +
         IOHelper.sizeOfUInt256 +
+        IOHelper.sizeOfUInt256 +
         IOHelper.sizeOfUInt32LE +
-        IOHelper.sizeOfObject(this.endHeights, () => IOHelper.sizeOfUInt32LE + IOHelper.sizeOfUInt32LE) +
-        IOHelper.sizeOfObject(this.claimed, () => IOHelper.sizeOfUInt32LE + IOHelper.sizeOfBoolean),
+        IOHelper.sizeOfUInt32LE +
+        IOHelper.sizeOfUInt64LE +
+        IOHelper.sizeOfArray(this.deployedContractHashes, () => IOHelper.sizeOfUInt160) +
+        IOHelper.sizeOfArray(this.deletedContractHashes, () => IOHelper.sizeOfUInt160) +
+        IOHelper.sizeOfArray(this.updatedContractHashes, () => IOHelper.sizeOfUInt160) +
+        this.executionResult.size,
     );
   }
 
@@ -116,33 +128,24 @@ export class TransactionData extends BaseState implements SerializableWire {
     return this.sizeInternal();
   }
 
-  public update({ endHeights = this.endHeights, claimed = this.claimed }: TransactionDataUpdate): TransactionData {
-    return new TransactionData({
-      version: this.version,
-      hash: this.hash,
-      blockHash: this.blockHash,
-      startHeight: this.startHeight,
-      index: this.index,
-      globalIndex: this.globalIndex,
-      endHeights,
-      claimed,
-    });
-  }
-
   public serializeWireBase(writer: BinaryWriter): void {
     writer.writeUInt8(this.version);
     writer.writeUInt256(this.hash);
     writer.writeUInt256(this.blockHash);
-    writer.writeUInt32LE(this.startHeight);
-    writer.writeUInt32LE(this.index);
+    writer.writeUInt32LE(this.blockIndex);
+    writer.writeUInt32LE(this.transactionIndex);
     writer.writeUInt64LE(this.globalIndex);
-    writer.writeObject(this.endHeights, (key, value) => {
-      writer.writeUInt32LE(key);
-      writer.writeUInt32LE(value);
+    writer.writeArray(this.deployedContractHashes, (contractHash) => {
+      writer.writeUInt160(contractHash);
     });
-    writer.writeObject(this.claimed, (key, value) => {
-      writer.writeUInt32LE(key);
-      writer.writeBoolean(value);
+    writer.writeArray(this.deletedContractHashes, (contractHash) => {
+      writer.writeUInt160(contractHash);
     });
+    writer.writeArray(this.updatedContractHashes, (contractHash) => {
+      writer.writeUInt160(contractHash);
+    });
+    writer.writeUInt64LE(this.actionIndexStart);
+    writer.writeUInt64LE(this.actionIndexStop);
+    this.executionResult.serializeWireBase(writer);
   }
 }

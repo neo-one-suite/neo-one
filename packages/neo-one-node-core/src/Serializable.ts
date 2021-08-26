@@ -1,6 +1,10 @@
-import { BinaryReader, SerializableWire } from '@neo-one/client-common';
+import { BinaryReader, SerializableWire, UInt160, UInt256 } from '@neo-one/client-common';
 import { utils } from '@neo-one/utils';
+import BN from 'bn.js';
+import { Action } from './action';
 import { Block } from './Block';
+import { ContractState } from './ContractState';
+import { ExecutionResult } from './executionResult';
 import { Header } from './Header';
 import { ExtensiblePayload } from './payload';
 import { Signers } from './Signers';
@@ -78,6 +82,19 @@ export function createDeserializeWire<T>(deserializeWireBase: DeserializeWireBas
 export interface SerializeJSONContext {
   readonly addressVersion: number;
   readonly network: number;
+  readonly tryGetTransactionData: (hash: UInt256) => Promise<SerializableTransactionData | undefined>;
+}
+
+export interface SerializableTransactionData {
+  readonly globalIndex: BN;
+  readonly transactionIndex: number;
+  readonly blockIndex: number;
+  readonly blockHash: UInt256;
+  readonly deletedContractHashes: readonly UInt160[];
+  readonly deployedContracts: readonly ContractState[];
+  readonly updatedContracts: readonly ContractState[];
+  readonly executionResult: ExecutionResult;
+  readonly actions: readonly Action[];
 }
 
 export type SerializeJSON<TJSON> = (context: SerializeJSONContext) => TJSON | Promise<TJSON>;
