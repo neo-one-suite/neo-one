@@ -19,72 +19,6 @@ const toASCII = (bytes: Buffer) => {
 
 const toUTF8 = (bytes: Buffer) => bytes.toString('utf8');
 
-const calculateClaimAmount = async ({
-  coins,
-  decrementInterval,
-  generationAmount,
-  getSystemFee,
-}: {
-  readonly coins: ReadonlyArray<{
-    readonly value: BN;
-    readonly startHeight: number;
-    readonly endHeight: number;
-  }>;
-  readonly decrementInterval: number;
-  readonly generationAmount: readonly number[];
-  readonly getSystemFee: (index: number) => Promise<BN>;
-}): Promise<BN> => {
-  const grouped = Object.values(_.groupBy(coins, (coin) => `${coin.startHeight}:${coin.endHeight}`));
-
-  const claimed = await Promise.all(
-    grouped.map(async (coinsGroup) => {
-      const { startHeight, endHeight } = coinsGroup[0];
-
-      let amount = clientUtils.ZERO;
-      let ustart = Math.floor(startHeight / decrementInterval);
-      if (ustart < generationAmount.length) {
-        let istart = startHeight % decrementInterval;
-        let uend = Math.floor(endHeight / decrementInterval);
-        let iend = endHeight % decrementInterval;
-        if (uend >= generationAmount.length) {
-          uend = generationAmount.length;
-          iend = 0;
-        }
-
-        if (iend === 0) {
-          uend -= 1;
-          iend = decrementInterval;
-        }
-
-        // tslint:disable-next-line no-loop-statement
-        while (ustart < uend) {
-          amount = amount.addn((decrementInterval - istart) * generationAmount[ustart]);
-
-          ustart += 1;
-          istart = 0;
-        }
-
-        amount = amount.addn((iend - istart) * generationAmount[ustart]);
-      }
-
-      const [sysFeeEnd, sysFeeStart] = await Promise.all([
-        getSystemFee(endHeight - 1),
-        startHeight === 0 ? Promise.resolve(clientUtils.ZERO) : getSystemFee(startHeight - 1),
-      ]);
-
-      amount = amount.add(sysFeeEnd.sub(sysFeeStart).div(clientUtils.ONE_HUNDRED_MILLION));
-      const totalValue = coinsGroup.reduce((acc, { value }) => acc.add(value), clientUtils.ZERO);
-
-      return [totalValue, amount];
-    }),
-  );
-
-  return claimed.reduce(
-    (acc, [value, amount]) => acc.add(value.div(clientUtils.ONE_HUNDRED_MILLION).mul(amount)),
-    clientUtils.ZERO,
-  );
-};
-
 const randomUInt64 = (): BN => new BN(randomBytes(8).toString('hex'), 16);
 
 const toKeyString = (clazz: { readonly name: string }, toKey: () => string) => () => `${clazz.name}:${toKey()}`;
@@ -234,7 +168,6 @@ export const utils = {
   ...clientUtils,
   toASCII,
   toUTF8,
-  calculateClaimAmount,
   randomUInt64,
   toKeyString,
   equals,

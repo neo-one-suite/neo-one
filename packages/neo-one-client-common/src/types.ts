@@ -228,9 +228,13 @@ export interface Header {
    */
   readonly merkleRoot: Hash256String;
   /**
-   * `Block` time persisted.
+   * `Block` time persisted in milliseconds.
    */
   readonly time: BigNumber;
+  /**
+   * `Block` time persisted in seconds.
+   */
+  readonly timeSeconds: number;
   /**
    * `Block` nonce.
    */
@@ -655,7 +659,7 @@ export interface Event<TName extends string = string, TEventParameters = EventPa
   /**
    * An implementation defined string identifying this `Event`. In the automatically generated NEO•ONE smart contract APIs this identifier distinguishes the type of `Event` and the exact type of the `parameters` of the `Event`.
    *
-   * @example 'transfer'
+   * @example 'Transfer'
    * @example 'mint'
    */
   readonly name: TName;

@@ -109,12 +109,7 @@ export class LedgerContract extends NativeContract implements LedgerContractNode
       return undefined;
     }
 
-    const transactionsOut = await Promise.all(
-      state.hashes.slice(1).map(async (tx) => this.getTransaction(context, tx)),
-    );
-    const transactions = await Promise.all(
-      transactionsOut.filter(oneUtils.notNull).map(async (tx) => this.getTransaction(context, tx.hash)),
-    );
+    const transactions = await Promise.all(state.hashes.map(async (tx) => this.getTransaction(context, tx)));
 
     return new Block({
       header: state.header,

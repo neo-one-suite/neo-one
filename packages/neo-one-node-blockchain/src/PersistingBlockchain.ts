@@ -88,21 +88,27 @@ export class PersistingBlockchain {
 
       main.clone();
 
-      const { transactionData, executedTransactions, actions, lastGlobalActionIndex } = this.persistTransactions(
-        block,
-        main,
-        clone,
-        lastGlobalActionIndexIn,
-        lastGlobalTransactionIndex,
-      );
+      const { actions: onPersistActions, lastGlobalActionIndex: lastGlobalActionIndexOnPersist } =
+        this.getActionsFromAppExecuted(executed, lastGlobalActionIndexIn.add(utils.ONE));
+
+      const {
+        transactionData,
+        executedTransactions,
+        actions: txActions,
+        lastGlobalActionIndex: lastGlobalActionIndexTxs,
+      } = this.persistTransactions(block, main, clone, lastGlobalActionIndexOnPersist, lastGlobalTransactionIndex);
 
       const postPersistExecuted = this.postPersist(block);
+      const { actions: blockActions, lastGlobalActionIndex } = this.getActionsFromAppExecuted(
+        postPersistExecuted,
+        lastGlobalActionIndexTxs,
+      );
 
       return {
         changeBatch: main.getChangeSet(),
         transactionData,
-        actions,
-        lastGlobalActionIndex,
+        actions: onPersistActions.concat(txActions, blockActions),
+        lastGlobalActionIndex: lastGlobalActionIndex.sub(utils.ONE),
         applicationsExecuted: appsExecuted.concat(executedTransactions).concat(postPersistExecuted),
       };
     });
@@ -242,7 +248,7 @@ export class PersistingBlockchain {
         });
 
         return {
-          transactionData: acc.transactionData.concat([txData]),
+          transactionData: acc.transactionData.concat(txData),
           executedTransactions: acc.executedTransactions.concat(appExecuted),
           actions: acc.actions.concat(newActions),
           lastGlobalActionIndex,

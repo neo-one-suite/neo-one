@@ -10,8 +10,6 @@ import { StackItem } from './StackItems';
 import { Batch } from './Storage';
 import { Transaction } from './transaction';
 
-export const StoragePrefix = 0x70;
-
 export const executionLimits = {
   maxShift: 256,
   maxStackSize: 2 * 1024,

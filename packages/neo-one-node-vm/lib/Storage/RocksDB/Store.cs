@@ -40,36 +40,31 @@ namespace NEOONE.Storage.RocksDB
     {
       if (keyOrPrefix == null) keyOrPrefix = Array.Empty<byte>();
 
-      // Here we need to add the special Prefix byte for Storage
-      byte[] fullKey = keyOrPrefix.AddNEOONEPrefixByte();
+      byte[] fullKey = keyOrPrefix;
 
       using var it = db.NewIterator(defaultFamily, Options.ReadDefault);
       if (direction == SeekDirection.Forward)
         for (it.Seek(fullKey); it.Valid(); it.Next())
         {
-          // Here we slice off the first Prefix byte
-          yield return (it.Key()[1..], it.Value());
+          yield return (it.Key(), it.Value());
         }
       else
         for (it.SeekForPrev(fullKey); it.Valid(); it.Prev())
         {
-          // Here we slice off the first Prefix byte
-          yield return (it.Key()[1..], it.Value());
+          yield return (it.Key(), it.Value());
         }
     }
 
     public bool Contains(byte[] key)
     {
       byte[] fullKey = key == null ? new byte[] { } : key;
-      // Here we need to add the special Prefix byte for Storage
-      return db.Get((fullKey ?? Array.Empty<byte>()).AddNEOONEPrefixByte(), defaultFamily, Options.ReadDefault) != null;
+      return db.Get(fullKey ?? Array.Empty<byte>(), defaultFamily, Options.ReadDefault) != null;
     }
 
     public byte[] TryGet(byte[] key)
     {
       byte[] fullKey = key == null ? new byte[] { } : key;
-      // Here we need to add the special Prefix byte for Storage
-      return db.Get((fullKey ?? Array.Empty<byte>()).AddNEOONEPrefixByte(), defaultFamily, Options.ReadDefault);
+      return db.Get(fullKey ?? Array.Empty<byte>(), defaultFamily, Options.ReadDefault);
     }
 
     public void Delete(byte[] key)

@@ -895,6 +895,7 @@ export class Node implements INode {
               name: 'neo_relay_block',
               [Labels.NEO_BLOCK_INDEX]: block.index,
               ['neo.block.transactions']: block.transactions.length,
+              hasTransactions: block.transactions.length > 0 ? true : undefined,
             });
           } catch (err) {
             logger.error({ name: 'neo_relay_block', [Labels.NEO_BLOCK_INDEX]: block.index, err });

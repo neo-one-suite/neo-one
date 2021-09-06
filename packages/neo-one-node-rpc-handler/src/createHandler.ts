@@ -378,9 +378,10 @@ export const createHandler = ({
         const confirmations = blockchain.currentBlockIndex - block.index + 1;
         const hash = await blockchain.getNextBlockHash(block.hash);
         const nextblockhash = hash ? JSONHelper.writeUInt256(hash) : undefined;
+        const result = await block.serializeJSON(blockchain.serializeJSONContext);
 
         return {
-          ...block.serializeJSON(blockchain.serializeJSONContext),
+          ...result,
           confirmations,
           nextblockhash,
         };
@@ -417,7 +418,7 @@ export const createHandler = ({
         const hash = await blockchain.getBlockHash(header.index + 1);
         const nextblockhash = hash ? JSONHelper.writeUInt256(hash) : undefined;
 
-        return header.serializeJSONVerbose(blockchain.serializeJSONContext, { confirmations, nextblockhash });
+        return { ...header.serializeJSON(blockchain.serializeJSONContext), confirmations, nextblockhash };
       }
 
       return header.serializeWire().toString('base64');
