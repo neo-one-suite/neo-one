@@ -1,4 +1,4 @@
-import { Batch, StoragePrefix } from '@neo-one/node-core';
+import { Batch } from '@neo-one/node-core';
 
 type ChangeType = 'Added' | 'Changed' | 'Deleted';
 
@@ -11,30 +11,26 @@ export interface ChangeReturn {
 // tslint:disable-next-line: readonly-array
 export const parseChangeReturns = (changes: readonly ChangeReturn[]): Batch[] => changes.map(parseChangeReturn);
 
-// This adds the Storage Prefix byte to all contract storage changes to keep contract/native storage
-// separate from all other blockchain storage
-const appendStoragePrefix = (keyIn: Buffer) => Buffer.concat([Buffer.from([StoragePrefix]), keyIn]);
-
 const parseChangeReturn = (change: ChangeReturn): Batch => {
   switch (change.type) {
     case 'Added':
       return {
         type: 'put',
-        key: appendStoragePrefix(change.key),
+        key: change.key,
         value: change.value,
       };
 
     case 'Changed':
       return {
         type: 'put',
-        key: appendStoragePrefix(change.key),
+        key: change.key,
         value: change.value,
       };
 
     case 'Deleted':
       return {
         type: 'del',
-        key: appendStoragePrefix(change.key),
+        key: change.key,
       };
 
     default:

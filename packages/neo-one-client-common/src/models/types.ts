@@ -410,7 +410,8 @@ export interface HeaderJSON {
   readonly version: number;
   readonly previousblockhash: string;
   readonly merkleroot: string;
-  readonly time: number;
+  readonly time: string;
+  readonly timeseconds: number;
   readonly nonce: string;
   readonly index: number;
   readonly primary: number;

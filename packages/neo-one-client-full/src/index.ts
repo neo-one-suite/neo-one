@@ -1,5 +1,6 @@
 export {
   Account,
+  AttributeTypeModel,
   ABIDefault,
   ABIDefaultType,
   ABIParameter,
@@ -105,6 +106,8 @@ export {
   MapABIParameter,
   MapABIReturn,
   MapContractParameter,
+  MethodToken,
+  NefFile,
   NetworkSettings,
   NetworkType,
   NEOONEDataProvider,

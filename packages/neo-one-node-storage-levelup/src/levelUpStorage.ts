@@ -27,6 +27,7 @@ interface LevelUpStorageOptions {
 export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage => {
   return {
     nep17Balances: read.createReadAllFindStorage({
+      prefixSize: 4,
       db,
       searchRange: keys.getAllNep17BalanceSearchRange,
       getSearchRange: keys.getNep17BalanceSearchRange,
@@ -40,6 +41,7 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
     }),
 
     nep17TransfersReceived: read.createReadFindStorage({
+      prefixSize: 4,
       db,
       getSearchRange: keys.getNep17TransferReceivedSearchRange,
       serializeKey: keys.createNep17TransferReceivedKey,
@@ -52,6 +54,7 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
     }),
 
     nep17TransfersSent: read.createReadFindStorage({
+      prefixSize: 4,
       db,
       getSearchRange: keys.getNep17TransferSentSearchRange,
       serializeKey: keys.createNep17TransferSentKey,
@@ -70,6 +73,7 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
     }),
 
     storages: read.createReadFindStorage({
+      prefixSize: 0,
       db,
       getSearchRange: keys.getStorageSearchRange,
       serializeKey: keys.createStorageKey,
@@ -106,6 +110,7 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
     }),
 
     action: read.createReadAllFindStorage({
+      prefixSize: 4,
       db,
       searchRange: keys.getAllActionSearchRange,
       getSearchRange: keys.getActionSearchRange,

@@ -10,7 +10,6 @@ import {
   JSONHelper,
   UInt160,
   UInt256,
-  UInt256Hex,
 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { InvalidPreviousHeaderError, UnsignedBlockError } from './errors';
@@ -122,7 +121,7 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
       this.deserializeUnsignedHeaderWireBase(options);
     const witnesses = options.reader.readArray(() => Witness.deserializeWireBase(options), 1);
     if (witnesses.length !== 1) {
-      throw new InvalidFormatError(`Expected only 1 witness. Got: ${witnesses.length}`);
+      throw new InvalidFormatError(`Expected 1 witness. Got: ${witnesses.length}`);
     }
 
     return new this({
@@ -296,32 +295,23 @@ export class Header implements SerializableWire, SerializableJSON<HeaderJSON>, S
     });
   }
 
-  public serializeJSON(_context: SerializeJSONContext): HeaderJSON {
+  public serializeJSON(context: SerializeJSONContext): HeaderJSON {
     return {
       hash: JSONHelper.writeUInt256(this.hash),
       size: this.size,
       version: this.version,
       previousblockhash: JSONHelper.writeUInt256(this.previousHash),
       merkleroot: JSONHelper.writeUInt256(this.merkleRoot),
-      time: this.timestamp.toNumber(),
+      time: this.timestamp.toString(),
+      timeseconds: this.timestamp.divn(1000).toNumber(),
       nonce: utils.toPaddedHexString(this.nonce, 16),
       index: this.index,
       primary: this.primaryIndex,
-      nextconsensus: JSONHelper.writeUInt160(this.nextConsensus),
+      nextconsensus: crypto.scriptHashToAddress({
+        scriptHash: this.nextConsensus,
+        addressVersion: context.addressVersion,
+      }),
       witnesses: [this.witness.serializeJSON()],
-    };
-  }
-
-  public serializeJSONVerbose(
-    context: SerializeJSONContext,
-    verbose: { readonly confirmations: number; readonly nextblockhash?: UInt256Hex },
-  ) {
-    const base = this.serializeJSON(context);
-
-    return {
-      ...base,
-      confirmations: verbose.confirmations,
-      nextblockhash: verbose.nextblockhash,
     };
   }
 }

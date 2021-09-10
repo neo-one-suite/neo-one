@@ -102,17 +102,18 @@ export function createFind$<Key, Value>({
   getSearchRange,
   deserializeKey,
   deserializeValue,
+  prefixSize,
 }: {
   readonly db: LevelUp;
   readonly getSearchRange: (key: Buffer, secondary?: Buffer) => StreamOptions;
   readonly deserializeKey: (key: Buffer) => Key;
   readonly deserializeValue: (value: Buffer) => Value;
+  readonly prefixSize: number;
 }): (lookup: Buffer, secondaryLookup?: Buffer) => Observable<StorageReturn<Key, Value>> {
   return (lookup: Buffer, secondaryLookup?: Buffer) =>
-    streamToObservable<StorageReturn<Buffer, Buffer>>(
-      () => db.createReadStream(getSearchRange(lookup, secondaryLookup)),
-      // Here we slice off the first byte before deserializing the key because we have to remove the Prefix byte
-    ).pipe(map(({ key, value }) => ({ key: deserializeKey(key.slice(1)), value: deserializeValue(value) })));
+    streamToObservable<StorageReturn<Buffer, Buffer>>(() =>
+      db.createReadStream(getSearchRange(lookup, secondaryLookup)),
+    ).pipe(map(({ key, value }) => ({ key: deserializeKey(key.slice(prefixSize)), value: deserializeValue(value) })));
 }
 
 export function createReadFindStorage<Key, Value>({
@@ -121,12 +122,14 @@ export function createReadFindStorage<Key, Value>({
   serializeKey,
   deserializeKey,
   deserializeValue,
+  prefixSize,
 }: {
   readonly db: LevelUp;
   readonly getSearchRange: (key: Buffer, secondary?: Buffer) => StreamOptions;
   readonly serializeKey: SerializeKey<Key>;
   readonly deserializeKey: (value: Buffer) => Key;
   readonly deserializeValue: (value: Buffer) => Value;
+  readonly prefixSize: number;
 }): ReadFindStorage<Key, Value> {
   const readStorage = createReadStorage({
     db,
@@ -142,6 +145,7 @@ export function createReadFindStorage<Key, Value>({
       getSearchRange,
       deserializeKey,
       deserializeValue,
+      prefixSize,
     }),
   };
 }
@@ -153,6 +157,7 @@ export function createReadAllFindStorage<Key, Value>({
   serializeKey,
   deserializeKey,
   deserializeValue,
+  prefixSize,
 }: {
   readonly db: LevelUp;
   readonly searchRange: StreamOptions;
@@ -160,6 +165,7 @@ export function createReadAllFindStorage<Key, Value>({
   readonly serializeKey: SerializeKey<Key>;
   readonly deserializeKey: (value: Buffer) => Key;
   readonly deserializeValue: (value: Buffer) => Value;
+  readonly prefixSize: number;
 }): ReadAllFindStorage<Key, Value> {
   const readStorage = createReadStorage({
     db,
@@ -177,6 +183,7 @@ export function createReadAllFindStorage<Key, Value>({
       getSearchRange,
       deserializeKey,
       deserializeValue,
+      prefixSize,
     }),
     all$,
   };

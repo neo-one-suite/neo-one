@@ -1,4 +1,12 @@
-import { BlockJSON, JSONHelper, TransactionJSON, UInt160, UInt256, utils } from '@neo-one/client-common';
+import {
+  BlockJSON,
+  JSONHelper,
+  scriptHashToAddress,
+  TransactionJSON,
+  UInt160,
+  UInt256,
+  utils,
+} from '@neo-one/client-common';
 import { OmitStrict } from '@neo-one/utils';
 import { BN } from 'bn.js';
 import { Block, BlockAdd } from '../Block';
@@ -91,11 +99,12 @@ export class BlockBuilder {
       tx: this.transactions?.map((tx) => tx.serializeJSON()),
       version: this.version,
       previousblockhash: this.previousHash ? JSONHelper.writeUInt256(this.previousHash) : undefined,
-      time: this.timestamp?.toNumber(),
+      time: this.timestamp?.toString(),
+      timeseconds: this.timestamp?.divn(1000).toNumber(),
       nonce: this.nonce === undefined ? undefined : utils.toPaddedHexString(this.nonce, 16),
       index: this.index,
       primary: this.primaryIndex,
-      nextconsensus: this.nextConsensus ? JSONHelper.writeUInt160(this.nextConsensus) : undefined,
+      nextconsensus: this.nextConsensus ? scriptHashToAddress(JSONHelper.writeUInt160(this.nextConsensus)) : undefined,
       witnesses: this.witness ? [this.witness.serializeJSON()] : undefined,
       hash: this.hash ? JSONHelper.writeUInt256(this.hash) : undefined,
     };

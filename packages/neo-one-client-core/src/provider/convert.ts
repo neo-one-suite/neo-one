@@ -302,6 +302,7 @@ export function convertBlock(block: BlockJSON): Block {
     previousBlockHash: block.previousblockhash,
     merkleRoot: block.merkleroot,
     time: new BigNumber(block.time),
+    timeSeconds: block.timeseconds,
     nonce: new BigNumber(block.nonce, 16),
     primaryIndex: block.primary,
     index: block.index,

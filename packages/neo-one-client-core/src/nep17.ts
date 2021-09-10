@@ -24,7 +24,7 @@ export interface NEP17TransferEventParameters {
   readonly to: AddressString | undefined;
   readonly amount: BigNumber;
 }
-export interface NEP17TransferEvent extends Event<'transfer', NEP17TransferEventParameters> {}
+export interface NEP17TransferEvent extends Event<'Transfer', NEP17TransferEventParameters> {}
 
 export interface NEP17SmartContract<TClient extends Client = Client> extends SmartContract<TClient, NEP17Event> {
   readonly name: (options?: SmartContractReadOptions) => Promise<string>;
