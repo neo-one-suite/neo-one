@@ -420,10 +420,14 @@ export class Client<
   /**
    * Constructs a `SmartContract` instance for the provided `definition` backed by this `Client` instance.
    */
-  public smartContract<T extends SmartContract<any, any> = SmartContractAny>(definition: SmartContractDefinition): T {
+  public smartContract<T extends SmartContract<any, any> = SmartContractAny>(
+    definition: SmartContractDefinition,
+    isNEOONEContract: boolean | undefined = true,
+  ): T {
     return createSmartContract({
       definition: args.assertSmartContractDefinition('definition', definition),
       client: this,
+      isNEOONEContract,
       // tslint:disable-next-line no-any
     }) as any;
   }

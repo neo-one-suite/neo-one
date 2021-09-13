@@ -43,21 +43,24 @@ export interface NEP17SmartContract<TClient extends Client = Client> extends Sma
 
 const DEFAULT_NEO_ONE_PARAM: ABIParameter = { type: 'String', name: NEO_ONE_METHOD_RESERVED_PARAM };
 
-const getDecimalsMethod = (decimals: number): ContractMethodDescriptorClient => ({
+const getDecimalsMethod = (
+  decimals: number,
+  isNEOONEContract: boolean | undefined = true,
+): ContractMethodDescriptorClient => ({
   name: 'decimals',
   constant: true,
-  parameters: [DEFAULT_NEO_ONE_PARAM],
+  parameters: isNEOONEContract ? [DEFAULT_NEO_ONE_PARAM] : [],
   returnType: { type: 'Integer', decimals },
   offset: 0,
   safe: true,
 });
 
-export const abi = (decimals: number): ContractABIClient => ({
+export const abi = (decimals: number, isNEOONEContract: boolean | undefined = true): ContractABIClient => ({
   methods: [
     {
       name: 'name',
       constant: true,
-      parameters: [DEFAULT_NEO_ONE_PARAM],
+      parameters: isNEOONEContract ? [DEFAULT_NEO_ONE_PARAM] : [],
       returnType: { type: 'String' },
       offset: 0,
       safe: true,
@@ -65,16 +68,16 @@ export const abi = (decimals: number): ContractABIClient => ({
     {
       name: 'symbol',
       constant: true,
-      parameters: [DEFAULT_NEO_ONE_PARAM],
+      parameters: isNEOONEContract ? [DEFAULT_NEO_ONE_PARAM] : [],
       returnType: { type: 'String' },
       offset: 0,
       safe: true,
     },
-    getDecimalsMethod(decimals),
+    getDecimalsMethod(decimals, isNEOONEContract),
     {
       name: 'totalSupply',
       constant: true,
-      parameters: [DEFAULT_NEO_ONE_PARAM],
+      parameters: isNEOONEContract ? [DEFAULT_NEO_ONE_PARAM] : [],
       returnType: { type: 'Integer', decimals },
       offset: 0,
       safe: true,
@@ -142,11 +145,11 @@ export const abi = (decimals: number): ContractABIClient => ({
   ],
 });
 
-export const manifest = (decimals: number): ContractManifestClient => ({
+export const manifest = (decimals: number, isNEOONEContract: boolean | undefined = true): ContractManifestClient => ({
   name: 'A NEO•ONE NEP-17 Smart Contract',
   groups: [],
   supportedStandards: ['NEP-17'],
-  abi: abi(decimals),
+  abi: abi(decimals, isNEOONEContract),
   permissions: [],
   trusts: '*',
 });
@@ -155,12 +158,13 @@ export const getDecimals = async (
   client: Client,
   networksDefinition: SmartContractNetworksDefinition,
   network: NetworkType,
+  isNEOONEContract: boolean | undefined = true,
 ): Promise<number> => {
   const decimalsBigNumber = await client
     .smartContract({
       networks: networksDefinition,
       manifest: {
-        ...manifest(0),
+        ...manifest(0, isNEOONEContract),
         abi: { events: [], methods: [getDecimalsMethod(0)] },
       },
     })
@@ -173,8 +177,12 @@ export const createNEP17SmartContract = <TClient extends Client>(
   client: TClient,
   networksDefinition: SmartContractNetworksDefinition,
   decimals: number,
+  isNEOONEContract: boolean | undefined = true,
 ): NEP17SmartContract =>
-  client.smartContract<NEP17SmartContract<TClient>>({
-    networks: networksDefinition,
-    manifest: manifest(decimals),
-  });
+  client.smartContract<NEP17SmartContract<TClient>>(
+    {
+      networks: networksDefinition,
+      manifest: manifest(decimals, isNEOONEContract),
+    },
+    isNEOONEContract,
+  );

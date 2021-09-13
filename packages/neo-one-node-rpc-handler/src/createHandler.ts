@@ -2,21 +2,36 @@ import {
   ApplicationLogJSON,
   assertTriggerTypeJSON,
   BlockJSON,
+  CallReceiptJSON,
   common,
   ConfirmedTransactionJSON,
+  ContractJSON,
   crypto,
+  HeaderJSON,
   JSONHelper,
+  NativeContractJSON,
+  Nep17BalancesJSON,
+  Nep17TransfersJSON,
   NetworkSettingsJSON,
+  Peer,
+  PrivateNetworkSettings,
   RelayTransactionResultJSON,
   scriptHashToAddress,
+  SendRawTransactionResultJSON,
+  StorageItemJSON,
   toVerifyResultJSON,
   TransactionDataJSON,
   TransactionJSON,
   TransactionReceiptJSON,
   TriggerTypeJSON,
   UInt256,
+  UnclaimedGASJSON,
+  ValidateAddressJSON,
+  ValidatorJSON,
+  VerificationCostJSON,
   VerifyResultModel,
   VerifyResultModelExtended,
+  VersionJSON,
 } from '@neo-one/client-common';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
@@ -392,7 +407,7 @@ export const createHandler = ({
     [RPC_METHODS.getblockheadercount]: async (): Promise<number> =>
       blockchain.headerCache.last?.index ?? (await blockchain.getCurrentIndex()) + 1,
     [RPC_METHODS.getblockcount]: async (): Promise<number> => (await blockchain.getCurrentIndex()) + 1,
-    [RPC_METHODS.getblockhash]: async (args) => {
+    [RPC_METHODS.getblockhash]: async (args): Promise<string | undefined> => {
       const height = args[0];
       await checkHeight(height);
       const hash = await blockchain.getBlockHash(height);
@@ -400,7 +415,7 @@ export const createHandler = ({
       return hash === undefined ? undefined : JSONHelper.writeUInt256(hash);
     },
 
-    [RPC_METHODS.getblockheader]: async (args) => {
+    [RPC_METHODS.getblockheader]: async (args): Promise<HeaderJSON | string> => {
       let hashOrIndex = args[0];
       if (typeof args[0] === 'string') {
         hashOrIndex = JSONHelper.readUInt256(args[0]);
@@ -423,7 +438,7 @@ export const createHandler = ({
 
       return header.serializeWire().toString('base64');
     },
-    [RPC_METHODS.getcontractstate]: async (args) => {
+    [RPC_METHODS.getcontractstate]: async (args): Promise<ContractJSON> => {
       const hash = toScriptHash(args[0]);
       const contract = await native.ContractManagement.getContract({ storages: blockchain.storages }, hash);
       if (contract === undefined) {
@@ -432,7 +447,7 @@ export const createHandler = ({
 
       return contract.serializeJSON();
     },
-    [RPC_METHODS.getrawmempool]: async () =>
+    [RPC_METHODS.getrawmempool]: async (): Promise<readonly string[]> =>
       Object.values(node.memPool).map((transaction) => JSONHelper.writeUInt256(transaction.hash)),
     [RPC_METHODS.getrawtransaction]: async (args): Promise<TransactionJSON | ConfirmedTransactionJSON | string> => {
       const hash = JSONHelper.readUInt256(args[0]);
@@ -469,7 +484,7 @@ export const createHandler = ({
 
       return tx.serializeJSON();
     },
-    [RPC_METHODS.getstorage]: async (args) => {
+    [RPC_METHODS.getstorage]: async (args): Promise<StorageItemJSON | string> => {
       const hash = JSONHelper.readUInt160(args[0]);
       const verbose = args.length >= 3 ? !!args[2] : false;
       const state = await native.ContractManagement.getContract({ storages: blockchain.storages }, hash);
@@ -492,7 +507,7 @@ export const createHandler = ({
 
       return JSONHelper.writeBase64Buffer(item.value);
     },
-    [RPC_METHODS.getnextblockvalidators]: async () => {
+    [RPC_METHODS.getnextblockvalidators]: async (): Promise<readonly ValidatorJSON[]> => {
       const [validators, candidates] = await Promise.all([
         native.NEO.computeNextBlockValidators({ storages: blockchain.storages }),
         native.NEO.getCandidates({ storages: blockchain.storages }),
@@ -508,7 +523,7 @@ export const createHandler = ({
 
       return validators.map((validator) => ({
         publickey: JSONHelper.writeECPoint(validator),
-        votes: 0,
+        votes: '0',
         active: true,
       }));
     },
@@ -523,15 +538,15 @@ export const createHandler = ({
     },
 
     // Node
-    [RPC_METHODS.getconnectioncount]: async () => node.connectedPeers.length,
-    [RPC_METHODS.getpeers]: async () => ({
+    [RPC_METHODS.getconnectioncount]: async (): Promise<number> => node.connectedPeers.length,
+    [RPC_METHODS.getpeers]: async (): Promise<{ readonly connected: readonly Peer[] }> => ({
       connected: node.connectedPeers.map((endpoint) => {
         const { host, port } = getEndpointConfig(endpoint);
 
         return { address: host, port };
       }),
     }),
-    [RPC_METHODS.getversion]: async () => {
+    [RPC_METHODS.getversion]: async (): Promise<VersionJSON> => {
       const { tcpPort: tcpport, wsPort: wsport, nonce, useragent } = node.version;
       const { network } = blockchain.settings;
 
@@ -543,7 +558,7 @@ export const createHandler = ({
         useragent,
       };
     },
-    [RPC_METHODS.sendrawtransaction]: async (args) => {
+    [RPC_METHODS.sendrawtransaction]: async (args): Promise<SendRawTransactionResultJSON> => {
       const transaction = Transaction.deserializeWire({
         context: blockchain.deserializeWireContext,
         buffer: JSONHelper.readBase64Buffer(args[0]),
@@ -555,7 +570,7 @@ export const createHandler = ({
           throw new JSONRPCError(-500, getVerifyResultErrorMessage(result));
         }
 
-        return { hash: transaction.hash };
+        return { hash: common.uInt256ToString(transaction.hash) };
       } catch (error) {
         throw new JSONRPCError(-500, error.message);
       }
@@ -563,32 +578,41 @@ export const createHandler = ({
     [RPC_METHODS.submitblock]: async () => {
       throw new JSONRPCError(-101, 'Not implemented');
     },
-    [RPC_METHODS.getcommittee]: async () =>
+    [RPC_METHODS.getcommittee]: async (): Promise<readonly string[]> =>
       (await native.NEO.getCommittee({ storages: blockchain.storages })).map((member) =>
         common.ecPointToString(member),
       ),
-    [RPC_METHODS.getnativecontracts]: async () =>
+    [RPC_METHODS.getnativecontracts]: async (): Promise<readonly NativeContractJSON[]> =>
       native.nativeContracts.map((nativeContract) => nativeContract.serializeJSON()),
 
     // SmartContract
     [RPC_METHODS.invokefunction]: async (_args) => {
       throw new JSONRPCError(-101, 'Not implemented');
     },
-    [RPC_METHODS.invokescript]: async (args) => {
+    [RPC_METHODS.invokescript]: async (args): Promise<CallReceiptJSON> => {
       const script = JSONHelper.readBase64Buffer(args[0]);
       const signers = args[1] !== undefined ? Signers.fromJSON(args[1]) : undefined;
+      const receipt = blockchain.invokeScript({ script, signers }); // TODO: should be 20 or 20 fixed8FromDecimal?
 
-      return blockchain.invokeScript({ script, signers }); // TODO: should be 20 or 20 fixed8FromDecimal?
+      return {
+        result: receipt.result.serializeJSON(),
+        actions: receipt.actions.map((action) => action.serializeJSON()),
+      };
     },
-    [RPC_METHODS.testtransaction]: async (args) => {
+    [RPC_METHODS.testtransaction]: async (args): Promise<CallReceiptJSON> => {
       const transaction = Transaction.deserializeWire({
         context: blockchain.deserializeWireContext,
         buffer: JSONHelper.readBuffer(args[0]),
       });
 
-      return blockchain.testTransaction(transaction);
+      const receipt = blockchain.testTransaction(transaction);
+
+      return {
+        result: receipt.result.serializeJSON(),
+        actions: receipt.actions.map((action) => action.serializeJSON()),
+      };
     },
-    [RPC_METHODS.getunclaimedgas]: async (args) => {
+    [RPC_METHODS.getunclaimedgas]: async (args): Promise<UnclaimedGASJSON> => {
       const address = args[0];
       if (typeof address !== 'string') {
         throw new JSONRPCError(-100, 'Invalid argument at position 0');
@@ -611,7 +635,7 @@ export const createHandler = ({
       };
     },
     // Utilities
-    [RPC_METHODS.validateaddress]: async (args) => {
+    [RPC_METHODS.validateaddress]: async (args): Promise<ValidateAddressJSON> => {
       let scriptHash;
       try {
         scriptHash = crypto.addressToScriptHash({
@@ -695,7 +719,7 @@ export const createHandler = ({
     },
 
     // NEP17
-    [RPC_METHODS.getnep17transfers]: async (args) => {
+    [RPC_METHODS.getnep17transfers]: async (args): Promise<Nep17TransfersJSON> => {
       const addressVersion = blockchain.settings.addressVersion;
       const { address, scriptHash } = getScriptHashAndAddress(args[0], addressVersion);
 
@@ -730,7 +754,7 @@ export const createHandler = ({
         address,
       };
     },
-    [RPC_METHODS.getnep17balances]: async (args) => {
+    [RPC_METHODS.getnep17balances]: async (args): Promise<Nep17BalancesJSON> => {
       const addressVersion = blockchain.settings.addressVersion;
       const { address, scriptHash } = getScriptHashAndAddress(args[0], addressVersion);
       const storedBalances = await blockchain.nep17Balances.find$(scriptHash).pipe(toArray()).toPromise();
@@ -760,7 +784,7 @@ export const createHandler = ({
     },
 
     // Settings
-    [RPC_METHODS.updatesettings]: async (args) => {
+    [RPC_METHODS.updatesettings]: async (args): Promise<boolean> => {
       const { settings } = blockchain;
       const newSettings = {
         ...settings,
@@ -771,7 +795,9 @@ export const createHandler = ({
 
       return true;
     },
-    [RPC_METHODS.getsettings]: async () => ({ millisecondsPerBlock: blockchain.settings.millisecondsPerBlock }),
+    [RPC_METHODS.getsettings]: async (): Promise<PrivateNetworkSettings> => ({
+      millisecondsPerBlock: blockchain.settings.millisecondsPerBlock,
+    }),
 
     // NEO•ONE
     [RPC_METHODS.relaytransaction]: async (args): Promise<RelayTransactionResultJSON> => {
@@ -798,7 +824,7 @@ export const createHandler = ({
         throw new JSONRPCError(-110, `Relay transaction failed: ${error.message}`);
       }
     },
-    [RPC_METHODS.getallstorage]: async (args) => {
+    [RPC_METHODS.getallstorage]: async (args): Promise<readonly StorageItemJSON[]> => {
       const hash = JSONHelper.readUInt160(args[0]);
       if (native.nativeHashes.some((natHash) => natHash.equals(hash))) {
         throw new Error("Can't get all storage for native contracts.");
@@ -923,22 +949,25 @@ export const createHandler = ({
         nativeupdatehistory: nativeUpdateHistory,
       };
     },
-    [RPC_METHODS.getfeeperbyte]: async () => {
+    [RPC_METHODS.getfeeperbyte]: async (): Promise<string> => {
       const feePerByte = await blockchain.getFeePerByte();
 
       return feePerByte.toString();
     },
-    [RPC_METHODS.getexecfeefactor]: async () => native.Policy.getExecFeeFactor({ storages: blockchain.storages }),
-    [RPC_METHODS.getverificationcost]: async (args) => {
+    [RPC_METHODS.getexecfeefactor]: async (): Promise<number> =>
+      native.Policy.getExecFeeFactor({ storages: blockchain.storages }),
+    [RPC_METHODS.getverificationcost]: async (args): Promise<VerificationCostJSON> => {
       const hash = JSONHelper.readUInt160(args[0]);
       const transaction = Transaction.deserializeWire({
         context: blockchain.deserializeWireContext,
         buffer: JSONHelper.readBuffer(args[1]),
       });
 
-      return blockchain.getVerificationCost(hash, transaction);
+      const { fee, size } = await blockchain.getVerificationCost(hash, transaction);
+
+      return { fee: fee.toString(), size };
     },
-    [RPC_METHODS.runconsensusnow]: async () => {
+    [RPC_METHODS.runconsensusnow]: async (): Promise<boolean> => {
       if (node.consensus) {
         await node.consensus.runConsensusNow();
       } else {
@@ -948,7 +977,7 @@ export const createHandler = ({
       return true;
     },
 
-    [RPC_METHODS.fastforwardoffset]: async (args) => {
+    [RPC_METHODS.fastforwardoffset]: async (args): Promise<boolean> => {
       if (node.consensus) {
         await node.consensus.fastForwardOffset(args[0]);
       } else {
@@ -957,7 +986,7 @@ export const createHandler = ({
 
       return true;
     },
-    [RPC_METHODS.fastforwardtotime]: async (args) => {
+    [RPC_METHODS.fastforwardtotime]: async (args): Promise<boolean> => {
       if (node.consensus !== undefined) {
         await node.consensus.fastForwardToTime(args[0]);
       } else {
@@ -966,7 +995,7 @@ export const createHandler = ({
 
       return true;
     },
-    [RPC_METHODS.reset]: async () => {
+    [RPC_METHODS.reset]: async (): Promise<boolean> => {
       if (node.consensus !== undefined) {
         await node.consensus.pause();
         await node.consensus.reset();
@@ -979,8 +1008,8 @@ export const createHandler = ({
 
       return true;
     },
-    [RPC_METHODS.getneotrackerurl]: async () => handleGetNEOTrackerURL(),
-    [RPC_METHODS.resetproject]: async () => {
+    [RPC_METHODS.getneotrackerurl]: async (): Promise<string | undefined> => handleGetNEOTrackerURL(),
+    [RPC_METHODS.resetproject]: async (): Promise<boolean> => {
       await handleResetProject();
 
       return true;
