@@ -488,6 +488,11 @@ export interface ValidatorJSON {
   readonly votes: string;
 }
 
+export interface ValidateAddressJSON {
+  readonly address: string;
+  readonly isvalid: boolean;
+}
+
 export interface PluginJSON {
   readonly name: string;
   readonly version: string;

@@ -198,10 +198,12 @@ const createCall =
     definition,
     client,
     func: { name, parameters = [], returnType, receive = false },
+    isNEOONEContract,
   }: {
     readonly definition: SmartContractDefinition;
     readonly client: Client;
     readonly func: ContractMethodDescriptorClient;
+    readonly isNEOONEContract: boolean;
   }) =>
   // tslint:disable-next-line no-any
   async (...args: any[]): Promise<Return | undefined> => {
@@ -215,7 +217,7 @@ const createCall =
 
     // For NEO•ONE contracts we need to add method name as the first param. This should be fixed
     const paramsIn = [name, ...params];
-    const receipt = await client.__call(network, address, name, paramsIn);
+    const receipt = await client.__call(network, address, name, isNEOONEContract ? paramsIn : params);
 
     return common.convertCallResult({
       returnType,
@@ -229,10 +231,12 @@ const createInvoke = ({
   definition,
   client,
   func: { name, parameters = [], returnType, receive = false },
+  isNEOONEContract,
 }: {
   readonly definition: SmartContractDefinition;
   readonly client: Client;
   readonly func: ContractMethodDescriptorClient;
+  readonly isNEOONEContract: boolean;
 }) => {
   const invoke = async (
     // tslint:disable-next-line no-any
@@ -246,10 +250,12 @@ const createInvoke = ({
       client,
     });
 
+    // For NEO•ONE contracts we need to add method name as the first param. This should be fixed
+    const paramsIn = [name, ...params];
     const result: TransactionResult<RawInvokeReceipt> = await client.__invoke(
       address,
       name,
-      [name, ...params], // For NEO•ONE contracts we need to add method name as the first param. This should be fixed
+      isNEOONEContract ? paramsIn : params,
       paramsZipped,
       receive,
       options,
@@ -307,9 +313,11 @@ const createInvoke = ({
 export const createSmartContract = ({
   definition,
   client,
+  isNEOONEContract = true,
 }: {
   readonly definition: SmartContractDefinition;
   readonly client: Client;
+  readonly isNEOONEContract?: boolean;
 }): SmartContractAny => {
   const {
     manifest: {
@@ -378,11 +386,13 @@ export const createSmartContract = ({
                 definition,
                 client,
                 func,
+                isNEOONEContract,
               })
             : createInvoke({
                 definition,
                 client,
                 func,
+                isNEOONEContract,
               }),
       }),
     {

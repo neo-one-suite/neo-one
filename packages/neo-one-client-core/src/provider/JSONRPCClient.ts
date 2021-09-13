@@ -24,6 +24,7 @@ import {
   TransactionReceiptJSON,
   TriggerTypeJSON,
   UnclaimedGASJSON,
+  ValidateAddressJSON,
   ValidatorJSON,
   VerificationCostJSON,
   VersionJSON,
@@ -228,7 +229,7 @@ export class JSONRPCClient {
     );
   }
 
-  public async getBlockHash(index: number): Promise<string> {
+  public async getBlockHash(index: number): Promise<string | undefined> {
     return this.withInstance(async (provider) =>
       provider.request({
         method: 'getblockhash',
@@ -250,7 +251,7 @@ export class JSONRPCClient {
     return this.withInstance(async (provider) => provider.request({ method: 'getnextblockvalidators' }));
   }
 
-  public async validateAddress(address: string): Promise<{ readonly address: string; readonly isvalid: boolean }> {
+  public async validateAddress(address: string): Promise<ValidateAddressJSON> {
     return this.withInstance(async (provider) => provider.request({ method: 'validateaddress', params: [address] }));
   }
 
