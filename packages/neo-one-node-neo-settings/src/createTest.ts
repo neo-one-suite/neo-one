@@ -54,6 +54,7 @@ export const createTest = ({
     decrementInterval: commonSettings.decrementInterval,
     generationAmount: commonSettings.generationAmount,
     secondsPerBlock: secondsPerBlock === undefined ? commonSettings.secondsPerBlock : secondsPerBlock,
+    noBonusHeight: commonSettings.noBonusHeight,
     maxTransactionsPerBlock: commonSettings.maxTransactionsPerBlock,
     memPoolSize: commonSettings.memPoolSize,
     fees: {

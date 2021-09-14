@@ -18,6 +18,7 @@ export const serializeSettings = (settings: Settings) => {
     standbyValidators,
     vm,
     secondsPerBlock,
+    noBonusHeight,
     maxTransactionsPerBlock,
     memPoolSize,
   } = settings;
@@ -38,6 +39,7 @@ export const serializeSettings = (settings: Settings) => {
     standbyValidators: standbyValidators.map((validator) => common.ecPointToString(validator)),
     vm,
     secondsPerBlock,
+    noBonusHeight,
     maxTransactionsPerBlock,
     memPoolSize,
   };
@@ -59,6 +61,7 @@ export const deserializeSettings = (settings: any): Settings => {
     standbyValidators,
     vm,
     secondsPerBlock,
+    noBonusHeight,
     maxTransactionsPerBlock,
     memPoolSize,
   } = settings;
@@ -87,6 +90,7 @@ export const deserializeSettings = (settings: any): Settings => {
     standbyValidators: standbyValidators.map((validator: string) => common.stringToECPoint(validator)),
     vm,
     secondsPerBlock,
+    noBonusHeight,
     maxTransactionsPerBlock,
     memPoolSize,
   };

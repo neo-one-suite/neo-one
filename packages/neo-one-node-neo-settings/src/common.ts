@@ -17,6 +17,7 @@ export const GENERATION_AMOUNT_PRIVATE: readonly number[] = [8, 7, 6];
 export const ISSUE_AMOUNT_PRIVATE = clientCommon.fixed8FromDecimal(58000000);
 export const DECREMENT_INTERVAL = 2000000;
 export const SECONDS_PER_BLOCK = 15;
+export const NO_BONUS_HEIGHT = 8000000;
 export const MAX_TRANSACTION_PER_BLOCK = 500;
 
 interface Options {
@@ -138,6 +139,7 @@ export const common = ({ privateNet, address, consensusAddress }: Options) => {
     decrementInterval: DECREMENT_INTERVAL,
     generationAmount: privateNet ? GENERATION_AMOUNT_PRIVATE : GENERATION_AMOUNT,
     secondsPerBlock: SECONDS_PER_BLOCK,
+    noBonusHeight: NO_BONUS_HEIGHT,
     maxTransactionsPerBlock: MAX_TRANSACTION_PER_BLOCK,
     memPoolSize: 50000,
   };

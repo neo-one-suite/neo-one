@@ -19,6 +19,7 @@ const calculateClaimAmount = async ({
   coins,
   decrementInterval,
   generationAmount,
+  noBonusHeight,
   getSystemFee,
 }: {
   readonly coins: ReadonlyArray<{
@@ -28,17 +29,19 @@ const calculateClaimAmount = async ({
   }>;
   readonly decrementInterval: number;
   readonly generationAmount: readonly number[];
+  readonly noBonusHeight: number;
   readonly getSystemFee: (index: number) => Promise<BN>;
 }): Promise<BN> => {
   const grouped = Object.values(_.groupBy(coins, (coin) => `${coin.startHeight}:${coin.endHeight}`));
 
   const claimed = await Promise.all(
     grouped.map(async (coinsGroup) => {
-      const { startHeight, endHeight } = coinsGroup[0];
+      const { startHeight, endHeight: endHeightOut } = coinsGroup[0];
+      const endHeight = Math.min(endHeightOut, noBonusHeight);
 
       let amount = clientUtils.ZERO;
       let ustart = Math.floor(startHeight / decrementInterval);
-      if (ustart < generationAmount.length) {
+      if (ustart < generationAmount.length && startHeight < noBonusHeight) {
         let istart = startHeight % decrementInterval;
         let uend = Math.floor(endHeight / decrementInterval);
         let iend = endHeight % decrementInterval;
