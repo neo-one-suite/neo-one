@@ -107,6 +107,7 @@ export const settings: Settings = {
   decrementInterval: DECREMENT_INTERVAL,
   generationAmount: GENERATION_AMOUNT,
   secondsPerBlock: 15,
+  noBonusHeight: 8000000,
   maxTransactionsPerBlock: 500,
   memPoolSize: 50000,
   fees: {

@@ -25,6 +25,7 @@ export interface Settings {
   readonly standbyValidators: readonly ECPoint[];
   readonly vm: VMSettings;
   readonly secondsPerBlock: number;
+  readonly noBonusHeight: number;
   readonly maxTransactionsPerBlock: number;
   readonly memPoolSize: number;
 }

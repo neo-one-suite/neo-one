@@ -121,6 +121,7 @@ Enables trace collection for the NEO•ONE Node. This must be used in tangent wi
       }
     },
     "secondsPerBlock": number,
+    "noBonusHeight": number,
     "maxTransactionsPerBlock": number,
     "memPoolSize": number
   }

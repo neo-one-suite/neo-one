@@ -513,6 +513,7 @@ export class Blockchain {
 
       decrementInterval: this.settings.decrementInterval,
       generationAmount: this.settings.generationAmount,
+      noBonusHeight: this.settings.noBonusHeight,
       getSystemFee: async (index) => {
         const header = await this.header.get({
           hashOrIndex: index,
