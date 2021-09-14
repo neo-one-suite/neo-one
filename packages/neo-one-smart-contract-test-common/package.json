@@ -16,9 +16,9 @@
     "@neo-one/cli-common": "^2.7.3",
     "@neo-one/client-common": "^2.7.3",
     "@neo-one/client-core": "^2.7.3",
-    "@neo-one/client-full-core": "^2.7.3",
+    "@neo-one/client-full-core": "^2.7.4",
     "@neo-one/logger": "^2.6.2",
-    "@neo-one/smart-contract-compiler": "^2.7.3",
+    "@neo-one/smart-contract-compiler": "^2.7.4",
     "@neo-one/utils": "^2.6.1",
     "bignumber.js": "^9.0.0",
     "tslib": "^1.10.0"

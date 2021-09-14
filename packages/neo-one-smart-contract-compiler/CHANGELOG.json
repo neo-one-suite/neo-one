@@ -2,6 +2,29 @@
   "name": "@neo-one/smart-contract-compiler",
   "entries": [
     {
+      "version": "2.7.4",
+      "tag": "@neo-one/smart-contract-compiler_v2.7.4",
+      "date": "Tue, 14 Sep 2021 21:24:27 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Bump NEO•ONE versions for patch publish"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-full-core\" from `^2.7.3` to `^2.7.4`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-storage-levelup\" from `^2.7.3` to `^2.7.4`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-vm\" from `^2.7.3` to `^2.7.4`"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.7.3",
       "tag": "@neo-one/smart-contract-compiler_v2.7.3",
       "date": "Tue, 15 Jun 2021 01:21:56 GMT",

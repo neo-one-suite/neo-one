@@ -2,6 +2,32 @@
   "name": "@neo-one/cli",
   "entries": [
     {
+      "version": "2.8.3",
+      "tag": "@neo-one/cli_v2.8.3",
+      "date": "Tue, 14 Sep 2021 21:24:27 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Bump NEO•ONE versions for patch publish"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-full-core\" from `^2.7.3` to `^2.7.4`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node\" from `^2.7.3` to `^2.7.4`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/smart-contract-compiler\" from `^2.7.3` to `^2.7.4`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/smart-contract-test\" from `^2.7.3` to `^2.7.4`"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.8.2",
       "tag": "@neo-one/cli_v2.8.2",
       "date": "Tue, 15 Jun 2021 01:21:56 GMT",
