@@ -9,7 +9,7 @@ export const compileContract = async (
   linked: LinkedContracts,
   fs: FileSystem,
 ): Promise<ContractResult> => {
-  const compileResult = compileContractBase(filePath, name, createCompilerHost({ fs }), linked);
+  const compileResult = await compileContractBase(filePath, name, createCompilerHost({ fs }), linked);
   const sourceMap = await compileResult.sourceMap;
 
   return {

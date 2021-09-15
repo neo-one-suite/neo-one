@@ -22,27 +22,6 @@ export const cacheStorage = ({
     // length: (value, key) => value.size + Buffer.byteLength(key, 'utf8'),
   });
 
-  const serializeBlockKey = ({ hashOrIndex }: { hashOrIndex: number | UInt256 }) => {
-    if (typeof hashOrIndex === 'number') {
-      // TODO: implement getting a block by index
-      throw new Error('not implemented');
-    }
-
-    return hashOrIndex;
-  };
-
-  const blockBase = read.createReadStorage({
-    cache,
-    storage: storage.blocks,
-    serializeKeyString: serializeBlockKey,
-  });
-
-  const block = {
-    get: blockBase.get,
-    tryGet: blockBase.tryGet,
-    tryGetLatest: storage.block.tryGetLatest,
-  };
-
   return {
     header,
     block,

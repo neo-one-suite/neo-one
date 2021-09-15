@@ -41,8 +41,7 @@ export class NetworkAddress implements SerializableWire {
     );
 
     if (new Set(capabilities.map((cap) => cap.type)).size !== capabilities.length) {
-      // TODO: implement new error same as VersionPayload
-      throw new InvalidFormatError();
+      throw new InvalidFormatError('Capabilities has a duplicate in NetworkAddress');
     }
 
     return new this({

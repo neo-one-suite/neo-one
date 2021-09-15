@@ -68,14 +68,16 @@ export const build = async ({ fs, output$, providerManager }: BuildOptions): Pro
       throw error;
     }
 
-    const address = scriptHashToAddress(
-      common.uInt160ToString(crypto.toScriptHash(Buffer.from(contract.contract.script, 'hex'))),
-    );
+    // TODO: this is almost definitely wrong
+    const scriptHash = crypto.toScriptHash(Buffer.from(contract.contract.script, 'hex'));
+    // TODO: this is almost definitely wrong
+    const address = scriptHashToAddress(common.uInt160ToString(scriptHash));
     mutableSourceMaps[address] = contract.sourceMap;
     await deployContract(
       provider,
       contract.contract,
-      contract.abi,
+      scriptHash, // TODO: this is almost definitely wrong
+      contract.contract.manifest,
       mutableSourceMaps,
       constants.PRIVATE_NET_PRIVATE_KEY,
     );
@@ -105,32 +107,36 @@ export const build = async ({ fs, output$, providerManager }: BuildOptions): Pro
   const getContractPaths = (name: string) => {
     const base = `${generated}/${name}`;
     const typesPath = `${base}/types.ts`;
-    const abiPath = `${base}/abi.ts`;
+    const manifestPath = `${base}/manifest.ts`;
     const createContractPath = `${base}/contract.ts`;
 
-    return { typesPath, abiPath, createContractPath };
+    return { typesPath, manifestPath, createContractPath };
   };
 
   const mutableFiles: BuildFile[] = [];
 
   output$.next({ owner: 'neo-one', message: 'Generating code...' });
   mutableContracts.forEach((contractResult) => {
-    const { typesPath, abiPath, createContractPath } = getContractPaths(contractResult.name);
+    const { typesPath, manifestPath, createContractPath } = getContractPaths(contractResult.name);
 
-    const { abi: abiContents, contract: contractContents, types: typesContents } = genFiles({
+    const {
+      manifest: manifestContents,
+      contract: contractContents,
+      types: typesContents,
+    } = genFiles({
       name: contractResult.name,
       networksDefinition: mutableSmartContractNetworkDefinitions[contractResult.name],
       contractPath: contractResult.filePath,
       typesPath,
-      abiPath,
+      manifestPath,
       createContractPath,
-      abi: contractResult.abi,
+      manifest: contractResult.contract.manifest,
       sourceMapsPath,
       browserify: false,
     });
 
     mutableFiles.push({ path: typesPath, content: typesContents.ts });
-    mutableFiles.push({ path: abiPath, content: abiContents.ts });
+    mutableFiles.push({ path: manifestPath, content: manifestContents.ts });
     mutableFiles.push({ path: createContractPath, content: contractContents.ts });
   });
 
