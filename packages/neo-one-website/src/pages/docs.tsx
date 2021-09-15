@@ -3,7 +3,7 @@ import '../polyfill';
 
 import * as React from 'react';
 import { useRouteData } from 'react-static';
-import { Docs, DocsProps, Helmet } from '../components';
+import { Docs, DocsProps, Helmet, ModalAlertVersion } from '../components';
 import { ContentLayout, DocsLoading } from '../layout';
 
 const { Suspense } = React;
@@ -17,6 +17,7 @@ export default () => {
       <Helmet title="NEO•ONE Docs" />
       <Suspense fallback={<DocsLoading />}>
         <ContentLayout path="docs">
+          <ModalAlertVersion />
           <Docs {...props} />
         </ContentLayout>
       </Suspense>

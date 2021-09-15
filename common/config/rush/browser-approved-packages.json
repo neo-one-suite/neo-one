@@ -23,6 +23,14 @@
       "allowedCategories": [ "web" ]
     },
     {
+      "name": "@babel/plugin-proposal-nullish-coalescing-operator",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "@babel/plugin-proposal-nullish-optional-chaining",
+      "allowedCategories": [ "tools" ]
+    },
+    {
       "name": "@babel/plugin-proposal-numeric-separator",
       "allowedCategories": [ "web" ]
     },
@@ -33,6 +41,10 @@
     {
       "name": "@babel/plugin-proposal-optional-catch-binding",
       "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "@babel/plugin-proposal-optional-chaining",
+      "allowedCategories": [ "tools" ]
     },
     {
       "name": "@babel/plugin-syntax-dynamic-import",
@@ -1008,6 +1020,10 @@
     },
     {
       "name": "react-universal-component",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "reactjs-popup",
       "allowedCategories": [ "web" ]
     },
     {

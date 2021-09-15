@@ -17,7 +17,7 @@ export class RawIteratorReduceHelper extends Helper {
   public constructor(options: RawIteratorReduceHelperOptions) {
     super();
     this.each = options.each;
-    this.deserializeKey = options.deserializeKey ?? false;
+    this.deserializeKey = options.deserializeKey || false;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {

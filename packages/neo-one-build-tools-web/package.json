@@ -45,7 +45,7 @@
     "@babel/plugin-syntax-optional-catch-binding": "^7.2.0",
     "@babel/plugin-syntax-typescript": "^7.3.3",
     "@babel/polyfill": "^7.6.0",
-    "@babel/preset-env": "^7.6.3",
+    "@babel/preset-env": "^7.12.16",
     "@babel/preset-react": "^7.0.0",
     "@babel/runtime": "^7.6.3",
     "@cypress/webpack-preprocessor": "^4.1.0",

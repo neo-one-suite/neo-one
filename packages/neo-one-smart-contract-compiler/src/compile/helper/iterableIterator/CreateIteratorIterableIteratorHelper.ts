@@ -22,7 +22,7 @@ export class CreateIteratorIterableIteratorHelper extends Helper {
 
   public constructor(options: CreateIteratorIterableIteratorHelperOptions) {
     super();
-    this.deserializeKey = options.deserializeKey ?? false;
+    this.deserializeKey = options.deserializeKey || false;
     this.mapKey = options.mapKey === undefined ? doNothing : options.mapKey;
     this.mapValue = options.mapValue === undefined ? doNothing : options.mapValue;
   }

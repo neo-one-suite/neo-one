@@ -28,7 +28,7 @@ export class WrapValRecursiveHelper extends Helper {
     this.checkValue = options.checkValue === undefined ? false : options.checkValue;
     this.type = options.type;
     this.optional = options.optional;
-    this.serializeFinalVal = options.serializeFinalVal ?? false;
+    this.serializeFinalVal = options.serializeFinalVal || false;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
