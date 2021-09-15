@@ -1,6 +1,7 @@
 import { common, crypto } from '@neo-one/client-common';
 import { DeveloperClient } from '@neo-one/client-core';
 import { Blockchain } from '@neo-one/node-blockchain';
+import { NativeContainer } from '@neo-one/node-native';
 import { createMain } from '@neo-one/node-neo-settings';
 import { Node } from '@neo-one/node-protocol';
 import { createHandler, RPCHandler } from '@neo-one/node-rpc-handler';
@@ -62,17 +63,24 @@ export class FullNode {
     crypto.addPublicKey(primaryPrivateKey, primaryPublicKey);
 
     const settings = createMain({
-      address: common.uInt160ToString(crypto.privateKeyToScriptHash(primaryPrivateKey)),
       standbyValidators: [common.ecPointToString(primaryPublicKey)],
       privateNet: true,
+      millisecondsPerBlock: 15000,
     });
     const storage = levelupStorage({
       db: LevelUp(this.options.type === 'persistent' ? Level(this.options.id) : MemDown()),
-      context: { network: settings.network },
+      context: {
+        network: settings.network,
+        validatorsCount: settings.validatorsCount,
+        maxValidUntilBlockIncrement: settings.maxValidUntilBlockIncrement,
+      },
     });
+
+    const native = new NativeContainer(settings);
 
     const blockchain = await Blockchain.create({
       settings,
+      native,
       storage,
       vm,
     });
@@ -84,6 +92,7 @@ export class FullNode {
     };
     const node = new Node({
       blockchain,
+      native,
       options: nodeOptions,
       createNetwork: () => new Network(),
     });
@@ -92,6 +101,7 @@ export class FullNode {
 
     return createHandler({
       blockchain,
+      native,
       node,
       handleResetProject: this.reset.bind(this),
       handleGetNEOTrackerURL: async () => undefined,
@@ -100,7 +110,7 @@ export class FullNode {
 
   private async reset(): Promise<void> {
     await this.developerClient.reset();
-    await this.developerClient.updateSettings({ secondsPerBlock: 15 });
+    await this.developerClient.updateSettings({ millisecondsPerBlock: 15000 });
 
     await this.build();
   }

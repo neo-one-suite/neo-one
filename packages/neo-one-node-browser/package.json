@@ -15,6 +15,7 @@
     "@neo-one/client-core": "^3.1.0",
     "@neo-one/node-blockchain": "^3.1.0",
     "@neo-one/node-core": "^3.1.0",
+    "@neo-one/node-native": "^3.1.0",
     "@neo-one/node-neo-settings": "^3.1.0",
     "@neo-one/node-protocol": "^3.1.0",
     "@neo-one/node-rpc-handler": "^3.1.0",

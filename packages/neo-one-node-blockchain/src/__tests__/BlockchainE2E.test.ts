@@ -1,4 +1,3 @@
-// this should be an e2e actually but zoom zoom
 import { NativeContainer } from '@neo-one/node-native';
 import { main } from '@neo-one/node-neo-settings';
 import { storage as levelupStorage } from '@neo-one/node-storage-levelup';
@@ -7,11 +6,12 @@ import LevelDOWN from 'leveldown';
 import LevelUp from 'levelup';
 import { Blockchain } from '../Blockchain';
 
+// TODO: this should be e2e test
 describe('blockchain persist genesis block test', () => {
   test('test', async () => {
     const blockchainSettings = main();
     const genesisHash = blockchainSettings.genesisBlock.hash;
-    const levelDBPath = '/Users/danielbyrne/Desktop/test-location';
+    const levelDBPath = '/Users/spencercorwin/Desktop/test-location';
     const db = LevelUp(LevelDOWN(levelDBPath));
     const storage = levelupStorage({
       db,

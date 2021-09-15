@@ -30,7 +30,7 @@ export class VersionPayload {
     const capabilities = reader.readArray(() => deserializeNodeCapabilityWireBase(options), this.maxCapabilities);
 
     if (Set(capabilities).size !== capabilities.length) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError('Capabilities has a duplicate in VersionPayload');
     }
 
     return new VersionPayload({

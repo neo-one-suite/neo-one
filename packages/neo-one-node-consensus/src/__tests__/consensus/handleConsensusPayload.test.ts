@@ -5,6 +5,7 @@ import {
   ChangeViewConsensusMessage,
   ChangeViewReason,
   ConsensusContext,
+  Header,
   TransactionVerificationContext,
   Witness,
 } from '@neo-one/node-core';
@@ -21,7 +22,6 @@ describe('handleConsensusPayload', () => {
   let node = {} as any;
   const getGasBalance = jest.fn(() => Promise.resolve(new BN(0)));
   let backupContext: ConsensusContext;
-  let primaryContext: ConsensusContext;
   let knownHashes: Set<UInt256Hex>;
   const blockchain = {
     getNextBlockValidators: jest.fn(() => keys.map(({ publicKey }) => publicKey)),
@@ -30,6 +30,8 @@ describe('handleConsensusPayload', () => {
       network: 2345123,
     },
   };
+  const validatorIndex = 10;
+  const blockIndex = 100;
   beforeEach(() => {
     node = {
       getNewTransactionVerificationContext: jest.fn(() => new TransactionVerificationContext({ getGasBalance })),
@@ -37,7 +39,6 @@ describe('handleConsensusPayload', () => {
       // tslint:disable-next-line no-any
     } as any;
     backupContext = context.getBackupContext(getGasBalance);
-    primaryContext = context.getPrimaryContext(getGasBalance);
     knownHashes = new Set<UInt256Hex>();
   });
 
@@ -50,6 +51,8 @@ describe('handleConsensusPayload', () => {
         viewNumber: backupContext.viewNumber,
         timestamp: new BN(Date.now()),
         reason: ChangeViewReason.ChangeAgreement,
+        validatorIndex,
+        blockIndex,
       }),
 
       privateKey: context.backupPrivateKey,
@@ -67,6 +70,8 @@ describe('handleConsensusPayload', () => {
           viewNumber: backupContext.viewNumber,
           timestamp: new BN(Date.now()),
           reason: ChangeViewReason.ChangeAgreement,
+          validatorIndex,
+          blockIndex,
         }),
 
         privateKey: context.backupPrivateKey,
@@ -92,13 +97,18 @@ describe('handleConsensusPayload', () => {
     });
 
     const genesisBlock = new Block({
-      previousHash: common.ZERO_UINT256,
-      timestamp: new BN(Date.now()),
-      index: 0,
-      nextConsensus: consensusAddress,
-      witness: deployWitness,
+      header: new Header({
+        merkleRoot: common.ZERO_UINT256,
+        nonce: new BN(Math.random() * 100000),
+        primaryIndex: 1,
+        previousHash: common.ZERO_UINT256,
+        timestamp: new BN(Date.now()),
+        index: 0,
+        nextConsensus: consensusAddress,
+        witness: deployWitness,
+        network: 7630401,
+      }),
       transactions: [],
-      network: 7630401,
     });
   });
 });
