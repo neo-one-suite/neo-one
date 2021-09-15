@@ -1,4 +1,4 @@
-import { StackItemType } from '@neo-one/client-common';
+import { StackItemType, toStackItemTypeJSON } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { ContractParameter } from '../contractParameter';
 
@@ -17,20 +17,20 @@ export abstract class StackItemBase {
   }
 
   public getBoolean(): boolean {
-    throw new Error('method not implemented');
+    throw new Error(`getBoolean method not implemented for ${toStackItemTypeJSON(this.type)} stack item`);
   }
 
   public getInteger(): BN {
-    throw new Error('method not implemented');
+    throw new Error(`getInteger method not implemented for ${toStackItemTypeJSON(this.type)} stack item`);
   }
 
   // tslint:disable-next-line: no-any
   public getInterface<T>(_isFunc?: (value: any) => value is T): T | undefined {
-    throw new Error('method not implemented');
+    throw new Error(`getInterface method not implemented for ${toStackItemTypeJSON(this.type)} stack item`);
   }
 
   public getBuffer(): Buffer {
-    throw new Error('method not implemented');
+    throw new Error(`getBuffer method not implemented for ${toStackItemTypeJSON(this.type)} stack item`);
   }
 
   public getString(): string {
@@ -39,6 +39,6 @@ export abstract class StackItemBase {
 
   public toContractParameter(): ContractParameter {
     /* istanbul ignore next */
-    throw new Error('method not implemented');
+    throw new Error(`toContractParameter method not implemented for ${toStackItemTypeJSON(this.type)} stack item`);
   }
 }

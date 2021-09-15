@@ -20,13 +20,13 @@ export function getExecutionResult(result: {
     return new ExecutionResultError({
       gasConsumed: result.gasConsumed,
       stack: result.stack.map((item) => item.toContractParameter()),
-      message: result.exception === undefined ? 'Unknown Error' : result.exception,
+      message: result.exception === undefined ? 'Unknown execution error' : result.exception,
     });
   } catch (error) {
     return new ExecutionResultError({
       gasConsumed: utils.ZERO,
-      stack: [],
-      message: error.message,
+      stack: result.stack.map((item) => item.toContractParameter()),
+      message: `Error while converting execution result: ${error.message}`,
     });
   }
 }

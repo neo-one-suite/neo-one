@@ -6,6 +6,7 @@ import {
   AttributeJSON,
   AttributeTypeModel,
   Block,
+  BlockDataJSON,
   BlockJSON,
   CallReceiptJSON,
   ConfirmedTransaction,
@@ -44,6 +45,7 @@ import {
   OracleResponseJSON,
   RawAction,
   RawApplicationLogData,
+  RawBlockData,
   RawCallReceipt,
   RawExecutionData,
   RawExecutionResult,
@@ -181,6 +183,7 @@ export function convertAction(
   if (action.type === 'Log') {
     return {
       type: 'Log',
+      source: action.source,
       version: action.version,
       blockIndex,
       blockHash,
@@ -196,6 +199,7 @@ export function convertAction(
 
   return {
     type: 'Notification',
+    source: action.source,
     version: action.version,
     blockIndex,
     blockHash,
@@ -311,6 +315,26 @@ export function convertBlock(block: BlockJSON): Block {
     witnesses: block.witnesses,
     size: block.size,
     transactions: block.tx.map(convertConfirmedTransaction),
+    blockData: convertBlockData(block, block.blockData),
+  };
+}
+
+export function convertBlockData(block: BlockJSON, data?: BlockDataJSON): RawBlockData {
+  if (data === undefined) {
+    throw new Error('Expected to get block data');
+  }
+
+  return {
+    blockActions: data.blockActions.map((action, idx) =>
+      convertAction(
+        block.hash,
+        block.index,
+        '0x​​​​​0000000000000000000000000000000000000000000000000000000000000000​​​​​',
+        0,
+        idx,
+        action,
+      ),
+    ),
   };
 }
 

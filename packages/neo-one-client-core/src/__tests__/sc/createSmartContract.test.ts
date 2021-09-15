@@ -24,9 +24,9 @@ describe('createSmartContract', () => {
   } as any;
 
   const definition = factory.createSmartContractDefinition();
-  let contract = createSmartContract({ definition, client });
+  let contract = createSmartContract({ definition, client, isNEOONEContract: true });
   beforeEach(() => {
-    contract = createSmartContract({ definition, client });
+    contract = createSmartContract({ definition, client, isNEOONEContract: true });
   });
 
   test('definition', () => {

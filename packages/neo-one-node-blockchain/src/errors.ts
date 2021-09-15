@@ -26,11 +26,15 @@ export const ConsensusPayloadVerifyError = makeErrorWithCode(
 );
 export const PersistNativeContractsError = makeErrorWithCode(
   'PERSIST_NATIVE_CONTRACTS_FAILED',
-  () => 'Engine state !== HALT when persisting native contract scripts',
+  (message?: string) =>
+    `Engine state !== HALT when persisting native contract scripts${
+      message !== undefined ? `. Message: ${message}` : ''
+    }`,
 );
 export const PostPersistError = makeErrorWithCode(
   'POST_PERSIST_SCRIPT_FAILED',
-  () => 'Engine state !== HALT when running post persist scripts',
+  (message?: string) =>
+    `Engine state !== HALT when running post persist scripts${message !== undefined ? `. Message: ${message}` : ''}`,
 );
 export const ContractStateFetchError = makeErrorWithCode(
   'FETCH_CONTRACT_FAILED',

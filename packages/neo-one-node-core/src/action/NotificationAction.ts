@@ -25,19 +25,21 @@ export class NotificationAction
       scriptHash: action.scriptHash,
       eventName,
       args,
+      source: action.source,
     });
   }
 
   public readonly args: readonly ContractParameter[];
   public readonly eventName: string;
 
-  public constructor({ version, index, scriptHash, eventName, args }: NotificationActionAdd) {
+  public constructor({ version, index, scriptHash, eventName, args, source }: NotificationActionAdd) {
     const options = {
       // tslint:disable-next-line no-useless-cast
       type: ActionType.Notification as ActionType.Notification,
       version,
       index,
       scriptHash,
+      source,
     };
     super(options);
 
@@ -56,6 +58,7 @@ export class NotificationAction
 
     return {
       type: 'Notification',
+      source: action.source,
       version: action.version,
       index: action.index,
       scriptHash: action.scriptHash,

@@ -3,6 +3,7 @@ import { common, TriggerType, UInt160, VMState } from '@neo-one/client-common';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   Action,
+  ActionSource,
   ApplicationExecuted,
   assertByteStringStackItem,
   Batch,
@@ -61,11 +62,10 @@ export class PersistingBlockchain {
     readonly applicationsExecuted: readonly ApplicationExecuted[];
     readonly actions: readonly Action[];
     readonly lastGlobalActionIndex: BN;
+    readonly blockActionsCount: number;
   } {
     return this.vm.withSnapshots(({ main, clone }) => {
-      const appsExecuted: ApplicationExecuted[] = [];
-
-      const executed = this.vm.withApplicationEngine<ApplicationExecuted>(
+      const onPersistExecuted = this.vm.withApplicationEngine<ApplicationExecuted>(
         {
           trigger: TriggerType.OnPersist,
           snapshot: 'main',
@@ -84,32 +84,38 @@ export class PersistingBlockchain {
         },
       );
 
-      appsExecuted.push(executed);
-
       main.clone();
-
-      const { actions: onPersistActions, lastGlobalActionIndex: lastGlobalActionIndexOnPersist } =
-        this.getActionsFromAppExecuted(executed, lastGlobalActionIndexIn.add(utils.ONE));
 
       const {
         transactionData,
         executedTransactions,
         actions: txActions,
         lastGlobalActionIndex: lastGlobalActionIndexTxs,
-      } = this.persistTransactions(block, main, clone, lastGlobalActionIndexOnPersist, lastGlobalTransactionIndex);
+      } = this.persistTransactions(
+        block,
+        main,
+        clone,
+        lastGlobalActionIndexIn.add(utils.ONE),
+        lastGlobalTransactionIndex,
+      );
 
       const postPersistExecuted = this.postPersist(block);
-      const { actions: blockActions, lastGlobalActionIndex } = this.getActionsFromAppExecuted(
+
+      const { actions: onPersistActions, lastGlobalActionIndex: lastGlobalActionIndexOnPersist } =
+        this.getActionsFromAppExecuted(onPersistExecuted, lastGlobalActionIndexTxs, ActionSource.Block);
+      const { actions: postPersistActions, lastGlobalActionIndex } = this.getActionsFromAppExecuted(
         postPersistExecuted,
-        lastGlobalActionIndexTxs,
+        lastGlobalActionIndexOnPersist,
+        ActionSource.Block,
       );
 
       return {
         changeBatch: main.getChangeSet(),
         transactionData,
-        actions: onPersistActions.concat(txActions, blockActions),
+        blockActionsCount: onPersistActions.length + postPersistActions.length,
+        actions: txActions.concat(onPersistActions, postPersistActions),
         lastGlobalActionIndex: lastGlobalActionIndex.sub(utils.ONE),
-        applicationsExecuted: appsExecuted.concat(executedTransactions).concat(postPersistExecuted),
+        applicationsExecuted: executedTransactions.concat(onPersistExecuted).concat(postPersistExecuted),
       };
     });
   }
@@ -117,6 +123,7 @@ export class PersistingBlockchain {
   private getActionsFromAppExecuted(
     appExecuted: ApplicationExecuted,
     lastGlobalActionIndexIn: BN,
+    source: ActionSource,
   ): { readonly actions: readonly Action[]; readonly lastGlobalActionIndex: BN } {
     let lastGlobalActionIndex = lastGlobalActionIndexIn;
     const actions: Action[] = [];
@@ -124,7 +131,8 @@ export class PersistingBlockchain {
     appExecuted.notifications.forEach((notification) => {
       actions.push(
         new NotificationAction({
-          index: lastGlobalActionIndexIn,
+          source,
+          index: lastGlobalActionIndex,
           scriptHash: notification.scriptHash,
           eventName: notification.eventName,
           args: notification.state.map((n) => n.toContractParameter()),
@@ -136,7 +144,8 @@ export class PersistingBlockchain {
     appExecuted.logs.forEach((log) => {
       actions.push(
         new LogAction({
-          index: lastGlobalActionIndexIn,
+          source,
+          index: lastGlobalActionIndex,
           scriptHash: log.callingScriptHash,
           message: log.message,
           position: log.position,
@@ -224,6 +233,7 @@ export class PersistingBlockchain {
         const { actions: newActions, lastGlobalActionIndex } = this.getActionsFromAppExecuted(
           appExecuted,
           lastGlobalActionIndexIn,
+          ActionSource.Transaction,
         );
 
         const executionResult = getExecutionResult(appExecuted);

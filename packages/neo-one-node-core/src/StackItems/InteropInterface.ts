@@ -1,4 +1,5 @@
 import { StackItemType } from '@neo-one/client-common';
+import { ContractParameter, InteropInterfaceContractParameter } from '../contractParameter';
 import { InvalidInteropInterfaceValueError, InvalidStackItemCastError } from '../errors';
 import { StackItemBase } from './StackItemBase';
 
@@ -29,5 +30,9 @@ export class InteropInterface extends StackItemBase {
     }
 
     throw new InvalidStackItemCastError();
+  }
+
+  public toContractParameter(): ContractParameter {
+    return new InteropInterfaceContractParameter();
   }
 }

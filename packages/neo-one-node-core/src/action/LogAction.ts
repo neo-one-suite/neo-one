@@ -21,19 +21,21 @@ export class LogAction extends ActionBase<ActionType.Log> implements Serializabl
       scriptHash: action.scriptHash,
       message,
       position,
+      source: action.source,
     });
   }
 
   public readonly message: string;
   public readonly position: number;
 
-  public constructor({ version, index, scriptHash, message, position }: LogAdd) {
+  public constructor({ version, index, scriptHash, message, position, source }: LogAdd) {
     const options = {
       // tslint:disable-next-line no-useless-cast
       type: ActionType.Log as ActionType.Log,
       version,
       index,
       scriptHash,
+      source,
     };
     super(options);
 
@@ -52,6 +54,7 @@ export class LogAction extends ActionBase<ActionType.Log> implements Serializabl
 
     return {
       type: 'Log',
+      source: action.source,
       version: action.version,
       index: action.index,
       scriptHash: action.scriptHash,
