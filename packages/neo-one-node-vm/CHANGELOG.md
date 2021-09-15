@@ -1,6 +1,13 @@
 # Change Log - @neo-one/node-vm
 
-This log was last generated on Tue, 15 Jun 2021 01:21:56 GMT and should not be manually modified.
+This log was last generated on Tue, 14 Sep 2021 21:24:27 GMT and should not be manually modified.
+
+## 2.7.4
+Tue, 14 Sep 2021 21:24:27 GMT
+
+### Patches
+
+- Bump NEO•ONE versions for patch publish
 
 ## 2.7.3
 Tue, 15 Jun 2021 01:21:56 GMT

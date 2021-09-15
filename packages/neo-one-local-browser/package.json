@@ -16,7 +16,7 @@
     "@neo-one/client-core": "^2.7.3",
     "@neo-one/node-browser": "^2.3.0",
     "@neo-one/smart-contract-codegen": "^2.7.3",
-    "@neo-one/smart-contract-compiler": "^2.7.3",
+    "@neo-one/smart-contract-compiler": "^2.7.4",
     "@neo-one/utils": "^2.6.1",
     "@neo-one/worker": "^2.3.0",
     "core-js": "^3.2.1",

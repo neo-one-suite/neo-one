@@ -2,6 +2,18 @@
   "name": "@neo-one/node-rpc-handler",
   "entries": [
     {
+      "version": "2.7.4",
+      "tag": "@neo-one/node-rpc-handler_v2.7.4",
+      "date": "Tue, 14 Sep 2021 21:24:27 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Bump NEO•ONE versions for patch publish"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.7.3",
       "tag": "@neo-one/node-rpc-handler_v2.7.3",
       "date": "Tue, 15 Jun 2021 01:21:56 GMT",

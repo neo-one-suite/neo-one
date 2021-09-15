@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-bin",
-  "version": "2.7.3",
+  "version": "2.7.4",
   "description": "NEO•ONE NEO executable full node.",
   "bin": {
     "neo-one-node": "bin/neo-one-node.js"
@@ -15,8 +15,8 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/logger": "^2.6.2",
-    "@neo-one/node": "^2.7.3",
-    "@neo-one/node-neo-settings": "^2.7.3",
+    "@neo-one/node": "^2.7.4",
+    "@neo-one/node-neo-settings": "^2.7.4",
     "@neo-one/utils": "^2.6.1",
     "@neo-one/utils-node": "^2.6.1",
     "@types/yargs": "^13.0.3",

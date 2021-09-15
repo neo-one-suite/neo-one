@@ -2,6 +2,18 @@
   "name": "@neo-one/node-core",
   "entries": [
     {
+      "version": "2.7.4",
+      "tag": "@neo-one/node-core_v2.7.4",
+      "date": "Tue, 14 Sep 2021 06:29:40 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Stop GAS generation at block 8M"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.7.3",
       "tag": "@neo-one/node-core_v2.7.3",
       "date": "Tue, 15 Jun 2021 01:21:56 GMT",

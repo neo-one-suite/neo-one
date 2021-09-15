@@ -14,7 +14,7 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/client": "^2.7.3",
-    "@neo-one/client-full-core": "^2.7.3"
+    "@neo-one/client-full-core": "^2.7.4"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
