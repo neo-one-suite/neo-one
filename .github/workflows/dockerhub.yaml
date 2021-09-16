@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - master-2.x
   release:
     types: [created]
 jobs:
