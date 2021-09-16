@@ -288,7 +288,7 @@
     },
     {
       "name": "@neo-one/node-native",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "web" ]
     },
     {
       "name": "@neo-one/node-neo-settings",
