@@ -236,7 +236,6 @@ export const convertAction = ({
     throw new InvalidEventError('Notification had no arguments');
   }
 
-  // TODO: check this
   const eventSpec = events[event];
   if (eventSpec === undefined) {
     return event;
@@ -244,6 +243,7 @@ export const convertAction = ({
 
   return {
     version: action.version,
+    source: action.source,
     blockIndex: action.blockIndex,
     blockHash: action.blockHash,
     transactionIndex: action.transactionIndex,

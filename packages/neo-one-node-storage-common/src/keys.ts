@@ -99,8 +99,10 @@ const createTransactionDataKey = getCreateKey<TransactionDataKey>({
   prefix: Prefix.TransactionData,
 });
 
+const serializeActionKey = (key: ActionKey) => key.index.toArrayLike(Buffer, 'be', 8);
+
 const createActionKey = getCreateKey<ActionKey>({
-  serializeKey: (key) => key.index.toBuffer(),
+  serializeKey: serializeActionKey,
   prefix: Prefix.Action,
 });
 
@@ -151,6 +153,7 @@ export const keys = {
   createStorageKey,
   createBlockDataKey,
   createTransactionDataKey,
+  serializeActionKey,
   createActionKey,
   getStorageSearchRange,
   getNep17BalanceSearchRange,

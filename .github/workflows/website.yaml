@@ -2,12 +2,12 @@ name: Cypress
 on:
   push:
     branches:
-      - master
+      - master-2.x
       - staging
       - trying
   pull_request:
     branches:
-      - master
+      - master-2.x
       - staging
       - trying
 jobs:

@@ -8,7 +8,7 @@ import { NEOONEDataProvider, NEOONEProvider } from '../provider';
 import { LocalKeyStore, LocalMemoryStore, LocalUserAccountProvider } from '../user';
 describe('nep17', () => {
   test('abi', () => {
-    expect(nep17.abi(4)).toMatchSnapshot();
+    expect(nep17.abi(4, true)).toMatchSnapshot();
   });
 
   const smartContract: { decimals?: () => BigNumber } = {};
@@ -20,13 +20,13 @@ describe('nep17', () => {
   test('getDecimals', async () => {
     smartContract.decimals = jest.fn(() => data.bigNumbers.a);
 
-    const result = await nep17.getDecimals(client, factory.createSmartContractDefinition().networks, 'main');
+    const result = await nep17.getDecimals(client, factory.createSmartContractDefinition().networks, 'main', true);
 
     expect(result).toEqual(data.bigNumbers.a.toNumber());
   });
 
   test('createNEP17SmartContract', () => {
-    const contract = nep17.createNEP17SmartContract(client, factory.createSmartContractDefinition().networks, 8);
+    const contract = nep17.createNEP17SmartContract(client, factory.createSmartContractDefinition().networks, 8, true);
 
     expect(contract).toEqual(smartContract);
     expect(clientSmartContract.mock.calls).toMatchSnapshot();
@@ -45,7 +45,7 @@ describe('nep17', () => {
     const gas = nep17.createNEP17SmartContract(myClient, gasNetwork, 8, false);
 
     const [symbol, totalSupply] = await Promise.all([gas.symbol(), gas.totalSupply()]);
-    console.log(symbol, totalSupply);
+    console.log(symbol, totalSupply.toString());
   });
 
   test.only('nep17 with NEO', async () => {
@@ -61,6 +61,6 @@ describe('nep17', () => {
     const neo = nep17.createNEP17SmartContract(myClient, neoNetwork, 0, false);
 
     const [symbol, totalSupply] = await Promise.all([neo.symbol(), neo.totalSupply()]);
-    console.log(symbol, totalSupply);
+    console.log(symbol, totalSupply.toString());
   });
 });

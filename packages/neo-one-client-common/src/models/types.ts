@@ -159,6 +159,7 @@ export interface RawInvocationResultSuccessJSON {
 export type RawInvocationResultJSON = RawInvocationResultSuccessJSON | RawInvocationResultErrorJSON;
 
 export interface ActionBaseJSON {
+  readonly source: 'Transaction' | 'Block';
   readonly version: number;
   readonly index: string;
   readonly scriptHash: string;
@@ -423,6 +424,11 @@ export interface HeaderJSON {
 
 export interface BlockJSON extends HeaderJSON {
   readonly tx: readonly ConfirmedTransactionJSON[];
+  readonly blockData?: BlockDataJSON;
+}
+
+export interface BlockDataJSON {
+  readonly blockActions: readonly ActionJSON[];
 }
 
 export interface NetworkSettingsJSON {

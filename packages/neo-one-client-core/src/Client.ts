@@ -422,12 +422,12 @@ export class Client<
    */
   public smartContract<T extends SmartContract<any, any> = SmartContractAny>(
     definition: SmartContractDefinition,
-    isNEOONEContract: boolean | undefined = true,
+    isNEOONEContract: boolean,
   ): T {
     return createSmartContract({
       definition: args.assertSmartContractDefinition('definition', definition),
       client: this,
-      isNEOONEContract,
+      isNEOONEContract: args.assertBoolean('isNEOONEContract', isNEOONEContract),
       // tslint:disable-next-line no-any
     }) as any;
   }

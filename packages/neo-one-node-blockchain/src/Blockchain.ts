@@ -13,6 +13,7 @@ import {
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   Action,
+  ActionSource,
   ApplicationExecuted,
   ApplicationLog,
   Block,
@@ -34,6 +35,7 @@ import {
   NotificationAction,
   RunEngineOptions,
   RunEngineResult,
+  SerializableBlockData,
   SerializableTransactionData,
   SerializeJSONContext,
   Signers,
@@ -199,6 +201,7 @@ export class Blockchain {
       addressVersion: this.settings.addressVersion,
       network: this.settings.network,
       tryGetTransactionData: this.tryGetTransactionData,
+      tryGetBlockData: this.tryGetBlockData,
     };
   }
 
@@ -502,6 +505,7 @@ export class Blockchain {
           scriptHash: notification.scriptHash,
           eventName: notification.eventName,
           args: notification.state.map((n) => n.toContractParameter()),
+          source: ActionSource.Transaction,
         }),
       );
 
@@ -515,6 +519,7 @@ export class Blockchain {
           scriptHash: log.callingScriptHash,
           message: log.message,
           position: log.position,
+          source: ActionSource.Transaction,
         }),
       );
 
@@ -528,6 +533,32 @@ export class Blockchain {
       actions,
     };
   }
+
+  private readonly tryGetBlockData = async (hash: UInt256): Promise<SerializableBlockData | undefined> => {
+    const blockData = await this.blockData.tryGet({ hash });
+
+    if (blockData === undefined) {
+      return undefined;
+    }
+
+    const count = blockData.blockActionsCount;
+    const lookupStart = blockData.lastGlobalActionIndex.subn(count - 1).toArrayLike(Buffer, 'be', 8);
+    const lookupEnd = blockData.lastGlobalActionIndex.toArrayLike(Buffer, 'be', 8);
+
+    const blockActions = await (count === 0
+      ? Promise.resolve([])
+      : this.action
+          .find$(lookupStart, lookupEnd)
+          .pipe(
+            map(({ value }) => value),
+            toArray(),
+          )
+          .toPromise());
+
+    return {
+      blockActions,
+    };
+  };
 
   private readonly tryGetTransactionData = async (hash: UInt256): Promise<SerializableTransactionData | undefined> => {
     const data = await this.transactionData.tryGet({ hash });
@@ -554,7 +585,10 @@ export class Blockchain {
       data.actionIndexStart.eq(data.actionIndexStop)
         ? Promise.resolve([])
         : this.action
-            .find$(data.actionIndexStart.toBuffer(), data.actionIndexStop.sub(utils.ONE).toBuffer())
+            .find$(
+              data.actionIndexStart.toArrayLike(Buffer, 'be', 8),
+              data.actionIndexStop.sub(utils.ONE).toArrayLike(Buffer, 'be', 8),
+            )
             .pipe(
               map(({ value }) => value),
               toArray(),
@@ -891,9 +925,11 @@ export class Blockchain {
     block,
     lastGlobalActionIndex,
     prevBlockData,
+    blockActionsCount,
   }: {
     readonly block: Block;
     readonly lastGlobalActionIndex: BN;
+    readonly blockActionsCount: number;
     readonly prevBlockData: { readonly lastGlobalActionIndex: BN; readonly lastGlobalTransactionIndex: BN };
   }): ChangeSet {
     return [
@@ -907,6 +943,7 @@ export class Blockchain {
             hash: block.hash,
             lastGlobalActionIndex,
             lastGlobalTransactionIndex: prevBlockData.lastGlobalTransactionIndex.add(new BN(block.transactions.length)),
+            blockActionsCount,
           }),
         },
       },
@@ -967,6 +1004,7 @@ export class Blockchain {
       applicationsExecuted,
       actions,
       lastGlobalActionIndex,
+      blockActionsCount,
     } = blockchain.persistBlock(block, prevBlockData.lastGlobalActionIndex, prevBlockData.lastGlobalTransactionIndex);
     await this.storage.commitBatch(persistBatch);
 
@@ -976,7 +1014,12 @@ export class Blockchain {
     const transactionDataUpdates = this.getTransactionDataChangeSet(transactionData);
     await this.storage.commit(transactionDataUpdates);
 
-    const blockDataUpdates = this.getBlockDataUpdates({ block, lastGlobalActionIndex, prevBlockData });
+    const blockDataUpdates = this.getBlockDataUpdates({
+      block,
+      lastGlobalActionIndex,
+      prevBlockData,
+      blockActionsCount,
+    });
     await this.storage.commit(blockDataUpdates);
 
     this.updateBlockMetadata(block);

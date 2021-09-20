@@ -83,6 +83,7 @@ export interface SerializeJSONContext {
   readonly addressVersion: number;
   readonly network: number;
   readonly tryGetTransactionData: (hash: UInt256) => Promise<SerializableTransactionData | undefined>;
+  readonly tryGetBlockData: (hash: UInt256) => Promise<SerializableBlockData | undefined>;
 }
 
 export interface SerializableTransactionData {
@@ -95,6 +96,10 @@ export interface SerializableTransactionData {
   readonly updatedContracts: readonly ContractState[];
   readonly executionResult: ExecutionResult;
   readonly actions: readonly Action[];
+}
+
+export interface SerializableBlockData {
+  readonly blockActions: readonly Action[];
 }
 
 export type SerializeJSON<TJSON> = (context: SerializeJSONContext) => TJSON | Promise<TJSON>;

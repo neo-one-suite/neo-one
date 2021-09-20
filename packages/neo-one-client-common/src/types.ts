@@ -274,6 +274,17 @@ export interface Block extends Header {
    * `Transaction`s contained in the `Block`.
    */
   readonly transactions: readonly ConfirmedTransaction[];
+  /**
+   * Extra block data produced by persisting the `Block`.
+   */
+  readonly blockData: RawBlockData;
+}
+
+export interface RawBlockData {
+  /**
+   * Actions produced by the `onPersist` and `postPersist` scrips run when persisting the `Block`.
+   */
+  readonly blockActions: readonly RawAction[];
 }
 
 /**
@@ -2217,6 +2228,10 @@ export interface RawExecutionResultError extends RawExecutionResultBase {
  * Base properties of `Event`s and `Log`s as well as their raw counterparts, `RawNotification` and `RawLog`, respectively.
  */
 export interface RawActionBase {
+  /**
+   * Indicates whether the action was produced by a `Transaction` or a `Block`.
+   */
+  readonly source: 'Block' | 'Transaction';
   /**
    * NEO network version number.
    */

@@ -313,11 +313,11 @@ const createInvoke = ({
 export const createSmartContract = ({
   definition,
   client,
-  isNEOONEContract = true,
+  isNEOONEContract,
 }: {
   readonly definition: SmartContractDefinition;
   readonly client: Client;
-  readonly isNEOONEContract?: boolean;
+  readonly isNEOONEContract: boolean;
 }): SmartContractAny => {
   const {
     manifest: {

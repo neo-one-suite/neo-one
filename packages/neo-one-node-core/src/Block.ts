@@ -172,10 +172,17 @@ export class Block implements SerializableContainer, SerializableJSON<BlockJSON>
   }
 
   public async serializeJSON(context: SerializeJSONContext): Promise<BlockJSON> {
+    const maybeBlockData = await context.tryGetBlockData(this.hash);
+    const blockData =
+      maybeBlockData === undefined
+        ? undefined
+        : { blockActions: maybeBlockData.blockActions.map((action) => action.serializeJSON()) };
+
     return {
       ...this.header.serializeJSON(context),
       size: this.size,
       tx: await Promise.all(this.transactions.map(async (tx) => tx.serializeJSONWithData(context))),
+      blockData,
     };
   }
 }
