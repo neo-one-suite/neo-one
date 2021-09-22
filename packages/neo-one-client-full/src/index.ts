@@ -116,6 +116,7 @@ export {
   ObjectABI,
   ObjectABIParameter,
   ObjectABIReturn,
+  OracleResponse,
   Param,
   Peer,
   PrivateKeyString,

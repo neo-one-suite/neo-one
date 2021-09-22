@@ -24,6 +24,7 @@ export type ContractParameter =
   | Hash160ContractParameter
   | Hash256ContractParameter
   | ByteArrayContractParameter
+  | SignatureContractParameter
   | PublicKeyContractParameter
   | StringContractParameter
   | ArrayContractParameter

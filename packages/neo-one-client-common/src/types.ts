@@ -1796,7 +1796,7 @@ export interface NefFile {
   /**
    * The script of the contract.
    */
-  readonly script: string;
+  readonly script: BufferString;
   /**
    * The methods to be called statically.
    */
@@ -2528,8 +2528,8 @@ export interface Peer {
  * Raw storage value
  */
 export interface StorageItem {
-  readonly key: string;
-  readonly value: string;
+  readonly key: BufferString;
+  readonly value: BufferString;
 }
 
 /* END LOW-LEVEL API */

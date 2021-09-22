@@ -4,6 +4,7 @@ import {
   createSerializeWire,
   InvalidFormatError,
   JSONHelper,
+  StorageItemJSON,
 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
 import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableWire } from './Serializable';
@@ -96,7 +97,7 @@ export class StorageItem implements SerializableWire {
     });
   }
 
-  public serializeJSON(key: StorageKey) {
+  public serializeJSON(key: StorageKey): StorageItemJSON {
     return {
       key: JSONHelper.writeBase64Buffer(key.serializeWire()),
       value: JSONHelper.writeBase64Buffer(this.value),

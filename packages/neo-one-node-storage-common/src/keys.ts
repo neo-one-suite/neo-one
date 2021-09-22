@@ -38,6 +38,7 @@ const getCreateKey = <Key>({
 };
 
 /* Daniel Byrne: This is a crude method but it does what we want it to do */
+/* Spencer: This is terrible and needs to be removed */
 const generateSearchRange = (lookupKey: Buffer): Required<StreamOptions> => {
   const asBN = new BN(lookupKey);
   const lte = asBN.addn(1).toBuffer();

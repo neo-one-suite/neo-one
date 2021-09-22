@@ -42,7 +42,7 @@ export class ByteArrayContractParameter extends ContractParameterBase<
   public serializeJSON(): ByteArrayContractParameterJSON {
     return {
       type: 'ByteArray',
-      value: JSONHelper.writeBuffer(this.value),
+      value: JSONHelper.writeBase64Buffer(this.value),
     };
   }
 }

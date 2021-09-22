@@ -127,6 +127,7 @@ export {
   RawVMNotification,
   InvocationResultSuccess,
   InvocationResultError,
+  OracleResponse,
   RelayTransactionResult,
   Return,
   ScriptBuilderParam,

@@ -17,7 +17,7 @@ export class ContractGroupModel implements SerializableJSON<ContractGroupJSON> {
   public serializeJSON(): ContractGroupJSON {
     return {
       publicKey: JSONHelper.writeECPoint(this.publicKey),
-      signature: JSONHelper.writeBuffer(this.signature),
+      signature: JSONHelper.writeBase64Buffer(this.signature),
     };
   }
 }

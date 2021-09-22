@@ -68,6 +68,8 @@ import {
   TransactionReceiptJSON,
   VerifyResultJSON,
   VerifyResultModel,
+  Witness,
+  WitnessJSON,
 } from '@neo-one/client-common';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
@@ -141,12 +143,16 @@ export function convertContractManifest(manifest: ContractManifestJSON): Contrac
   };
 }
 
+export function convertBase64Buffer(base64Str: string) {
+  return Buffer.from(base64Str, 'base64').toString('hex');
+}
+
 export function convertNefFile(nef: NefFileJSON): NefFile {
   return {
     magic: nef.magic,
     compiler: nef.compiler,
     tokens: nef.tokens.map(convertMethodToken),
-    script: nef.script,
+    script: convertBase64Buffer(nef.script),
     checksum: nef.checksum,
   };
 }
@@ -161,7 +167,7 @@ export function convertContractPermission(permission: ContractPermissionJSON): C
 export function convertContractGroup(group: ContractGroupJSON): ContractGroup {
   return {
     publicKey: group.publicKey,
-    signature: group.signature,
+    signature: convertBase64Buffer(group.signature),
   };
 }
 
@@ -253,7 +259,7 @@ export function convertContractParameter(parameter: ContractParameterJSON): Cont
     case 'ByteArray':
       return {
         type: 'Buffer',
-        value: parameter.value,
+        value: convertBase64Buffer(parameter.value),
       };
     case 'Hash160':
       return {
@@ -294,8 +300,15 @@ export function convertContractParameter(parameter: ContractParameterJSON): Cont
 
 export function convertStorageItem(storageItem: StorageItemJSON): StorageItem {
   return {
-    key: storageItem.key,
-    value: storageItem.value,
+    key: convertBase64Buffer(storageItem.key),
+    value: convertBase64Buffer(storageItem.value),
+  };
+}
+
+export function convertWitness(witness: WitnessJSON): Witness {
+  return {
+    invocation: convertBase64Buffer(witness.invocation),
+    verification: convertBase64Buffer(witness.verification),
   };
 }
 
@@ -311,8 +324,8 @@ export function convertBlock(block: BlockJSON): Block {
     primaryIndex: block.primary,
     index: block.index,
     nextConsensus: block.nextconsensus,
-    witness: block.witnesses[0],
-    witnesses: block.witnesses,
+    witness: convertWitness(block.witnesses[0]),
+    witnesses: block.witnesses.map(convertWitness),
     size: block.size,
     transactions: block.tx.map(convertConfirmedTransaction),
     blockData: convertBlockData(block, block.blockData),
@@ -350,8 +363,8 @@ export function convertTransaction(transaction: TransactionJSON): Transaction {
     systemFee: new BigNumber(transaction.sysfee),
     networkFee: new BigNumber(transaction.netfee),
     signers: transaction.signers.map(convertSigner),
-    script: transaction.script,
-    witnesses: transaction.witnesses,
+    script: convertBase64Buffer(transaction.script),
+    witnesses: transaction.witnesses.map(convertWitness),
   };
 }
 
@@ -402,7 +415,7 @@ export function convertAttribute(attribute: AttributeJSON): Attribute {
         type,
         id: new BigNumber(oracleJSON.id),
         code: oracleJSON.code,
-        result: oracleJSON.result,
+        result: convertBase64Buffer(oracleJSON.result),
       };
     default:
       throw new Error(`Unexpected attribute type: ${type}`);

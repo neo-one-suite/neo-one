@@ -1,6 +1,7 @@
 import {
   ApplicationLogJSON,
   assertTriggerTypeJSON,
+  BinaryWriter,
   BlockJSON,
   CallReceiptJSON,
   common,
@@ -12,6 +13,7 @@ import {
   NativeContractJSON,
   Nep17BalancesJSON,
   Nep17TransfersJSON,
+  Nep17TransferSource,
   NetworkSettingsJSON,
   Peer,
   PrivateNetworkSettings,
@@ -20,6 +22,7 @@ import {
   SendRawTransactionResultJSON,
   StorageItemJSON,
   toVerifyResultJSON,
+  toVMStateJSON,
   TransactionDataJSON,
   TransactionJSON,
   TransactionReceiptJSON,
@@ -166,11 +169,16 @@ const RPC_METHODS: { readonly [key: string]: string } = {
 const mapToTransfers = ({ key, value }: { readonly key: Nep17TransferKey; readonly value: Nep17Transfer }) => ({
   timestamp: key.timestampMS.toNumber(),
   assethash: common.uInt160ToString(key.assetScriptHash),
-  transferaddress: scriptHashToAddress(common.uInt160ToString(value.userScriptHash)),
+  transferaddress: value.userScriptHash.equals(common.ZERO_UINT160)
+    ? // tslint:disable-next-line: no-null-keyword
+      null
+    : scriptHashToAddress(common.uInt160ToString(value.userScriptHash)),
   amount: value.amount.toString(),
   blockindex: value.blockIndex,
   transfernotifyindex: key.blockTransferNotificationIndex,
   txhash: common.uInt256ToString(value.txHash),
+  source: value.source === Nep17TransferSource.Block ? 'Block' : 'Transaction',
+  state: toVMStateJSON(value.state),
 });
 
 const getScriptHashAndAddress = (param: string, addressVersion: number) => {
@@ -727,23 +735,38 @@ export const createHandler = ({
       const startTime = args[1] == undefined ? Date.now() - SEVEN_DAYS_IN_MS : args[1];
       const endTime = args[2] == undefined ? Date.now() : args[2];
 
+      let source = Nep17TransferSource.Transaction;
+      if (args[3] === 'All') {
+        source = Nep17TransferSource.All;
+      }
+      if (args[3] === 'Block') {
+        source = Nep17TransferSource.Block;
+      }
+
       if (endTime < startTime) {
         throw new JSONRPCError(-32602, 'Invalid params');
       }
 
-      const startTimeBytes = new BN(startTime, 'le').toBuffer();
-      const endTimeBytes = new BN(endTime, 'le').toBuffer();
-
+      const startTimeBytes = new BinaryWriter().writeUInt64LE(new BN(startTime)).toBuffer();
+      const endTimeBytes = new BinaryWriter().writeUInt64LE(new BN(endTime)).toBuffer();
       const gte = Buffer.concat([scriptHash, startTimeBytes]);
       const lte = Buffer.concat([scriptHash, endTimeBytes]);
 
       const sentPromise = blockchain.nep17TransfersSent
         .find$(gte, lte)
-        .pipe(take(1000), map(mapToTransfers), toArray())
+        .pipe(
+          filter(({ value }) => (source === Nep17TransferSource.All ? true : value.source === source)),
+          map(mapToTransfers),
+          toArray(),
+        )
         .toPromise();
       const receivedPromise = blockchain.nep17TransfersReceived
         .find$(gte, lte)
-        .pipe(take(1000), map(mapToTransfers), toArray())
+        .pipe(
+          filter(({ value }) => (source === Nep17TransferSource.All ? true : value.source === source)),
+          map(mapToTransfers),
+          toArray(),
+        )
         .toPromise();
 
       const [sent, received] = await Promise.all([sentPromise, receivedPromise]);
@@ -755,8 +778,7 @@ export const createHandler = ({
       };
     },
     [RPC_METHODS.getnep17balances]: async (args): Promise<Nep17BalancesJSON> => {
-      const addressVersion = blockchain.settings.addressVersion;
-      const { address, scriptHash } = getScriptHashAndAddress(args[0], addressVersion);
+      const { address, scriptHash } = getScriptHashAndAddress(args[0], blockchain.settings.addressVersion);
       const storedBalances = await blockchain.nep17Balances.find$(scriptHash).pipe(toArray()).toPromise();
       // TODO: need to check/test this but probably good
       const validBalances = await Promise.all(
