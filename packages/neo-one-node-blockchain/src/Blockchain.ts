@@ -1006,35 +1006,30 @@ export class Blockchain {
       lastGlobalActionIndex,
       blockActionsCount,
     } = blockchain.persistBlock(block, prevBlockData.lastGlobalActionIndex, prevBlockData.lastGlobalTransactionIndex);
-    await this.storage.commitBatch(persistBatch);
-
     const actionUpdates = this.getActionUpdates(actions);
-    await this.storage.commit(actionUpdates);
-
     const transactionDataUpdates = this.getTransactionDataChangeSet(transactionData);
-    await this.storage.commit(transactionDataUpdates);
-
     const blockDataUpdates = this.getBlockDataUpdates({
       block,
       lastGlobalActionIndex,
       prevBlockData,
       blockActionsCount,
     });
-    await this.storage.commit(blockDataUpdates);
+    const applicationLogUpdates = this.updateApplicationLogs({ applicationsExecuted });
+    const blockLogUpdate = this.updateBlockLog({ applicationsExecuted, block });
+    const allUpdates: ChangeSet = [
+      ...actionUpdates,
+      ...transactionDataUpdates,
+      ...blockDataUpdates,
+      ...applicationLogUpdates,
+      ...blockLogUpdate,
+    ];
 
-    this.updateBlockMetadata(block);
+    await Promise.all([this.storage.commitBatch(persistBatch), this.storage.commit(allUpdates)]);
 
     const nep17Updates = this.updateNep17Balances({ applicationsExecuted, block });
     await this.storage.commit(nep17Updates);
 
-    const applicationLogUpdates = this.updateApplicationLogs({ applicationsExecuted });
-    await this.storage.commit(applicationLogUpdates);
-
-    const blockLogUpdate = this.updateBlockLog({ applicationsExecuted, block });
-    if (blockLogUpdate.length > 0) {
-      await this.storage.commit(blockLogUpdate);
-    }
-
+    this.updateBlockMetadata(block);
     this.mutableExtensibleWitnessWhiteList = new ImmutableHashSetBuilder<UInt160>().toImmutable();
 
     await this.onPersist();

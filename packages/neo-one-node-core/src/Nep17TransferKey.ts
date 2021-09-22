@@ -1,14 +1,6 @@
-import { BinaryReader, createSerializeWire, IOHelper, Nep17TransferKeyModel, UInt160 } from '@neo-one/client-common';
-import { BN } from 'bn.js';
+import { BinaryReader, createSerializeWire, IOHelper, Nep17TransferKeyModel } from '@neo-one/client-common';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from './Serializable';
 import { utils } from './utils';
-
-export interface Nep17TransferKeyAdd {
-  readonly userScriptHash: UInt160;
-  readonly timestampMS: BN;
-  readonly assetScriptHash: UInt160;
-  readonly blockTransferNotificationIndex: number;
-}
 
 export class Nep17TransferKey extends Nep17TransferKeyModel {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Nep17TransferKey {

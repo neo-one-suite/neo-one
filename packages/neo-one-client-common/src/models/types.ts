@@ -5,6 +5,7 @@ import { ContractParameterTypeModel } from './ContractParameterTypeModel';
 import { AttributeTypeModel } from './transaction';
 import { TriggerTypeJSON } from './trigger';
 import { VerifyResultModel } from './VerifyResultModel';
+import { VMStateJSON } from './vm';
 import { WitnessScopeModel } from './WitnessScopeModel';
 
 export interface AnyContractParameterJSON {
@@ -398,11 +399,13 @@ export interface Nep17BalanceJSON {
 export interface Nep17TransferJSON {
   readonly timestamp: number;
   readonly assethash: string;
-  readonly transferaddress: string;
+  readonly transferaddress: string | null;
   readonly amount: string;
   readonly blockindex: number;
   readonly transfernotifyindex: number;
   readonly txhash: string;
+  readonly source: string;
+  readonly state: VMStateJSON;
 }
 
 export interface HeaderJSON {

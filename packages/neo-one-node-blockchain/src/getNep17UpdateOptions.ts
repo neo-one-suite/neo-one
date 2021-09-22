@@ -1,4 +1,4 @@
-import { common, VMState } from '@neo-one/client-common';
+import { common } from '@neo-one/client-common';
 import {
   ApplicationExecuted,
   Block,
@@ -29,15 +29,17 @@ export function getNep17UpdateOptions({
   readonly block: Block;
 }): Nep17UpdateOptions {
   let transferIndex = 0;
+  let blockTransferIndex = block.transactions.length;
   const nep17BalancesChanged = new Set<string>();
   const mutableNep17BalancesChangedKeys: Nep17BalanceKey[] = [];
   const mutableTransfersSent: Nep17TransferReturn[] = [];
   const mutableTransfersReceived: Nep17TransferReturn[] = [];
 
   applicationsExecuted.forEach((appExecuted) => {
-    if (appExecuted.state === VMState.FAULT) {
-      return;
-    }
+    // We capture FAULT executions as well for debugging purposes
+    // if (appExecuted.state === VMState.FAULT) {
+    //   return;
+    // }
 
     appExecuted.notifications.forEach((notifyEventArgs) => {
       const { container, scriptHash, eventName, state: stateItems } = notifyEventArgs;
@@ -97,9 +99,11 @@ export function getNep17UpdateOptions({
         }
       }
 
-      if (utils.isTransaction(container)) {
+      // We want to capture block transactions (ie minting and burning) as well for debugging purposes
+      if (utils.isTransaction(container) || container === undefined) {
+        const isBlock = container === undefined;
         const amount = amountItem.getInteger();
-        const txHash = container.hash;
+        const txHash = container === undefined ? block.hash : container.hash;
 
         if (!from.equals(common.ZERO_UINT160)) {
           mutableTransfersSent.push({
@@ -107,13 +111,15 @@ export function getNep17UpdateOptions({
               userScriptHash: from,
               timestampMS: block.header.timestamp,
               assetScriptHash: scriptHash,
-              blockTransferNotificationIndex: transferIndex,
+              blockTransferNotificationIndex: isBlock ? blockTransferIndex : transferIndex,
             }),
             value: new Nep17Transfer({
               userScriptHash: to,
               txHash,
               blockIndex: block.index,
               amountBuffer: amount.toBuffer(),
+              source: isBlock ? 'Block' : 'Transaction',
+              state: appExecuted.state,
             }),
           });
         }
@@ -124,18 +130,24 @@ export function getNep17UpdateOptions({
               userScriptHash: to,
               timestampMS: block.header.timestamp,
               assetScriptHash: scriptHash,
-              blockTransferNotificationIndex: transferIndex,
+              blockTransferNotificationIndex: isBlock ? blockTransferIndex : transferIndex,
             }),
             value: new Nep17Transfer({
               userScriptHash: from,
               txHash,
               blockIndex: block.index,
               amountBuffer: amount.toBuffer(),
+              source: isBlock ? 'Block' : 'Transaction',
+              state: appExecuted.state,
             }),
           });
         }
 
-        transferIndex += 1;
+        if (isBlock) {
+          blockTransferIndex += 1;
+        } else {
+          transferIndex += 1;
+        }
       }
     });
   });

@@ -3,11 +3,6 @@ import { BN } from 'bn.js';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from './Serializable';
 import { utils } from './utils';
 
-export interface Nep17BalanceAdd {
-  readonly balanceBuffer: Buffer;
-  readonly lastUpdatedBlock: number;
-}
-
 export class Nep17Balance extends Nep17BalanceModel {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Nep17Balance {
     const { reader } = options;

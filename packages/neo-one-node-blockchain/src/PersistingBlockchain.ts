@@ -232,7 +232,7 @@ export class PersistingBlockchain {
         const appExecuted = this.persistTransaction(transaction, main, clone, block);
         const { actions: newActions, lastGlobalActionIndex } = this.getActionsFromAppExecuted(
           appExecuted,
-          lastGlobalActionIndexIn,
+          acc.lastGlobalActionIndex,
           ActionSource.Transaction,
         );
 
@@ -250,7 +250,7 @@ export class PersistingBlockchain {
           deployedContractHashes,
           updatedContractHashes,
           executionResult,
-          actionIndexStart: lastGlobalActionIndexIn,
+          actionIndexStart: acc.lastGlobalActionIndex,
           actionIndexStop: lastGlobalActionIndex,
           transactionIndex,
           blockIndex: block.index,

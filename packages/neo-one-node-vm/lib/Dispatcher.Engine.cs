@@ -296,7 +296,7 @@ namespace NEOONE
 
     private string _getFaultException()
     {
-      return this.engine.FaultException?.ToString();
+      return this.engine.FaultException?.Message.ToString();
     }
 
     private bool _push(string item)
