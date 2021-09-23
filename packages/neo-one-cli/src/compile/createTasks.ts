@@ -26,12 +26,11 @@ export const createTasks = (path: string, outDir: string, options: CompileWriteO
           (ctx.foundContracts as Contracts).map((contract) => ({
             title: `Compile ${contract.name}`,
             task: async (innerCtx) => {
-              const { linked, sourceMaps, contract: result } = await compileContract(
-                contract.filePath,
-                contract.name,
-                innerCtx.linked,
-                innerCtx.sourceMaps,
-              );
+              const {
+                linked,
+                sourceMaps,
+                contract: result,
+              } = await compileContract(contract.filePath, contract.name, innerCtx.linked, innerCtx.sourceMaps);
 
               await writeContract(contract.filePath, result, outDir, options);
 

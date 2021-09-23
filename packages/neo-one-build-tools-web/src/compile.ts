@@ -16,8 +16,10 @@ const { argv } = yargs
 
 const stage = process.env.NEO_ONE_PROD === 'true' ? 'prod' : 'dev';
 
-const createDispose = (watcher: webpack.Compiler.Watching): (() => Promise<void>) => async () =>
-  new Promise<void>((resolve) => watcher.close(resolve));
+const createDispose =
+  (watcher: webpack.Compiler.Watching): (() => Promise<void>) =>
+  async () =>
+    new Promise<void>((resolve) => watcher.close(resolve));
 const watchConfig = (config: webpack.Configuration): (() => Promise<void>) =>
   createDispose(webpack(config).watch({}, () => undefined));
 const watchWorkers = () => watchConfig(workers({ stage }));

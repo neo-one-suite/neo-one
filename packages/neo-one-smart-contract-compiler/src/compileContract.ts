@@ -39,7 +39,11 @@ export const compileContract = async ({
       ? transpileContext
       : updateContext(transpileContext, { [filePath]: transpileResult.text });
 
-  const { sourceMap: finalSourceMap, contract, debugInfo } = await compile({
+  const {
+    sourceMap: finalSourceMap,
+    contract,
+    debugInfo,
+  } = await compile({
     sourceFile: tsUtils.file.getSourceFileOrThrow(context.program, filePath),
     context,
     linked,

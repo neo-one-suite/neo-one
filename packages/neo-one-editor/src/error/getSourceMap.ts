@@ -33,7 +33,12 @@ export class SourceMap {
     readonly line: number | undefined;
     readonly column: number | undefined;
   } {
-    const { name, line: l, column: c, source: s } = this.sourceMap.originalPositionFor({
+    const {
+      name,
+      line: l,
+      column: c,
+      source: s,
+    } = this.sourceMap.originalPositionFor({
       line,
       column,
     });

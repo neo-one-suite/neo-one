@@ -31,13 +31,10 @@ export function TransferTo({ to, onChangeTo, ...props }: Props & React.Component
   const addError = useAddError();
   const [tokens] = useTokens();
   const { client, userAccounts$, block$ } = useContext(DeveloperToolsContext);
-  const options = useStream(() => getWalletSelectorOptions$(addError, client, userAccounts$, block$, tokens), [
-    addError,
-    client,
-    userAccounts$,
-    block$,
-    tokens,
-  ]);
+  const options = useStream(
+    () => getWalletSelectorOptions$(addError, client, userAccounts$, block$, tokens),
+    [addError, client, userAccounts$, block$, tokens],
+  );
 
   return (
     <Wrapper {...props}>

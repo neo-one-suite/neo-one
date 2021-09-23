@@ -122,9 +122,7 @@ export interface ExchangeSmartContract<TClient extends Client = Client> extends 
       options?: TransactionOptions & GetOptions,
     ) => Promise<InvokeReceipt<undefined, ExchangeEvent> & { readonly transaction: InvocationTransaction }>;
   };
-  readonly getOffer: (
-    offerHash: Hash256String,
-  ) => Promise<
+  readonly getOffer: (offerHash: Hash256String) => Promise<
     | {
         readonly maker: AddressString;
         readonly offerAssetID: AddressString;
@@ -216,9 +214,7 @@ export interface ExchangeMigrationSmartContract {
     burnMakerFee: boolean | Promise<boolean>,
     options?: TransactionOptions & GetOptions,
   ) => Promise<InvokeReceipt<undefined, ExchangeEvent> & { readonly transaction: InvocationTransaction }>;
-  readonly getOffer: (
-    offerHash: Hash256String | Promise<Hash256String>,
-  ) => Promise<
+  readonly getOffer: (offerHash: Hash256String | Promise<Hash256String>) => Promise<
     | {
         readonly maker: AddressString;
         readonly offerAssetID: AddressString;

@@ -715,10 +715,8 @@ describe('InvokeSmartContractHelper', () => {
       }
     `);
 
-    const {
-      contract: forwardedForwarded,
-      definition: forwardedForwardedDefinition,
-    } = await node.addContractWithDefinition(`
+    const { contract: forwardedForwarded, definition: forwardedForwardedDefinition } =
+      await node.addContractWithDefinition(`
       import { constant, Fixed, Integer, ForwardedValue, SmartContract, createEventNotifier } from '@neo-one/smart-contract';
 
       const forwardedForwardedEvent = createEventNotifier('forwardedForwardedEvent');

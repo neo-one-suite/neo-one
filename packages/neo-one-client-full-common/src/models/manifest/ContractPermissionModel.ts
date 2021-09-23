@@ -2,15 +2,16 @@ import { ContractPermissionJSON, SerializableJSON, WildcardContainer } from '@ne
 import { ContractPermissionDescriptorModel } from './ContractPermissionDescriptorModel';
 
 export interface ContractPermissionModelAdd<
-  TContractPermissionDescriptor extends ContractPermissionDescriptorModel = ContractPermissionDescriptorModel
+  TContractPermissionDescriptor extends ContractPermissionDescriptorModel = ContractPermissionDescriptorModel,
 > {
   readonly contract: TContractPermissionDescriptor;
   readonly methods: WildcardContainer<string>;
 }
 
 export class ContractPermissionModel<
-  TContractPermissionDescriptor extends ContractPermissionDescriptorModel = ContractPermissionDescriptorModel
-> implements SerializableJSON<ContractPermissionJSON> {
+  TContractPermissionDescriptor extends ContractPermissionDescriptorModel = ContractPermissionDescriptorModel,
+> implements SerializableJSON<ContractPermissionJSON>
+{
   public readonly contract: TContractPermissionDescriptor;
   public readonly methods: WildcardContainer<string>;
 

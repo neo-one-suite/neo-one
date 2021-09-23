@@ -221,10 +221,7 @@ export class RemoteEngine {
     await this.fs.writeFile(resolvedPath, text);
   }
 
-  private findPackageJSON({
-    request,
-    currentPath,
-  }: MissingPath):
+  private findPackageJSON({ request, currentPath }: MissingPath):
     | {
         readonly packageJSONPath: string;
         readonly packageJSON: PackageJSON;

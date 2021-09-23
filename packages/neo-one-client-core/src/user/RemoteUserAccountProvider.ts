@@ -209,6 +209,7 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
+    verify: boolean,
     options?: InvokeSendUnsafeReceiveTransactionOptions,
     sourceMaps?: SourceMaps,
   ): Promise<TransactionResult<RawInvokeReceipt>> {

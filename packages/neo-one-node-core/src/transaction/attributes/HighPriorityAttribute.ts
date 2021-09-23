@@ -5,7 +5,8 @@ import { AttributeBase } from './AttributeBase';
 
 export class HighPriorityAttribute
   extends HighPriorityAttributeModel
-  implements AttributeBase<HighPriorityAttributeJSON> {
+  implements AttributeBase<HighPriorityAttributeJSON>
+{
   public static deserializeWithoutType(_reader: BinaryReader) {
     return new HighPriorityAttribute();
   }

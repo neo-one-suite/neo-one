@@ -20,8 +20,10 @@ export const deserializeAttribute = (options: DeserializeWireBaseOptions): Attri
   }
 };
 
-export const getIsAttribute = <T extends Attribute>(type: AttributeTypeModel) => (attr: Attribute): attr is T =>
-  attr.type === type;
+export const getIsAttribute =
+  <T extends Attribute>(type: AttributeTypeModel) =>
+  (attr: Attribute): attr is T =>
+    attr.type === type;
 
 export const isHighPriorityAttribute = getIsAttribute<HighPriorityAttribute>(AttributeTypeModel.HighPriority);
 export const isOracleResponse = getIsAttribute<OracleResponse>(AttributeTypeModel.OracleResponse);

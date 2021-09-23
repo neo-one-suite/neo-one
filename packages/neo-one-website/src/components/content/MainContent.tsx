@@ -40,7 +40,8 @@ const StyledMarkdown = styled(Markdown)`
   & table {
     border-collapse: collapse;
   }
-  & td, th {
+  & td,
+  th {
     padding: 8px;
   }
   & th {

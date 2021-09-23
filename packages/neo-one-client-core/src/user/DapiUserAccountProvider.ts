@@ -91,7 +91,8 @@ const paramToArgDataType = (param: ScriptBuilderParam): Argument =>
 
 export class DapiUserAccountProvider<TProvider extends Provider>
   extends UserAccountProviderBase<TProvider>
-  implements UserAccountProvider {
+  implements UserAccountProvider
+{
   public readonly currentUserAccount$: Observable<UserAccount | undefined>;
   public readonly userAccounts$: Observable<ReadonlyArray<UserAccount>>;
   public readonly networks$: Observable<ReadonlyArray<NetworkType>>;
@@ -245,7 +246,7 @@ export class DapiUserAccountProvider<TProvider extends Provider>
       confirmed: async () => {
         const [receipt, data] = await Promise.all([
           this.provider.getTransactionReceipt(from.network, txid),
-          this.provider.getApplicationLogData(from.network, txid),
+          this.provider.getTransactionData(from.network, txid),
         ]);
 
         return onConfirm({ transaction, receipt, data });

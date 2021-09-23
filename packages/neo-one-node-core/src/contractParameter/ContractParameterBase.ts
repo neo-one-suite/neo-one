@@ -13,8 +13,9 @@ export abstract class ContractParameterBase<
   // tslint:disable-next-line: no-unused
   T = {},
   TJSON = {},
-  Type extends ContractParameterType = ContractParameterType
-> implements SerializableWire, SerializableJSON<TJSON> {
+  Type extends ContractParameterType = ContractParameterType,
+> implements SerializableWire, SerializableJSON<TJSON>
+{
   public static deserializeContractParameterBaseWireBase({ reader }: DeserializeWireBaseOptions) {
     const type = reader.readUInt8();
 

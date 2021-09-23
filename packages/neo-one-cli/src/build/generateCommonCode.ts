@@ -25,17 +25,18 @@ export const generateCommonCode = async (
     name,
     contractPath: filePath,
   }));
+  const { sourceMapsPath, testPath, contractsPath, reactPath, angularPath, vuePath, clientPath, generatedPath } =
+    getCommonPaths(config);
   const {
-    sourceMapsPath,
-    testPath,
-    contractsPath,
-    reactPath,
-    angularPath,
-    vuePath,
-    clientPath,
-    generatedPath,
-  } = getCommonPaths(config);
-  const { sourceMaps, test, contracts: contractsContent, react, angular, vue, client, generated } = genCommonFiles({
+    sourceMaps,
+    test,
+    contracts: contractsContent,
+    react,
+    angular,
+    vue,
+    client,
+    generated,
+  } = genCommonFiles({
     contractsPaths,
     testPath,
     contractsPath,

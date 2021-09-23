@@ -119,13 +119,15 @@ export function workerPouch(
 
   api._remote = false;
 
-  const createAdapterAPI = (type: RequestType, func?: (...args: any[]) => void) => (...args: any[]) => {
-    const funcArgs = args.slice(0, -1);
-    sendMessage(type, funcArgs, args[args.length - 1]);
-    if (func) {
-      func(funcArgs);
-    }
-  };
+  const createAdapterAPI =
+    (type: RequestType, func?: (...args: any[]) => void) =>
+    (...args: any[]) => {
+      const funcArgs = args.slice(0, -1);
+      sendMessage(type, funcArgs, args[args.length - 1]);
+      if (func) {
+        func(funcArgs);
+      }
+    };
   const createTopLevelAPI = (type: RequestType, func?: (...args: any[]) => void) =>
     adapterFun(type, createAdapterAPI(type, func));
 

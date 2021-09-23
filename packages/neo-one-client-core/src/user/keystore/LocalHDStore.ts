@@ -308,7 +308,12 @@ export class LocalHDStore implements HDLocalStore {
   }
 
   private async getHDTree(keys: readonly string[]) {
-    const { accounts: accountsIn, chains: chainsIn, wallets: walletsIn, master } = keys.reduce<ParsedNodePaths>(
+    const {
+      accounts: accountsIn,
+      chains: chainsIn,
+      wallets: walletsIn,
+      master,
+    } = keys.reduce<ParsedNodePaths>(
       (acc, path) => {
         const splitPath = path.split('/');
 

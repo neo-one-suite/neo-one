@@ -855,13 +855,11 @@ export const createHandler = ({
       if (contract === undefined) {
         return [];
       }
-      const buffer = Buffer.alloc(4);
-      buffer.writeInt32LE(contract.id);
+      const buffer = new BinaryWriter().writeInt32LE(contract.id).toBuffer();
 
       return blockchain.storages
         .find$(buffer)
         .pipe(
-          take(1000),
           map(({ key, value }) => value.serializeJSON(key)),
           toArray(),
         )
