@@ -2,6 +2,18 @@
   "name": "@neo-one/smart-contract-typescript-plugin",
   "entries": [
     {
+      "version": "3.8.0",
+      "tag": "@neo-one/smart-contract-typescript-plugin_v3.8.0",
+      "date": "Thu, 23 Sep 2021 21:28:34 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Updates for MainNet updates"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.7.1",
       "tag": "@neo-one/smart-contract-typescript-plugin_v2.7.1",
       "date": "Tue, 08 Dec 2020 19:29:01 GMT",

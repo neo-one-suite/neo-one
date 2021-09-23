@@ -1,6 +1,13 @@
 # Change Log - @neo-one/http-context
 
-This log was last generated on Tue, 08 Dec 2020 19:29:01 GMT and should not be manually modified.
+This log was last generated on Thu, 23 Sep 2021 21:28:34 GMT and should not be manually modified.
+
+## 3.8.0
+Thu, 23 Sep 2021 21:28:34 GMT
+
+### Updates
+
+- Updates for MainNet updates
 
 ## 2.7.1
 Tue, 08 Dec 2020 19:29:01 GMT

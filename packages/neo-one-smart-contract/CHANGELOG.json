@@ -2,6 +2,18 @@
   "name": "@neo-one/smart-contract",
   "entries": [
     {
+      "version": "3.8.0",
+      "tag": "@neo-one/smart-contract_v3.8.0",
+      "date": "Thu, 23 Sep 2021 21:28:34 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Updates for MainNet updates"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.1.0",
       "tag": "@neo-one/smart-contract_v3.1.0",
       "date": "Mon, 08 Feb 2021 21:00:42 GMT",

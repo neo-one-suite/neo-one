@@ -1,6 +1,11 @@
 # Change Log - @neo-one/http
 
-This log was last generated on Thu, 23 Jul 2020 22:11:12 GMT and should not be manually modified.
+This log was last generated on Thu, 23 Sep 2021 21:28:34 GMT and should not be manually modified.
+
+## 3.8.0
+Thu, 23 Sep 2021 21:28:34 GMT
+
+*Version update only*
 
 ## 2.7.0
 Thu, 23 Jul 2020 22:11:12 GMT
