@@ -8,7 +8,7 @@ import { ContractEventDescriptorModel, ContractEventDescriptorModelAdd } from '.
 import { ContractParameterDefinitionModel } from './ContractParameterDefinitionModel';
 
 export interface ContractMethodDescriptorModelAdd<
-  TContractParameterDefinition extends ContractParameterDefinitionModel = ContractParameterDefinitionModel
+  TContractParameterDefinition extends ContractParameterDefinitionModel = ContractParameterDefinitionModel,
 > extends ContractEventDescriptorModelAdd<TContractParameterDefinition> {
   readonly returnType: ContractParameterTypeModel;
   readonly offset: number;
@@ -16,10 +16,11 @@ export interface ContractMethodDescriptorModelAdd<
 }
 
 export class ContractMethodDescriptorModel<
-    TContractParameterDefinition extends ContractParameterDefinitionModel = ContractParameterDefinitionModel
+    TContractParameterDefinition extends ContractParameterDefinitionModel = ContractParameterDefinitionModel,
   >
   extends ContractEventDescriptorModel<TContractParameterDefinition>
-  implements SerializableJSON<ContractMethodDescriptorJSON> {
+  implements SerializableJSON<ContractMethodDescriptorJSON>
+{
   public readonly returnType: ContractParameterTypeModel;
   public readonly offset: number;
   public readonly safe: boolean;

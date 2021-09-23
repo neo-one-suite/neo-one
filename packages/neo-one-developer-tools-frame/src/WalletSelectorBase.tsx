@@ -149,39 +149,38 @@ const AddressGrid = styled(Box)`
   gap: 0;
 `;
 
-const createFormatOptionLabel = (isMulti?: boolean) => (
-  option: WalletSelectorOptionType,
-  { context }: FormatOptionLabelMeta<WalletSelectorOptionType>,
-): React.ReactNode => {
-  if (context === 'value') {
-    return isMulti && option.label === option.address ? option.address.slice(0, 4) : option.label;
-  }
+const createFormatOptionLabel =
+  (isMulti?: boolean) =>
+  (option: WalletSelectorOptionType, { context }: FormatOptionLabelMeta<WalletSelectorOptionType>): React.ReactNode => {
+    if (context === 'value') {
+      return isMulti && option.label === option.address ? option.address.slice(0, 4) : option.label;
+    }
 
-  return (
-    <AddressGrid>
-      <Box>Name:</Box>
-      <Box>{option.label}</Box>
-      {option.label === option.address ? (
-        <></>
-      ) : (
-        <>
-          <Box>Address:</Box>
-          <Box>{option.address}</Box>
-        </>
-      )}
-      {/* tslint:disable-next-line no-useless-cast */}
-      {((option as any).balances === undefined ? [] : (option as any).balances).map(
-        ([name, value]: [string, BigNumber]) => (
-          // @ts-ignore
-          <React.Fragment key={name}>
-            <Box>{name}:</Box>
-            <Box>{value.toFormat()}</Box>
-          </React.Fragment>
-        ),
-      )}
-    </AddressGrid>
-  );
-};
+    return (
+      <AddressGrid>
+        <Box>Name:</Box>
+        <Box>{option.label}</Box>
+        {option.label === option.address ? (
+          <></>
+        ) : (
+          <>
+            <Box>Address:</Box>
+            <Box>{option.address}</Box>
+          </>
+        )}
+        {/* tslint:disable-next-line no-useless-cast */}
+        {((option as any).balances === undefined ? [] : (option as any).balances).map(
+          ([name, value]: [string, BigNumber]) => (
+            // @ts-ignore
+            <React.Fragment key={name}>
+              <Box>{name}:</Box>
+              <Box>{value.toFormat()}</Box>
+            </React.Fragment>
+          ),
+        )}
+      </AddressGrid>
+    );
+  };
 
 const formatOptionLabelMulti = createFormatOptionLabel(true);
 const formatOptionLabel = createFormatOptionLabel(false);

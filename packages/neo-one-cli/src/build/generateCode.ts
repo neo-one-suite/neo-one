@@ -16,7 +16,11 @@ export const generateCode = async (
   const base = nodePath.resolve(config.codegen.path, name);
   const { sourceMapsPath } = getCommonPaths(config);
   const { typesPath, manifestPath, createContractPath } = getContractPaths(config, name);
-  const { manifest: manifestFile, contract, types } = genFiles({
+  const {
+    manifest: manifestFile,
+    contract,
+    types,
+  } = genFiles({
     name,
     networksDefinition,
     contractPath: filePath,

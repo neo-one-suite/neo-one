@@ -272,9 +272,7 @@ function getImplementorsWorker(
       }
 
       let derived: ts.ClassDeclaration | ts.InterfaceDeclaration | undefined =
-        node_.getFirstAncestorByKind<
-          ts.ClassDeclaration
-        >(clause, ts.SyntaxKind.ClassDeclaration);
+        node_.getFirstAncestorByKind<ts.ClassDeclaration>(clause, ts.SyntaxKind.ClassDeclaration);
       if (derived === undefined) {
         derived = node_.getFirstAncestorByKindOrThrow<ts.InterfaceDeclaration>(
           clause,

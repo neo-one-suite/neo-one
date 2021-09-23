@@ -3,7 +3,7 @@ import { ContractManifestModel } from './manifest';
 
 export interface ContractStateModelAdd<
   TContractManifest extends ContractManifestModel = ContractManifestModel,
-  TNefFile extends NefFileModel = NefFileModel
+  TNefFile extends NefFileModel = NefFileModel,
 > {
   readonly id: number;
   readonly updateCounter: number;
@@ -14,7 +14,7 @@ export interface ContractStateModelAdd<
 
 export class ContractStateModel<
   TContractManifest extends ContractManifestModel = ContractManifestModel,
-  TNefFile extends NefFileModel = NefFileModel
+  TNefFile extends NefFileModel = NefFileModel,
 > {
   public readonly id: number;
   public readonly updateCounter: number;

@@ -76,10 +76,9 @@ const fetchTallestBlockIndex = async (
   checkEndpoints?: number,
 ): Promise<number | undefined> => {
   const counts = await Promise.all(
-    _.take(
-      _.shuffle(rpcEndpoints),
-      checkEndpoints === undefined ? CHECK_ENDPOINTS : checkEndpoints,
-    ).map(async (rpcEndpoint) => fetchCount(logger, rpcEndpoint, timeoutMS)),
+    _.take(_.shuffle(rpcEndpoints), checkEndpoints === undefined ? CHECK_ENDPOINTS : checkEndpoints).map(
+      async (rpcEndpoint) => fetchCount(logger, rpcEndpoint, timeoutMS),
+    ),
   );
 
   return _.max(counts.filter(utils.notNull).map((count) => count - 1));

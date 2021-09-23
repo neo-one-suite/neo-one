@@ -2,15 +2,16 @@ import { ContractEventDescriptorJSON, SerializableJSON } from '@neo-one/client-c
 import { ContractParameterDefinitionModel } from './ContractParameterDefinitionModel';
 
 export interface ContractEventDescriptorModelAdd<
-  TContractParameterDefinition extends ContractParameterDefinitionModel = ContractParameterDefinitionModel
+  TContractParameterDefinition extends ContractParameterDefinitionModel = ContractParameterDefinitionModel,
 > {
   readonly name: string;
   readonly parameters: readonly TContractParameterDefinition[];
 }
 
 export class ContractEventDescriptorModel<
-  TContractParameterDefinition extends ContractParameterDefinitionModel = ContractParameterDefinitionModel
-> implements SerializableJSON<ContractEventDescriptorJSON> {
+  TContractParameterDefinition extends ContractParameterDefinitionModel = ContractParameterDefinitionModel,
+> implements SerializableJSON<ContractEventDescriptorJSON>
+{
   public readonly name: string;
   public readonly parameters: readonly TContractParameterDefinition[];
 

@@ -12,9 +12,11 @@ export const numberToPx = (value?: string | number) => {
 };
 
 // tslint:disable-next-line
-export const callAll = (...fns: Array<Function | undefined>) => (...args: any[]) =>
-  // tslint:disable-next-line
-  fns.forEach((fn) => fn && fn(...args));
+export const callAll =
+  (...fns: Array<Function | undefined>) =>
+  (...args: any[]) =>
+    // tslint:disable-next-line
+    fns.forEach((fn) => fn && fn(...args));
 
 const NO_SELECTOR = 'NO_COMPONENT_SELECTOR';
 

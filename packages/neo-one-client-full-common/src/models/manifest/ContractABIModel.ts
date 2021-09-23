@@ -4,7 +4,7 @@ import { ContractMethodDescriptorModel } from './ContractMethodDescriptorModel';
 
 export interface ContractABIModelAdd<
   TContractMethod extends ContractMethodDescriptorModel = ContractMethodDescriptorModel,
-  TContractEvent extends ContractEventDescriptorModel = ContractEventDescriptorModel
+  TContractEvent extends ContractEventDescriptorModel = ContractEventDescriptorModel,
 > {
   readonly methods: readonly TContractMethod[];
   readonly events: readonly TContractEvent[];
@@ -12,8 +12,9 @@ export interface ContractABIModelAdd<
 
 export class ContractABIModel<
   TContractMethod extends ContractMethodDescriptorModel = ContractMethodDescriptorModel,
-  TContractEvent extends ContractEventDescriptorModel = ContractEventDescriptorModel
-> implements SerializableJSON<ContractABIJSON> {
+  TContractEvent extends ContractEventDescriptorModel = ContractEventDescriptorModel,
+> implements SerializableJSON<ContractABIJSON>
+{
   public readonly methods: readonly TContractMethod[];
   public readonly events: readonly TContractEvent[];
 

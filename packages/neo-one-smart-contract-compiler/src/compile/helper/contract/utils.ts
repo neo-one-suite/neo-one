@@ -4,25 +4,24 @@ import { ContractInfo, DeployPropInfo } from '../../../contract';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 
-export const createWrapParam = (sb: ScriptBuilder) => (
-  param: ts.ParameterDeclaration | ts.ParameterPropertyDeclaration,
-  innerOptions: VisitOptions,
-) => {
-  let type = sb.context.analysis.getType(param);
-  if (type !== undefined && tsUtils.parameter.isRestParameter(param)) {
-    type = tsUtils.type_.getArrayType(type);
-  }
+export const createWrapParam =
+  (sb: ScriptBuilder) =>
+  (param: ts.ParameterDeclaration | ts.ParameterPropertyDeclaration, innerOptions: VisitOptions) => {
+    let type = sb.context.analysis.getType(param);
+    if (type !== undefined && tsUtils.parameter.isRestParameter(param)) {
+      type = tsUtils.type_.getArrayType(type);
+    }
 
-  sb.emitHelper(
-    param,
-    innerOptions,
-    sb.helpers.wrapValRecursive({
-      type,
-      checkValue: true,
-      optional: tsUtils.initializer.getInitializer(param) !== undefined,
-    }),
-  );
-};
+    sb.emitHelper(
+      param,
+      innerOptions,
+      sb.helpers.wrapValRecursive({
+        type,
+        checkValue: true,
+        optional: tsUtils.initializer.getInitializer(param) !== undefined,
+      }),
+    );
+  };
 
 export const findSuperDeployPropInfo = (
   contractInfo: ContractInfo,
