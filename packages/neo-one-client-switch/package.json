@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client-switch",
-  "version": "3.1.0",
+  "version": "3.8.0",
   "description": "NEO•ONE client library for browser/node differences.",
   "main": "./dist/cjs/index",
   "browser": "./dist/cjs/index.browser",
@@ -16,9 +16,9 @@
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
     "@ledgerhq/hw-transport-u2f": "^4.68.2",
-    "@neo-one/client-common": "^3.1.0",
-    "@neo-one/node-core": "^3.1.0",
-    "@neo-one/utils": "^3.1.0",
+    "@neo-one/client-common": "^3.8.0",
+    "@neo-one/node-core": "^3.8.0",
+    "@neo-one/utils": "^3.2.0",
     "lodash": "^4.17.15",
     "regenerator-runtime": "^0.13.3",
     "source-map": "^0.7.3",

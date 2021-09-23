@@ -1,6 +1,13 @@
 # Change Log - @neo-one/ts-utils
 
-This log was last generated on Thu, 23 Jul 2020 22:11:12 GMT and should not be manually modified.
+This log was last generated on Thu, 23 Sep 2021 21:28:34 GMT and should not be manually modified.
+
+## 2.7.0
+Thu, 23 Sep 2021 21:28:34 GMT
+
+### Minor changes
+
+- Updates for MainNet updates
 
 ## 2.6.1
 Thu, 23 Jul 2020 22:11:12 GMT

@@ -2,6 +2,29 @@
   "name": "@neo-one/node-core",
   "entries": [
     {
+      "version": "3.8.0",
+      "tag": "@neo-one/node-core_v3.8.0",
+      "date": "Thu, 23 Sep 2021 21:28:34 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Updates for MainNet updates"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Dependency @neo-one/client-common version bump from ^3.1.0 to ^3.8.0."
+          },
+          {
+            "comment": "Dependency @neo-one/client-full-common version bump from ^3.1.0 to ^3.8.0."
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/utils\" from `^3.1.0` to `^3.2.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.1.0",
       "tag": "@neo-one/node-core_v3.1.0",
       "date": "Mon, 08 Feb 2021 21:00:42 GMT",

@@ -2,6 +2,35 @@
   "name": "@neo-one/node-http-rpc",
   "entries": [
     {
+      "version": "3.8.0",
+      "tag": "@neo-one/node-http-rpc_v3.8.0",
+      "date": "Thu, 23 Sep 2021 21:28:34 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Updates for MainNet updates"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Dependency @neo-one/cli-common-node version bump from ^3.1.0 to ^3.8.0."
+          },
+          {
+            "comment": "Dependency @neo-one/http version bump from ^2.7.0 to ^3.8.0."
+          },
+          {
+            "comment": "Dependency @neo-one/http-context version bump from ^2.7.1 to ^3.8.0."
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/logger\" from `^2.6.1` to `^2.7.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/utils\" from `^3.1.0` to `^3.2.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.0.1",
       "tag": "@neo-one/node-http-rpc_v3.0.1",
       "date": "Mon, 08 Feb 2021 21:00:42 GMT",

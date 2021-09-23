@@ -2,6 +2,29 @@
   "name": "@neo-one/smart-contract-test",
   "entries": [
     {
+      "version": "3.8.0",
+      "tag": "@neo-one/smart-contract-test_v3.8.0",
+      "date": "Thu, 23 Sep 2021 21:28:34 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Updates for MainNet updates"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Dependency @neo-one/node version bump from ^3.1.0 to ^3.8.0."
+          },
+          {
+            "comment": "Dependency @neo-one/node-neo-settings version bump from ^3.1.0 to ^3.8.0."
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/utils\" from `^3.1.0` to `^3.2.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.8.0",
       "tag": "@neo-one/smart-contract-test_v2.8.0",
       "date": "Mon, 08 Feb 2021 21:00:42 GMT",
