@@ -1,0 +1,144 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`nep17 abi 1`] = `
+Object {
+  "events": Array [
+    Object {
+      "name": "Transfer",
+      "parameters": Array [
+        Object {
+          "name": "from",
+          "optional": true,
+          "type": "Hash160",
+        },
+        Object {
+          "name": "to",
+          "optional": true,
+          "type": "Hash160",
+        },
+        Object {
+          "decimals": 4,
+          "name": "amount",
+          "optional": false,
+          "type": "Integer",
+        },
+      ],
+    },
+  ],
+  "methods": Array [
+    Object {
+      "constant": true,
+      "name": "name",
+      "offset": 0,
+      "parameters": Array [
+        Object {
+          "name": "__neoonemethodstring",
+          "optional": false,
+          "type": "String",
+        },
+      ],
+      "returnType": Object {
+        "type": "String",
+      },
+      "safe": true,
+    },
+    Object {
+      "constant": true,
+      "name": "symbol",
+      "offset": 0,
+      "parameters": Array [
+        Object {
+          "name": "__neoonemethodstring",
+          "optional": false,
+          "type": "String",
+        },
+      ],
+      "returnType": Object {
+        "type": "String",
+      },
+      "safe": true,
+    },
+    Object {
+      "constant": true,
+      "name": "decimals",
+      "offset": 0,
+      "parameters": Array [
+        Object {
+          "name": "__neoonemethodstring",
+          "optional": false,
+          "type": "String",
+        },
+      ],
+      "returnType": Object {
+        "decimals": 4,
+        "type": "Integer",
+      },
+      "safe": true,
+    },
+    Object {
+      "constant": true,
+      "name": "totalSupply",
+      "offset": 0,
+      "parameters": Array [
+        Object {
+          "name": "__neoonemethodstring",
+          "optional": false,
+          "type": "String",
+        },
+      ],
+      "returnType": Object {
+        "decimals": 4,
+        "type": "Integer",
+      },
+      "safe": true,
+    },
+    Object {
+      "constant": true,
+      "name": "balanceOf",
+      "offset": 0,
+      "parameters": Array [
+        Object {
+          "name": "account",
+          "optional": false,
+          "type": "Hash160",
+        },
+      ],
+      "returnType": Object {
+        "decimals": 4,
+        "type": "Integer",
+      },
+      "safe": false,
+    },
+    Object {
+      "name": "transfer",
+      "offset": 0,
+      "parameters": Array [
+        Object {
+          "name": "from",
+          "optional": false,
+          "type": "Hash160",
+        },
+        Object {
+          "name": "to",
+          "optional": false,
+          "type": "Hash160",
+        },
+        Object {
+          "decimals": 4,
+          "name": "amount",
+          "optional": false,
+          "type": "Integer",
+        },
+        Object {
+          "name": "data",
+          "type": "Any",
+        },
+      ],
+      "returnType": Object {
+        "type": "Boolean",
+      },
+      "safe": false,
+    },
+  ],
+}
+`;

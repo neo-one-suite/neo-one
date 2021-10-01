@@ -32,35 +32,35 @@ describe('nep17', () => {
     expect(clientSmartContract.mock.calls).toMatchSnapshot();
   });
 
-  test.only('nep17 with native contracts GAS', async () => {
+  // const localHost = 'http://localhost:8080/rpc';
+  const staging = 'https://staging.neotracker.io/rpc';
+  test('nep17 with native contracts GAS', async () => {
     const myClient = new Client({
       memory: new LocalUserAccountProvider({
         keystore: new LocalKeyStore(new LocalMemoryStore()),
-        provider: new NEOONEProvider([
-          new NEOONEDataProvider({ network: 'main', rpcURL: 'http://localhost:8080/rpc' }),
-        ]),
+        provider: new NEOONEProvider([new NEOONEDataProvider({ network: 'main', rpcURL: staging })]),
       }),
     });
     const gasNetwork = { main: { address: common.nativeScriptHashes.GAS } };
     const gas = nep17.createNEP17SmartContract(myClient, gasNetwork, 8, false);
 
     const [symbol, totalSupply] = await Promise.all([gas.symbol(), gas.totalSupply()]);
-    console.log(symbol, totalSupply.toString());
+    expect(symbol).toEqual('GAS');
+    expect(totalSupply.toNumber()).toBeGreaterThan(50000000);
   });
 
-  test.only('nep17 with NEO', async () => {
+  test('nep17 with NEO', async () => {
     const myClient = new Client({
       memory: new LocalUserAccountProvider({
         keystore: new LocalKeyStore(new LocalMemoryStore()),
-        provider: new NEOONEProvider([
-          new NEOONEDataProvider({ network: 'main', rpcURL: 'http://localhost:8080/rpc' }),
-        ]),
+        provider: new NEOONEProvider([new NEOONEDataProvider({ network: 'main', rpcURL: staging })]),
       }),
     });
     const neoNetwork = { main: { address: common.nativeScriptHashes.NEO } };
     const neo = nep17.createNEP17SmartContract(myClient, neoNetwork, 0, false);
 
     const [symbol, totalSupply] = await Promise.all([neo.symbol(), neo.totalSupply()]);
-    console.log(symbol, totalSupply.toString());
+    expect(symbol).toEqual('NEO');
+    expect(totalSupply.toString()).toEqual('100000000');
   });
 });
