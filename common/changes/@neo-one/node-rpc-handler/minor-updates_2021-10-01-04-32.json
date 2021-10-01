@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/node-rpc-handler",
+      "comment": "Remove TODO comment",
+      "type": "none"
+    }
+  ],
+  "packageName": "@neo-one/node-rpc-handler",
+  "email": "29364457+spencercorwin@users.noreply.github.com"
+}

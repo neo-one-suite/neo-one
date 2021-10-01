@@ -284,19 +284,18 @@ namespace NEOONE
     private dynamic[] _getLogs()
     {
       this.isEngineInitialized();
-      return new dynamic[] { };
-      // var events = this.engine.Logs;
-      // if (events == null || events.Count == 0)
-      // {
-      //   return new dynamic[] { };
-      // }
+      var logs = this.engine.Logs;
+      if (logs == null || logs.Count == 0)
+      {
+        return new dynamic[] { };
+      }
 
-      // return events.Select((p) => ReturnHelpers.convertLog(p)).ToArray();
+      return logs.Select((p) => ReturnHelpers.convertLog(p)).ToArray();
     }
 
     private string _getFaultException()
     {
-      return this.engine.FaultException?.Message.ToString();
+      return this.engine.FaultException?.GetBaseException().Message.ToString();
     }
 
     private bool _push(string item)

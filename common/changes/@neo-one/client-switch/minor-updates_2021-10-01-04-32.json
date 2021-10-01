@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/client-switch",
+      "comment": "Import BinaryReader from client-common",
+      "type": "none"
+    }
+  ],
+  "packageName": "@neo-one/client-switch",
+  "email": "29364457+spencercorwin@users.noreply.github.com"
+}

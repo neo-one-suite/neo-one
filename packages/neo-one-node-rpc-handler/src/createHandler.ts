@@ -600,7 +600,7 @@ export const createHandler = ({
     [RPC_METHODS.invokescript]: async (args): Promise<CallReceiptJSON> => {
       const script = JSONHelper.readBase64Buffer(args[0]);
       const signers = args[1] !== undefined ? Signers.fromJSON(args[1]) : undefined;
-      const receipt = blockchain.invokeScript({ script, signers }); // TODO: should be 20 or 20 fixed8FromDecimal?
+      const receipt = blockchain.invokeScript({ script, signers });
 
       return {
         result: receipt.result.serializeJSON(),
@@ -638,7 +638,7 @@ export const createHandler = ({
       );
 
       return {
-        unclaimed: unclaimed.toString(),
+        unclaimed: unclaimed.toString(10),
         address: JSONHelper.writeUInt160(address),
       };
     },
@@ -778,9 +778,10 @@ export const createHandler = ({
       };
     },
     [RPC_METHODS.getnep17balances]: async (args): Promise<Nep17BalancesJSON> => {
+      // tslint:disable-next-line: no-suspicious-comment
+      // TODO: need to check/test method this but probably good
       const { address, scriptHash } = getScriptHashAndAddress(args[0], blockchain.settings.addressVersion);
       const storedBalances = await blockchain.nep17Balances.find$(scriptHash).pipe(toArray()).toPromise();
-      // TODO: need to check/test this but probably good
       const validBalances = await Promise.all(
         storedBalances.map(async ({ key, value }) => {
           const assetStillExists = await native.ContractManagement.getContract(
