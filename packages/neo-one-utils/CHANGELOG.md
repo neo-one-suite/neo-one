@@ -1,6 +1,13 @@
 # Change Log - @neo-one/utils
 
-This log was last generated on Thu, 23 Sep 2021 21:28:34 GMT and should not be manually modified.
+This log was last generated on Sat, 02 Oct 2021 20:01:20 GMT and should not be manually modified.
+
+## 3.2.1
+Sat, 02 Oct 2021 20:01:20 GMT
+
+### Patches
+
+- Add metrics and tracing
 
 ## 3.2.0
 Thu, 23 Sep 2021 21:28:34 GMT

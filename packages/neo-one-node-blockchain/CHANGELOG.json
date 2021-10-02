@@ -2,6 +2,29 @@
   "name": "@neo-one/node-blockchain",
   "entries": [
     {
+      "version": "3.8.1",
+      "tag": "@neo-one/node-blockchain_v3.8.1",
+      "date": "Sat, 02 Oct 2021 20:01:20 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Add metrics and tracing"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-switch\" from `^3.8.0` to `^3.8.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/utils\" from `^3.2.0` to `^3.2.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-vm\" from `^3.8.0` to `^3.8.1`"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.8.0",
       "tag": "@neo-one/node-blockchain_v3.8.0",
       "date": "Thu, 23 Sep 2021 21:28:34 GMT",
