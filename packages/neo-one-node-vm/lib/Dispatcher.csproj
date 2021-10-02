@@ -23,7 +23,7 @@
 
   <ItemGroup>
     <Reference Include="EdgeJs">
-      <HintPath>../node_modules/@neo-one/edge/src/double/Edge.js/bin/Release/netcoreapp3.0/EdgeJs.dll</HintPath>
+      <HintPath>../../edge/src/double/Edge.js/bin/Release/netcoreapp3.0/EdgeJs.dll</HintPath>
       <Private>true</Private>
     </Reference>
   </ItemGroup>

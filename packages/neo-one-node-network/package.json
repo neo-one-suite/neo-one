@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-network",
-  "version": "3.8.0",
+  "version": "3.8.1",
   "description": "NEO•ONE NEO network protocol.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -13,10 +13,10 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-switch": "^3.8.0",
+    "@neo-one/client-switch": "^3.8.1",
     "@neo-one/logger": "^2.7.0",
     "@neo-one/node-core": "^3.8.0",
-    "@neo-one/utils": "^3.2.0",
+    "@neo-one/utils": "^3.2.1",
     "lodash": "^4.17.15",
     "tslib": "^1.10.0"
   },
