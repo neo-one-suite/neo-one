@@ -3,7 +3,7 @@
     {
       "packageName": "@neo-one/node-vm",
       "comment": "Add ability to get logs data",
-      "type": "none"
+      "type": "patch"
     }
   ],
   "packageName": "@neo-one/node-vm",

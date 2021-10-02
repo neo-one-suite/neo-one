@@ -13,6 +13,7 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/client-common": "^3.8.0",
+    "@neo-one/client-switch": "^3.8.0",
     "@neo-one/node-core": "^3.8.0",
     "@neo-one/node-native": "^3.8.0",
     "@neo-one/logger": "^2.7.0",

@@ -1,11 +1,11 @@
 {
   "changes": [
     {
-      "packageName": "@neo-one/client-full",
-      "comment": "Add exports",
+      "packageName": "@neo-one/node",
+      "comment": "Add metrics and tracing",
       "type": "patch"
     }
   ],
-  "packageName": "@neo-one/client-full",
+  "packageName": "@neo-one/node",
   "email": "29364457+spencercorwin@users.noreply.github.com"
 }

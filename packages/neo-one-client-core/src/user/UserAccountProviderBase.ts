@@ -37,8 +37,15 @@ import {
   Witness,
   WitnessModel,
 } from '@neo-one/client-common';
-import { processConsoleLogMessages } from '@neo-one/client-switch';
-import { Labels, utils as commonUtils } from '@neo-one/utils';
+import {
+  AggregationType,
+  globalStats,
+  Measure,
+  MeasureUnit,
+  processConsoleLogMessages,
+  TagMap,
+} from '@neo-one/client-switch';
+import { Labels, labelToTag, utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import debug from 'debug';
 import _ from 'lodash';
@@ -48,6 +55,7 @@ import { InsufficientSystemFeeError, InvokeError, NoAccountError, NotImplemented
 import { converters } from './converters';
 
 const logger = debug('NEOONE:LocalUserAccountProvider');
+const invokeTag = labelToTag(Labels.INVOKE_RAW_METHOD);
 
 export interface InvokeMethodOptions {
   readonly scriptHash: UInt160Hex;
@@ -136,6 +144,70 @@ interface TransactionOptionsFull {
   readonly validBlockCount: number;
 }
 
+const transferDurationSec = globalStats.createMeasureDouble('transfer/duration', MeasureUnit.SEC);
+const transferFailures = globalStats.createMeasureInt64('transfer/failures', MeasureUnit.UNIT);
+const claimDurationSec = globalStats.createMeasureDouble('claim/duration', MeasureUnit.SEC);
+const claimFailures = globalStats.createMeasureInt64('claim/failures', MeasureUnit.UNIT);
+const invokeDurationSec = globalStats.createMeasureDouble('invoke/duration', MeasureUnit.SEC);
+const invokeFailures = globalStats.createMeasureInt64('invoke/failures', MeasureUnit.UNIT);
+
+const NEO_TRANSFER_DURATION_SECONDS = globalStats.createView(
+  'neo_transfer_duration_seconds',
+  transferDurationSec,
+  AggregationType.DISTRIBUTION,
+  [],
+  'Transfer durations in seconds',
+  [1, 2, 5, 7.5, 10, 12.5, 15, 17.5, 20],
+);
+globalStats.registerView(NEO_TRANSFER_DURATION_SECONDS);
+
+const NEO_TRANSFER_FAILURES_TOTAL = globalStats.createView(
+  'neo_transfer_failures_total',
+  transferFailures,
+  AggregationType.COUNT,
+  [],
+  'Total transfer failures',
+);
+globalStats.registerView(NEO_TRANSFER_FAILURES_TOTAL);
+
+const NEO_CLAIM_DURATION_SECONDS = globalStats.createView(
+  'neo_claim_duration_seconds',
+  claimDurationSec,
+  AggregationType.DISTRIBUTION,
+  [],
+  'Claim durations in seconds',
+  [1, 2, 5, 7.5, 10, 12.5, 15, 17.5, 20],
+);
+globalStats.registerView(NEO_CLAIM_DURATION_SECONDS);
+
+const NEO_CLAIM_FAILURES_TOTAL = globalStats.createView(
+  'neo_claims_failures_total',
+  claimFailures,
+  AggregationType.COUNT,
+  [],
+  'Total claims failures',
+);
+globalStats.registerView(NEO_CLAIM_FAILURES_TOTAL);
+
+const NEO_INVOKE_RAW_DURATION_SECONDS = globalStats.createView(
+  'neo_invoke_raw_duration_seconds',
+  invokeDurationSec,
+  AggregationType.DISTRIBUTION,
+  [invokeTag],
+  'Invoke durations in seconds',
+  [1, 2, 5, 7.5, 10, 12.5, 15, 17.5, 20],
+);
+globalStats.registerView(NEO_INVOKE_RAW_DURATION_SECONDS);
+
+const NEO_INVOKE_RAW_FAILURES_TOTAL = globalStats.createView(
+  'neo_invoke_raw_failures_total',
+  invokeFailures,
+  AggregationType.COUNT,
+  [invokeTag],
+  'Total invocation failures',
+);
+globalStats.registerView(NEO_INVOKE_RAW_FAILURES_TOTAL);
+
 interface FullTransfer extends Transfer {
   readonly from: UserAccountID;
 }
@@ -185,6 +257,10 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
       async () => this.executeTransfer(transfers, from, attributes, maxNetworkFee, maxSystemFee, validBlockCount),
       {
         name: 'neo_transfer',
+        measures: {
+          total: transferDurationSec,
+          error: transferFailures,
+        },
       },
     );
   }
@@ -194,6 +270,10 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
 
     return this.capture(async () => this.executeClaim(from, attributes, maxNetworkFee, maxSystemFee, validBlockCount), {
       name: 'neo_claim',
+      measures: {
+        total: claimDurationSec,
+        error: claimFailures,
+      },
     });
   }
 
@@ -414,28 +494,58 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     {
       name,
       labels = {},
+      measures,
       invoke = false,
     }: {
       readonly name: string;
       readonly labels?: Record<string, string>;
+      readonly measures?: {
+        readonly total?: Measure;
+        readonly error?: Measure;
+      };
       readonly invoke?: boolean;
     },
   ): Promise<T> {
+    const tags = new TagMap();
     if (invoke) {
       const value = labels[Labels.INVOKE_RAW_METHOD];
       // tslint:disable-next-line: strict-type-predicates
       if (value === undefined) {
         throw new Error('Invocation should have an invoke method');
       }
+      tags.set(invokeTag, { value });
     }
 
+    const startTime = commonUtils.nowSeconds();
     try {
       const result = await func();
       logger('%o', { name, level: 'verbose', ...labels });
+      if (measures !== undefined && measures.total !== undefined) {
+        globalStats.record(
+          [
+            {
+              measure: measures.total,
+              value: commonUtils.nowSeconds() - startTime,
+            },
+          ],
+          tags,
+        );
+      }
 
       return result;
     } catch (error) {
       logger('%o', { name, level: 'error', error: error.message, ...labels });
+      if (measures !== undefined && measures.error !== undefined) {
+        globalStats.record(
+          [
+            {
+              measure: measures.error,
+              value: 1,
+            },
+          ],
+          tags,
+        );
+      }
 
       throw error;
     }
@@ -523,6 +633,10 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
       {
         name: 'neo_invoke_raw',
         invoke: true,
+        measures: {
+          total: invokeDurationSec,
+          error: invokeFailures,
+        },
         labels: {
           [Labels.INVOKE_RAW_METHOD]: method,
           ...labels,

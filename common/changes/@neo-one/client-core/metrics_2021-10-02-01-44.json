@@ -2,7 +2,7 @@
   "changes": [
     {
       "packageName": "@neo-one/client-core",
-      "comment": "Update nep17 test",
+      "comment": "Add metrics and tracing",
       "type": "patch"
     }
   ],

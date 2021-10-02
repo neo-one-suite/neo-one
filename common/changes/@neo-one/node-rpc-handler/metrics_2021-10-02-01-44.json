@@ -2,7 +2,7 @@
   "changes": [
     {
       "packageName": "@neo-one/node-rpc-handler",
-      "comment": "Remove TODO comment",
+      "comment": "Add metrics and tracing",
       "type": "patch"
     }
   ],

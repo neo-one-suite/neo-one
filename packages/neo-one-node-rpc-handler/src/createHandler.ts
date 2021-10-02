@@ -36,6 +36,7 @@ import {
   VerifyResultModelExtended,
   VersionJSON,
 } from '@neo-one/client-common';
+import { AggregationType, globalStats, MeasureUnit, TagMap } from '@neo-one/client-switch';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   Block,
@@ -50,7 +51,7 @@ import {
   Transaction,
   TransactionState,
 } from '@neo-one/node-core';
-import { Labels, utils } from '@neo-one/utils';
+import { Labels, labelToTag, utils } from '@neo-one/utils';
 import { BN } from 'bn.js';
 import { filter, map, switchMap, take, timeout, toArray } from 'rxjs/operators';
 
@@ -199,6 +200,29 @@ const getVerifyResultErrorMessage = (extendedResult?: VerifyResultModelExtended)
 
   return 'Verification failed.';
 };
+const rpcTag = labelToTag(Labels.RPC_METHOD);
+
+const requestDurations = globalStats.createMeasureDouble('request/duration', MeasureUnit.MS);
+const requestErrors = globalStats.createMeasureInt64('request/failures', MeasureUnit.UNIT);
+
+const SINGLE_REQUESTS_HISTOGRAM = globalStats.createView(
+  'jsonrpc_server_single_request_duration_ms',
+  requestDurations,
+  AggregationType.DISTRIBUTION,
+  [rpcTag],
+  'Distribution of request durations',
+  [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000],
+);
+globalStats.registerView(SINGLE_REQUESTS_HISTOGRAM);
+
+const SINGLE_REQUEST_ERRORS_COUNTER = globalStats.createView(
+  'jsonrpc_server_single_request_failures_total',
+  requestErrors,
+  AggregationType.COUNT,
+  [rpcTag],
+  'Total number of request errors',
+);
+globalStats.registerView(SINGLE_REQUEST_ERRORS_COUNTER);
 
 const createJSONRPCHandler = (handlers: Handlers) => {
   // tslint:disable-next-line no-any
@@ -220,6 +244,7 @@ const createJSONRPCHandler = (handlers: Handlers) => {
 
   // tslint:disable-next-line no-any
   const handleSingleRequest = async (requestIn: any) => {
+    const startTime = utils.nowSeconds();
     let labels = {};
     let method = RPC_METHODS.UNKNOWN;
     try {
@@ -257,6 +282,13 @@ const createJSONRPCHandler = (handlers: Handlers) => {
       const result = await handler(handlerParams);
       logger.debug({ name: 'jsonrpc_server_single_request', ...labels });
 
+      globalStats.record([
+        {
+          measure: requestDurations,
+          value: utils.nowSeconds() - startTime,
+        },
+      ]);
+
       return {
         jsonrpc: '2.0',
         result,
@@ -264,6 +296,17 @@ const createJSONRPCHandler = (handlers: Handlers) => {
       };
     } catch (err) {
       logger.error({ name: 'jsonrpc_server_single_request', ...labels, err });
+      const tags = new TagMap();
+      tags.set(rpcTag, { value: method });
+      globalStats.record(
+        [
+          {
+            measure: requestErrors,
+            value: 1,
+          },
+        ],
+        tags,
+      );
 
       throw err;
     }
