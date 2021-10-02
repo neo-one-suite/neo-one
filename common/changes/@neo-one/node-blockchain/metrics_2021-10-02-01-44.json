@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/node-blockchain",
+      "comment": "Add metrics and tracing",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/node-blockchain",
+  "email": "29364457+spencercorwin@users.noreply.github.com"
+}

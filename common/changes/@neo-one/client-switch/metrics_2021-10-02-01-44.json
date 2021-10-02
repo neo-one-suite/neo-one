@@ -2,7 +2,7 @@
   "changes": [
     {
       "packageName": "@neo-one/client-switch",
-      "comment": "Import BinaryReader from client-common",
+      "comment": "Add metrics and tracing",
       "type": "patch"
     }
   ],

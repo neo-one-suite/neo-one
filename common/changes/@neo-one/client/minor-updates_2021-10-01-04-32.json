@@ -3,7 +3,7 @@
     {
       "packageName": "@neo-one/client",
       "comment": "Add exports",
-      "type": "none"
+      "type": "patch"
     }
   ],
   "packageName": "@neo-one/client",
