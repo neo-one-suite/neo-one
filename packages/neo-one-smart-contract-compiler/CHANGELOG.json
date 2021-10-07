@@ -2,6 +2,29 @@
   "name": "@neo-one/smart-contract-compiler",
   "entries": [
     {
+      "version": "3.9.1",
+      "tag": "@neo-one/smart-contract-compiler_v3.9.1",
+      "date": "Thu, 07 Oct 2021 20:25:48 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update client-switch package version"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-core\" from `^3.10.0` to `^3.10.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-full-core\" from `^3.9.0` to `^3.9.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-blockchain\" from `^3.8.1` to `^3.8.2`"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.9.0",
       "tag": "@neo-one/smart-contract-compiler_v3.9.0",
       "date": "Thu, 07 Oct 2021 04:09:53 GMT",

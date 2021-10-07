@@ -14,8 +14,8 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/client-common": "^3.8.0",
-    "@neo-one/client-core": "^3.10.0",
-    "@neo-one/node": "^3.8.1",
+    "@neo-one/client-core": "^3.10.1",
+    "@neo-one/node": "^3.8.2",
     "@neo-one/node-neo-settings": "^3.8.0",
     "@neo-one/smart-contract-compiler-node": "^3.8.0",
     "@neo-one/smart-contract-test-common": "^3.9.0",

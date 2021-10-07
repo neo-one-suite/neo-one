@@ -2,6 +2,29 @@
   "name": "@neo-one/node",
   "entries": [
     {
+      "version": "3.8.2",
+      "tag": "@neo-one/node_v3.8.2",
+      "date": "Thu, 07 Oct 2021 20:25:48 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update client-switch package version"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/node-blockchain\" from `^3.8.1` to `^3.8.2`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-network\" from `^3.8.1` to `^3.8.2`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-protocol\" from `^3.8.1` to `^3.8.2`"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.8.1",
       "tag": "@neo-one/node_v3.8.1",
       "date": "Sat, 02 Oct 2021 20:01:20 GMT",

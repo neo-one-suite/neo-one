@@ -1,6 +1,13 @@
 # Change Log - @neo-one/node-rpc-handler
 
-This log was last generated on Thu, 07 Oct 2021 04:09:53 GMT and should not be manually modified.
+This log was last generated on Thu, 07 Oct 2021 20:25:48 GMT and should not be manually modified.
+
+## 3.10.1
+Thu, 07 Oct 2021 20:25:48 GMT
+
+### Patches
+
+- Update client-switch package version
 
 ## 3.10.0
 Thu, 07 Oct 2021 04:09:53 GMT

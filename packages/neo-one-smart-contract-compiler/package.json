@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract-compiler",
-  "version": "3.9.0",
+  "version": "3.9.1",
   "description": "NEO•ONE TypeScript smart contract compiler.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -15,9 +15,9 @@
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
     "@neo-one/client-common": "^3.8.0",
-    "@neo-one/client-core": "^3.10.0",
+    "@neo-one/client-core": "^3.10.1",
     "@neo-one/client-full-common": "^3.8.0",
-    "@neo-one/client-full-core": "^3.9.0",
+    "@neo-one/client-full-core": "^3.9.1",
     "@neo-one/smart-contract": "^3.8.0",
     "@neo-one/ts-utils": "^2.7.0",
     "@neo-one/typescript-concatenator": "^2.7.0",
@@ -32,8 +32,8 @@
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
-    "@neo-one/client-switch": "^3.8.1",
-    "@neo-one/node-blockchain": "^3.8.1",
+    "@neo-one/client-switch": "^3.8.3",
+    "@neo-one/node-blockchain": "^3.8.2",
     "@neo-one/node-native": "^3.8.0",
     "@neo-one/node-neo-settings": "^3.8.0",
     "@neo-one/node-storage-levelup": "^3.8.0",

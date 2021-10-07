@@ -6,4 +6,5 @@ export {
   ProcessActionsAndMessageOptions,
   ProcessConsoleLogOptions,
 } from './common';
+export * from './node/tracing';
 export * from './node';

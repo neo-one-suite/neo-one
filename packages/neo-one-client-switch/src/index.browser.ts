@@ -6,3 +6,4 @@ export {
   ProcessActionsAndMessageOptions,
   ProcessConsoleLogOptions,
 } from './common';
+export * from './browser/tracing';

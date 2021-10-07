@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-protocol",
-  "version": "3.8.1",
+  "version": "3.8.2",
   "description": "NEO•ONE NEO node and consensus protocol.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -14,7 +14,7 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/client-common": "^3.8.0",
-    "@neo-one/client-switch": "^3.8.1",
+    "@neo-one/client-switch": "^3.8.3",
     "@neo-one/logger": "^2.7.0",
     "@neo-one/node-consensus": "^3.8.0",
     "@neo-one/node-core": "^3.8.0",
