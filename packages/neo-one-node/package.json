@@ -17,7 +17,7 @@
     "@neo-one/logger": "^2.7.0",
     "@neo-one/node-blockchain": "^3.8.1",
     "@neo-one/node-core": "^3.8.0",
-    "@neo-one/node-http-rpc": "^3.8.0",
+    "@neo-one/node-http-rpc": "^3.9.0",
     "@neo-one/node-native": "^3.8.0",
     "@neo-one/node-network": "^3.8.1",
     "@neo-one/node-offline": "^3.8.0",

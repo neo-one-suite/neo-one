@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-http-rpc",
-  "version": "3.8.0",
+  "version": "3.9.0",
   "description": "NEO•ONE RPC server.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -13,13 +13,13 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/cli-common-node": "^3.8.0",
+    "@neo-one/cli-common-node": "^3.9.0",
     "@neo-one/http": "^3.8.0",
     "@neo-one/http-context": "^3.8.1",
     "@neo-one/logger": "^2.7.0",
     "@neo-one/node-core": "^3.8.0",
     "@neo-one/node-native": "^3.8.0",
-    "@neo-one/node-rpc-handler": "^3.8.1",
+    "@neo-one/node-rpc-handler": "^3.10.0",
     "@neo-one/utils": "^3.2.1",
     "@types/koa": "^2.0.49",
     "@types/koa-compose": "^3.2.4",

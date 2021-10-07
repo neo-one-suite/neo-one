@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract-test-common",
-  "version": "3.8.0",
+  "version": "3.9.0",
   "description": "NEO•ONE TypeScript smart contract test harness common code.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -13,12 +13,12 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/cli-common": "^3.8.0",
+    "@neo-one/cli-common": "^3.9.0",
     "@neo-one/client-common": "^3.8.0",
-    "@neo-one/client-core": "^3.8.1",
-    "@neo-one/client-full-core": "^3.8.0",
+    "@neo-one/client-core": "^3.10.0",
+    "@neo-one/client-full-core": "^3.9.0",
     "@neo-one/logger": "^2.7.0",
-    "@neo-one/smart-contract-compiler": "^3.8.0",
+    "@neo-one/smart-contract-compiler": "^3.9.0",
     "@neo-one/utils": "^3.2.1",
     "bignumber.js": "^9.0.0",
     "tslib": "^1.10.0"

@@ -1,6 +1,20 @@
 # Change Log - @neo-one/client-core
 
-This log was last generated on Sat, 02 Oct 2021 20:01:20 GMT and should not be manually modified.
+This log was last generated on Thu, 07 Oct 2021 04:09:53 GMT and should not be manually modified.
+
+## 3.10.0
+Thu, 07 Oct 2021 04:09:53 GMT
+
+### Minor changes
+
+- Update neo-one dependencies
+
+## 3.9.0
+Thu, 07 Oct 2021 03:38:19 GMT
+
+### Minor changes
+
+- Fix minor bugs in nep17 transfers
 
 ## 3.8.1
 Sat, 02 Oct 2021 20:01:20 GMT

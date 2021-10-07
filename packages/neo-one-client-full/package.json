@@ -13,8 +13,8 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client": "^3.8.1",
-    "@neo-one/client-full-core": "^3.8.0"
+    "@neo-one/client": "^3.9.0",
+    "@neo-one/client-full-core": "^3.9.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",

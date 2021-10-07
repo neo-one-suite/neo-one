@@ -2,6 +2,26 @@
   "name": "@neo-one/client",
   "entries": [
     {
+      "version": "3.9.0",
+      "tag": "@neo-one/client_v3.9.0",
+      "date": "Thu, 07 Oct 2021 04:09:53 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update neo-one dependencies"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-core\" from `^3.9.0` to `^3.10.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/developer-tools\" from `^3.8.0` to `^3.9.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.8.1",
       "tag": "@neo-one/client_v3.8.1",
       "date": "Sat, 02 Oct 2021 20:01:20 GMT",
