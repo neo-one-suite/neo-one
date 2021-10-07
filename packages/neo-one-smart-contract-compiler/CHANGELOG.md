@@ -1,6 +1,13 @@
 # Change Log - @neo-one/smart-contract-compiler
 
-This log was last generated on Thu, 07 Oct 2021 04:09:53 GMT and should not be manually modified.
+This log was last generated on Thu, 07 Oct 2021 20:25:48 GMT and should not be manually modified.
+
+## 3.9.1
+Thu, 07 Oct 2021 20:25:48 GMT
+
+### Patches
+
+- Update client-switch package version
 
 ## 3.9.0
 Thu, 07 Oct 2021 04:09:53 GMT

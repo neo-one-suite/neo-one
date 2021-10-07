@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-rpc-handler",
-  "version": "3.10.0",
+  "version": "3.10.1",
   "description": "NEO•ONE RPC handler.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -14,7 +14,7 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/client-common": "^3.8.0",
-    "@neo-one/client-switch": "^3.8.1",
+    "@neo-one/client-switch": "^3.8.3",
     "@neo-one/logger": "^2.7.0",
     "@neo-one/node-core": "^3.8.0",
     "@neo-one/utils": "^3.2.1",

@@ -1,6 +1,11 @@
 # Change Log - @neo-one/client-full
 
-This log was last generated on Sat, 02 Oct 2021 20:01:20 GMT and should not be manually modified.
+This log was last generated on Thu, 07 Oct 2021 20:25:48 GMT and should not be manually modified.
+
+## 3.9.0
+Thu, 07 Oct 2021 20:25:48 GMT
+
+*Version update only*
 
 ## 3.8.1
 Sat, 02 Oct 2021 20:01:20 GMT

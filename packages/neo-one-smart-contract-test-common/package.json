@@ -15,10 +15,10 @@
   "dependencies": {
     "@neo-one/cli-common": "^3.9.0",
     "@neo-one/client-common": "^3.8.0",
-    "@neo-one/client-core": "^3.10.0",
-    "@neo-one/client-full-core": "^3.9.0",
+    "@neo-one/client-core": "^3.10.1",
+    "@neo-one/client-full-core": "^3.9.1",
     "@neo-one/logger": "^2.7.0",
-    "@neo-one/smart-contract-compiler": "^3.9.0",
+    "@neo-one/smart-contract-compiler": "^3.9.1",
     "@neo-one/utils": "^3.2.1",
     "bignumber.js": "^9.0.0",
     "tslib": "^1.10.0"

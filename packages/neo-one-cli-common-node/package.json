@@ -14,8 +14,8 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/cli-common": "^3.9.0",
-    "@neo-one/client-core": "^3.10.0",
-    "@neo-one/client-full-core": "^3.9.0",
+    "@neo-one/client-core": "^3.10.1",
+    "@neo-one/client-full-core": "^3.9.1",
     "@neo-one/utils": "^3.2.1",
     "@types/lodash": "^4.14.138",
     "cosmiconfig": "^6.0.0",

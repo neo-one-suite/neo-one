@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client-switch",
-  "version": "3.8.1",
+  "version": "3.8.3",
   "description": "NEO•ONE client library for browser/node differences.",
   "main": "./dist/cjs/index",
   "browser": "./dist/cjs/index.browser",

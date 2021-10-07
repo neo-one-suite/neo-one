@@ -2,6 +2,18 @@
   "name": "@neo-one/node-rpc-handler",
   "entries": [
     {
+      "version": "3.10.1",
+      "tag": "@neo-one/node-rpc-handler_v3.10.1",
+      "date": "Thu, 07 Oct 2021 20:25:48 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update client-switch package version"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.10.0",
       "tag": "@neo-one/node-rpc-handler_v3.10.0",
       "date": "Thu, 07 Oct 2021 04:09:53 GMT",

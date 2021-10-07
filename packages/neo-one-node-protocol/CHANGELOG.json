@@ -2,6 +2,18 @@
   "name": "@neo-one/node-protocol",
   "entries": [
     {
+      "version": "3.8.2",
+      "tag": "@neo-one/node-protocol_v3.8.2",
+      "date": "Thu, 07 Oct 2021 20:25:48 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update client-switch package version"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.8.1",
       "tag": "@neo-one/node-protocol_v3.8.1",
       "date": "Sat, 02 Oct 2021 20:01:20 GMT",

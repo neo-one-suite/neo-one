@@ -1,6 +1,13 @@
 # Change Log - @neo-one/node-blockchain
 
-This log was last generated on Sat, 02 Oct 2021 20:01:20 GMT and should not be manually modified.
+This log was last generated on Thu, 07 Oct 2021 20:25:48 GMT and should not be manually modified.
+
+## 3.8.2
+Thu, 07 Oct 2021 20:25:48 GMT
+
+### Patches
+
+- Update client-switch package version
 
 ## 3.8.1
 Sat, 02 Oct 2021 20:01:20 GMT

@@ -14,7 +14,7 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/client-common": "^3.8.0",
-    "@neo-one/client-core": "^3.10.0",
+    "@neo-one/client-core": "^3.10.1",
     "@neo-one/developer-tools": "^3.9.0"
   },
   "devDependencies": {

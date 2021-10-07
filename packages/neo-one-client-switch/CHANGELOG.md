@@ -1,6 +1,20 @@
 # Change Log - @neo-one/client-switch
 
-This log was last generated on Sat, 02 Oct 2021 20:01:20 GMT and should not be manually modified.
+This log was last generated on Thu, 07 Oct 2021 20:15:48 GMT and should not be manually modified.
+
+## 3.8.3
+Thu, 07 Oct 2021 20:15:48 GMT
+
+### Updates
+
+- Update client-switch package version
+
+## 3.8.2
+Thu, 07 Oct 2021 19:47:25 GMT
+
+### Patches
+
+- Fix node vs browser resolutions
 
 ## 3.8.1
 Sat, 02 Oct 2021 20:01:20 GMT
