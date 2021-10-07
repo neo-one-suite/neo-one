@@ -39,7 +39,6 @@ import {
 import { AggregationType, globalStats, MeasureUnit, TagMap } from '@neo-one/client-switch';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
-  Block,
   Blockchain,
   getEndpointConfig,
   NativeContainer,
@@ -49,7 +48,7 @@ import {
   Signers,
   StorageKey,
   Transaction,
-  TransactionState,
+  TransactionData,
 } from '@neo-one/node-core';
 import { Labels, labelToTag, utils } from '@neo-one/utils';
 import { BN } from 'bn.js';
@@ -396,11 +395,11 @@ export const createHandler = ({
     return JSONHelper.readUInt160(input);
   };
 
-  const getTransactionReceiptJSON = (block: Block, value: TransactionState): TransactionReceiptJSON => ({
+  const getTransactionReceiptJSON = (value: TransactionData): TransactionReceiptJSON => ({
     blockIndex: value.blockIndex,
-    blockHash: JSONHelper.writeUInt256(block.hash),
-    globalIndex: JSONHelper.writeUInt64(new BN(-1)),
-    transactionIndex: block.transactions.findIndex((tx) => value.transaction.hash.equals(tx.hash)),
+    blockHash: JSONHelper.writeUInt256(value.blockHash),
+    transactionIndex: value.transactionIndex,
+    globalIndex: JSONHelper.writeUInt64(value.globalIndex),
   });
 
   const handlers: Handlers = {
@@ -911,7 +910,8 @@ export const createHandler = ({
     },
 
     [RPC_METHODS.gettransactionreceipt]: async (args): Promise<TransactionReceiptJSON | undefined> => {
-      const state = await blockchain.getTransaction(JSONHelper.readUInt256(args[0]));
+      const hash = JSONHelper.readUInt256(args[0]);
+      const transactionData = await blockchain.transactionData.tryGet({ hash });
 
       let watchTimeoutMS;
       if (args[1] !== undefined && typeof args[1] === 'number') {
@@ -920,7 +920,7 @@ export const createHandler = ({
       }
 
       let result;
-      if (state === undefined) {
+      if (transactionData === undefined) {
         if (watchTimeoutMS === undefined) {
           throw new JSONRPCError(-100, 'Unknown transaction');
         }
@@ -928,10 +928,10 @@ export const createHandler = ({
         try {
           result = await blockchain.block$
             .pipe(
-              switchMap(async (block) => {
-                const data = await blockchain.getTransaction(JSONHelper.readUInt256(args[0]));
+              switchMap(async () => {
+                const data = await blockchain.transactionData.tryGet({ hash });
 
-                return data === undefined ? undefined : getTransactionReceiptJSON(block, data);
+                return data === undefined ? undefined : getTransactionReceiptJSON(data);
               }),
               filter((receipt) => receipt !== undefined),
               take(1),
@@ -942,12 +942,7 @@ export const createHandler = ({
           throw new JSONRPCError(-100, 'Unknown transaction');
         }
       } else {
-        const block = await blockchain.getBlock(state.blockIndex);
-        if (block === undefined) {
-          throw new Error('For TS');
-        }
-
-        result = getTransactionReceiptJSON(block, state);
+        result = getTransactionReceiptJSON(transactionData);
       }
 
       return result;

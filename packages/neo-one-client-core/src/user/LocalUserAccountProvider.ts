@@ -2,6 +2,7 @@ import {
   Attribute,
   CallFlags,
   common,
+  ContractParameterTypeModel,
   crypto,
   GetOptions,
   IOHelper,
@@ -12,6 +13,7 @@ import {
   signatureContractCost,
   SignerModel,
   SourceMaps,
+  toJSONContractParameterType,
   toVerifyResultJSON,
   Transaction,
   TransactionModel,
@@ -187,42 +189,67 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
             scriptHash: hash,
           }),
         })?.contract.script;
+        let invocationScript;
 
         if (witnessScript === undefined && transaction.witnesses.length !== 0) {
           const witness = transaction.witnesses[index];
-          witnessScript = witness?.verification;
-          // TODO: might need to revert this later due to lack of ApplicationEngine in client
-          // // tslint:disable-next-line: no-loop-statement
-          // for (const witness of transaction.witnesses) {
-          //   if (common.uInt160Equal(crypto.toScriptHash(witness.verification), hash)) {
-          //     witnessScript = witness.verification;
-          //     break;
-          //   }
-          // }
+          witnessScript = witness.verification;
+          if (witnessScript.length === 0) {
+            invocationScript = witness.invocation;
+          }
         }
 
-        // it may seem odd to throw here and continue logic, but it helps keep our other checks type safe when it IS defined.
         if (witnessScript === undefined || witnessScript.length === 0) {
-          throw new Error('Witness still not defined so we try to look it up as a contract with a "verify" method');
-        }
+          const contractHash = common.uInt160ToString(hash);
+          const contract = await this.provider.getContract(network, contractHash);
+          const md = contract.manifest.abi.methods.find((method) => method.name === 'verify');
+          if (md === undefined) {
+            throw new Error(`The smart contract ${contractHash} does not have a verify method.`);
+          }
+          if (md.returnType !== toJSONContractParameterType(ContractParameterTypeModel.Boolean)) {
+            throw new Error('The verify method should have a boolean return value.');
+          }
+          if (md.parameters?.length !== undefined && md.parameters.length > 0 && invocationScript !== undefined) {
+            throw new Error(
+              "The verity method should have parameters that need to be passed via the witness' invocation script.",
+            );
+          }
+          // TODO: implement .GetVarSize()
+          const invSize = invocationScript === undefined ? 0 : invocationScript.length; // TODO
+          size += invSize + 0; // TODO
+          if (invocationScript !== undefined) {
+            // TODO: implement a way to call engine.loadContract() then engine.loadScript() then return
+            // execution result from node
+            const receipt = await this.provider.testInvoke(network, invocationScript);
+            if (receipt.result.state === 'FAULT') {
+              throw new Error(`Smart contract ${contractHash} verification fault.`);
+            }
+            const result = receipt.result.stack[0];
+            if (result.type !== 'Boolean' || !result.value) {
+              throw new Error(`Smart contract ${contractHash} returns false.`);
+            }
 
-        const multiSig = crypto.isMultiSigContractWithResult(witnessScript);
-        if (multiSig.result) {
-          const { m, n } = multiSig;
-          const sizeInv = m * 66;
-          const sizeMulti = IOHelper.sizeOfVarUIntLE(sizeInv) + sizeInv + IOHelper.sizeOfVarBytesLE(witnessScript);
-          const totalFee = multiSignatureContractCost(m, n).multipliedBy(execFeeFactor);
-
-          size = size + sizeMulti;
-          fee = fee.plus(totalFee);
-        } else if (crypto.isSignatureContract(witnessScript)) {
-          const sigSize = IOHelper.sizeOfVarBytesLE(witnessScript) + 67;
-          const sigFee = signatureContractCost.multipliedBy(execFeeFactor);
-
-          size = size + sigSize;
-          fee = fee.plus(sigFee);
+            fee = fee.plus(receipt.result.gasConsumed);
+          }
         } else {
-          // do nothing
+          const multiSig = crypto.isMultiSigContractWithResult(witnessScript);
+          if (multiSig.result) {
+            const { m, n } = multiSig;
+            const sizeInv = m * 66;
+            const sizeMulti = IOHelper.sizeOfVarUIntLE(sizeInv) + sizeInv + IOHelper.sizeOfVarBytesLE(witnessScript);
+            const totalFee = multiSignatureContractCost(m, n).multipliedBy(execFeeFactor);
+
+            size = size + sizeMulti;
+            fee = fee.plus(totalFee);
+          } else if (crypto.isSignatureContract(witnessScript)) {
+            const sigSize = IOHelper.sizeOfVarBytesLE(witnessScript) + 67;
+            const sigFee = signatureContractCost.multipliedBy(execFeeFactor);
+
+            size = size + sigSize;
+            fee = fee.plus(sigFee);
+          } else {
+            // do nothing
+          }
         }
       } catch {
         const { fee: newFee, size: newSize } = await this.provider.getVerificationCost(
@@ -393,7 +420,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
       validUntilBlock,
       signers: [signer],
       attributes: this.convertAttributes(attributes),
-      systemFee: utils.bigNumberToBN(systemFee, 0),
+      systemFee: utils.bigNumberToBN(systemFee, 8),
       networkFee: utils.bigNumberToBN(networkFee, 0),
       network,
       maxValidUntilBlockIncrement,
@@ -480,7 +507,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
       signers: [signer],
       witnesses,
       attributes: this.convertAttributes(attributes),
-      systemFee: utils.bigNumberToBN(systemFee, 0),
+      systemFee: utils.bigNumberToBN(systemFee, 8),
       networkFee: utils.bigNumberToBN(networkFee, 0),
       network,
       maxValidUntilBlockIncrement,

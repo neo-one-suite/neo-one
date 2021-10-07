@@ -1039,7 +1039,7 @@ export const assertInvokeSendUnsafeReceiveTransactionOptions = (
     maxNetworkFee: assertProperty(
       options,
       'InvokeSendUnsafeReceiveTransactionOptions',
-      'maxNetworKFee',
+      'maxNetworkFee',
       assertNullableBigNumber,
     ),
     maxSystemFee: assertProperty(

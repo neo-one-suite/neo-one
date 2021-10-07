@@ -60,3 +60,21 @@ export const restore = async ({ path, bucket, folder }: RestoreOptions) => {
 
   return () => runRestore({ path, bucket, folder });
 };
+
+export const dump = ({ path, bucket, folder }: RestoreOptions) => {
+  if (!fs.existsSync(path)) {
+    // tslint:disable-next-line: no-console
+    console.log(`Skipping dump, path not found: ${path}`);
+
+    return {
+      kill: () => {
+        // do nothing
+      },
+    };
+  }
+
+  return execa('gsutil', ['-m', 'rsync', '-r', path, `gs://${bucket}/${folder}`], {
+    shell: true,
+    stdio: 'inherit',
+  });
+};
