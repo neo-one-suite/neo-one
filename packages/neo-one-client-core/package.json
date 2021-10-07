@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client-core",
-  "version": "3.8.1",
+  "version": "3.10.0",
   "description": "NEO•ONE client core types implementation.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",

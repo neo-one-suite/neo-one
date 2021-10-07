@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client-full-core",
-  "version": "3.8.0",
+  "version": "3.9.0",
   "description": "NEO•ONE client-full core types implementation.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -14,7 +14,7 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/client-common": "^3.8.0",
-    "@neo-one/client-core": "^3.8.1",
+    "@neo-one/client-core": "^3.10.0",
     "@neo-one/client-full-common": "^3.8.0",
     "@neo-one/client-switch": "^3.8.1",
     "@neo-one/utils": "^3.2.1",
