@@ -2,6 +2,44 @@
   "name": "@neo-one/cli",
   "entries": [
     {
+      "version": "3.9.0",
+      "tag": "@neo-one/cli_v3.9.0",
+      "date": "Thu, 07 Oct 2021 04:09:53 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update neo-one dependencies"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/cli-common\" from `^3.8.0` to `^3.9.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/cli-common-node\" from `^3.8.0` to `^3.9.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client\" from `^3.8.1` to `^3.9.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-core\" from `^3.9.0` to `^3.10.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-full-core\" from `^3.8.0` to `^3.9.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/smart-contract-codegen\" from `^3.8.0` to `^3.9.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/smart-contract-compiler\" from `^3.8.0` to `^3.9.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/smart-contract-test\" from `^3.8.0` to `^3.9.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.8.0",
       "tag": "@neo-one/cli_v3.8.0",
       "date": "Thu, 23 Sep 2021 21:28:34 GMT",
