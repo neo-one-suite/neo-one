@@ -11,6 +11,7 @@ import {
   WitnessScopeModel,
 } from '@neo-one/client-common';
 import { DeserializeWireBaseOptions, SerializableJSON } from './Serializable';
+
 export class Signer extends SignerModel implements SerializableJSON<SignerJSON> {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Signer {
     const { reader } = options;

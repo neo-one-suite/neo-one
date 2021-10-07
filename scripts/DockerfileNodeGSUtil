@@ -140,7 +140,8 @@ COPY --from=builder /tmp/neo-one/packages/neo-one-node-native/dist/cjs packages/
 COPY --from=builder /tmp/neo-one/packages/neo-one-node-native/node_modules packages/neo-one-node-native/node_modules/
 COPY --from=builder /tmp/neo-one/common/temp/node_modules common/temp/node_modules/
 
-RUN apt-get -qqy update && apt-get install -qqy gcc python-dev python-setuptools libffi-dev python-pip && pip install gsutil
+# Install gsutil (and gcloud components)
+RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - && apt-get update -y && apt-get install google-cloud-sdk -y
 
 ENV EDGE_APP_ROOT /neo-one/packages/neo-one-node-vm/lib/bin/Debug/netcoreapp3.0
 ENV EDGE_USE_CORELR 1

@@ -60,8 +60,8 @@ export const isTransactionOptions = (arg: any) =>
   ((arg.from !== undefined && isMaybeUserAccountID(arg.from)) ||
     (arg.network !== undefined && typeof arg.network === 'string') ||
     (arg.attributes !== undefined && Array.isArray(arg.attributes)) ||
-    (arg.networkFee !== undefined && BigNumber.isBigNumber(arg.networkFee)) ||
-    (arg.systemFee !== undefined && BigNumber.isBigNumber(arg.systemFee)) ||
+    (arg.maxNetworkFee !== undefined && BigNumber.isBigNumber(arg.maxNetworkFee)) ||
+    (arg.maxSystemFee !== undefined && BigNumber.isBigNumber(arg.maxSystemFee)) ||
     (arg.sendFrom !== undefined && Array.isArray(arg.sendFrom)) ||
     (arg.sendTo !== undefined && Array.isArray(arg.sendTo)) ||
     (arg.timeoutMS !== undefined && typeof arg.timeoutMS === 'number'));

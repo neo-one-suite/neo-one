@@ -38,7 +38,7 @@ export interface NEP17SmartContract<TClient extends Client = Client> extends Sma
     to: AddressString,
     amount: BigNumber,
     options?: TransactionOptions,
-  ) => TransactionResult<InvokeReceipt<boolean, NEP17Event>>;
+  ) => Promise<TransactionResult<InvokeReceipt<boolean, NEP17Event>>>;
 }
 
 const DEFAULT_NEO_ONE_PARAM: ABIParameter = { type: 'String', name: NEO_ONE_METHOD_RESERVED_PARAM, optional: false };
@@ -115,6 +115,7 @@ export const abi = (decimals: number, isNEOONEContract: boolean): ContractABICli
         {
           type: 'Any',
           name: 'data',
+          optional: true,
         },
       ],
       returnType: { type: 'Boolean' },
