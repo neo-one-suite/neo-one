@@ -13,7 +13,7 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-core": "^3.10.1",
+    "@neo-one/client-core": "^3.10.3",
     "resize-observer-polyfill": "^1.5.0",
     "tslib": "^1.10.0"
   },

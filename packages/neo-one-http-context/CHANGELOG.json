@@ -2,6 +2,40 @@
   "name": "@neo-one/http-context",
   "entries": [
     {
+      "version": "3.8.4",
+      "tag": "@neo-one/http-context_v3.8.4",
+      "date": "Sat, 09 Oct 2021 23:05:48 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update neo-one deps"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-switch\" from `^3.8.5` to `^3.8.6`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "3.8.3",
+      "tag": "@neo-one/http-context_v3.8.3",
+      "date": "Sat, 09 Oct 2021 23:03:49 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update neo-one deps"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-switch\" from `^3.8.4` to `^3.8.5`"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.8.2",
       "tag": "@neo-one/http-context_v3.8.2",
       "date": "Thu, 07 Oct 2021 20:25:48 GMT",

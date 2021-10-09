@@ -1,6 +1,20 @@
 # Change Log - @neo-one/smart-contract-codegen
 
-This log was last generated on Thu, 07 Oct 2021 04:09:53 GMT and should not be manually modified.
+This log was last generated on Sat, 09 Oct 2021 23:05:48 GMT and should not be manually modified.
+
+## 3.9.2
+Sat, 09 Oct 2021 23:05:48 GMT
+
+### Patches
+
+- Update neo-one deps
+
+## 3.9.1
+Sat, 09 Oct 2021 23:03:49 GMT
+
+### Patches
+
+- Update neo-one deps
 
 ## 3.9.0
 Thu, 07 Oct 2021 04:09:53 GMT

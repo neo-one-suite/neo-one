@@ -1,6 +1,27 @@
 # Change Log - @neo-one/client-switch
 
-This log was last generated on Thu, 07 Oct 2021 20:15:48 GMT and should not be manually modified.
+This log was last generated on Sat, 09 Oct 2021 23:05:48 GMT and should not be manually modified.
+
+## 3.8.6
+Sat, 09 Oct 2021 23:05:48 GMT
+
+### Patches
+
+- Update neo-one deps
+
+## 3.8.5
+Sat, 09 Oct 2021 23:03:49 GMT
+
+### Patches
+
+- Update neo-one deps
+
+## 3.8.4
+Sat, 09 Oct 2021 22:04:54 GMT
+
+### Patches
+
+- Remove intialize sourcemap from common
 
 ## 3.8.3
 Thu, 07 Oct 2021 20:15:48 GMT

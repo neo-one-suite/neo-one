@@ -2,6 +2,58 @@
   "name": "@neo-one/node-protocol",
   "entries": [
     {
+      "version": "3.8.4",
+      "tag": "@neo-one/node-protocol_v3.8.4",
+      "date": "Sat, 09 Oct 2021 23:05:48 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update neo-one deps"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-common\" from `^3.8.2` to `^3.8.3`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-switch\" from `^3.8.5` to `^3.8.6`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-consensus\" from `^3.8.1` to `^3.8.2`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-core\" from `^3.8.1` to `^3.8.2`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "3.8.3",
+      "tag": "@neo-one/node-protocol_v3.8.3",
+      "date": "Sat, 09 Oct 2021 23:03:49 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update neo-one deps"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-common\" from `^3.8.1` to `^3.8.2`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-switch\" from `^3.8.4` to `^3.8.5`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-consensus\" from `^3.8.0` to `^3.8.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-core\" from `^3.8.0` to `^3.8.1`"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.8.2",
       "tag": "@neo-one/node-protocol_v3.8.2",
       "date": "Thu, 07 Oct 2021 20:25:48 GMT",
