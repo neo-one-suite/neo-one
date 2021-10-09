@@ -18,6 +18,6 @@ export const attribute = (attrib: Attribute): AttributeModel => {
         result: Buffer.from(attrib.result, 'hex'),
       });
     default:
-      throw new Error('for ts');
+      throw new Error('For TS');
   }
 };

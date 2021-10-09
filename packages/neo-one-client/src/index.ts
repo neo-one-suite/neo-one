@@ -57,6 +57,7 @@ export {
   ContractParameterType,
   ContractPermission,
   ContractPermissionDescriptor,
+  contractParamToJSON,
   createPrivateKey,
   decryptNEP2,
   DeveloperProvider,

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/client-full",
+      "comment": "Export new contractParamToJSON func",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/client-full",
+  "email": "29364457+spencercorwin@users.noreply.github.com"
+}
