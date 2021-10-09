@@ -1,6 +1,8 @@
 import { BN } from 'bn.js';
 import { BinaryWriter } from '../../../BinaryWriter';
 import { IOHelper } from '../../../IOHelper';
+import { JSONHelper } from '../../../JSONHelper';
+import { OracleResponseJSON } from '../../../models/types';
 import { AttributeBaseModel } from './AttributeBaseModel';
 import { AttributeTypeModel } from './AttributeTypeModel';
 import { OracleResponseCode } from './OracleResponseCode';
@@ -23,6 +25,15 @@ export class OracleResponseModel extends AttributeBaseModel {
     this.id = id;
     this.code = code;
     this.result = result;
+  }
+
+  public serializeJSON(): OracleResponseJSON {
+    return {
+      type: 'OracleResponse',
+      id: this.id.toString(),
+      code: this.code,
+      result: JSONHelper.writeBase64Buffer(this.result),
+    };
   }
 
   protected serializeWithoutTypeBase(writer: BinaryWriter) {

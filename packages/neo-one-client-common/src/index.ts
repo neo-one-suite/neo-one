@@ -2,6 +2,7 @@ export * from './BinaryWriter';
 export * from './BinaryReader';
 export * from './common';
 export * from './contractParameters';
+export * from './contractParamToJSON';
 export * from './crypto';
 export * from './errors';
 export * from './helpers';
