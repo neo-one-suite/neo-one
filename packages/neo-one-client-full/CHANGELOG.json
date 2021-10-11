@@ -2,6 +2,63 @@
   "name": "@neo-one/client-full",
   "entries": [
     {
+      "version": "3.9.3",
+      "tag": "@neo-one/client-full_v3.9.3",
+      "date": "Sat, 09 Oct 2021 23:05:48 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update neo-one deps"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client\" from `^3.9.2` to `^3.9.3`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-full-core\" from `^3.9.2` to `^3.9.3`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "3.9.2",
+      "tag": "@neo-one/client-full_v3.9.2",
+      "date": "Sat, 09 Oct 2021 23:03:49 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update neo-one deps"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client\" from `^3.9.1` to `^3.9.2`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-full-core\" from `^3.9.1` to `^3.9.2`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "3.9.1",
+      "tag": "@neo-one/client-full_v3.9.1",
+      "date": "Sat, 09 Oct 2021 22:04:54 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Export new contractParamToJSON func"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client\" from `^3.9.0` to `^3.9.1`"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.9.0",
       "tag": "@neo-one/client-full_v3.9.0",
       "date": "Thu, 07 Oct 2021 20:25:48 GMT",

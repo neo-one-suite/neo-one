@@ -2,6 +2,58 @@
   "name": "@neo-one/node-bin",
   "entries": [
     {
+      "version": "3.8.2",
+      "tag": "@neo-one/node-bin_v3.8.2",
+      "date": "Sat, 09 Oct 2021 23:05:48 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update neo-one deps"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/node\" from `^3.8.3` to `^3.8.4`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-neo-settings\" from `^3.8.1` to `^3.8.2`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client\" from `^3.9.2` to `^3.9.3`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-common\" from `^3.8.2` to `^3.8.3`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "3.8.1",
+      "tag": "@neo-one/node-bin_v3.8.1",
+      "date": "Sat, 09 Oct 2021 23:03:49 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update neo-one deps"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/node\" from `^3.8.2` to `^3.8.3`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-neo-settings\" from `^3.8.0` to `^3.8.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client\" from `^3.9.1` to `^3.9.2`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-common\" from `^3.8.1` to `^3.8.2`"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.8.0",
       "tag": "@neo-one/node-bin_v3.8.0",
       "date": "Thu, 23 Sep 2021 21:28:34 GMT",

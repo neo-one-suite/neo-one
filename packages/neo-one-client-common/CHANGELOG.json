@@ -2,6 +2,42 @@
   "name": "@neo-one/client-common",
   "entries": [
     {
+      "version": "3.8.3",
+      "tag": "@neo-one/client-common_v3.8.3",
+      "date": "Sat, 09 Oct 2021 23:05:48 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update neo-one deps"
+          }
+        ]
+      }
+    },
+    {
+      "version": "3.8.2",
+      "tag": "@neo-one/client-common_v3.8.2",
+      "date": "Sat, 09 Oct 2021 23:03:49 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update neo-one deps"
+          }
+        ]
+      }
+    },
+    {
+      "version": "3.8.1",
+      "tag": "@neo-one/client-common_v3.8.1",
+      "date": "Sat, 09 Oct 2021 22:04:54 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Add serializeJSON to attributes"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.8.0",
       "tag": "@neo-one/client-common_v3.8.0",
       "date": "Thu, 23 Sep 2021 21:28:34 GMT",

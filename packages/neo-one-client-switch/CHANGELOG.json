@@ -2,6 +2,63 @@
   "name": "@neo-one/client-switch",
   "entries": [
     {
+      "version": "3.8.6",
+      "tag": "@neo-one/client-switch_v3.8.6",
+      "date": "Sat, 09 Oct 2021 23:05:48 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update neo-one deps"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-common\" from `^3.8.2` to `^3.8.3`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-core\" from `^3.8.1` to `^3.8.2`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "3.8.5",
+      "tag": "@neo-one/client-switch_v3.8.5",
+      "date": "Sat, 09 Oct 2021 23:03:49 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update neo-one deps"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-common\" from `^3.8.1` to `^3.8.2`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-core\" from `^3.8.0` to `^3.8.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "3.8.4",
+      "tag": "@neo-one/client-switch_v3.8.4",
+      "date": "Sat, 09 Oct 2021 22:04:54 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Remove intialize sourcemap from common"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-common\" from `^3.8.0` to `^3.8.1`"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.8.3",
       "tag": "@neo-one/client-switch_v3.8.3",
       "date": "Thu, 07 Oct 2021 20:15:48 GMT",

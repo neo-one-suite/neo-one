@@ -2,6 +2,46 @@
   "name": "@neo-one/node-storage-common",
   "entries": [
     {
+      "version": "3.8.2",
+      "tag": "@neo-one/node-storage-common_v3.8.2",
+      "date": "Sat, 09 Oct 2021 23:05:48 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update neo-one deps"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-common\" from `^3.8.2` to `^3.8.3`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-core\" from `^3.8.1` to `^3.8.2`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "3.8.1",
+      "tag": "@neo-one/node-storage-common_v3.8.1",
+      "date": "Sat, 09 Oct 2021 23:03:49 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update neo-one deps"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-common\" from `^3.8.1` to `^3.8.2`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-core\" from `^3.8.0` to `^3.8.1`"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.8.0",
       "tag": "@neo-one/node-storage-common_v3.8.0",
       "date": "Thu, 23 Sep 2021 21:28:34 GMT",
