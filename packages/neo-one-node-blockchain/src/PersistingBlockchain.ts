@@ -77,7 +77,7 @@ export class PersistingBlockchain {
           engine.loadScript({ script: this.onPersistNativeContractScript });
           const result = engine.execute();
           if (result !== VMState.HALT) {
-            throw new PersistNativeContractsError();
+            throw new PersistNativeContractsError(engine.faultException);
           }
 
           return utils.getApplicationExecuted(engine);
@@ -311,7 +311,7 @@ export class PersistingBlockchain {
         engine.loadScript({ script: this.postPersistNativeContractScript });
         const result = engine.execute();
         if (result !== VMState.HALT) {
-          throw new PostPersistError();
+          throw new PostPersistError(engine.faultException);
         }
 
         return utils.getApplicationExecuted(engine);

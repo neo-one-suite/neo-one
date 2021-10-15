@@ -28,6 +28,16 @@ namespace NEOONE
       }
     }
 
+    public class IntegerReturn : PrimitiveReturn
+    {
+      public readonly int Sign;
+
+      public IntegerReturn(PrimitiveType item, byte[] value) : base(item, value)
+      {
+        this.Sign = item.GetInteger().Sign;
+      }
+    }
+
     public class PointerReturn
     {
       public readonly byte[] value;
@@ -136,7 +146,7 @@ namespace NEOONE
       return item.Type switch
       {
         StackItemType.Boolean => new PrimitiveReturn(item, item.GetBoolean()),
-        StackItemType.Integer => new PrimitiveReturn(item, item.GetInteger().ToByteArray()),
+        StackItemType.Integer => new IntegerReturn(item, item.GetInteger().ToByteArray()),
         StackItemType.ByteString => new PrimitiveReturn(item, item.GetSpan().ToArray()),
         _ => throw new ArgumentException($"{item.Type} is not a valid StackItem argument")
       };
