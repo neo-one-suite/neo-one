@@ -13,6 +13,7 @@ import {
   StackItem,
   StructStackItem,
 } from '@neo-one/node-core';
+import { utils } from '@neo-one/utils';
 import { BN } from 'bn.js';
 
 export interface StackItemReturnBase {
@@ -40,6 +41,7 @@ export interface IntegerStackItemReturn extends StackItemReturnBase {
   readonly Type: 'Integer';
   readonly value: string | number;
   readonly Size: number;
+  readonly Sign: number; // -1 is negative, 1 is positive, 0 is zero
 }
 
 export interface ByteStringStackItemReturn extends StackItemReturnBase {
@@ -144,6 +146,7 @@ const parsePrimitiveStackItem = (item: PrimitiveStackItemReturn): PrimitiveStack
       return new IntegerStackItem(new BN(item.value, 'le'));
 
     default:
-      throw new Error(`invalid stack item when parsing, found type ${item}`);
+      utils.assertNever(item);
+      throw new Error(`Invalid stack item type when parsing stack item return, found type ${item}`);
   }
 };

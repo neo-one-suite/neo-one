@@ -785,12 +785,15 @@ export const createHandler = ({
         source = Nep17TransferSource.Block;
       }
 
+      const useMaxVal = args[4] !== undefined;
+      const ULONG_MAX = new BN('18446744073709551615', 10); // 64-bit unsigned int
+
       if (endTime < startTime) {
         throw new JSONRPCError(-32602, 'Invalid params');
       }
 
       const startTimeBytes = new BinaryWriter().writeUInt64LE(new BN(startTime)).toBuffer();
-      const endTimeBytes = new BinaryWriter().writeUInt64LE(new BN(endTime)).toBuffer();
+      const endTimeBytes = new BinaryWriter().writeUInt64LE(new BN(useMaxVal ? ULONG_MAX : endTime)).toBuffer();
       const gte = Buffer.concat([scriptHash, startTimeBytes]);
       const lte = Buffer.concat([scriptHash, endTimeBytes]);
 
