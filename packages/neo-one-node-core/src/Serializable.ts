@@ -7,6 +7,7 @@ import { ContractState } from './ContractState';
 import { ExecutionResult } from './executionResult';
 import { Header } from './Header';
 import { ExtensiblePayload } from './payload';
+import { PolicyChange, Vote } from './policy';
 import { Signers } from './Signers';
 import { Transaction } from './transaction';
 import { Verifiable } from './Verifiable';
@@ -91,6 +92,8 @@ export interface SerializableTransactionData {
   readonly transactionIndex: number;
   readonly blockIndex: number;
   readonly blockHash: UInt256;
+  readonly votes: readonly Vote[];
+  readonly policyChanges: readonly PolicyChange[];
   readonly deletedContractHashes: readonly UInt160[];
   readonly deployedContracts: readonly ContractState[];
   readonly updatedContracts: readonly ContractState[];

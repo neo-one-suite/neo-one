@@ -1,8 +1,10 @@
+import { common } from '@neo-one/client-common';
 import {
   ApplicationLog,
   BlockData,
   deserializeActionWire,
   DeserializeWireContext,
+  FailedTransaction,
   Nep17Balance,
   Nep17BalanceKey,
   Nep17Transfer,
@@ -121,6 +123,22 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
           buffer,
         }),
       deserializeKey: (key) => ({ index: new BN(key) }),
+    }),
+
+    failedTransactions: read.createReadAllFindStorage({
+      prefixSize: 4,
+      db,
+      searchRange: keys.getAllFailedTransactionSearchRange,
+      getSearchRange: keys.getFailedTransactionSearchRange,
+      serializeKey: keys.createFailedTransactionKey,
+      deserializeValue: (buffer) =>
+        FailedTransaction.deserializeWire({
+          context,
+          buffer,
+        }),
+      deserializeKey: (key) => ({
+        hash: common.bufferToUInt256(key),
+      }),
     }),
 
     async close(): Promise<void> {

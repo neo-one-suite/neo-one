@@ -48,6 +48,7 @@ export * from './Execution';
 export * from './ImmutableHashSet';
 export * from './BlockData';
 export * from './executionResult';
+export * from './policy';
 
 import { BinaryReader, disassembleByteCode } from '@neo-one/client-common';
 export { BinaryReader, disassembleByteCode };

@@ -1,4 +1,5 @@
 import { BinaryWriter, BooleanContractParameterJSON, IOHelper, utils } from '@neo-one/client-common';
+import { BN } from 'bn.js';
 import { DeserializeWireBaseOptions } from '../Serializable';
 import { ContractParameterBase } from './ContractParameterBase';
 import { ContractParameterType } from './ContractParameterType';
@@ -38,6 +39,10 @@ export class BooleanContractParameter extends ContractParameterBase<
 
   public asBoolean(): boolean {
     return this.value;
+  }
+
+  public asInteger(): BN {
+    return this.value ? new BN(1) : new BN(0);
   }
 
   public serializeWireBase(writer: BinaryWriter): void {

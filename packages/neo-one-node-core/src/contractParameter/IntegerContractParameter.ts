@@ -44,6 +44,10 @@ export class IntegerContractParameter extends ContractParameterBase<
     return utils.toSignedBuffer(this.value);
   }
 
+  public asInteger(): BN {
+    return this.value;
+  }
+
   public serializeWireBase(writer: BinaryWriter): void {
     super.serializeWireBase(writer);
     writer.writeVarBytesLE(utils.toSignedBuffer(this.value));

@@ -9,6 +9,7 @@ import {
   UInt256,
   VerifyResultModel,
   VerifyResultModelExtended,
+  VMState,
 } from '@neo-one/client-common';
 import { AggregationType, globalStats, MeasureUnit } from '@neo-one/client-switch';
 import { createChild, nodeLogger } from '@neo-one/logger';
@@ -26,7 +27,9 @@ import {
   DeserializeWireContext,
   DesignationRole,
   Execution,
+  ExecutionResultError,
   ExtensiblePayload,
+  FailedTransaction,
   Header,
   LogAction,
   Mempool,
@@ -241,6 +244,10 @@ export class Blockchain {
 
   public get applicationLogs() {
     return this.storage.applicationLogs;
+  }
+
+  public get failedTransactions() {
+    return this.storage.failedTransactions;
   }
 
   public get storages() {
@@ -1090,6 +1097,29 @@ export class Blockchain {
     }));
   }
 
+  private getFailedTransactions(txDataIn: readonly TransactionData[], block: Block): ChangeSet {
+    return txDataIn
+      .filter((td) => td.executionResult.state === VMState.FAULT)
+      .map((txData) => {
+        const value = new FailedTransaction({
+          hash: txData.hash,
+          blockIndex: block.index,
+          message: (txData.executionResult as ExecutionResultError).message,
+        });
+        logger.debug({ title: 'failed_transaction', ...value.serializeJSON() });
+
+        return {
+          type: 'add',
+          subType: 'add',
+          change: {
+            type: 'failedTransaction',
+            key: { hash: txData.hash },
+            value,
+          },
+        };
+      });
+  }
+
   private async persistBlockInternal(block: Block, verify?: boolean): Promise<void> {
     globalStats.record([
       {
@@ -1113,6 +1143,7 @@ export class Blockchain {
       lastGlobalActionIndex,
       blockActionsCount,
     } = blockchain.persistBlock(block, prevBlockData.lastGlobalActionIndex, prevBlockData.lastGlobalTransactionIndex);
+    const failedTxs = this.getFailedTransactions(transactionData, block);
     const actionUpdates = this.getActionUpdates(actions);
     const transactionDataUpdates = this.getTransactionDataChangeSet(transactionData);
     const blockDataUpdates = this.getBlockDataUpdates({
@@ -1124,6 +1155,7 @@ export class Blockchain {
     const applicationLogUpdates = this.updateApplicationLogs({ applicationsExecuted });
     const blockLogUpdate = this.updateBlockLog({ applicationsExecuted, block });
     const allUpdates: ChangeSet = [
+      ...failedTxs,
       ...actionUpdates,
       ...transactionDataUpdates,
       ...blockDataUpdates,
@@ -1131,7 +1163,8 @@ export class Blockchain {
       ...blockLogUpdate,
     ];
 
-    await Promise.all([this.storage.commitBatch(persistBatch), this.storage.commit(allUpdates)]);
+    await this.storage.commitBatch(persistBatch);
+    await this.storage.commit(allUpdates);
 
     const nep17Updates = this.updateNep17Balances({ applicationsExecuted, block });
     await this.storage.commit(nep17Updates);

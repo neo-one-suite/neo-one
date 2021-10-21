@@ -16,6 +16,7 @@ export class AnyContractParameter extends ContractParameterBase<
 
   public readonly type = ContractParameterType.Any;
   public readonly size: number = 0;
+  public readonly isNull = true;
 
   public asBoolean(): boolean {
     return false;

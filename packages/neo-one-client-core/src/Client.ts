@@ -8,6 +8,7 @@ import {
   IterOptions,
   NetworkType,
   Param,
+  PublicKeyString,
   RawAction,
   RawCallReceipt,
   RawInvokeReceipt,
@@ -461,6 +462,17 @@ export class Client<
     await this.applyBeforeRelayHook(options);
 
     return this.addTransactionHooks(this.getProvider(options).claim(options));
+  }
+
+  /**
+   * Vote for a specified validator for the currencly selected account (or the specified `from` `UserAccountID`).
+   */
+  public async vote(publicKeyIn: PublicKeyString, optionsIn?: TransactionOptions): Promise<TransactionResult> {
+    const options = args.assertTransactionOptions('options', optionsIn);
+    const publicKey = args.assertPublicKey('publicKey', publicKeyIn);
+    await this.applyBeforeRelayHook(options);
+
+    return this.addTransactionHooks(this.getProvider(options).vote(publicKey, options));
   }
 
   /**

@@ -9,7 +9,7 @@ import { Nep17Transfer } from './Nep17Transfer';
 import { Nep17TransferKey } from './Nep17TransferKey';
 import { StorageItem } from './StorageItem';
 import { StorageKey } from './StorageKey';
-import { TransactionKey } from './transaction';
+import { FailedTransaction, FailedTransactionKey, TransactionKey } from './transaction';
 import { TransactionData, TransactionDataKey } from './TransactionData';
 
 export interface StreamOptions {
@@ -85,7 +85,8 @@ export type AddChange =
   | { readonly type: 'applicationLog'; readonly key: TransactionKey; readonly value: ApplicationLog }
   | { readonly type: 'blockData'; readonly key: BlockDataKey; readonly value: BlockData }
   | { readonly type: 'transactionData'; readonly key: TransactionDataKey; readonly value: TransactionData }
-  | { readonly type: 'action'; readonly key: ActionKey; readonly value: Action };
+  | { readonly type: 'action'; readonly key: ActionKey; readonly value: Action }
+  | { readonly type: 'failedTransaction'; readonly key: FailedTransactionKey; readonly value: FailedTransaction };
 
 export type DeleteChange =
   | { readonly type: 'storage'; readonly key: StorageKey }
@@ -106,6 +107,7 @@ export interface BlockchainStorage {
   readonly blockData: ReadStorage<BlockDataKey, BlockData>;
   readonly transactionData: ReadStorage<TransactionDataKey, TransactionData>;
   readonly action: ReadAllFindStorage<ActionKey, Action>;
+  readonly failedTransactions: ReadAllFindStorage<FailedTransactionKey, FailedTransaction>;
 }
 
 interface PutBatch {
