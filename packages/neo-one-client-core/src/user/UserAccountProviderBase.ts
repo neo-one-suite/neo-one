@@ -17,6 +17,7 @@ import {
   NetworkType,
   Param,
   ParamJSON,
+  PublicKeyString,
   RawApplicationLogData,
   RawCallReceipt,
   RawInvokeReceipt,
@@ -274,6 +275,15 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
         error: claimFailures,
       },
     });
+  }
+
+  public async vote(publicKey: PublicKeyString, options?: TransactionOptions): Promise<TransactionResult> {
+    const { from, attributes, maxNetworkFee, maxSystemFee, validBlockCount } = this.getTransactionOptions(options);
+
+    return this.capture(
+      async () => this.executeVote(publicKey, from, attributes, maxNetworkFee, maxSystemFee, validBlockCount),
+      { name: 'neo_vote' },
+    );
   }
 
   public async invoke(
@@ -563,6 +573,15 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
   ): Promise<TransactionResult>;
 
   protected abstract async executeClaim(
+    from: UserAccountID,
+    attributes: readonly Attribute[],
+    maxNetworkFee: BigNumber,
+    maxSystemFee: BigNumber,
+    validBlockCount: number,
+  ): Promise<TransactionResult>;
+
+  protected abstract async executeVote(
+    publicKey: PublicKeyString,
     from: UserAccountID,
     attributes: readonly Attribute[],
     maxNetworkFee: BigNumber,

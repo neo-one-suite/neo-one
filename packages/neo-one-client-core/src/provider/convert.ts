@@ -43,15 +43,18 @@ import {
   NetworkSettingsJSON,
   NotificationJSON,
   OracleResponseJSON,
+  PolicyChangeJSON,
   RawAction,
   RawApplicationLogData,
   RawBlockData,
   RawCallReceipt,
   RawExecutionData,
   RawExecutionResult,
+  RawPolicyChange,
   RawTransactionData,
   RawVMLog,
   RawVMNotification,
+  RawVote,
   RelayTransactionResult,
   RelayTransactionResultJSON,
   scriptHashToAddress,
@@ -68,6 +71,7 @@ import {
   TransactionReceiptJSON,
   VerifyResultJSON,
   VerifyResultModel,
+  VoteJSON,
   Witness,
   WitnessJSON,
 } from '@neo-one/client-common';
@@ -94,6 +98,8 @@ export function convertCallReceipt(receipt: CallReceiptJSON): RawCallReceipt {
 export function convertTransactionData(data: TransactionDataJSON, transactionHash: string): RawTransactionData {
   return {
     ...convertTransactionReceipt(data),
+    votes: data.votes.map(convertVote),
+    policyChanges: data.policyChanges.map(convertPolicyChange),
     deletedContractHashes: data.deletedContractHashes,
     deployedContracts: data.deployedContracts.map(convertContract),
     updatedContracts: data.updatedContracts.map(convertContract),
@@ -101,6 +107,90 @@ export function convertTransactionData(data: TransactionDataJSON, transactionHas
     actions: data.actions.map((action, idx) =>
       convertAction(data.blockHash, data.blockIndex, transactionHash, data.transactionIndex, idx, action),
     ),
+  };
+}
+
+export function convertPolicyChange(change: PolicyChangeJSON): RawPolicyChange {
+  const index = new BigNumber(change.index);
+  switch (change.type) {
+    case 'GasPerBlock':
+      return {
+        type: change.type,
+        index,
+        value: new BigNumber(change.value),
+      };
+    case 'RegisterPrice':
+      return {
+        type: change.type,
+        index,
+        value: new BigNumber(change.value),
+      };
+    case 'UnregisterCandidate':
+      return {
+        type: change.type,
+        index,
+        value: change.value,
+      };
+    case 'RegisterCandidate':
+      return {
+        type: change.type,
+        index,
+        value: change.value,
+      };
+    case 'RoleDesignation':
+      return {
+        type: change.type,
+        index,
+        value: change.value,
+      };
+    case 'FeePerByte':
+      return {
+        type: change.type,
+        index,
+        value: new BigNumber(change.value),
+      };
+    case 'ExecFeeFactor':
+      return {
+        type: change.type,
+        index,
+        value: change.value,
+      };
+    case 'StoragePrice':
+      return {
+        type: change.type,
+        index,
+        value: change.value,
+      };
+    case 'BlockAccount':
+      return {
+        type: change.type,
+        index,
+        value: change.value,
+      };
+    case 'UnblockAccount':
+      return {
+        type: change.type,
+        index,
+        value: change.value,
+      };
+    case 'MinimumDeploymentFee':
+      return {
+        type: change.type,
+        index,
+        value: new BigNumber(change.value),
+      };
+    default:
+      utils.assertNever(change);
+      throw new Error('For TS');
+  }
+}
+
+export function convertVote(vote: VoteJSON): RawVote {
+  return {
+    account: vote.account,
+    voteTo: vote.voteTo ?? undefined,
+    balance: new BigNumber(vote.balance),
+    index: new BigNumber(vote.index),
   };
 }
 

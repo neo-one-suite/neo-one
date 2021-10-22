@@ -2,6 +2,7 @@ import { BinaryReader, BinaryWriter, IOHelper, UInt160, UInt256 } from '@neo-one
 import { BaseState } from '@neo-one/client-full-common';
 import { BN } from 'bn.js';
 import { deserializeExecutionResultWireBase, ExecutionResult } from './executionResult';
+import { deserializePolicyChangeWireBase, PolicyChange, Vote } from './policy';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,
@@ -16,6 +17,8 @@ export interface TransactionDataAdd {
   readonly hash: UInt256;
   readonly blockHash: UInt256;
   readonly globalIndex: BN;
+  readonly votes: readonly Vote[];
+  readonly policyChanges: readonly PolicyChange[];
   readonly deployedContractHashes: readonly UInt160[];
   readonly deletedContractHashes: readonly UInt160[];
   readonly updatedContractHashes: readonly UInt160[];
@@ -39,6 +42,8 @@ export class TransactionData extends BaseState implements SerializableWire {
     const blockIndex = reader.readUInt32LE();
     const transactionIndex = reader.readUInt32LE();
     const globalIndex = reader.readUInt64LE();
+    const votes = reader.readArray(() => Vote.deserializeWireBase(options));
+    const policyChanges = reader.readArray(() => deserializePolicyChangeWireBase(options));
     const deployedContractHashes = reader.readArray(() => reader.readUInt160());
     const deletedContractHashes = reader.readArray(() => reader.readUInt160());
     const updatedContractHashes = reader.readArray(() => reader.readUInt160());
@@ -53,6 +58,8 @@ export class TransactionData extends BaseState implements SerializableWire {
       transactionIndex,
       globalIndex,
       blockIndex,
+      votes,
+      policyChanges,
       deployedContractHashes,
       deletedContractHashes,
       updatedContractHashes,
@@ -73,6 +80,8 @@ export class TransactionData extends BaseState implements SerializableWire {
   public readonly blockHash: UInt256;
   public readonly transactionIndex: number;
   public readonly globalIndex: BN;
+  public readonly votes: readonly Vote[];
+  public readonly policyChanges: readonly PolicyChange[];
   public readonly deletedContractHashes: readonly UInt160[];
   public readonly deployedContractHashes: readonly UInt160[];
   public readonly updatedContractHashes: readonly UInt160[];
@@ -89,6 +98,8 @@ export class TransactionData extends BaseState implements SerializableWire {
     blockHash,
     transactionIndex,
     globalIndex,
+    votes,
+    policyChanges,
     deletedContractHashes,
     deployedContractHashes,
     updatedContractHashes,
@@ -102,6 +113,8 @@ export class TransactionData extends BaseState implements SerializableWire {
     this.blockHash = blockHash;
     this.transactionIndex = transactionIndex;
     this.globalIndex = globalIndex;
+    this.votes = votes;
+    this.policyChanges = policyChanges;
     this.deletedContractHashes = deletedContractHashes;
     this.deployedContractHashes = deployedContractHashes;
     this.updatedContractHashes = updatedContractHashes;
@@ -117,6 +130,8 @@ export class TransactionData extends BaseState implements SerializableWire {
         IOHelper.sizeOfUInt32LE +
         IOHelper.sizeOfUInt32LE +
         IOHelper.sizeOfUInt64LE +
+        IOHelper.sizeOfArray(this.votes, (vote) => vote.size) +
+        IOHelper.sizeOfArray(this.policyChanges, (change) => change.size) +
         IOHelper.sizeOfArray(this.deployedContractHashes, () => IOHelper.sizeOfUInt160) +
         IOHelper.sizeOfArray(this.deletedContractHashes, () => IOHelper.sizeOfUInt160) +
         IOHelper.sizeOfArray(this.updatedContractHashes, () => IOHelper.sizeOfUInt160) +
@@ -135,6 +150,12 @@ export class TransactionData extends BaseState implements SerializableWire {
     writer.writeUInt32LE(this.blockIndex);
     writer.writeUInt32LE(this.transactionIndex);
     writer.writeUInt64LE(this.globalIndex);
+    writer.writeArray(this.votes, (vote) => {
+      vote.serializeWireBase(writer);
+    });
+    writer.writeArray(this.policyChanges, (change) => {
+      change.serializeWireBase(writer);
+    });
     writer.writeArray(this.deployedContractHashes, (contractHash) => {
       writer.writeUInt160(contractHash);
     });

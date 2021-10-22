@@ -1,5 +1,6 @@
 import { JSONObject } from '@neo-one/utils';
 import { UInt256Hex } from '../common';
+import { DesignationRoleJSON } from '../DesignationRole';
 import { UserAccount } from '../types';
 import { ContractParameterTypeModel } from './ContractParameterTypeModel';
 import { AttributeTypeModel } from './transaction';
@@ -274,6 +275,8 @@ export interface TransactionReceiptJSON {
 }
 
 export interface TransactionDataJSON extends TransactionReceiptJSON {
+  readonly votes: readonly VoteJSON[];
+  readonly policyChanges: readonly PolicyChangeJSON[];
   readonly deletedContractHashes: readonly string[];
   readonly deployedContracts: readonly ContractJSON[];
   readonly updatedContracts: readonly ContractJSON[];
@@ -408,6 +411,82 @@ export interface Nep17TransferJSON {
   readonly state: VMStateJSON;
 }
 
+export interface FailedTransactionJSON {
+  readonly hash: string;
+  readonly blockIndex: number;
+  readonly message: string;
+}
+
+export interface VoteJSON {
+  readonly account: string;
+  readonly voteTo: string | null;
+  readonly balance: string;
+  readonly index: string;
+}
+
+export interface PolicyChangeJSONBase {
+  readonly type: PolicyChangeJSON['type'];
+  readonly index: string;
+}
+
+interface IntegerTypePolicyChangeJSON {
+  readonly value: string;
+}
+
+interface BasicTypePolicyChangeJSON {
+  readonly value: string;
+}
+
+export interface GasPerBlockPolicyChangeJSON extends PolicyChangeJSONBase, IntegerTypePolicyChangeJSON {
+  readonly type: 'GasPerBlock';
+}
+export interface RegisterPricePolicyChangeJSON extends PolicyChangeJSONBase, IntegerTypePolicyChangeJSON {
+  readonly type: 'RegisterPrice';
+}
+export interface FeePerBytePolicyChangeJSON extends PolicyChangeJSONBase, IntegerTypePolicyChangeJSON {
+  readonly type: 'FeePerByte';
+}
+export interface ExecFeeFactorPolicyChangeJSON extends PolicyChangeJSONBase {
+  readonly type: 'ExecFeeFactor';
+  readonly value: number;
+}
+export interface StoragePricePolicyChangeJSON extends PolicyChangeJSONBase {
+  readonly type: 'StoragePrice';
+  readonly value: number;
+}
+export interface MinimumDeploymentFeePolicyChangeJSON extends PolicyChangeJSONBase, IntegerTypePolicyChangeJSON {
+  readonly type: 'MinimumDeploymentFee';
+}
+export interface UnregisterCandidatePolicyChangeJSON extends PolicyChangeJSONBase, BasicTypePolicyChangeJSON {
+  readonly type: 'UnregisterCandidate';
+}
+export interface RegisterCandidatePolicyChangeJSON extends PolicyChangeJSONBase, BasicTypePolicyChangeJSON {
+  readonly type: 'RegisterCandidate';
+}
+export interface RoleDesignationPolicyChangeJSON extends PolicyChangeJSONBase {
+  readonly type: 'RoleDesignation';
+  readonly value: DesignationRoleJSON;
+}
+export interface BlockAccountPolicyChangeJSON extends PolicyChangeJSONBase, BasicTypePolicyChangeJSON {
+  readonly type: 'BlockAccount';
+}
+export interface UnblockAccountPolicyChangeJSON extends PolicyChangeJSONBase, BasicTypePolicyChangeJSON {
+  readonly type: 'UnblockAccount';
+}
+
+export type PolicyChangeJSON =
+  | GasPerBlockPolicyChangeJSON
+  | RegisterPricePolicyChangeJSON
+  | FeePerBytePolicyChangeJSON
+  | ExecFeeFactorPolicyChangeJSON
+  | StoragePricePolicyChangeJSON
+  | MinimumDeploymentFeePolicyChangeJSON
+  | UnregisterCandidatePolicyChangeJSON
+  | RegisterCandidatePolicyChangeJSON
+  | RoleDesignationPolicyChangeJSON
+  | BlockAccountPolicyChangeJSON
+  | UnblockAccountPolicyChangeJSON;
+
 export interface HeaderJSON {
   readonly hash: string;
   readonly size: number;
@@ -509,11 +588,21 @@ export interface PluginJSON {
 }
 
 export interface VersionJSON {
-  readonly network: number;
   readonly tcpport: number;
   readonly wsport: number;
   readonly nonce: number;
   readonly useragent: string;
+  readonly protocol: {
+    readonly addressversion: number;
+    readonly network: number;
+    readonly validatorscount: number;
+    readonly msperblock: number;
+    readonly maxtraceableblocks: number;
+    readonly maxvaliduntilblockincrement: number;
+    readonly maxtransactionsperblock: number;
+    readonly memorypoolmaxtransactions: number;
+    readonly initialgasdistribution: number;
+  };
 }
 
 export interface VerificationCostJSON {

@@ -288,9 +288,144 @@ export interface RawBlockData {
 }
 
 /**
+ * A vote for a Neo council member.
+ */
+export interface RawVote {
+  /**
+   * The account that made the vote update.
+   */
+  readonly account: AddressString;
+  /**
+   * The validator that this vote was made to.
+   */
+  readonly voteTo?: PublicKeyString;
+  /**
+   * The NEO balance of the account when the vote was made and thus the amount of votes.
+   */
+  readonly balance: BigNumber;
+  /**
+   * The index which corresponds to the vote's globally unique global action index.
+   */
+  readonly index: BigNumber;
+}
+
+/**
+ * The base of a policy change.
+ */
+export interface RawPolicyChangeBase {
+  /**
+   * The type of policy change.
+   */
+  readonly type: RawPolicyChange['type'];
+  /**
+   * The index which corresponds to the policy change's globally unique global action index.
+   */
+  readonly index: BigNumber;
+}
+
+/**
+ * A change to the GasPerBlock policy.
+ */
+export interface RawGasPerBlockPolicyChange extends RawPolicyChangeBase {
+  readonly type: 'GasPerBlock';
+  readonly value: BigNumber;
+}
+/**
+ * A change to the RegisterPrice policy.
+ */
+export interface RawRegisterPricePolicyChange extends RawPolicyChangeBase {
+  readonly type: 'RegisterPrice';
+  readonly value: BigNumber;
+}
+/**
+ * A change to the UnregisterCandidate policy.
+ */
+export interface RawUnregisterCandidatePolicyChange extends RawPolicyChangeBase {
+  readonly type: 'UnregisterCandidate';
+  readonly value: PublicKeyString;
+}
+/**
+ * A change to the RegisterCandidate policy.
+ */
+export interface RawRegisterCandidatePolicyChange extends RawPolicyChangeBase {
+  readonly type: 'RegisterCandidate';
+  readonly value: PublicKeyString;
+}
+/**
+ * A change to the RoleDesignation policy.
+ */
+export interface RawRoleDesignationPolicyChange extends RawPolicyChangeBase {
+  readonly type: 'RoleDesignation';
+  readonly value: 'StateValidator' | 'Oracle' | 'NeoFSAlphabetNode';
+}
+/**
+ * A change to the FeePerByte policy.
+ */
+export interface RawFeePerBytePolicyChange extends RawPolicyChangeBase {
+  readonly type: 'FeePerByte';
+  readonly value: BigNumber;
+}
+/**
+ * A change to the ExecFeeFactor policy.
+ */
+export interface RawExecFeeFactorPolicyChange extends RawPolicyChangeBase {
+  readonly type: 'ExecFeeFactor';
+  readonly value: number;
+}
+/**
+ * A change to the StoragePrice policy.
+ */
+export interface RawStoragePricePolicyChange extends RawPolicyChangeBase {
+  readonly type: 'StoragePrice';
+  readonly value: number;
+}
+/**
+ * A change to the BlockAccount policy.
+ */
+export interface RawBlockAccountPolicyChange extends RawPolicyChangeBase {
+  readonly type: 'BlockAccount';
+  readonly value: AddressString;
+}
+/**
+ * A change to the UnblockAccount policy.
+ */
+export interface RawUnblockAccountPolicyChange extends RawPolicyChangeBase {
+  readonly type: 'UnblockAccount';
+  readonly value: AddressString;
+}
+/**
+ * A change to the MinimumDeploymentFee policy.
+ */
+export interface RawMinimumDeploymentFeePolicyChange extends RawPolicyChangeBase {
+  readonly type: 'MinimumDeploymentFee';
+  readonly value: BigNumber;
+}
+
+export type RawPolicyChange =
+  | RawGasPerBlockPolicyChange
+  | RawRegisterPricePolicyChange
+  | RawUnregisterCandidatePolicyChange
+  | RawRegisterCandidatePolicyChange
+  | RawRoleDesignationPolicyChange
+  | RawFeePerBytePolicyChange
+  | RawExecFeeFactorPolicyChange
+  | RawStoragePricePolicyChange
+  | RawBlockAccountPolicyChange
+  | RawUnblockAccountPolicyChange
+  | RawMinimumDeploymentFeePolicyChange;
+
+/**
  * Additional raw data that is typically processed by client APIs.
  */
 export interface RawTransactionData extends TransactionReceipt {
+  /**
+   * The NeoToken governance votes produced by this transaction.
+   */
+  readonly votes: readonly RawVote[];
+  /**
+   * The policy change produced by this transaction.
+   */
+  readonly policyChanges: readonly RawPolicyChange[];
   /**
    * The `AddressString`s of contracts destroyed by the transaction execution.
    */
@@ -540,6 +675,10 @@ export interface UserAccountProvider {
    * Claim all claimable GAS.
    */
   readonly claim: (options?: TransactionOptions) => Promise<TransactionResult>;
+  /**
+   * Vote for a specified public key for governance.
+   */
+  readonly vote: (publicKey: PublicKeyString, options?: TransactionOptions) => Promise<TransactionResult>;
   /**
    * Invoke the specified `method` with the given `params` on `contract`.
    *

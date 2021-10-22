@@ -73,6 +73,10 @@ export const InvalidVerifyResultJSONError = makeErrorWithCode(
   'INVALID_RELAY_RESULT_REASON_JSON',
   (value: string) => `Invalid VerifyResult: ${value}`,
 );
+export const InvalidDesignationRoleError = makeErrorWithCode(
+  'INVALID_DESIGNATION_ROLE',
+  (type: number) => `Expected designation role, found: ${type}`,
+);
 export const InvalidContractParameterTypeJSONError = makeErrorWithCode(
   'INVALID_CONTRACT_PARAMETER_TYPE_JSON',
   (value: string) => `Invalid ContractParameterType: ${value}`,

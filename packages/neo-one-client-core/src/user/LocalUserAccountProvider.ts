@@ -1,4 +1,5 @@
 import {
+  addressToScriptHash,
   Attribute,
   CallFlags,
   common,
@@ -8,6 +9,7 @@ import {
   IOHelper,
   multiSignatureContractCost,
   NetworkType,
+  PublicKeyString,
   RelayTransactionResult,
   ScriptBuilder,
   signatureContractCost,
@@ -447,6 +449,82 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     };
 
     return this.executeTransfer([transfer], from, attributes, maxNetworkFee, maxSystemFee, validBlockCount);
+  }
+
+  protected async executeVote(
+    publicKey: PublicKeyString,
+    from: UserAccountID,
+    attributes: readonly Attribute[],
+    maxNetworkFee: BigNumber,
+    maxSystemFee: BigNumber,
+    validBlockCount: number,
+  ): Promise<TransactionResult> {
+    const { addressVersion, blockCount, network, maxValidUntilBlockIncrement } = await this.provider.getNetworkSettings(
+      from.network,
+    );
+
+    const script = new ScriptBuilder()
+      .emitDynamicAppCall(
+        common.nativeHashes.NEO,
+        'vote',
+        CallFlags.All,
+        crypto.addressToScriptHash({ address: from.address, addressVersion }),
+        common.stringToECPoint(publicKey),
+      )
+      .build();
+
+    const signer = new SignerModel({
+      account: crypto.addressToScriptHash({ address: from.address, addressVersion }),
+      scopes: WitnessScopeModel.Global,
+    });
+
+    const nonce = utils.randomUShort();
+    const validUntilBlock = blockCount + validBlockCount;
+
+    const feelessTransaction = new TransactionModel({
+      version: 0,
+      nonce,
+      script,
+      validUntilBlock,
+      signers: [signer],
+      attributes: this.convertAttributes(attributes),
+      systemFee: utils.bigNumberToBN(utils.ZERO_BIG_NUMBER, 8),
+      networkFee: utils.bigNumberToBN(utils.ZERO_BIG_NUMBER, 8),
+      network,
+      maxValidUntilBlockIncrement,
+    });
+
+    const [systemFee, networkFee] = await Promise.all([
+      this.getSystemFee({
+        network: from.network,
+        transaction: feelessTransaction,
+        maxFee: maxSystemFee,
+      }),
+      this.getNetworkFee({
+        network: from.network,
+        transaction: feelessTransaction,
+        maxFee: maxNetworkFee,
+      }),
+    ]);
+
+    const transaction = new TransactionModel({
+      version: 0,
+      nonce,
+      script,
+      validUntilBlock,
+      signers: [signer],
+      attributes: this.convertAttributes(attributes),
+      systemFee: utils.bigNumberToBN(systemFee, 8),
+      networkFee: utils.bigNumberToBN(networkFee, 0),
+      network,
+      maxValidUntilBlockIncrement,
+    });
+
+    return this.sendTransaction({
+      from,
+      transaction,
+      onConfirm: async ({ receipt }) => receipt,
+    });
   }
 
   private async executeInvoke<T extends TransactionReceipt>({

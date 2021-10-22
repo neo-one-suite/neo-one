@@ -1,5 +1,2 @@
-export enum DesignationRole {
-  StateValidator = 4,
-  Oracle = 8,
-  NeoFSAlphabetNode = 16,
-}
+import { DesignationRole, toDesignationRoleJSON } from '@neo-one/client-common';
+export { DesignationRole, toDesignationRoleJSON };

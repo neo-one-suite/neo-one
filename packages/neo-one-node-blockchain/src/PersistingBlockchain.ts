@@ -4,21 +4,36 @@ import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   Action,
   ActionSource,
+  ActionType,
   ApplicationExecuted,
   assertByteStringStackItem,
   Batch,
   Block,
+  BlockAccountPolicyChange,
+  ContractParameter,
+  ExecFeeFactorPolicyChange,
+  FeePerBytePolicyChange,
+  GasPerBlockPolicyChange,
   LogAction,
+  MinimumDeploymentFeePolicyChange,
   Notification,
   NotificationAction,
+  RegisterCandidatePolicyChange,
+  RegisterPricePolicyChange,
+  RoleDesignationPolicyChange,
   SnapshotHandler,
   StackItem,
   stackItemToJSON,
+  StoragePricePolicyChange,
   Transaction,
   TransactionData,
+  UnblockAccountPolicyChange,
+  UnregisterCandidatePolicyChange,
   VM,
   VMProtocolSettingsIn,
+  Vote,
 } from '@neo-one/node-core';
+import { utils as commonUtils } from '@neo-one/utils';
 import { BN } from 'bn.js';
 import { PersistNativeContractsError, PostPersistError } from './errors';
 import { getExecutionResult } from './getExecutionResult';
@@ -210,6 +225,87 @@ export class PersistingBlockchain {
     return { deletedContractHashes, deployedContractHashes, updatedContractHashes };
   }
 
+  private getVotes(actions: readonly Action[]) {
+    return actions
+      .filter((a): a is NotificationAction => a.type === ActionType.Notification)
+      .filter((n) => n.eventName === 'Vote' && common.uInt160Equal(n.scriptHash, common.nativeHashes.NEO))
+      .map((n) => {
+        const vote = new Vote({
+          account: common.bufferToUInt160(n.args[0].asBuffer()),
+          voteTo: n.args[1].isNull ? common.ECPOINT_INFINITY : common.bufferToECPoint(n.args[1].asBuffer()),
+          balance: n.args[2].asInteger(),
+          index: n.index,
+        });
+        logger.debug({ title: 'new_vote', ...vote.serializeJSON() });
+
+        return vote;
+      });
+  }
+
+  private getPolicyChanges(actions: readonly Action[]) {
+    const getECPoint = (item: ContractParameter) => common.bufferToECPoint(item.asBuffer());
+    const getUInt160 = (item: ContractParameter) => common.bufferToUInt160(item.asBuffer());
+    const getBN = (item: ContractParameter) => item.asInteger();
+
+    return actions
+      .filter((n): n is NotificationAction => n.type === ActionType.Notification)
+      .filter(
+        (n) =>
+          common.uInt160Equal(n.scriptHash, common.nativeHashes.NEO) ||
+          common.uInt160Equal(n.scriptHash, common.nativeHashes.RoleManagement) ||
+          common.uInt160Equal(n.scriptHash, common.nativeHashes.Policy) ||
+          common.uInt160Equal(n.scriptHash, common.nativeHashes.ContractManagement),
+      )
+      .map((n) => {
+        const val = n.args[0];
+        const index = n.index;
+        let result;
+        switch (n.eventName) {
+          case 'GasPerBlock':
+            result = new GasPerBlockPolicyChange({ value: getBN(val), index });
+            break;
+          case 'RegisterPrice':
+            result = new RegisterPricePolicyChange({ value: getBN(val), index });
+            break;
+          case 'UnregisterCandidate':
+            result = new UnregisterCandidatePolicyChange({ value: getECPoint(val), index });
+            break;
+          case 'RegisterCandidate':
+            result = new RegisterCandidatePolicyChange({ value: getECPoint(val), index });
+            break;
+          case 'Designation':
+            result = new RoleDesignationPolicyChange({ value: getBN(val).toNumber(), index });
+            break;
+          case 'FeePerByte':
+            result = new FeePerBytePolicyChange({ value: getBN(val), index });
+            break;
+          case 'ExecFeeFactor':
+            result = new ExecFeeFactorPolicyChange({ value: getBN(val).toNumber(), index });
+            break;
+          case 'StoragePrice':
+            result = new StoragePricePolicyChange({ value: getBN(val).toNumber(), index });
+            break;
+          case 'BlockAccount':
+            result = new BlockAccountPolicyChange({ value: getUInt160(val), index });
+            break;
+          case 'UnblockAccount':
+            result = new UnblockAccountPolicyChange({ value: getUInt160(val), index });
+            break;
+          case 'MinimumDeploymentFee':
+            result = new MinimumDeploymentFeePolicyChange({ value: getBN(val), index });
+            break;
+          default:
+            result = undefined;
+        }
+        if (result !== undefined) {
+          logger.debug({ title: 'new_policy_change', ...result.serializeJSON() });
+        }
+
+        return result;
+      })
+      .filter(commonUtils.notNull);
+  }
+
   private persistTransactions(
     block: Block,
     main: SnapshotHandler,
@@ -242,8 +338,12 @@ export class PersistingBlockchain {
           appExecuted,
           block,
         );
+        const votes = this.getVotes(newActions);
+        const policyChanges = this.getPolicyChanges(newActions);
 
         const txData = new TransactionData({
+          votes,
+          policyChanges,
           hash: transaction.hash,
           blockHash: block.hash,
           deletedContractHashes,

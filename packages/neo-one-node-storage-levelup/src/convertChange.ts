@@ -78,6 +78,15 @@ const convertAddChange = (change: AddChange): readonly PutBatch[] => {
         },
       ];
 
+    case 'failedTransaction':
+      return [
+        {
+          type: 'put',
+          key: keys.createFailedTransactionKey(change.key),
+          value: change.value.serializeWire(),
+        },
+      ];
+
     default:
       utils.assertNever(change);
       throw new UnknownTypeError();

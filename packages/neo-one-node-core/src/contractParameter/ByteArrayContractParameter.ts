@@ -1,4 +1,5 @@
 import { BinaryWriter, ByteArrayContractParameterJSON, IOHelper, JSONHelper, utils } from '@neo-one/client-common';
+import { BN } from 'bn.js';
 import { DeserializeWireBaseOptions } from '../Serializable';
 import { ContractParameterBase } from './ContractParameterBase';
 import { ContractParameterType } from './ContractParameterType';
@@ -32,6 +33,10 @@ export class ByteArrayContractParameter extends ContractParameterBase<
 
   public asBuffer(): Buffer {
     return this.value;
+  }
+
+  public asInteger(): BN {
+    return new BN(this.asBuffer(), 'le');
   }
 
   public serializeWireBase(writer: BinaryWriter): void {

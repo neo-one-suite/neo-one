@@ -10,6 +10,10 @@ export const InvalidActionTypeError = makeErrorWithCode(
   'INVALID_ACTION_TYPE',
   (type: number) => `Expected action type, found: ${type}`,
 );
+export const InvalidPolicyChangeTypeError = makeErrorWithCode(
+  'INVALID_POLICY_CHANGE_TYPE',
+  (type: number) => `Expected policy change type, found: ${type}`,
+);
 export const InvalidScriptContainerTypeError = makeErrorWithCode(
   'INVALID_SCRIPT_CONTAINER_TYPE',
   (value: number) => `Expected ScriptContainerType, found: ${value.toString(16)}`,

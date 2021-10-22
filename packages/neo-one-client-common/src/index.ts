@@ -19,3 +19,4 @@ export * from './StackItemType';
 export * from './disassembleByteCode';
 export * from './Script';
 export * from './Instruction';
+export * from './DesignationRole';

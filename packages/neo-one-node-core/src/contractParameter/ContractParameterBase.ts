@@ -1,4 +1,5 @@
 import { BinaryReader, BinaryWriter } from '@neo-one/client-common';
+import { BN } from 'bn.js';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,
@@ -32,12 +33,17 @@ export abstract class ContractParameterBase<
       reader: new BinaryReader(options.buffer),
     });
   }
+  public readonly isNull: boolean = false;
 
   public abstract readonly type: Type;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   public asBuffer(): Buffer {
-    throw new Error('Unimplemented.');
+    throw new Error('Not Implemented');
+  }
+
+  public asInteger(): BN {
+    throw new Error('Not Impleneted');
   }
 
   public asBoolean(): boolean {

@@ -442,6 +442,8 @@ export class Transaction
         blockHash: JSONHelper.writeUInt256(data.blockHash),
         globalIndex: JSONHelper.writeUInt64(data.globalIndex),
         transactionIndex: data.transactionIndex,
+        votes: data.votes.map((v) => v.serializeJSON()),
+        policyChanges: data.policyChanges.map((change) => change.serializeJSON()),
         deletedContractHashes: data.deletedContractHashes.map((hash) => JSONHelper.writeUInt160(hash)),
         deployedContracts: data.deployedContracts.map((c) => c.serializeJSON()),
         updatedContracts: data.updatedContracts.map((c) => c.serializeJSON()),

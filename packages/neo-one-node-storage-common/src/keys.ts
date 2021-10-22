@@ -2,6 +2,7 @@ import { BinaryWriter, common, InvalidFormatError, UInt256 } from '@neo-one/clie
 import {
   ActionKey,
   BlockDataKey,
+  FailedTransactionKey,
   Nep17BalanceKey,
   Nep17TransferKey,
   StorageKey,
@@ -21,6 +22,7 @@ export enum Prefix {
   BlockData = -24,
   TransactionData = -25,
   Action = -26,
+  FailedTransaction = -27,
 }
 
 const getPrefixKeyFromInt = (int: number) => new BinaryWriter().writeInt32LE(int).toBuffer();
@@ -107,6 +109,11 @@ const createActionKey = getCreateKey<ActionKey>({
   prefix: Prefix.Action,
 });
 
+const createFailedTransactionKey = getCreateKey<FailedTransactionKey>({
+  serializeKey: (key) => key.hash,
+  prefix: Prefix.FailedTransaction,
+});
+
 const createApplicationLogKey = getCreateKey<UInt256>({
   serializeKey: (key) => common.uInt256ToBuffer(key),
   prefix: Prefix.ApplicationLog,
@@ -142,9 +149,21 @@ const getNep17TransferSentSearchRange = createGetSearchRange(Prefix.Nep17Transfe
 
 const getAllActionSearchRange = {
   lte: getPrefixKeyFromInt(Prefix.Action),
-  gte: getPrefixKeyFromInt(Prefix.Action - 1),
+  gte: getPrefixKeyFromInt(Prefix.FailedTransaction),
 };
 const getActionSearchRange = createGetSearchRange(Prefix.Action);
+
+const getAllFailedTransactionSearchRange = {
+  lte: Buffer.concat([
+    getPrefixKeyFromInt(Prefix.FailedTransaction),
+    Buffer.alloc(common.UINT256_BUFFER_BYTES, Buffer.from([0xff])),
+  ]),
+  gte: Buffer.concat([
+    getPrefixKeyFromInt(Prefix.FailedTransaction - 1),
+    Buffer.alloc(common.UINT256_BUFFER_BYTES, Buffer.from([0x00])),
+  ]),
+};
+const getFailedTransactionSearchRange = createGetSearchRange(Prefix.FailedTransaction);
 
 export const keys = {
   createNep17BalanceKey,
@@ -156,6 +175,7 @@ export const keys = {
   createTransactionDataKey,
   serializeActionKey,
   createActionKey,
+  createFailedTransactionKey,
   getStorageSearchRange,
   getNep17BalanceSearchRange,
   getAllNep17BalanceSearchRange,
@@ -163,4 +183,6 @@ export const keys = {
   getNep17TransferSentSearchRange,
   getActionSearchRange,
   getAllActionSearchRange,
+  getAllFailedTransactionSearchRange,
+  getFailedTransactionSearchRange,
 };

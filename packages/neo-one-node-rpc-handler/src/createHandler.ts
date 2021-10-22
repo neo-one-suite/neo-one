@@ -8,6 +8,7 @@ import {
   ConfirmedTransactionJSON,
   ContractJSON,
   crypto,
+  FailedTransactionJSON,
   HeaderJSON,
   JSONHelper,
   NativeContractJSON,
@@ -112,6 +113,9 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   submitblock: 'submitblock',
   getcommittee: 'getcommittee',
   getnativecontracts: 'getnativecontracts',
+  getstateroot: 'getstateroot',
+  getstate: 'getstate',
+  findstate: 'findstate',
 
   // SmartContract
   invokefunction: 'invokefunction',
@@ -149,6 +153,7 @@ const RPC_METHODS: { readonly [key: string]: string } = {
 
   // NEO•ONE
   gettransactiondata: 'gettransactiondata',
+  getfailedtransactions: 'getfailedtransactions',
   getfeeperbyte: 'getfeeperbyte',
   getexecfeefactor: 'getexecfeefactor',
   getverificationcost: 'getverificationcost',
@@ -598,14 +603,34 @@ export const createHandler = ({
     }),
     [RPC_METHODS.getversion]: async (): Promise<VersionJSON> => {
       const { tcpPort: tcpport, wsPort: wsport, nonce, useragent } = node.version;
-      const { network } = blockchain.settings;
+      const {
+        network,
+        maxValidUntilBlockIncrement,
+        memoryPoolMaxTransactions,
+        maxTransactionsPerBlock,
+        addressVersion,
+        validatorsCount,
+        millisecondsPerBlock,
+        maxTraceableBlocks,
+        initialGasDistribution,
+      } = blockchain.settings;
 
       return {
-        network,
         tcpport,
         wsport,
         nonce,
         useragent,
+        protocol: {
+          addressversion: addressVersion,
+          network,
+          maxvaliduntilblockincrement: maxValidUntilBlockIncrement,
+          maxtransactionsperblock: maxTransactionsPerBlock,
+          validatorscount: validatorsCount,
+          msperblock: millisecondsPerBlock,
+          maxtraceableblocks: maxTraceableBlocks,
+          memorypoolmaxtransactions: memoryPoolMaxTransactions,
+          initialgasdistribution: initialGasDistribution.toNumber(),
+        },
       };
     },
     [RPC_METHODS.sendrawtransaction]: async (args): Promise<SendRawTransactionResultJSON> => {
@@ -634,6 +659,15 @@ export const createHandler = ({
       ),
     [RPC_METHODS.getnativecontracts]: async (): Promise<readonly NativeContractJSON[]> =>
       native.nativeContracts.map((nativeContract) => nativeContract.serializeJSON()),
+    [RPC_METHODS.getstateroot]: async () => {
+      throw new JSONRPCError(-101, 'Not implemented');
+    },
+    [RPC_METHODS.getstate]: async () => {
+      throw new JSONRPCError(-101, 'Not implemented');
+    },
+    [RPC_METHODS.findstate]: async () => {
+      throw new JSONRPCError(-101, 'Not implemented');
+    },
 
     // SmartContract
     [RPC_METHODS.invokefunction]: async (_args) => {
@@ -966,6 +1000,14 @@ export const createHandler = ({
 
       return result.transactionData;
     },
+
+    [RPC_METHODS.getfailedtransactions]: async (): Promise<FailedTransactionJSON[]> =>
+      blockchain.failedTransactions.all$
+        .pipe(
+          map((tx) => tx.serializeJSON()),
+          toArray(),
+        )
+        .toPromise(),
 
     [RPC_METHODS.getnetworksettings]: async (): Promise<NetworkSettingsJSON> => {
       const {
