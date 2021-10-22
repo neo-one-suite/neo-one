@@ -241,6 +241,7 @@ export function convertNefFile(nef: NefFileJSON): NefFile {
   return {
     magic: nef.magic,
     compiler: nef.compiler,
+    source: nef.source,
     tokens: nef.tokens.map(convertMethodToken),
     script: convertBase64Buffer(nef.script),
     checksum: nef.checksum,

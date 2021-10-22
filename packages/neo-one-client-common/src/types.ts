@@ -1933,6 +1933,10 @@ export interface NefFile {
    */
   readonly compiler: string;
   /**
+   * The URL of the source files.
+   */
+  readonly source: string;
+  /**
    * The script of the contract.
    */
   readonly script: BufferString;

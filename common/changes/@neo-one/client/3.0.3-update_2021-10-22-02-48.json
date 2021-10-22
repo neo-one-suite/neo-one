@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/client",
+      "comment": "Export new policy and vote features",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@neo-one/client",
+  "email": "29364457+spencercorwin@users.noreply.github.com"
+}

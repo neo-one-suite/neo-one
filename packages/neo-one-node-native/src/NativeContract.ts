@@ -51,7 +51,7 @@ export abstract class NativeContract implements NativeContractNode {
     });
     const script = builder.build();
 
-    this.nef = new NefFile({ compiler: 'neo-core-v3.0', tokens: [], script });
+    this.nef = new NefFile({ compiler: 'neo-core-v3.0', source: '', tokens: [], script });
     this.hash = crypto.getContractHash(common.ZERO_UINT160, 0, this.name);
     this.manifest = new ContractManifest({
       name,
