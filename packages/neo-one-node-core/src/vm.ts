@@ -16,6 +16,7 @@ export const executionLimits = {
   maxItemSize: 1024 * 1024,
   maxInvocationStackSize: 1024,
   maxTryNestingDepth: 16,
+  catchEngineExceptions: true,
 };
 
 export interface VMLog {

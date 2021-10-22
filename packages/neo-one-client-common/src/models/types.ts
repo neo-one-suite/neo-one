@@ -361,6 +361,7 @@ export interface MethodTokenJSON {
 export interface NefFileJSON {
   readonly magic: number;
   readonly compiler: string;
+  readonly source: string;
   readonly tokens: readonly MethodTokenJSON[];
   readonly script: string;
   readonly checksum: number;

@@ -12,7 +12,8 @@ export class NefFile extends NefFileModel implements SerializableJSON<NefFileJSO
       throw new Error('Wrong magic');
     }
     const compiler = reader.readFixedString(64);
-    const firstReserved = reader.readUInt16LE();
+    const source = reader.readVarString(256);
+    const firstReserved = reader.readUInt8();
     if (firstReserved !== 0) {
       throw new Error('Reserved bytes must be 0');
     }
@@ -29,6 +30,7 @@ export class NefFile extends NefFileModel implements SerializableJSON<NefFileJSO
     const nef = new this({
       compiler,
       tokens,
+      source,
       script,
     });
 
