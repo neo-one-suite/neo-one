@@ -1001,13 +1001,33 @@ export const createHandler = ({
       return result.transactionData;
     },
 
-    [RPC_METHODS.getfailedtransactions]: async (): Promise<FailedTransactionJSON[]> =>
-      blockchain.failedTransactions.all$
+    [RPC_METHODS.getfailedtransactions]: async (): Promise<{
+      readonly results: FailedTransactionJSON[];
+      readonly length: number;
+    }> => {
+      // tslint:disable-next-line: no-array-mutation
+      const results = await blockchain.failedTransactions.all$
         .pipe(
           map((tx) => tx.serializeJSON()),
           toArray(),
         )
-        .toPromise(),
+        .toPromise();
+      const sorted = results.sort((a, b) => {
+        if (a.blockIndex < b.blockIndex) {
+          return -1;
+        }
+        if (a.blockIndex > b.blockIndex) {
+          return 1;
+        }
+
+        return 0;
+      });
+
+      return {
+        results: sorted,
+        length: results.length,
+      };
+    },
 
     [RPC_METHODS.getnetworksettings]: async (): Promise<NetworkSettingsJSON> => {
       const {

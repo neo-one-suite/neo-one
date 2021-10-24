@@ -24,9 +24,9 @@ export const handler = ({ path, bucket, folder }: Yarguments<ReturnType<typeof b
     return async () => {
       await new Promise((resolve, reject) => {
         try {
-          runner.kill();
+          const result = runner.kill();
 
-          resolve();
+          resolve(result);
         } catch (error) {
           reject(error);
         }

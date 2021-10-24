@@ -229,7 +229,7 @@ export interface ExecutionJSON {
   readonly trigger: TriggerTypeJSON;
   readonly vmstate: 'HALT' | 'FAULT';
   readonly gasconsumed: string;
-  readonly exception?: string;
+  readonly exception: string | null;
   readonly stack: readonly ContractParameterJSON[] | string;
   readonly notifications: readonly NotificationJSON[];
   readonly logs: readonly LogJSON[];

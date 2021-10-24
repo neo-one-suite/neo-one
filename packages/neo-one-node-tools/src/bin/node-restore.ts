@@ -1,5 +1,5 @@
 import yargs from 'yargs';
-import * as cmd from '../restoreCmd';
+import * as cmd from '../cmd';
 
 const { command } = cmd;
 // tslint:disable-next-line no-unused-expression
