@@ -24,7 +24,7 @@ const runRestore = ({ path, bucket, folder }: RestoreOptions) => {
 const getLocalMTime = async (path: string) => {
   let stats: fs.Stats;
   try {
-    stats = await fs.stat(nodePath.join(path, 'LOG'));
+    stats = await fs.stat(nodePath.join(path, 'CURRENT'));
   } catch (error) {
     if (error.code === 'ENOENT') {
       return new Date(0);
@@ -43,7 +43,7 @@ const getLocalMTime = async (path: string) => {
 const getCloudMTime = async (bucket: string, folder: string) => {
   const storage = new Storage();
 
-  const [metadata] = await storage.bucket(bucket).file(nodePath.join(folder, 'LOG')).getMetadata();
+  const [metadata] = await storage.bucket(bucket).file(nodePath.join(folder, 'CURRENT')).getMetadata();
 
   return new Date(metadata.updated);
 };

@@ -43,7 +43,7 @@ export class Execution {
       vmstate: toVMStateJSON(this.vmState) as 'HALT' | 'FAULT',
       gasconsumed: this.gasConsumed.toString(),
       stack,
-      exception: this.exception,
+      exception: this.exception === undefined ? null : this.exception,
       notifications: this.notifications.map((n) => n.serializeJSON()),
       logs: [],
     };

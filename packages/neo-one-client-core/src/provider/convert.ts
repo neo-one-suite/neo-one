@@ -589,6 +589,7 @@ export function convertExecution(data: ExecutionJSON): RawExecutionData {
     trigger: data.trigger,
     vmState: data.vmstate,
     gasConsumed: new BigNumber(data.gasconsumed),
+    exception: data.exception === null ? undefined : data.exception,
     stack: typeof data.stack === 'string' ? data.stack : convertContractParameters(data.stack),
     notifications: data.notifications.map(convertNotification),
     logs: data.logs.map(convertLog),

@@ -208,8 +208,8 @@ export class PersistingBlockchain {
         })
         .map((n) => {
           const hash = getUInt160(n.state[0]);
-          logger.info({
-            name: 'new_contract_management_action',
+          logger.debug({
+            title: 'new_contract_management_action',
             index: block.index,
             event: eventName,
             hash: common.uInt160ToString(hash),

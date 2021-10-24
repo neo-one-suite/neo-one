@@ -2591,6 +2591,10 @@ export interface RawExecutionData {
    */
   readonly vmState: 'HALT' | 'FAULT';
   /**
+   * The exception message if FAULT result.
+   */
+  readonly exception?: string;
+  /**
    * The GAS consumed by the `Transaction`'s script execution.
    */
   readonly gasConsumed: BigNumber;
