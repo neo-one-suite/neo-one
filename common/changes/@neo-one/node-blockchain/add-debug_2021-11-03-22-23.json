@@ -2,7 +2,7 @@
   "changes": [
     {
       "packageName": "@neo-one/node-blockchain",
-      "comment": "Cleanup logs",
+      "comment": "Add audit function",
       "type": "minor"
     }
   ],

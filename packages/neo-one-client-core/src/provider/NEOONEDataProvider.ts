@@ -22,6 +22,7 @@ import {
   Transaction,
   TransactionModel,
   TransactionReceipt,
+  TriggerTypeJSON,
   UInt160Hex,
 } from '@neo-one/client-common';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
@@ -95,8 +96,11 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return { ...result, globalIndex: new BigNumber(result.globalIndex) };
   }
 
-  public async getApplicationLogData(hash: Hash256String): Promise<RawApplicationLogData> {
-    const applicationLogData = await this.mutableClient.getApplicationLog(hash);
+  public async getApplicationLogData(
+    hash: Hash256String,
+    triggerType?: TriggerTypeJSON,
+  ): Promise<RawApplicationLogData> {
+    const applicationLogData = await this.mutableClient.getApplicationLog(hash, triggerType);
 
     return convertApplicationLogData(applicationLogData);
   }

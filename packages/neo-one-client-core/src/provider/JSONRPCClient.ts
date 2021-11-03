@@ -271,7 +271,7 @@ export class JSONRPCClient {
     return this.withInstance(async (provider) =>
       provider.request({
         method: 'getapplicationlog',
-        params: [hash, trigger],
+        params: trigger === undefined ? [hash] : [hash, trigger],
       }),
     );
   }
