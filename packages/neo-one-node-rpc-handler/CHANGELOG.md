@@ -1,6 +1,21 @@
 # Change Log - @neo-one/node-rpc-handler
 
-This log was last generated on Sat, 09 Oct 2021 23:05:48 GMT and should not be manually modified.
+This log was last generated on Wed, 03 Nov 2021 23:01:17 GMT and should not be manually modified.
+
+## 3.11.1
+Wed, 03 Nov 2021 23:01:17 GMT
+
+### Patches
+
+- Update neo-one deps
+
+## 3.11.0
+Wed, 03 Nov 2021 22:49:14 GMT
+
+### Minor changes
+
+- Updates for policy and vote changes and more
+- Cleanup getfailedtransactions
 
 ## 3.10.3
 Sat, 09 Oct 2021 23:05:48 GMT

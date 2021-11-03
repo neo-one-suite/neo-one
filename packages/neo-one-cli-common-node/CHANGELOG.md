@@ -1,6 +1,13 @@
 # Change Log - @neo-one/cli-common-node
 
-This log was last generated on Thu, 07 Oct 2021 04:09:53 GMT and should not be manually modified.
+This log was last generated on Wed, 03 Nov 2021 23:01:17 GMT and should not be manually modified.
+
+## 3.9.1
+Wed, 03 Nov 2021 23:01:17 GMT
+
+### Patches
+
+- Update neo-one deps
 
 ## 3.9.0
 Thu, 07 Oct 2021 04:09:53 GMT

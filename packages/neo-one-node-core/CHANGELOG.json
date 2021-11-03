@@ -2,6 +2,49 @@
   "name": "@neo-one/node-core",
   "entries": [
     {
+      "version": "3.9.1",
+      "tag": "@neo-one/node-core_v3.9.1",
+      "date": "Wed, 03 Nov 2021 23:01:17 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update neo-one deps"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-common\" from `^3.9.0` to `^3.9.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-full-common\" from `^3.8.2` to `^3.8.3`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "3.9.0",
+      "tag": "@neo-one/node-core_v3.9.0",
+      "date": "Wed, 03 Nov 2021 22:49:14 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update nef file"
+          },
+          {
+            "comment": "Updates for policy and vote changes and more"
+          },
+          {
+            "comment": "Cleanup Execution model"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-common\" from `^3.8.3` to `^3.9.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.8.2",
       "tag": "@neo-one/node-core_v3.8.2",
       "date": "Sat, 09 Oct 2021 23:05:48 GMT",

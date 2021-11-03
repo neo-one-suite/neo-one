@@ -1,6 +1,13 @@
 # Change Log - @neo-one/node-offline
 
-This log was last generated on Thu, 23 Sep 2021 21:28:34 GMT and should not be manually modified.
+This log was last generated on Wed, 03 Nov 2021 23:01:17 GMT and should not be manually modified.
+
+## 3.8.1
+Wed, 03 Nov 2021 23:01:17 GMT
+
+### Patches
+
+- Update neo-one deps
 
 ## 3.8.0
 Thu, 23 Sep 2021 21:28:34 GMT

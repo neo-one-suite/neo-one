@@ -1,6 +1,20 @@
 # Change Log - @neo-one/node-neo-settings
 
-This log was last generated on Sat, 09 Oct 2021 23:05:48 GMT and should not be manually modified.
+This log was last generated on Wed, 03 Nov 2021 23:01:17 GMT and should not be manually modified.
+
+## 3.9.1
+Wed, 03 Nov 2021 23:01:17 GMT
+
+### Patches
+
+- Update neo-one deps
+
+## 3.9.0
+Wed, 03 Nov 2021 22:49:14 GMT
+
+### Minor changes
+
+- Fix milliseconds per block
 
 ## 3.8.2
 Sat, 09 Oct 2021 23:05:48 GMT

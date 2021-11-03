@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-vm",
-  "version": "3.8.4",
+  "version": "3.9.1",
   "description": "NEO•ONE C# Wrapper for Neo3 VM",
   "main": "./dist/cjs/index",
   "scripts": {
@@ -14,8 +14,8 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/edge": "^15.0.0",
-    "@neo-one/node-core": "^3.8.2",
-    "@neo-one/client-common": "^3.8.3",
+    "@neo-one/node-core": "^3.9.1",
+    "@neo-one/client-common": "^3.9.1",
     "@neo-one/utils": "^3.2.1",
     "bn.js": "^5.0.0"
   },

@@ -2,6 +2,52 @@
   "name": "@neo-one/node-rpc-handler",
   "entries": [
     {
+      "version": "3.11.1",
+      "tag": "@neo-one/node-rpc-handler_v3.11.1",
+      "date": "Wed, 03 Nov 2021 23:01:17 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update neo-one deps"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-common\" from `^3.9.0` to `^3.9.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-switch\" from `^3.8.6` to `^3.8.7`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-core\" from `^3.9.0` to `^3.9.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "3.11.0",
+      "tag": "@neo-one/node-rpc-handler_v3.11.0",
+      "date": "Wed, 03 Nov 2021 22:49:14 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Updates for policy and vote changes and more"
+          },
+          {
+            "comment": "Cleanup getfailedtransactions"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-common\" from `^3.8.3` to `^3.9.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-core\" from `^3.8.2` to `^3.9.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.10.3",
       "tag": "@neo-one/node-rpc-handler_v3.10.3",
       "date": "Sat, 09 Oct 2021 23:05:48 GMT",
