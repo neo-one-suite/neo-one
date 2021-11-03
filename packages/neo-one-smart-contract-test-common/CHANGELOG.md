@@ -1,6 +1,13 @@
 # Change Log - @neo-one/smart-contract-test-common
 
-This log was last generated on Sat, 09 Oct 2021 23:05:48 GMT and should not be manually modified.
+This log was last generated on Wed, 03 Nov 2021 23:01:17 GMT and should not be manually modified.
+
+## 3.9.3
+Wed, 03 Nov 2021 23:01:17 GMT
+
+### Patches
+
+- Update neo-one deps
 
 ## 3.9.2
 Sat, 09 Oct 2021 23:05:48 GMT

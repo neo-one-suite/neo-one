@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-storage-cache",
-  "version": "3.8.2",
+  "version": "3.8.3",
   "description": "NEO•ONE node storage cache.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -13,9 +13,9 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-common": "^3.8.3",
-    "@neo-one/node-core": "^3.8.2",
-    "@neo-one/node-storage-common": "^3.8.2",
+    "@neo-one/client-common": "^3.9.1",
+    "@neo-one/node-core": "^3.9.1",
+    "@neo-one/node-storage-common": "^3.9.1",
     "@neo-one/utils": "^3.2.1",
     "@types/lru-cache": "^5.1.0",
     "lru-cache": "^5.0.0",
