@@ -11,6 +11,7 @@ import {
   VerifyResultModelExtended,
   VMState,
 } from '@neo-one/client-common';
+// import { JSONRPCClient, JSONRPCHTTPProvider } from '@neo-one/client-core';
 import { AggregationType, globalStats, MeasureUnit } from '@neo-one/client-switch';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
@@ -1120,6 +1121,29 @@ export class Blockchain {
       });
   }
 
+  // private async auditFailedTxs(txData: readonly TransactionData[], block: Block) {
+  //   const provider = new JSONRPCClient(new JSONRPCHTTPProvider('http://seed2t4.neo.org:20332'));
+  //   await Promise.all(
+  //     txData
+  //       .filter((td) => td.executionResult.state === VMState.FAULT)
+  //       .map(async (txDataIn) => {
+  //         const hash = common.uInt256ToString(txDataIn.hash);
+  //         const message = (txDataIn.executionResult as ExecutionResultError).message;
+  //         const { executions } = await provider.getApplicationLog(hash);
+  //         logger.info({ title: 'failed_transaction_audit' });
+  //         const { vmstate, exception } = executions[0];
+  //         if (vmstate !== 'FAULT') {
+  //           throw new Error(`Transaction ${hash} in block ${block.index} should not have FAULTed`);
+  //         }
+  //         if (exception !== message) {
+  //           throw new Error(
+  //             `Transaction ${hash} in block ${block.index} error message ${message} does not match expected message of ${exception}`,
+  //           );
+  //         }
+  //       }),
+  //   );
+  // }
+
   private async persistBlockInternal(block: Block, verify?: boolean): Promise<void> {
     globalStats.record([
       {
@@ -1144,6 +1168,7 @@ export class Blockchain {
       blockActionsCount,
     } = blockchain.persistBlock(block, prevBlockData.lastGlobalActionIndex, prevBlockData.lastGlobalTransactionIndex);
     const failedTxs = this.getFailedTransactions(transactionData, block);
+    // await this.auditFailedTxs(transactionData, block);
     const actionUpdates = this.getActionUpdates(actions);
     const transactionDataUpdates = this.getTransactionDataChangeSet(transactionData);
     const blockDataUpdates = this.getBlockDataUpdates({

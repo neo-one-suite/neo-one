@@ -3,7 +3,7 @@
     {
       "packageName": "@neo-one/node-rpc-handler",
       "comment": "Cleanup getfailedtransactions",
-      "type": "none"
+      "type": "minor"
     }
   ],
   "packageName": "@neo-one/node-rpc-handler",

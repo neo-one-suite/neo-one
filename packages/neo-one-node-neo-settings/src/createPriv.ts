@@ -30,6 +30,9 @@ export const createPriv = ({
 
   const millisecondsPerBlockFinal =
     millisecondsPerBlock === undefined ? commonSettings.millisecondsPerBlock : millisecondsPerBlock;
+  if (millisecondsPerBlockFinal === 0) {
+    throw new Error('millisecondsPerBlock cannot be 0');
+  }
 
   return {
     genesisBlock: commonSettings.genesisBlock,

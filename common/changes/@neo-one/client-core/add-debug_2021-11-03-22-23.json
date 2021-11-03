@@ -2,7 +2,7 @@
   "changes": [
     {
       "packageName": "@neo-one/client-core",
-      "comment": "Cleanup execution data converter",
+      "comment": "Update getapplicationlog method",
       "type": "minor"
     }
   ],
