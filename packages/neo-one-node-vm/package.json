@@ -13,7 +13,7 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/edge": "^15.0.0",
+    "@neo-one/edge": "^16.0.4",
     "@neo-one/node-core": "^3.9.1",
     "@neo-one/client-common": "^3.9.1",
     "@neo-one/utils": "^3.2.1",

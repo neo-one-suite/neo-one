@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -10,20 +10,22 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.3" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="3.11.0.0" />
     <PackageReference Include="RocksDbNative" Version="6.2.2" />
     <PackageReference Include="RocksDbSharp" Version="6.2.2" />
-    <PackageReference Include="Neo-VM-N1-Fork" Version="3.0.1" />
-    <PackageReference Include="Neo-NEO-ONE-Fork" Version="3.0.3" />
+    <PackageReference Include="Neo-VM-N1-Fork" Version="3.0.1.1" />
+    <PackageReference Include="Neo-NEO-ONE-Fork" Version="3.0.3.1" />
     <!-- <ProjectReference Include="/Users/spencercorwin/neo/src/neo/neo.csproj" /> -->
     <!-- <ProjectReference Include="/Users/spencercorwin/neo-vm/src/neo-vm/neo-vm.csproj" /> -->
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="EdgeJs">
-      <HintPath>../node_modules/@neo-one/edge/src/double/Edge.js/bin/Release/netcoreapp3.0/EdgeJs.dll</HintPath>
+      <HintPath>../node_modules/@neo-one/edge/src/double/Edge.js/bin/Release/net5.0/EdgeJs.dll</HintPath>
       <Private>true</Private>
     </Reference>
   </ItemGroup>

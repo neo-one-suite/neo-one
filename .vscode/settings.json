@@ -22,6 +22,6 @@
     "packages/*/dist/**": true
   },
   "files.exclude": {
-    "packages/neo-one-csharp-vm/lib/obj/Debug/netcoreapp3.0/.NETCoreApp,Version=v3.0.AssemblyAttributes.cs": true
+    "packages/neo-one-csharp-vm/lib/obj/Debug/net5.0/.NETCoreApp,Version=v3.0.AssemblyAttributes.cs": true
   }
 }

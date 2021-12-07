@@ -55,19 +55,19 @@ Here's how to setup your local development environment:
 - Linux and Mac: We recommend using [Node Version Manager](https://github.com/creationix/nvm).
 - Windows: We recommend using [Chocolatey](https://chocolatey.org/).
 
-2. Install [C# .NET](https://docs.microsoft.com/en-us/dotnet/) version 3.1.401
+2. Install [C# .NET](https://docs.microsoft.com/en-us/dotnet/) version 5.0.302
 
 3. Add a `global.json` file to the root of your project repo with this JSON:
 
 ```json
 {
   "sdk": {
-    "version": "3.1.401"
+    "version": "5.0.302"
   }
 }
 ```
 
-This tells your local C# .NET runtime to use version 3.1.401 in this repo, even if you have newer versions installed on your machine.
+This tells your local C# .NET runtime to use version 5.0.302 in this repo, even if you have newer versions installed on your machine.
 
 4. Follow the [installation instructions for Create React App](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) to make a new project.
 
@@ -88,14 +88,20 @@ npm install @neo-one/cli@prerelease @neo-one/client@prerelease @neo-one/smart-co
 7. Add environment variables to get the NEO•ONE node working:
 
 - On **Windows**:
+
   - Add these environment variables to your shell environment:
     - `EDGE_USE_CORECLR=1`
-    - `EDGE_APP_ROOT=<path/to/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/netcoreapp3.0`
+    - `EDGE_APP_ROOT=<path/to/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/net5.0`
+      - If after adding `EDGE_APP_ROOT` and `EDGE_USE_CORECLR` to the shell environment you still get errors then add the same `EDGE_APP_ROOT` variable before the shell command that you are trying to run with NEO•ONE. For example: `EDGE_APP_ROOT=<path/to/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/net5.0 npx neo-one start network`.
 
 - On **macOS**:
+  - Add these environment variables to your shell environment:
+    - `EDGE_USE_CORECLR=1`
+    - `EDGE_APP_ROOT=<path/to/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/net5.0`
+      - If after adding `EDGE_APP_ROOT` and `EDGE_USE_CORECLR` to the shell environment you still get errors then add the same `EDGE_APP_ROOT` variable before the shell command that you are trying to run with NEO•ONE. For example: `EDGE_APP_ROOT=<path/to/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/net5.0 npx neo-one start network`.
   - Install `pkgconfig` on macOS with Homebrew: `brew install pkgconfig`
     - Then add this environment variable: `PKG_CONFIG_PATH=/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig`
-    - You then need to re-install your node modules by deleting the `node_modules` folder and then running `npm install` again 
+    - You then need to re-install your node modules by deleting the `node_modules` folder and then running `npm install` again
 
 8. Run `yarn neo-one init` or `npx neo-one init`
 
@@ -114,7 +120,8 @@ You may or may not run into environment problems when using the CLI, trying to t
 
 - Add these environment variables to your shell environment:
   - `EDGE_USE_CORECLR=1`
-  - `EDGE_APP_ROOT=<path/to/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/netcoreapp3.0`
+  - `EDGE_APP_ROOT=<path/to/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/net5.0`
+    - If after adding `EDGE_APP_ROOT` and `EDGE_USE_CORECLR` to the shell environment you still get errors then add the same `EDGE_APP_ROOT` variable before the shell command that you are trying to run with NEO•ONE. For example: `EDGE_APP_ROOT=<path/to/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/net5.0 npx neo-one start network`.
 - Install `pkgconfig` on macOS with Homebrew: `brew install pkgconfig`
   - Then add this environment variable: `PKG_CONFIG_PATH=/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig`
   - You then need to re-install your node modules by deleting the `node_modules` folder and then running `npm install` again
