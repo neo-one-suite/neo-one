@@ -4,7 +4,7 @@
 
 1. Install NodeJS
 2. Install RushJS
-3. Install C# dotnet v3.1.401
+3. Install C# .NET v5.0.302
 4. Install rocksdb with Homebrew
 
 ## Steps required to build/run the node from source

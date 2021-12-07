@@ -20,7 +20,7 @@ This can be useful for local debugging and if you would like to make your own co
   - Windows: We recommend using [Chocolatey](https://chocolatey.org/).
 - [Yarn](https://yarnpkg.com/) (recommended)
 - [RushJS](https://rushjs.io/)
-- [C# .NET](https://docs.microsoft.com/en-us/dotnet/) version 3.1.401
+- [C# .NET](https://docs.microsoft.com/en-us/dotnet/) version 5.0.302
 
 ---
 
@@ -78,16 +78,24 @@ You can also add a `.neo-onerc` configuration file anywhere in the app directory
 Make sure you add these environment variables to get the NEO•ONE node working:
 
 On **Windows**:
+
 - Add these environment variables to your shell environment:
   - `EDGE_USE_CORECLR=1`
-  - `EDGE_APP_ROOT=<path/to/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/netcoreapp3.0`
+  - `EDGE_APP_ROOT=<path/to/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/net5.0`
+    - `EDGE_APP_ROOT=<path/to/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/net5.0`
+      - If after adding `EDGE_APP_ROOT` and `EDGE_USE_CORECLR` to the shell environment you still get errors then add the same `EDGE_APP_ROOT` variable before the shell command that you are trying to run with NEO•ONE. For example: `EDGE_APP_ROOT=<path/to/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/net5.0 npx neo-one start network`.
 
 On **macOS**:
+
+- Add these environment variables to your shell environment:
+  - `EDGE_USE_CORECLR=1`
+  - `EDGE_APP_ROOT=<path/to/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/net5.0`
+    - If after adding `EDGE_APP_ROOT` and `EDGE_USE_CORECLR` to the shell environment you still get errors then add the same `EDGE_APP_ROOT` variable before the shell command that you are trying to run with NEO•ONE. For example: `EDGE_APP_ROOT=<path/to/project>/node_modules/@neo-one/node-vm/lib/bin/Debug/net5.0 npx neo-one start network`.
 - Install `pkgconfig` on macOS with Homebrew: `brew install pkgconfig`
   - Then add this environment variable: `PKG_CONFIG_PATH=/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig`
   - You then need to re-install your node modules by deleting the `node_modules` folder and then running `npm install` again
 
 **Testing your setup:**
+
 - Use `npx neo-one start network`. The output should be something like `{"level":30,"time":1625855073745,"service":"node","service":"blockchain","name":"neo_blockchain_start","msg":"Neo blockchain started.","v":1}`. You may need to use `sudo` depending on your project configuration.
 - If you run into problems, then please reach out to us on [Discord](https://discord.gg/S86PqDE)
-

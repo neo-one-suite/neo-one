@@ -8,7 +8,7 @@ import { DefaultMethods, DispatcherFunc } from './types';
 const directory = path.basename(__dirname);
 const APP_ROOT =
   directory === 'cjs' || directory === 'esm' ? path.resolve(__dirname, '..', '..') : path.resolve(__dirname, '..');
-const CSHARP_APP_ROOT = process.env.EDGE_APP_ROOT ?? path.resolve(APP_ROOT, 'lib', 'bin', 'Debug', 'netcoreapp3.0');
+const CSHARP_APP_ROOT = process.env.EDGE_APP_ROOT ?? path.resolve(APP_ROOT, 'lib', 'bin', 'Debug', 'net5.0');
 
 export const constants = {
   APP_ROOT,

@@ -872,15 +872,17 @@ export class Blockchain {
       block,
     });
 
-    const nep17BalancePairs = assetKeys.map((key) => {
-      const script = new ScriptBuilder()
-        .emitDynamicAppCall(key.assetScriptHash, 'balanceOf', CallFlags.All, key.userScriptHash)
-        .build();
-      const callReceipt = this.invokeScript({ script });
-      const balanceBuffer = callReceipt.result.stack[0].asBuffer(true);
+    const nep17BalancePairs = assetKeys
+      .filter((key) => !key.userScriptHash.equals(common.ZERO_UINT160))
+      .map((key) => {
+        const script = new ScriptBuilder()
+          .emitDynamicAppCall(key.assetScriptHash, 'balanceOf', CallFlags.All, key.userScriptHash)
+          .build();
+        const callReceipt = this.invokeScript({ script });
+        const balanceBuffer = callReceipt.result.stack[0].asBuffer(true);
 
-      return { key, value: new Nep17Balance({ balanceBuffer, lastUpdatedBlock: this.currentBlockIndex }) };
-    });
+        return { key, value: new Nep17Balance({ balanceBuffer, lastUpdatedBlock: this.currentBlockIndex }) };
+      });
 
     const nep17BalanceChangeSet: ChangeSet = nep17BalancePairs.map(({ key, value }) => {
       if (value.balance.eqn(0)) {
@@ -1122,7 +1124,9 @@ export class Blockchain {
   }
 
   // private async auditFailedTxs(txData: readonly TransactionData[], block: Block) {
-  //   const provider = new JSONRPCClient(new JSONRPCHTTPProvider('http://seed2t4.neo.org:20332'));
+  //   const n3TestNet = 'http://seed2t4.neo.org:20332';
+  //   const n3MainNet = 'http://seed2.neo.org:10332';
+  //   const provider = new JSONRPCClient(new JSONRPCHTTPProvider(n3MainNet));
   //   await Promise.all(
   //     txData
   //       .filter((td) => td.executionResult.state === VMState.FAULT)
@@ -1133,7 +1137,11 @@ export class Blockchain {
   //         logger.info({ title: 'failed_transaction_audit' });
   //         const { vmstate, exception } = executions[0];
   //         if (vmstate !== 'FAULT') {
-  //           throw new Error(`Transaction ${hash} in block ${block.index} should not have FAULTed`);
+  //           throw new Error(
+  //             `Transaction ${hash} in block ${block.index} should not have FAULTed. Message: ${
+  //               (txDataIn.executionResult as ExecutionResultError).message
+  //             }`,
+  //           );
   //         }
   //         if (exception !== message) {
   //           throw new Error(

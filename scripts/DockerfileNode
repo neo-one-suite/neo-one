@@ -140,7 +140,7 @@ COPY --from=builder /tmp/neo-one/packages/neo-one-node-native/dist/cjs packages/
 COPY --from=builder /tmp/neo-one/packages/neo-one-node-native/node_modules packages/neo-one-node-native/node_modules/
 COPY --from=builder /tmp/neo-one/common/temp/node_modules common/temp/node_modules/
 
-ENV EDGE_APP_ROOT /neo-one/packages/neo-one-node-vm/lib/bin/Debug/netcoreapp3.0
+ENV EDGE_APP_ROOT /neo-one/packages/neo-one-node-vm/lib/bin/Debug/net5.0
 ENV EDGE_USE_CORELR 1
 RUN dotnet build packages/neo-one-node-vm/lib
 

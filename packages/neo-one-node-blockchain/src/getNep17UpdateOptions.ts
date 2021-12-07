@@ -1,4 +1,4 @@
-import { common } from '@neo-one/client-common';
+import { common, VMState } from '@neo-one/client-common';
 import {
   ApplicationExecuted,
   Block,
@@ -36,10 +36,9 @@ export function getNep17UpdateOptions({
   const mutableTransfersReceived: Nep17TransferReturn[] = [];
 
   applicationsExecuted.forEach((appExecuted) => {
-    // We capture FAULT executions as well for debugging purposes
-    // if (appExecuted.state === VMState.FAULT) {
-    //   return;
-    // }
+    if (appExecuted.state === VMState.FAULT) {
+      return;
+    }
 
     appExecuted.notifications.forEach((notifyEventArgs) => {
       const { container, scriptHash, eventName, state: stateItems } = notifyEventArgs;

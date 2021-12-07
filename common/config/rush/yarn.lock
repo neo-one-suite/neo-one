@@ -1772,10 +1772,18 @@
   dependencies:
     asn1.js "^1.0.4"
 
-"@neo-one/edge@^15.0.0":
-  version "15.0.0"
-  resolved "https://registry.yarnpkg.com/@neo-one/edge/-/edge-15.0.0.tgz#e76de2a71f647e3a2ecc7e1e12912c24224e4c61"
-  integrity sha512-oBxcE1r5vNHreZmQYWnVZLniJXBVv6A5VY5Viqd3hF7WcEa9aT2Z+3bSgvHtT6TykIJhonXwBoilcFdS08Ux6A==
+"@neo-one/edge@^16.0.3":
+  version "16.0.3"
+  resolved "https://registry.yarnpkg.com/@neo-one/edge/-/edge-16.0.3.tgz#47d84d54f349f7650e83a7511e2e9fa7611ed8de"
+  integrity sha512-JL9WO0HKLWQgsghJhpbpxQIRqNKAVbnufbCWuanrEGw2lSKhIT7rR2jMxbRswUydRlB38KPz3JvKXVbu7mcHEA==
+  dependencies:
+    edge-cs "1.2.1"
+    nan "^2.14.0"
+
+"@neo-one/edge@^16.0.4":
+  version "16.0.4"
+  resolved "https://registry.yarnpkg.com/@neo-one/edge/-/edge-16.0.4.tgz#2794937b3a178a222f5b018370faa3625aedc4c3"
+  integrity sha512-4w9AFIDmXRmmkUL0eQyHq5pXdAFmiHddzAl2Wj4ykm2F8ZJJ9pwe/g3rPQAi7V8mfm00OTvtjiJ4svaymMd/xQ==
   dependencies:
     edge-cs "1.2.1"
     nan "^2.14.0"
@@ -1956,17 +1964,6 @@
     "@nodelib/fs.scandir" "2.1.3"
     fastq "^1.6.0"
 
-"@opencensus/core@^0.0.19":
-  version "0.0.19"
-  resolved "https://registry.yarnpkg.com/@opencensus/core/-/core-0.0.19.tgz#058a2885179bb9f89db7fa93b366a73e51c0c8dc"
-  integrity sha512-Y5QXa7vggMU0+jveLcworfX9jNnztix7x1NraAV0uGkTp4y46HrFl0DnNcnNxUDvBu/cYeWRwlmhiWlr9+adOQ==
-  dependencies:
-    continuation-local-storage "^3.2.1"
-    log-driver "^1.2.7"
-    semver "^6.0.0"
-    shimmer "^1.2.0"
-    uuid "^3.2.1"
-
 "@opencensus/core@^0.1.0":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@opencensus/core/-/core-0.1.0.tgz#dbb06007f9b924ab5d58411bb39d43fa1cb153e3"
@@ -1978,14 +1975,6 @@
     shimmer "^1.2.0"
     uuid "^8.0.0"
 
-"@opencensus/exporter-jaeger@^0.0.19":
-  version "0.0.19"
-  resolved "https://registry.yarnpkg.com/@opencensus/exporter-jaeger/-/exporter-jaeger-0.0.19.tgz#38abd5e791202b53c127b3e4f1b3d4ee3f1bcbf4"
-  integrity sha512-wlbPfTU8EhU7dhQMzMh8vJeHQ3GelEoAiMnKx53KtPjTi4Kl6jaLwizwxxiIWBc2P0QEANVWLyBR1pmazoQ/Jg==
-  dependencies:
-    "@opencensus/core" "^0.0.19"
-    jaeger-client "~3.17.0"
-
 "@opencensus/exporter-jaeger@^0.1.0":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@opencensus/exporter-jaeger/-/exporter-jaeger-0.1.0.tgz#634109b2668277da6ae644f15c0c6e434d6688c4"
@@ -1993,15 +1982,6 @@
   dependencies:
     "@opencensus/core" "^0.1.0"
     jaeger-client "~3.18.0"
-
-"@opencensus/exporter-prometheus@^0.0.19":
-  version "0.0.19"
-  resolved "https://registry.yarnpkg.com/@opencensus/exporter-prometheus/-/exporter-prometheus-0.0.19.tgz#b2f9b3d1a7b8019e3bad9f769b93bc76a2914a6b"
-  integrity sha512-htVWkHPCA7OO00t21MidSNHJ3+blLnXQkxx6P2reARvKg2bRn5d1RAkIK5sBbS6eHrIFkI21VWGGUtcFJlE6Dw==
-  dependencies:
-    "@opencensus/core" "^0.0.19"
-    express "^4.16.3"
-    prom-client "^11.1.1"
 
 "@opencensus/exporter-prometheus@^0.1.0":
   version "0.1.0"
@@ -2012,15 +1992,6 @@
     express "^4.16.3"
     prom-client "^11.1.1"
 
-"@opencensus/nodejs-base@^0.0.19":
-  version "0.0.19"
-  resolved "https://registry.yarnpkg.com/@opencensus/nodejs-base/-/nodejs-base-0.0.19.tgz#69aad730543cb740b942928aea9d09c7d7971c13"
-  integrity sha512-pzhvCQv2HPVdhkazPf9U55pC9LU6jTvJjilWHI+3vnHXNOozDTGK/3UwIxvlLcwzi0K2qJ1ubOsHry38sanBtg==
-  dependencies:
-    "@opencensus/core" "^0.0.19"
-    extend "^3.0.2"
-    require-in-the-middle "^4.0.0"
-
 "@opencensus/nodejs-base@^0.1.0":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@opencensus/nodejs-base/-/nodejs-base-0.1.0.tgz#2123d78a83b04b58c890906f6c0500d6d0a9a352"
@@ -2029,13 +2000,6 @@
     "@opencensus/core" "^0.1.0"
     extend "^3.0.2"
     require-in-the-middle "^4.0.0"
-
-"@opencensus/propagation-tracecontext@^0.0.19":
-  version "0.0.19"
-  resolved "https://registry.yarnpkg.com/@opencensus/propagation-tracecontext/-/propagation-tracecontext-0.0.19.tgz#9776fd0528dfc3432cd40321cf1589a9733dcdca"
-  integrity sha512-6uO5VA744ESiwSswM5+ADR7NuDaopYHAhgasuKu2sLa4WYOkMHHZzAZ9gRcP+JHSQydwcKDgSlmfBx4QijdB+w==
-  dependencies:
-    "@opencensus/core" "^0.0.19"
 
 "@opencensus/propagation-tracecontext@^0.1.0":
   version "0.1.0"
@@ -2944,7 +2908,7 @@
   version "0.0.0"
   resolved "file:./projects/node-vm.tgz"
   dependencies:
-    "@neo-one/edge" "^15.0.0"
+    "@neo-one/edge" "^16.0.4"
     "@types/jest" "^24.0.18"
     "@types/lodash" "^4.14.138"
     bn.js "^5.0.0"
@@ -12414,17 +12378,6 @@ ix@^2.5.3:
     "@types/node" "^11.11.6"
     tslib "^1.9.3"
 
-jaeger-client@~3.17.0:
-  version "3.17.2"
-  resolved "https://registry.yarnpkg.com/jaeger-client/-/jaeger-client-3.17.2.tgz#92cf26752c5c66f3e66adf595cdde2f548cc0804"
-  integrity sha512-19YloSidmKbrXHgecLWod8eXo7rm2ieUnsfg0ripTFGRCW5v2OWE96Gte4/tOQG/8N+T39VoLU2nMBdjbdMUJg==
-  dependencies:
-    node-int64 "^0.4.0"
-    opentracing "^0.13.0"
-    thriftrw "^3.5.0"
-    uuid "^3.2.1"
-    xorshift "^0.2.0"
-
 jaeger-client@~3.18.0:
   version "3.18.1"
   resolved "https://registry.yarnpkg.com/jaeger-client/-/jaeger-client-3.18.1.tgz#a8c7a778244ba117f4fb8775eb6aa5508703564e"
@@ -15497,11 +15450,6 @@ opener@^1.5.1:
   resolved "https://registry.yarnpkg.com/opener/-/opener-1.5.1.tgz#6d2f0e77f1a0af0032aca716c2c1fbb8e7e8abed"
   integrity sha512-goYSy5c2UXE4Ra1xixabeVh1guIX/ZV/YokJksb6q2lubWu6UbvPQ20p542/sFIll1nl8JnCyK9oBaOcCWXwvA==
 
-opentracing@^0.13.0:
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/opentracing/-/opentracing-0.13.0.tgz#6a341442f09d7d866bc11ed03de1e3828e3d6aab"
-  integrity sha1-ajQUQvCdfYZrwR7QPeHjgo49aqs=
-
 opentracing@^0.14.4:
   version "0.14.5"
   resolved "https://registry.yarnpkg.com/opentracing/-/opentracing-0.14.5.tgz#891fa92cd90a24e64f99bc964370227310926c85"
@@ -16743,7 +16691,7 @@ preserve@^0.2.0:
   resolved "https://registry.yarnpkg.com/preserve/-/preserve-0.2.0.tgz#815ed1f6ebc65926f865b310c0713bcb3315ce4b"
   integrity sha1-gV7R9uvGWSb4ZbMQwHE7yzMVzks=
 
-prettier@^2.0.1, prettier@^2.4.1:
+prettier@^2.4.1:
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.4.1.tgz#671e11c89c14a4cfc876ce564106c4a6726c9f5c"
   integrity sha512-9fbDAXSBcc6Bs1mZrDYb3XKzDLm4EXXL9sC1LqKP5rZkT6KRr/rf9amVUcODVXgguK/isJz0d0hP72WeaKWsvA==
