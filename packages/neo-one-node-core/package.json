@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-core",
-  "version": "3.9.1",
+  "version": "3.11.2",
   "description": "NEO•ONE core types for node packages",
   "main": "./dist/cjs/index",
   "scripts": {
@@ -12,8 +12,8 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-common": "^3.9.1",
-    "@neo-one/client-full-common": "^3.8.3",
+    "@neo-one/client-common": "^3.11.2",
+    "@neo-one/client-full-common": "^3.11.2",
     "@neo-one/utils": "^3.2.1",
     "bignumber.js": "^9.0.0",
     "bn.js": "^5.0.0",

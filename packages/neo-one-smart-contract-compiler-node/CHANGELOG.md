@@ -1,6 +1,11 @@
 # Change Log - @neo-one/smart-contract-compiler-node
 
-This log was last generated on Thu, 23 Sep 2021 21:28:34 GMT and should not be manually modified.
+This log was last generated on Tue, 07 Dec 2021 02:24:31 GMT and should not be manually modified.
+
+## 3.11.2
+Tue, 07 Dec 2021 02:24:31 GMT
+
+*Version update only*
 
 ## 3.8.0
 Thu, 23 Sep 2021 21:28:34 GMT

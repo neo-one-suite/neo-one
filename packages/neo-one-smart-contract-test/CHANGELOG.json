@@ -2,6 +2,21 @@
   "name": "@neo-one/smart-contract-test",
   "entries": [
     {
+      "version": "3.11.2",
+      "tag": "@neo-one/smart-contract-test_v3.11.2",
+      "date": "Tue, 07 Dec 2021 02:24:31 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Dependency @neo-one/node version bump from ^3.8.5 to ^3.11.2."
+          },
+          {
+            "comment": "Dependency @neo-one/node-neo-settings version bump from ^3.9.1 to ^3.11.2."
+          }
+        ]
+      }
+    },
+    {
       "version": "3.9.3",
       "tag": "@neo-one/smart-contract-test_v3.9.3",
       "date": "Wed, 03 Nov 2021 23:01:17 GMT",
