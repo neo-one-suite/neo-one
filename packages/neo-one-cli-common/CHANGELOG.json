@@ -2,6 +2,12 @@
   "name": "@neo-one/cli-common",
   "entries": [
     {
+      "version": "3.11.2",
+      "tag": "@neo-one/cli-common_v3.11.2",
+      "date": "Tue, 07 Dec 2021 02:24:31 GMT",
+      "comments": {}
+    },
+    {
       "version": "3.9.3",
       "tag": "@neo-one/cli-common_v3.9.3",
       "date": "Wed, 03 Nov 2021 23:01:17 GMT",

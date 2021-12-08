@@ -1,6 +1,11 @@
 # Change Log - @neo-one/node-rpc-handler
 
-This log was last generated on Wed, 03 Nov 2021 23:01:17 GMT and should not be manually modified.
+This log was last generated on Tue, 07 Dec 2021 02:24:31 GMT and should not be manually modified.
+
+## 3.11.2
+Tue, 07 Dec 2021 02:24:31 GMT
+
+*Version update only*
 
 ## 3.11.1
 Wed, 03 Nov 2021 23:01:17 GMT

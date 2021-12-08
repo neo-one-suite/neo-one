@@ -2,6 +2,12 @@
   "name": "@neo-one/http-context",
   "entries": [
     {
+      "version": "3.11.2",
+      "tag": "@neo-one/http-context_v3.11.2",
+      "date": "Tue, 07 Dec 2021 02:24:31 GMT",
+      "comments": {}
+    },
+    {
       "version": "3.8.4",
       "tag": "@neo-one/http-context_v3.8.4",
       "date": "Sat, 09 Oct 2021 23:05:48 GMT",

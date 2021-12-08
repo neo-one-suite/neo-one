@@ -2,6 +2,12 @@
   "name": "@neo-one/react-common",
   "entries": [
     {
+      "version": "3.11.2",
+      "tag": "@neo-one/react-common_v3.11.2",
+      "date": "Tue, 07 Dec 2021 02:24:31 GMT",
+      "comments": {}
+    },
+    {
       "version": "3.8.0",
       "tag": "@neo-one/react-common_v3.8.0",
       "date": "Thu, 23 Sep 2021 21:28:34 GMT",

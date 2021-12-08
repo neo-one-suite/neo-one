@@ -2,6 +2,21 @@
   "name": "@neo-one/node-bin",
   "entries": [
     {
+      "version": "3.11.2",
+      "tag": "@neo-one/node-bin_v3.11.2",
+      "date": "Tue, 07 Dec 2021 02:24:31 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Dependency @neo-one/client version bump from ^3.10.1 to ^3.11.2."
+          },
+          {
+            "comment": "Dependency @neo-one/client-common version bump from ^3.9.1 to ^3.11.2."
+          }
+        ]
+      }
+    },
+    {
       "version": "3.8.3",
       "tag": "@neo-one/node-bin_v3.8.3",
       "date": "Wed, 03 Nov 2021 23:01:17 GMT",

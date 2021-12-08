@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "changeType": 1,
+      "comment": "Dependency @neo-one/smart-contract-compiler-node version bump from ^3.8.0 to ^3.11.2.",
+      "packageName": "@neo-one/typescript-concatenator"
+    }
+  ],
+  "packageName": "@neo-one/typescript-concatenator",
+  "email": "29364457+spencercorwin@users.noreply.github.com"
+}

@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client-core",
-  "version": "3.11.1",
+  "version": "3.11.2",
   "description": "NEO•ONE client core types implementation.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -13,8 +13,8 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-common": "^3.9.1",
-    "@neo-one/client-switch": "^3.8.7",
+    "@neo-one/client-common": "^3.11.2",
+    "@neo-one/client-switch": "^3.11.2",
     "@neo-one/utils": "^3.2.1",
     "@reactivex/ix-es2015-cjs": "^2.5.3",
     "@reactivex/ix-esnext-esm": "^2.5.3",

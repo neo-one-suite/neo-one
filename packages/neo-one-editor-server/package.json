@@ -11,7 +11,7 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/http": "^3.8.0",
+    "@neo-one/http": "^3.11.2",
     "@neo-one/logger": "^2.7.0",
     "@neo-one/utils": "^3.2.1",
     "@neo-one/utils-node": "^2.7.0",
