@@ -18,7 +18,7 @@ This page describes how to setup NEO•ONE using `yarn` or `npm`.
 - [Node](https://nodejs.org) >= 10.16.0 (We recommend the latest version)
   - Linux and Mac: We recommend using [Node Version Manager](https://github.com/creationix/nvm).
   - Windows: We recommend using [Chocolatey](https://chocolatey.org/).
-- [C# .NET](https://docs.microsoft.com/en-us/dotnet/) version 3.1.404
+- [C# .NET](https://docs.microsoft.com/en-us/dotnet/) version 5.0.302
 
 ---
 
@@ -35,12 +35,12 @@ This page describes how to setup NEO•ONE using `yarn` or `npm`.
 ```json
 {
   "sdk": {
-    "version": "3.1.404"
+    "version": "5.0.302"
   }
 }
 ```
 
-This tells your local C# .NET runtime to use version 3.1.404 in this repo. Make sure you are using versions 3.1.4xx. You can view the installed SDKs by typing `dotnet --list-sdks` on the console. To confirm you are using a compatible version, type `dotnet --version` inside the project folder. NEO•ONE will use the latest version unless it sees the `global.json`. This is required because NEO•ONE node uses the official C# NeoVM under the hood.
+This tells your local C# .NET runtime to use version 5.0.302 in this repo. Make sure you are using versions 5.0.3xx. You can view the installed SDKs by typing `dotnet --list-sdks` on the console. To confirm you are using a compatible version, type `dotnet --version` inside the project folder. NEO•ONE will use the latest version unless it sees the `global.json`. This is required because NEO•ONE node uses the official C# NeoVM under the hood.
 
 **You need to add environment variables to get the NEO•ONE node working.**
 

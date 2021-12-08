@@ -36,18 +36,18 @@ Tip
    - Linux and Mac: [Node Version Manager](https://github.com/creationix/nvm). (`recommended`)
    - Windows: We recommend using [Chocolatey](https://chocolatey.org/). (`recommended`)
 
-2. Install [C# .NET](https://docs.microsoft.com/en-us/dotnet/) version 3.1.404
+2. Install [C# .NET](https://docs.microsoft.com/en-us/dotnet/) version 5.0.302
 3. Add a `global.json` file to the root of your project repo with this JSON:
 
 ```json
 {
   "sdk": {
-    "version": "3.1.404"
+    "version": "5.0.302"
   }
 }
 ```
 
-This tells your local C# .NET runtime to use version 3.1.404 in this repo. Make sure you are using versions 3.1.4xx. You can view the installed SDKs by typing `dotnet --list-sdks` on the console. To confirm you are using a compatible version, type `dotnet --version` inside the project folder. NEO•ONE will use the latest version unless it sees the `global.json`. This is required because NEO•ONE node uses the official C# NeoVM under the hood.
+This tells your local C# .NET runtime to use version 5.0.302 in this repo. Make sure you are using versions 5.0.3xx. You can view the installed SDKs by typing `dotnet --list-sdks` on the console. To confirm you are using a compatible version, type `dotnet --version` inside the project folder. NEO•ONE will use the latest version unless it sees the `global.json`. This is required because NEO•ONE node uses the official C# NeoVM under the hood.
 
 4. Follow the [installation instructions for Create React App](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) to make a new project.
 
