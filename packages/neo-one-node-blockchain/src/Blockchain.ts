@@ -1,8 +1,10 @@
 import {
   CallFlags,
   common,
+  // ContractParameterJSON,
   crypto,
   ECPoint,
+  // JSONHelper,
   ScriptBuilder,
   TriggerType,
   UInt160,
@@ -1138,9 +1140,7 @@ export class Blockchain {
   //         const { vmstate, exception } = executions[0];
   //         if (vmstate !== 'FAULT') {
   //           throw new Error(
-  //             `Transaction ${hash} in block ${block.index} should not have FAULTed. Message: ${
-  //               (txDataIn.executionResult as ExecutionResultError).message
-  //             }`,
+  //             `Transaction ${hash} in block ${block.index} should not have FAULTed. Message: ${(txDataIn.executionResult as ExecutionResultError).message}`,
   //           );
   //         }
   //         if (exception !== message) {
@@ -1151,6 +1151,84 @@ export class Blockchain {
   //       }),
   //   );
   // }
+
+  // tslint:disable: no-any no-console
+  // private async auditAllTxs(txData: readonly TransactionData[], block: Block) {
+  //   const n3TestNet = 'http://seed2t4.neo.org:20332';
+  //   const n3MainNet = 'http://seed2.neo.org:10332';
+  //   const provider = new JSONRPCClient(new JSONRPCHTTPProvider(n3MainNet));
+  //   await Promise.all(
+  //     txData
+  //       .filter(({ hash }) => common.uInt256ToString(hash) !== '')
+  //       .map(async ({ hash, executionResult }) => {
+  //         const hashIn = common.uInt256ToString(hash);
+  //         const { executions } = await provider.getApplicationLog(hashIn);
+  //         logger.info({ title: 'transaction_audit' });
+  //         const { vmstate, exception, gasconsumed, stack } = executions[0];
+  //         const { state, gas_consumed, stack: oneStack, message } = executionResult.serializeJSON();
+  //         const neoOneGas = JSONHelper.readFixed8(gas_consumed).toString();
+  //         const baseMessage = `Transaction ${hashIn} in block ${block.index} did not match.`;
+  //         if (vmstate !== state) {
+  //           throw new Error(
+  //             `${baseMessage} State did not match. Got ${state} but expected ${vmstate}. Our exception: ${message}, expected message: ${exception}.`,
+  //           );
+  //         }
+  //         if (gasconsumed !== neoOneGas) {
+  //           throw new Error(
+  //             `${baseMessage} Gas consumed did not match. Expected: ${neoOneGas} but got ${gasconsumed}.`,
+  //           );
+  //         }
+  //         function compareStacks(
+  //           neoStack: string | readonly ContractParameterJSON[],
+  //           neoOneStack: readonly ContractParameterJSON[],
+  //         ) {
+  //           if (typeof neoStack === 'string') {
+  //             throw new Error(`${baseMessage} Neo node stack is a string: ${neoStack}`);
+  //           }
+  //           if (neoStack.length !== neoOneStack.length) {
+  //             throw new Error(`${baseMessage} Stack lengths do not match`);
+  //           }
+  //           const stackPrints = `Neo stack: ${neoStack
+  //             .map((s) => JSON.stringify(s))
+  //             .join(',')}\n\nNEO•ONE stack: ${neoOneStack.map((s) => JSON.stringify(s)).join(',')}`;
+  //           // tslint:disable-next-line: no-loop-statement
+  //           for (let i = 0; i < neoStack.length; i += 1) {
+  //             const one = neoStack[i];
+  //             const two = neoOneStack[i];
+  //             if (two.type === 'ByteArray') {
+  //               // tslint:disable-next-line: no-object-mutation
+  //               (two as any).type = 'ByteString';
+  //             }
+  //             if (one.type !== two.type) {
+  //               // TODO: When deploying a contract it appears that our VM will use Array stack items
+  //               // whereas the Neo node will use Struct stack items. This appears to be okay
+  //               // but should be fixed at some point.
+  //               console.log('Neo stack:', neoStack);
+  //               console.log('NEO•ONE stack:', neoOneStack);
+  //               throw new Error(`${baseMessage} Types do not match. ${stackPrints}`);
+  //             }
+  //             if (
+  //               one.type !== 'InteropInterface' &&
+  //               one.type !== 'Void' &&
+  //               two.type !== 'InteropInterface' &&
+  //               two.type !== 'Void'
+  //             ) {
+  //               if (one.type === 'Array' && two.type === 'Array') {
+  //                 compareStacks(one.value, two.value);
+  //               } else if (one.type === 'Map' && two.type === 'Map') {
+  //                 // TODO: Not sure how to handle Maps so just leaving this here for now
+  //                 compareStacks(one.value as any, two.value as any);
+  //               } else if (one.value !== two.value) {
+  //                 throw new Error(`${baseMessage} Stack values did not match. ${stackPrints}`);
+  //               }
+  //             }
+  //           }
+  //         }
+  //         compareStacks(stack, (oneStack as any).reverse());
+  //       }),
+  //   );
+  // }
+  // tslint:enable: no-any no-console
 
   private async persistBlockInternal(block: Block, verify?: boolean): Promise<void> {
     globalStats.record([
@@ -1177,6 +1255,7 @@ export class Blockchain {
     } = blockchain.persistBlock(block, prevBlockData.lastGlobalActionIndex, prevBlockData.lastGlobalTransactionIndex);
     const failedTxs = this.getFailedTransactions(transactionData, block);
     // await this.auditFailedTxs(transactionData, block);
+    // await this.auditAllTxs(transactionData, block);
     const actionUpdates = this.getActionUpdates(actions);
     const transactionDataUpdates = this.getTransactionDataChangeSet(transactionData);
     const blockDataUpdates = this.getBlockDataUpdates({

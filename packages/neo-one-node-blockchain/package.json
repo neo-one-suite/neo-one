@@ -25,6 +25,7 @@
     "rxjs": "^6.5.3"
   },
   "devDependencies": {
+    "@neo-one/client-core": "^3.11.1",
     "@neo-one/build-tools": "^1.0.0",
     "@neo-one/node-neo-settings": "^3.11.2",
     "@neo-one/node-storage-levelup": "^3.11.2",
