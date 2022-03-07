@@ -49,7 +49,7 @@
     "fs-extra": "^8.1.0",
     "glob": "^7.1.4",
     "html-entities": "^1.2.1",
-    "immer": "^5.0.0",
+    "immer": "^9.0.0",
     "jest-circus": "^24.9.0",
     "jest-matchers": "^20.0.3",
     "jest-mock": "^24.0.0",
