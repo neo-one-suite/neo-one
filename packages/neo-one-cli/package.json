@@ -56,7 +56,7 @@
     "yargs": "^14.2.0"
   },
   "devDependencies": {
-    "@angular/core": "^8.2.7",
+    "@angular/core": "^11.0.5",
     "@neo-one/build-tools": "^1.0.0",
     "@neo-one/smart-contract": "^3.11.2",
     "@neo-one/smart-contract-test": "^3.11.2",
