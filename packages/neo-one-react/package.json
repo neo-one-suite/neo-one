@@ -12,16 +12,16 @@
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "dependencies": {
-    "tslib": "^1.10.0"
+    "tslib": "^2.0.0"
   },
   "sideEffects": false,
   "peerDependencies": {
-    "@types/react": "^16.0.0",
-    "react": "^16.0.0",
-    "rxjs": "^6.0.0"
+    "@types/react": "^18.0.0",
+    "react": "^18.0.0",
+    "rxjs": "^7.0.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
-    "gulp": "~4.0.2"
+    "gulp": "~5.0.0"
   }
 }
