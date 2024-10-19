@@ -15,7 +15,7 @@
   "sideEffects": false,
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
-    "@ledgerhq/hw-transport-u2f": "^4.68.2",
+    "@ledgerhq/hw-transport-u2f": "^5.0.0",
     "@neo-one/client-common": "^3.11.2",
     "@neo-one/node-core": "^3.11.2",
     "@neo-one/utils": "^3.2.1",
@@ -28,9 +28,9 @@
     "@opencensus/web-propagation-tracecontext": "^0.0.7",
     "@opencensus/web-types": "^0.0.7",
     "lodash": "^4.17.15",
-    "regenerator-runtime": "^0.13.3",
+    "regenerator-runtime": "^0.14.0",
     "source-map": "^0.7.3",
-    "tslib": "^1.10.0"
+    "tslib": "^2.0.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
@@ -39,9 +39,9 @@
     "@types/ledgerhq__hw-transport-node-hid": "^4.22.1",
     "@types/ledgerhq__hw-transport-u2f": "^4.21.1",
     "@types/lodash": "^4.14.138",
-    "gulp": "~4.0.2"
+    "gulp": "~5.0.0"
   },
   "optionalDependencies": {
-    "@ledgerhq/hw-transport-node-hid": "^4.68.2"
+    "@ledgerhq/hw-transport-node-hid": "^6.0.0"
   }
 }
