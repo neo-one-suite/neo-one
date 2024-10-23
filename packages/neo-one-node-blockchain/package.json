@@ -21,8 +21,8 @@
     "bn.js": "^5.0.0",
     "js-priority-queue": "^0.1.5",
     "lodash": "^4.17.15",
-    "lru-cache": "^5.0.0",
-    "rxjs": "^6.5.3"
+    "lru-cache": "^11.0.0",
+    "rxjs": "^7.0.0"
   },
   "devDependencies": {
     "@neo-one/client-core": "^3.11.1",
@@ -30,17 +30,17 @@
     "@neo-one/node-neo-settings": "^3.11.2",
     "@neo-one/node-storage-levelup": "^3.11.2",
     "@neo-one/node-vm": "^3.11.2",
-    "@types/jest": "^24.0.18",
-    "@types/js-priority-queue": "^0.0.5",
-    "@types/levelup": "^3.1.1",
+    "@types/jest": "^29.0.0",
+    "@types/js-priority-queue": "^0.0.9",
+    "@types/levelup": "^5.0.0",
     "@types/leveldown": "^4.0.0",
     "@types/lodash": "^4.14.138",
-    "@types/lru-cache": "^5.1.0",
+    "@types/lru-cache": "^7.0.0",
     "@types/memdown": "^3.0.0",
-    "leveldown": "^5.1.1",
-    "levelup": "4.1.0",
-    "gulp": "~4.0.2",
-    "memdown": "^5.0.0",
-    "tslib": "^1.10.0"
+    "leveldown": "^6.0.0",
+    "levelup": "5.1.1",
+    "gulp": "~5.0.0",
+    "memdown": "^6.0.0",
+    "tslib": "^2.0.0"
   }
 }

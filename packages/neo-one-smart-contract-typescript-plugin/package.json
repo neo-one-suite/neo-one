@@ -15,10 +15,10 @@
   "dependencies": {
     "@neo-one/smart-contract-compiler": "^3.11.2",
     "@neo-one/smart-contract-compiler-node": "^3.11.2",
-    "typescript": "3.9.5"
+    "typescript": "5.6.3"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
-    "gulp": "~4.0.2"
+    "gulp": "~5.0.0"
   }
 }

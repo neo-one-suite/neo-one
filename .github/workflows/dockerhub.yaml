@@ -8,9 +8,9 @@ on:
     types: [created]
 jobs:
   node:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@a14471d838f6a7ce15cab8740f25e337c51e7cad
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: ./actions/dockerhub/
         with:
           args: -f ./scripts/DockerfileNode .
@@ -20,9 +20,9 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
   node-gsutil:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@a14471d838f6a7ce15cab8740f25e337c51e7cad
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: ./actions/dockerhub/
         with:
           args: -f ./scripts/DockerfileNodeGSUtil .

@@ -1,16 +1,16 @@
 {
   "dependencies": {
-    "@emotion/core": "10.0.27",
-    "@emotion/styled": "10.0.27",
-    "@neo-one/react": "2.3.0",
-    "@neo-one/react-core": "2.3.0",
-    "@types/react": "16.9.19",
-    "@types/react-dom": "16.9.1",
-    "bignumber.js": "9.0.0",
-    "emotion-theming": "10.0.27",
-    "react": "16.10.0",
-    "react-dom": "16.10.0",
-    "rxjs": "6.5.4",
-    "styled-tools": "1.7.1"
+    "@emotion/core": "11.0.0",
+    "@emotion/styled": "11.13.0",
+    "@neo-one/react": "2.7.3",
+    "@neo-one/react-core": "2.7.3",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "bignumber.js": "9.1.2",
+    "emotion-theming": "11.0.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "rxjs": "7.8.1",
+    "styled-tools": "1.7.2"
   }
 }

@@ -19,15 +19,15 @@
     "bn.js": "^5.0.0",
     "immutable": "^4.0.0-rc.12",
     "lodash": "^4.17.15",
-    "rxjs": "^6.5.3",
+    "rxjs": "^7.0.0",
     "through": "^2.3.8"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
-    "@types/jest": "^24.0.18",
+    "@types/jest": "^29.0.0",
     "@types/lodash": "^4.14.138",
-    "@types/through": "^0.0.30",
-    "gulp": "~4.0.2",
-    "tslib": "^1.10.0"
+    "@types/through": "^0.0.33",
+    "gulp": "~5.0.0",
+    "tslib": "^2.0.0"
   }
 }

@@ -15,11 +15,11 @@
   "dependencies": {
     "@neo-one/client-common": "^3.11.2",
     "@neo-one/utils": "^3.2.1",
-    "tslib": "^1.10.0"
+    "tslib": "^2.0.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
-    "@types/jest": "^24.0.18",
-    "gulp": "~4.0.2"
+    "@types/jest": "^29.0.0",
+    "gulp": "~5.0.0"
   }
 }

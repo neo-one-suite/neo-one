@@ -25,27 +25,27 @@
     "@neo-one/node-storage-levelup": "^3.11.2",
     "@neo-one/node-vm": "^3.11.2",
     "@neo-one/utils": "^3.2.1",
-    "@types/abstract-leveldown": "^5.0.1",
-    "abstract-leveldown": "^6.0.3",
-    "fs-extra": "^8.1.0",
-    "leveldown": "^5.1.1",
-    "levelup": "4.1.0",
-    "rocksdb": "^4.1.0",
-    "rxjs": "^6.5.3",
-    "tslib": "^1.10.0"
+    "@types/abstract-leveldown": "^7.0.0",
+    "abstract-leveldown": "^7.0.0",
+    "fs-extra": "^11.0.0",
+    "leveldown": "^6.0.0",
+    "levelup": "5.1.1",
+    "rocksdb": "^5.0.0",
+    "rxjs": "^7.0.0",
+    "tslib": "^2.0.0"
   },
   "devDependencies": {
     "@neo-one/client-common": "^3.11.2",
     "@neo-one/build-tools": "^1.0.0",
     "@neo-one/node-neo-settings": "^3.11.2",
-    "@types/fs-extra": "^8.0.0",
-    "@types/jest": "^24.0.18",
+    "@types/fs-extra": "^11.0.0",
+    "@types/jest": "^29.0.0",
     "@types/leveldown": "^4.0.0",
-    "@types/levelup": "^3.1.1",
+    "@types/levelup": "^5.0.0",
     "@types/memdown": "^3.0.0",
-    "@types/rocksdb": "3.0.0",
+    "@types/rocksdb": "3.0.5",
     "bn.js": "^5.0.0",
-    "gulp": "~4.0.2",
-    "memdown": "^5.0.0"
+    "gulp": "~5.0.0",
+    "memdown": "^6.0.0"
   }
 }
