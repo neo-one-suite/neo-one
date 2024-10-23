@@ -17,21 +17,21 @@
     "@neo-one/utils": "^3.2.1",
     "lodash": "^4.17.15",
     "toposort": "^2.0.2",
-    "tslib": "^1.10.0",
-    "typescript": "3.9.5"
+    "tslib": "^2.0.0",
+    "typescript": "5.6.3"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
     "@neo-one/smart-contract-compiler-node": "^3.11.2",
     "@types/app-root-dir": "^0.1.0",
-    "@types/fs-extra": "^8.0.0",
-    "@types/jest": "^24.0.18",
+    "@types/fs-extra": "^11.0.0",
+    "@types/jest": "^29.0.0",
     "@types/lodash": "^4.14.138",
     "@types/toposort": "^2.0.1",
-    "@types/yargs": "^13.0.3",
+    "@types/yargs": "^17.0.0",
     "app-root-dir": "^1.0.2",
-    "fs-extra": "^8.1.0",
-    "gulp": "~4.0.2",
-    "yargs": "^14.2.0"
+    "fs-extra": "^11.0.0",
+    "gulp": "~5.0.0",
+    "yargs": "^17.0.0"
   }
 }

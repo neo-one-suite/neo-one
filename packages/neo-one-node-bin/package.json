@@ -19,25 +19,25 @@
     "@neo-one/node-neo-settings": "^3.11.2",
     "@neo-one/utils": "^3.2.1",
     "@neo-one/utils-node": "^2.7.0",
-    "@types/yargs": "^13.0.3",
-    "env-paths": "^2.2.0",
-    "execa": "^3.2.0",
+    "@types/yargs": "^17.0.0",
+    "env-paths": "^3.0.0",
+    "execa": "^9.0.0",
     "import-local": "^3.0.2",
     "rc": "^1.2.8",
-    "semver": "^6.3.0",
+    "semver": "^7.0.0",
     "source-map-support": "^0.5.13",
-    "tslib": "^1.10.0",
-    "yargs": "^14.2.0"
+    "tslib": "^2.0.0",
+    "yargs": "^17.0.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
     "@neo-one/client": "^3.11.2",
     "@neo-one/client-common": "^3.11.2",
-    "@types/fs-extra": "^8.0.0",
-    "@types/jest": "^24.0.18",
+    "@types/fs-extra": "^11.0.0",
+    "@types/jest": "^29.0.0",
     "@types/rc": "^1.1.0",
-    "cross-fetch": "^3.0.4",
-    "fs-extra": "^8.1.0",
-    "gulp": "~4.0.2"
+    "cross-fetch": "^4.0.0",
+    "fs-extra": "^11.0.0",
+    "gulp": "~5.0.0"
   }
 }
