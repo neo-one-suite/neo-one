@@ -82,7 +82,7 @@
     "url-loader": "^3.0.0",
     "webpack": "^4.40.2",
     "webpack-bundle-analyzer": "^3.4.1",
-    "webpack-dev-server": "^3.8.0",
+    "webpack-dev-server": "^5.2.1",
     "webpack-node-externals": "^1.7.2",
     "webpackbar": "^4.0.0",
     "workbox-webpack-plugin": "^4.3.1",
