@@ -37,7 +37,7 @@
     "immer": "^5.0.0",
     "localforage": "^1.7.3",
     "lodash": "^4.17.15",
-    "markdown-it": "^10.0.0",
+    "markdown-it": "^12.3.2",
     "markdown-it-anchor": "^5.2.4",
     "markdown-it-container": "^2.0.0",
     "modernizr": "^3.7.1",
