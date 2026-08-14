@@ -12,8 +12,8 @@
   "sideEffects": false,
   "dependencies": {
     "core-js": "^3.2.1",
-    "rxjs": "^6.5.3",
-    "tslib": "^1.10.0"
+    "rxjs": "^7.0.0",
+    "tslib": "^2.0.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0"
