@@ -8,21 +8,21 @@
   },
   "sideEffects": false,
   "devDependencies": {
-    "@babel/preset-env": "^7.6.3",
+    "@babel/preset-env": "^8.0.0",
     "@neo-one/build-tools": "^1.0.0",
     "@neo-one/logger": "^2.7.0",
     "app-root-dir": "^1.0.2",
-    "babel-jest": "^24.9.0",
+    "babel-jest": "^30.0.0",
     "bn.js": "^5.0.0",
     "codecov": "^3.6.1",
-    "execa": "^3.2.0",
-    "fs-extra": "^8.1.0",
-    "jest": "^24.9.0",
-    "jest-circus": "^24.9.0",
-    "jest-junit": "^10.0.0",
+    "execa": "^10.0.0",
+    "fs-extra": "^11.0.0",
+    "jest": "^30.0.0",
+    "jest-circus": "^30.0.0",
+    "jest-junit": "^17.0.0",
     "lodash": "^4.17.15",
-    "nyc": "^14.1.1",
-    "tmp": "^0.1.0",
-    "ts-jest": "^24.1.0"
+    "nyc": "^18.0.0",
+    "tmp": "^0.2.0",
+    "ts-jest": "^29.0.0"
   }
 }

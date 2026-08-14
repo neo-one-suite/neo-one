@@ -14,8 +14,8 @@
     "@neo-one/node-browser": "^2.3.0",
     "@neo-one/worker": "^2.3.0",
     "core-js": "^3.2.1",
-    "file-loader": "^5.0.2",
-    "regenerator-runtime": "^0.13.3"
+    "file-loader": "^6.0.0",
+    "regenerator-runtime": "^0.14.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0"
