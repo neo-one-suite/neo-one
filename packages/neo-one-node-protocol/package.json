@@ -27,7 +27,7 @@
     "bn.js": "^5.0.0",
     "immutable": "^4.0.0-rc.12",
     "cross-fetch": "^3.0.4",
-    "ip-address": "^6.0.0",
+    "ip-address": "^10.7.1",
     "lodash": "^4.17.15",
     "lru-cache": "^5.0.0",
     "lz4": "0.6.3",
