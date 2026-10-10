@@ -60,7 +60,7 @@
     "lint-staged": "^9.4.1",
     "lodash": "^4.17.15",
     "minimatch": "^3.0.4",
-    "rollup": "^1.21.4",
+    "rollup": "^2.80.0",
     "rollup-plugin-string": "^3.0.0",
     "rollup-plugin-typescript2": "^0.25.0",
     "rxjs-tslint-rules": "^4.24.3",
