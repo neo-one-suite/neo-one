@@ -56,7 +56,7 @@
     "lodash": "^4.17.15",
     "monaco-editor": "^0.17.1",
     "monaco-textmate": "^3.0.0",
-    "nanoid": "^2.0.3",
+    "nanoid": "^3.3.18",
     "onigasm": "^2.2.2",
     "prop-types": "^15.6.2",
     "raw-loader": "^4.0.0",

@@ -15,7 +15,7 @@
     "@neo-one/worker": "^2.3.0",
     "core-js": "^3.2.1",
     "file-loader": "^5.0.2",
-    "nanoid": "^2.0.3",
+    "nanoid": "^3.3.18",
     "pouchdb": "7.1.1",
     "regenerator-runtime": "^0.13.3",
     "rxjs": "^6.5.3"
