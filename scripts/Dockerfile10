@@ -3,7 +3,7 @@
 ###
 
 # node:10.16.3-buster-slim 2019-08-27
-FROM node@sha256:043bc1cd3f8ed6abeefa14e2a60a97433f589876e776c194d0b19121b20a2473
+FROM node@sha256:6d2c7d5d074bf72f81ddc252b4fbb5d625bc028eeda49cb4b8c2ff8eda1ee617
 
 # make Apt non-interactive
 RUN echo 'APT::Get::Assume-Yes "true";' > /etc/apt/apt.conf.d/90circleci \
