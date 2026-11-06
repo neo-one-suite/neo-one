@@ -17,11 +17,11 @@
     "@neo-one/node-core": "^3.11.2",
     "@neo-one/utils": "^3.2.1",
     "bn.js": "^5.0.0",
-    "tslib": "^1.10.0"
+    "tslib": "^2.0.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
-    "@types/bn.js": "^4.11.5",
-    "gulp": "~4.0.2"
+    "@types/bn.js": "^5.0.0",
+    "gulp": "~5.0.0"
   }
 }
