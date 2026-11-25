@@ -1,4 +1,4 @@
-FROM library/docker@sha256:18ff92d3d31725b53fa6633d60bed323effb6d5d4588be7b547078d384e0d4bf
+FROM library/docker@sha256:d367ae4192b30dd0559d1d21cfe7a9465c5b03344960eb51cdfcb5479e765d79
 
 COPY entrypoint.sh /entrypoint.sh
 
